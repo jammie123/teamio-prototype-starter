@@ -16,7 +16,17 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   'chevron-right': 'Chevron vpravo',
   'chevron-up': 'Chevron nahoru',
   'chevron-down': 'Chevron dolů',
+  'chevrons-left': 'Dvojitý chevron vlevo',
+  'chevrons-right': 'Dvojitý chevron vpravo',
   trash: 'Smazat',
+  menu: 'Menu',
+  home: 'Přehled',
+  'file-text': 'Nábory',
+  user: 'Uchazeči',
+  briefcase: 'Preboarding',
+  database: 'Databáze',
+  calendar: 'Kalendář',
+  'bar-chart': 'Statistiky',
 }
 
 const KNOWN_ICONS = Object.keys(ICON_LABELS) as KnownIconName[]

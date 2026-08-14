@@ -53,4 +53,10 @@ describe('components barrel', () => {
     expect(components.ModalFooter).toBeTypeOf('object')
     expect(components.ModalClose).toBeTypeOf('object')
   })
+
+  it('exports complex components', () => {
+    expect(components.TeamioLogo).toBeTypeOf('object')
+    expect(components.LeftMenu).toBeTypeOf('object')
+    expect(components.leftMenuItemClass).toBeTypeOf('function')
+  })
 })

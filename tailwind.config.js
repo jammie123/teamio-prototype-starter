@@ -311,6 +311,10 @@ export default {
             'max-xs': { max: '749.98px' },
         },
         extend: {
+            spacing: {
+                'left-menu': '15rem',
+                'left-menu-collapsed': '4.5rem',
+            },
             minWidth: ({ theme }) => ({
                 ...theme('spacing'),
             }),

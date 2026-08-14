@@ -26,6 +26,7 @@ const preview: Preview = {
             'Icons',
           ],
           'Components',
+          'Complex components',
           'App',
         ],
       },

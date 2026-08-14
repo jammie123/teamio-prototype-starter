@@ -1,0 +1,27 @@
+.tm-scrollbar-x,
+.tm-scrollbar-y {
+    scrollbar-width: thin;
+    scrollbar-color: #c2c8ce transparent;
+}
+.tm-scrollbar-x::-webkit-scrollbar {
+    @apply tm-h-2;
+}
+.tm-scrollbar-x {
+    @apply tm-overflow-x-auto;
+}
+.tm-scrollbar-y::-webkit-scrollbar {
+    @apply tm-w-2;
+}
+.tm-scrollbar-y {
+    @apply tm-overflow-y-auto;
+}
+.tm-scrollbar-x::-webkit-scrollbar-track,
+.tm-scrollbar-y::-webkit-scrollbar-track {
+    @apply tm-bg-transparent tm-rounded;
+}
+.tm-scrollbar-x::-webkit-scrollbar-thumb,
+.tm-scrollbar-y::-webkit-scrollbar-thumb {
+    @apply tm-rounded tm-border-2 tm-border-solid tm-border-transparent;
+    background-color: #c2c8ce;
+    background-clip: content-box;
+}

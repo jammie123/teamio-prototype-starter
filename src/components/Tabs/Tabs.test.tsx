@@ -1,0 +1,78 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it } from 'vitest'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs'
+
+describe('Tabs', () => {
+  it('renders tab list and switches panels on click', async () => {
+    const user = userEvent.setup()
+    render(
+      <Tabs defaultValue="one">
+        <TabsList aria-label="Ukázkové záložky">
+          <TabsTrigger value="one">První</TabsTrigger>
+          <TabsTrigger value="two">Druhá</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Obsah jedna</TabsContent>
+        <TabsContent value="two">Obsah dvě</TabsContent>
+      </Tabs>,
+    )
+
+    expect(screen.getByRole('tablist', { name: 'Ukázkové záložky' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'První' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('Obsah jedna')).toBeVisible()
+
+    await user.click(screen.getByRole('tab', { name: 'Druhá' }))
+    expect(screen.getByRole('tab', { name: 'Druhá' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('Obsah dvě')).toBeVisible()
+  })
+
+  it('supports keyboard navigation between triggers', async () => {
+    const user = userEvent.setup()
+    render(
+      <Tabs defaultValue="one">
+        <TabsList>
+          <TabsTrigger value="one">Alpha</TabsTrigger>
+          <TabsTrigger value="two">Beta</TabsTrigger>
+          <TabsTrigger value="three">Gamma</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">A</TabsContent>
+        <TabsContent value="two">B</TabsContent>
+        <TabsContent value="three">C</TabsContent>
+      </Tabs>,
+    )
+
+    const alpha = screen.getByRole('tab', { name: 'Alpha' })
+    alpha.focus()
+    expect(alpha).toHaveFocus()
+
+    await user.keyboard('{ArrowRight}')
+    expect(screen.getByRole('tab', { name: 'Beta' })).toHaveFocus()
+    expect(screen.getByRole('tab', { name: 'Beta' })).toHaveAttribute('aria-selected', 'true')
+
+    await user.keyboard('{ArrowRight}')
+    expect(screen.getByRole('tab', { name: 'Gamma' })).toHaveFocus()
+  })
+
+  it('applies selected visual classes on the active trigger', () => {
+    render(
+      <Tabs defaultValue="selected">
+        <TabsList>
+          <TabsTrigger value="selected">Vybraná</TabsTrigger>
+          <TabsTrigger value="other">Jiná</TabsTrigger>
+        </TabsList>
+        <TabsContent value="selected">S</TabsContent>
+        <TabsContent value="other">O</TabsContent>
+      </Tabs>,
+    )
+
+    const selected = screen.getByRole('tab', { name: 'Vybraná' })
+    expect(selected).toHaveAttribute('data-state', 'active')
+    expect(selected).toHaveClass(
+      'tm-font-semibold',
+      'data-[state=active]:tm-text-primary-default',
+      'data-[state=active]:after:tm-bg-teamio-pink',
+    )
+    expect(screen.getByRole('tab', { name: 'Jiná' })).toHaveClass('tm-text-secondary-default')
+    expect(screen.getByRole('tab', { name: 'Jiná' })).toHaveAttribute('data-state', 'inactive')
+  })
+})

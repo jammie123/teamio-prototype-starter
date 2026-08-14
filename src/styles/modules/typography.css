@@ -1,0 +1,88 @@
+@layer base {
+    h1,
+    .h1,
+    h2,
+    .h2,
+    h3,
+    .h3,
+    h4,
+    .h4,
+    h5,
+    .h5,
+    h6,
+    .h6 {
+        @apply
+        tm-font-inherit
+        tm-leading-tight
+        tm-font-semibold
+    }
+
+    h1,
+    .h1 {
+        @apply
+        tm-mb-5
+        tm-text-2xl
+    }
+
+    h2,
+    .h2 {
+        @apply
+        tm-mb-4
+        tm-text-xl
+    }
+
+    h3,
+    .h3 {
+        @apply
+        tm-mb-3
+        tm-text-lg
+    }
+
+    h4,
+    .h4 {
+        @apply
+        tm-mb-2
+        tm-text-base
+    }
+
+    h5,
+    .h5 {
+        @apply
+        tm-mb-2
+        tm-text-sm
+    }
+
+    h6,
+    .h6 {
+        @apply
+        tm-mb-2
+        tm-text-sm
+    }
+
+    p {
+        @apply
+        tm-mb-3
+    }
+
+    ul,
+    ol {
+        @apply
+        tm-m-0
+        tm-mb-4
+        tm-p-0
+        tm-pl-6
+    }
+
+    ul {
+        list-style: disc;
+    }
+
+    ol {
+        list-style: decimal;
+    }
+
+    hr {
+        @apply
+        tm-my-6
+    }
+}

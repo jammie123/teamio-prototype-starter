@@ -1,0 +1,37 @@
+@layer base {
+    html {
+        font-size: 16px; /* base size for REM units */
+    }
+
+    body {
+        @apply
+        tm-font-poppins
+        tm-text-base
+        tm-leading-normal
+        tm-tracking-normal
+        tm-text-primary-default
+        tm-bg-cover-light;
+
+        &:has(dialog[open]) {
+            @apply
+            tm-overflow-hidden;
+        }
+    }
+
+    a {
+        @apply
+        tm-text-action-link-default;
+
+        &:hover,
+        &:focus {
+            @apply
+            tm-text-action-link-hover
+            tm-underline
+        }
+
+        &:active {
+            @apply
+            tm-text-action-link-active
+        }
+    }
+}

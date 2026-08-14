@@ -1,0 +1,5 @@
+.tm-group:hover .group-hover\:tm-no-truncate {
+    overflow: auto;
+    text-overflow: unset;
+    white-space: normal;
+}

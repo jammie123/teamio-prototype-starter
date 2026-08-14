@@ -1,0 +1,9 @@
+@layer base {
+    input,
+    select,
+    textarea,
+    button {
+        line-height: inherit;
+        letter-spacing: inherit;
+    }
+}

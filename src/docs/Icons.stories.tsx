@@ -3,6 +3,7 @@ import { Icon, type KnownIconName } from '../components/Icon'
 
 const ICON_LABELS: Record<KnownIconName, string> = {
   plus: 'Přidat',
+  'plus-circle': 'Přidat (kruh)',
   check: 'Hotovo',
   x: 'Zavřít',
   search: 'Hledat',
@@ -27,6 +28,8 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   database: 'Databáze',
   calendar: 'Kalendář',
   'bar-chart': 'Statistiky',
+  mail: 'Zprávy',
+  notification: 'Notifikace',
 }
 
 const KNOWN_ICONS = Object.keys(ICON_LABELS) as KnownIconName[]

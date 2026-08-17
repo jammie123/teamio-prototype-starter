@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   BarChart3,
+  Bell,
   Briefcase,
   Calendar,
   Check,
@@ -13,12 +14,14 @@ import {
   ChevronsLeft,
   ChevronsRight,
   CircleHelp,
+  CirclePlus,
   Database,
   Download,
   Eye,
   FileText,
   Home,
   Info,
+  Mail,
   Menu,
   Plus,
   Search,
@@ -33,6 +36,7 @@ import type { StyleProps } from '../../lib/types'
 
 const iconMap = {
   plus: Plus,
+  'plus-circle': CirclePlus,
   check: Check,
   x: X,
   search: Search,
@@ -57,6 +61,8 @@ const iconMap = {
   database: Database,
   calendar: Calendar,
   'bar-chart': BarChart3,
+  mail: Mail,
+  notification: Bell,
 } as const satisfies Record<string, LucideIcon>
 
 export type KnownIconName = keyof typeof iconMap

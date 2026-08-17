@@ -80,6 +80,13 @@ export {
   type HeaderTopMenuItem,
 } from './HeaderTop'
 export {
+  PageTemplate,
+  pageTemplateClass,
+  pageTemplateColumnClass,
+  pageTemplateMainClass,
+  type PageTemplateProps,
+} from './PageTemplate'
+export {
   Dropdown,
   DropdownToggle,
   DropdownBody,

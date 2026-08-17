@@ -43,6 +43,7 @@ Use Storybook for exploring tokens and components:
 - **Foundation** — colors, typography, spacing, shadows/radii, breakpoints, icons
 - **Components** — every public component with Controls, Autodocs, and a11y checks
 - **Complex components** — composed layout pieces built from the primitives (e.g. `LeftMenu`)
+- **Page** — full page shells (e.g. `Page Template` with LeftMenu + HeaderTop + content)
 - Sample copy is often Czech; a11y failures are treated as errors (`a11y.test: 'error'`)
 
 `src/App.tsx` is only a smoke gallery so you can confirm the Vite pipeline quickly. Prefer Storybook when designing or reviewing UI. Do not grow `App.tsx` into product pages.
@@ -197,6 +198,7 @@ Pro prohlížení tokenů a komponent používejte Storybook:
 - **Foundation** — barvy, typografie, spacing, stíny/radiusy, breakpointy, ikony
 - **Components** — všechny veřejné komponenty s Controls, Autodocs a a11y kontrolami
 - **Complex components** — složené celky postavené z primitiv (např. `LeftMenu`)
+- **Page** — celostránkové shelly (např. `Page Template` s LeftMenu + HeaderTop + obsahem)
 - Ukázkové texty jsou často české; porušení a11y se berou jako chyby
 
 `src/App.tsx` je jen smoke galerie pro rychlou kontrolu Vite. Při návrhu UI preferujte Storybook. Nerozšiřujte `App.tsx` na produktové stránky.

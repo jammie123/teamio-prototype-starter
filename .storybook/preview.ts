@@ -27,6 +27,7 @@ const preview: Preview = {
           ],
           'Components',
           'Complex components',
+          'Jobs',
           'Page',
           'App',
         ],

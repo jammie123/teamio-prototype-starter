@@ -1,0 +1,12 @@
+---
+description: teamio-prototype-starter is a shared catalog — keep product prototypes elsewhere
+alwaysApply: true
+---
+
+# Teamio prototype starter (catalog) rules
+
+- This repo is the shared Teamio component + Storybook catalog and design tokens (`tm-`).
+- Do not grow `src/App.tsx` into product pages — keep it as a smoke gallery only.
+- New UI belongs in `src/components/` with stories, tests, and a barrel export from `src/components/index.ts`.
+- Product prototypes live as sibling folders under `TeamioPrototypes/` (e.g. `job-listing`) and link this repo’s `src` via Vite alias — they must not copy components here.
+- Prefer Storybook for reviewing components and foundation tokens.

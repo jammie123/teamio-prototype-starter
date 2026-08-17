@@ -105,6 +105,16 @@ export {
   type OptionColor,
 } from './OptionList'
 export {
+  JobCard,
+  type JobCardProps,
+  type JobStatus,
+  type JobPublication,
+  type JobPublicationStatus,
+  type JobAdvertisement,
+  type JobCardCandidates,
+  type JobCardAction,
+} from './JobCard'
+export {
   Modal,
   ModalTrigger,
   ModalPortal,

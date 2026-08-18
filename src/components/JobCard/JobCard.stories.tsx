@@ -35,6 +35,7 @@ const meta = {
     totalViewCount: 1284,
     status: 'open',
     candidates: { unreviewed: 14, inProgress: 6, total: 52 },
+    onCandidatesClick: fn(),
     advertisements: [activeAdvertisement],
     onEdit: fn(),
     actions,
@@ -134,6 +135,12 @@ export const AllPublicationsExpired: Story = {
         ],
       },
     ],
+  },
+}
+
+export const StaticStats: Story = {
+  args: {
+    onCandidatesClick: undefined,
   },
 }
 

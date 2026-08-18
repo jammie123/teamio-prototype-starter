@@ -38,11 +38,17 @@ describe('JobCard', () => {
 
   it('renders the open status by default and the closed status on demand', () => {
     const { unmount } = renderJobCard()
-    expect(screen.getByTestId('job-card-status')).toHaveTextContent('Otevřený')
+    const openStatus = screen.getByTestId('job-card-status')
+    expect(openStatus).toHaveTextContent('Otevřený')
+    expect(openStatus).toHaveClass('!tm-font-medium')
+    expect(screen.getByTestId('job-card-status-indicator')).toHaveClass(
+      'tm-bg-emotion-success-emphasis',
+    )
 
     unmount()
     renderJobCard({ status: 'closed' })
     expect(screen.getByTestId('job-card-status')).toHaveTextContent('Uzavřený')
+    expect(screen.queryByTestId('job-card-status-indicator')).not.toBeInTheDocument()
   })
 
   it('renders candidate counts with labels', () => {
@@ -51,7 +57,24 @@ describe('JobCard', () => {
     const stats = screen.getByTestId('job-card-stats')
     expect(stats).toHaveTextContent('14Neposouzení')
     expect(stats).toHaveTextContent('6Ve hře')
-    expect(stats).toHaveTextContent('52Uchazečů')
+    expect(stats).toHaveTextContent('52Celkem')
+  })
+
+  it('makes the candidate stats clickable only when a handler is passed', async () => {
+    const user = userEvent.setup()
+    const onCandidatesClick = vi.fn()
+    const { unmount } = renderJobCard()
+
+    expect(screen.queryByTestId('job-card-stat-unreviewed')).not.toBeInTheDocument()
+
+    unmount()
+    renderJobCard({ onCandidatesClick })
+
+    await user.click(screen.getByTestId('job-card-stat-unreviewed'))
+    expect(onCandidatesClick).toHaveBeenCalledWith('unreviewed')
+
+    await user.click(screen.getByTestId('job-card-stat-total'))
+    expect(onCandidatesClick).toHaveBeenLastCalledWith('total')
   })
 
   it('omits the stats block when no candidates are passed', () => {
@@ -117,6 +140,17 @@ describe('JobCard', () => {
     const publication = screen.getByTestId('job-card-publication')
     expect(publication).toHaveTextContent('Ukončeno')
     expect(publication).toHaveTextContent('12. 7. – 12. 8.')
+    expect(screen.getByTestId('job-card-publication-status')).toHaveClass(
+      'tm-text-emotion-danger-emphasis',
+    )
+  })
+
+  it('colors an active publication status with the success emphasis token', () => {
+    renderJobCard()
+
+    const [status] = screen.getAllByTestId('job-card-publication-status')
+    expect(status).toHaveTextContent('Aktivní')
+    expect(status).toHaveClass('tm-text-emotion-success-emphasis')
   })
 
   it('renders an empty state when the job has no advertisement', async () => {
@@ -141,7 +175,9 @@ describe('JobCard', () => {
       actions: [{ id: 'delete', label: 'Smazat nábor', color: 'danger', onClick: onDelete }],
     })
 
-    await user.click(screen.getByRole('button', { name: 'Editovat' }))
+    const editButton = screen.getByRole('button', { name: 'Editovat' })
+    expect(editButton).toHaveClass('!tm-font-medium')
+    await user.click(editButton)
     expect(onEdit).toHaveBeenCalledTimes(1)
 
     await user.click(screen.getByTestId('job-card-actions-toggle'))

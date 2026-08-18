@@ -13,6 +13,7 @@ import { JobCardAdvertisement } from './JobCardAdvertisement'
 import { JobCardStats } from './JobCardStats'
 import type {
   JobAdvertisement,
+  JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
   JobStatus,
@@ -26,6 +27,7 @@ export interface JobCardProps
   totalViewCount?: number
   status?: JobStatus
   candidates?: JobCardCandidates
+  onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
   publicationLimit?: number | 'all'
   defaultOpenAdvertisementIds?: string[]
@@ -47,6 +49,7 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     totalViewCount,
     status = 'open',
     candidates,
+    onCandidatesClick,
     advertisements = [],
     publicationLimit = 2,
     defaultOpenAdvertisementIds,
@@ -91,6 +94,13 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
             isSubtle
             className="tm-min-h-8 tm-px-3 !tm-font-medium"
           >
+            {status === 'open' ? (
+              <span
+                aria-hidden="true"
+                data-testid="job-card-status-indicator"
+                className="tm-size-2 tm-flex-none tm-rounded-full tm-bg-emotion-success-emphasis"
+              />
+            ) : null}
             {statusConfig.label}
           </Tag>
           {onEdit ? (
@@ -114,7 +124,9 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
         </div>
       </div>
 
-      {candidates ? <JobCardStats candidates={candidates} /> : null}
+      {candidates ? (
+        <JobCardStats candidates={candidates} onStatClick={onCandidatesClick} />
+      ) : null}
 
       <div className="tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3">
         {advertisements.length === 0 ? (

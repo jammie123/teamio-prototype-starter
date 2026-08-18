@@ -112,6 +112,7 @@ export {
   type JobPublicationStatus,
   type JobAdvertisement,
   type JobCardCandidates,
+  type JobCandidateStat,
   type JobCardAction,
 } from './JobCard'
 export {

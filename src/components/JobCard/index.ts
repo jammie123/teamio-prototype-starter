@@ -1,6 +1,7 @@
 export { JobCard, type JobCardProps } from './JobCard'
 export type {
   JobAdvertisement,
+  JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
   JobPublication,

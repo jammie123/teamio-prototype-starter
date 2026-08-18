@@ -32,3 +32,5 @@ export interface JobCardCandidates {
   inProgress?: number
   total?: number
 }
+
+export type JobCandidateStat = keyof JobCardCandidates

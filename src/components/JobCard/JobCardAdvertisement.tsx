@@ -46,7 +46,16 @@ function PublicationRow({ publication }: { publication: JobPublication }) {
       )}
     >
       <span className="tm-min-w-[8rem] tm-flex-1">{publication.channel}</span>
-      <span className="tm-min-w-[6rem]">
+      <span
+        data-testid="job-card-publication-status"
+        className={cn(
+          'tm-min-w-[6rem]',
+          'tm-font-medium',
+          isExpired(publication)
+            ? 'tm-text-emotion-danger-emphasis'
+            : 'tm-text-emotion-success-emphasis',
+        )}
+      >
         {isExpired(publication) ? 'Ukončeno' : 'Aktivní'}
       </span>
       <span className="tm-min-w-[8rem] tm-flex-1">

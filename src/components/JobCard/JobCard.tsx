@@ -6,11 +6,12 @@ import { Card } from '../Card'
 import { Icon } from '../Icon'
 import { Link } from '../Link'
 import { Tag, type TagColor } from '../Tag'
+import { TooltipProvider } from '../Tooltip'
 import { Typography } from '../Typography'
-import { formatCount } from './formatCount'
 import { JobCardActions } from './JobCardActions'
 import { JobCardAdvertisement } from './JobCardAdvertisement'
 import { JobCardStats } from './JobCardStats'
+import { ViewCountRenderer } from './ViewCountRenderer'
 import type {
   JobAdvertisement,
   JobCandidateStat,
@@ -29,7 +30,6 @@ export interface JobCardProps
   candidates?: JobCardCandidates
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
-  publicationLimit?: number | 'all'
   defaultOpenAdvertisementIds?: string[]
   onEdit?: () => void
   editLabel?: string
@@ -51,7 +51,6 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     candidates,
     onCandidatesClick,
     advertisements = [],
-    publicationLimit = 2,
     defaultOpenAdvertisementIds,
     onEdit,
     editLabel = 'Editovat',
@@ -72,92 +71,91 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
       className={cn('tm-flex', 'tm-flex-col', 'tm-gap-4', className)}
       {...rest}
     >
-      <div className="tm-flex tm-flex-wrap tm-items-start tm-justify-between tm-gap-3">
-        <div className="tm-min-w-[12rem] tm-flex-1">
-          <Typography variant="h3" className="tm-mb-1 tm-text-teamio-blue">
-            {title}
-          </Typography>
-          <div className="tm-flex tm-flex-wrap tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
-            {owner ? <span>{owner}</span> : null}
-            {totalViewCount === undefined ? null : (
-              <span data-testid="job-card-total-views">
-                Zhlédnuto celkem: {formatCount(totalViewCount)}
-              </span>
-            )}
+      <TooltipProvider delayDuration={0} skipDelayDuration={0} disableHoverableContent>
+        <div className="tm-flex tm-flex-wrap tm-items-start tm-justify-between tm-gap-3">
+          <div className="tm-min-w-[12rem] tm-flex-1">
+            <Typography variant="h3" className="tm-mb-1 tm-text-teamio-blue">
+              {title}
+            </Typography>
+            <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
+              {owner ? <span>{owner}</span> : null}
+              {totalViewCount === undefined ? null : (
+                <ViewCountRenderer count={totalViewCount} testId="job-card-total-views" />
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="tm-flex tm-flex-none tm-items-center tm-gap-2">
-          <Tag
-            data-testid="job-card-status"
-            color={statusConfig.color}
-            isSubtle
-            className="tm-min-h-8 tm-px-3 !tm-font-medium"
-          >
-            {status === 'open' ? (
-              <span
-                aria-hidden="true"
-                data-testid="job-card-status-indicator"
-                className="tm-size-2 tm-flex-none tm-rounded-full tm-bg-emotion-success-emphasis"
-              />
-            ) : null}
-            {statusConfig.label}
-          </Tag>
-          {onEdit ? (
-            <Button
-              variant="secondary"
-              size="medium"
-              onClick={onEdit}
-              className="!tm-font-medium"
+          <div className="tm-flex tm-flex-none tm-items-center tm-gap-2">
+            <Tag
+              data-testid="job-card-status"
+              color={statusConfig.color}
+              isSubtle
+              className="tm-min-h-8 tm-px-3 !tm-font-medium"
             >
-              <Icon name="edit" />
-              {editLabel}
-            </Button>
-          ) : null}
-          {actions?.length ? (
-            <JobCardActions
-              actions={actions}
-              label="Další akce náboru"
-              testId="job-card-actions-toggle"
-            />
-          ) : null}
-        </div>
-      </div>
-
-      {candidates ? (
-        <JobCardStats candidates={candidates} onStatClick={onCandidatesClick} />
-      ) : null}
-
-      <div className="tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3">
-        {advertisements.length === 0 ? (
-          <div
-            data-testid="job-card-no-advertisement"
-            className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
-          >
-            <span>Nábor nemá žádný inzerát.</span>
-            {onCreateAdvertisement ? (
-              <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
-                Vytvořit inzerát
-              </Link>
+              {status === 'open' ? (
+                <span
+                  aria-hidden="true"
+                  data-testid="job-card-status-indicator"
+                  className="tm-size-2 tm-flex-none tm-rounded-full tm-bg-emotion-success-emphasis"
+                />
+              ) : null}
+              {statusConfig.label}
+            </Tag>
+            {onEdit ? (
+              <Button
+                variant="secondary"
+                size="medium"
+                onClick={onEdit}
+                className="!tm-font-medium"
+              >
+                <Icon name="edit" />
+                {editLabel}
+              </Button>
+            ) : null}
+            {actions?.length ? (
+              <JobCardActions
+                actions={actions}
+                label="Další akce náboru"
+                testId="job-card-actions-toggle"
+              />
             ) : null}
           </div>
-        ) : (
-          <div className="tm-flex tm-flex-col tm-gap-3">
-            {advertisements.map((advertisement) => (
-              <JobCardAdvertisement
-                key={advertisement.id}
-                advertisement={advertisement}
-                publicationLimit={publicationLimit}
-                defaultOpen={
-                  defaultOpenAdvertisementIds
-                    ? defaultOpenAdvertisementIds.includes(advertisement.id)
-                    : true
-                }
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+
+        {candidates ? (
+          <JobCardStats candidates={candidates} onStatClick={onCandidatesClick} />
+        ) : null}
+
+        <div className="tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3">
+          {advertisements.length === 0 ? (
+            <div
+              data-testid="job-card-no-advertisement"
+              className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
+            >
+              <span>Nábor nemá žádný inzerát.</span>
+              {onCreateAdvertisement ? (
+                <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
+                  Vytvořit inzerát
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <div className="tm-flex tm-flex-col tm-gap-3">
+              {advertisements.map((advertisement) => (
+                <JobCardAdvertisement
+                  key={advertisement.id}
+                  advertisement={advertisement}
+                  defaultOpen={
+                    defaultOpenAdvertisementIds
+                      ? defaultOpenAdvertisementIds.includes(advertisement.id)
+                      : true
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </TooltipProvider>
     </Card>
   )
 })

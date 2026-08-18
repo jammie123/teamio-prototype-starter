@@ -1,15 +1,14 @@
-import { useId, useState } from 'react'
+import { Fragment, useId, useState } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Icon } from '../Icon'
-import { Link } from '../Link'
-import { formatCount } from './formatCount'
+import { getAdvertisementSummary, portalCountLabel } from './advertisementSummary'
 import { JobCardActions } from './JobCardActions'
 import type { JobAdvertisement, JobPublication } from './types'
+import { ViewCountRenderer } from './ViewCountRenderer'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
-  publicationLimit: number | 'all'
   defaultOpen?: boolean
 }
 
@@ -17,39 +16,29 @@ function isExpired(publication: JobPublication) {
   return publication.status === 'expired'
 }
 
-function showMoreLabel(count: number) {
-  if (count === 1) {
-    return `Zobrazit další ${count} portál`
-  }
+const PUBLICATION_GRID_CLASS = cn(
+  'tm-grid',
+  'tm-w-full',
+  'tm-grid-cols-[minmax(8rem,1fr)_7rem_10.5rem_5.5rem]',
+  'tm-items-center',
+  'tm-gap-x-6',
+)
 
-  if (count < 5) {
-    return `Zobrazit další ${count} portály`
-  }
-
-  return `Zobrazit dalších ${count} portálů`
-}
+const PUBLICATION_ROW_CLASS = cn(
+  PUBLICATION_GRID_CLASS,
+  'tm-py-1.5',
+  'tm-text-sm',
+  'tm-font-normal',
+  'tm-text-primary-default',
+)
 
 function PublicationRow({ publication }: { publication: JobPublication }) {
   return (
-    <li
-      data-testid="job-card-publication"
-      className={cn(
-        'tm-flex',
-        'tm-flex-wrap',
-        'tm-items-center',
-        'tm-gap-x-4',
-        'tm-gap-y-1',
-        'tm-py-1.5',
-        'tm-text-sm',
-        'tm-font-normal',
-        'tm-text-primary-default',
-      )}
-    >
-      <span className="tm-min-w-[8rem] tm-flex-1">{publication.channel}</span>
+    <li data-testid="job-card-publication" className={PUBLICATION_ROW_CLASS}>
+      <span className="tm-min-w-0 tm-truncate">{publication.channel}</span>
       <span
         data-testid="job-card-publication-status"
         className={cn(
-          'tm-min-w-[6rem]',
           'tm-font-medium',
           isExpired(publication)
             ? 'tm-text-emotion-danger-emphasis'
@@ -58,32 +47,52 @@ function PublicationRow({ publication }: { publication: JobPublication }) {
       >
         {isExpired(publication) ? 'Ukončeno' : 'Aktivní'}
       </span>
-      <span className="tm-min-w-[8rem] tm-flex-1">
+      <span className="tm-min-w-0 tm-whitespace-nowrap">
         {publication.startDate} – {publication.endDate ?? 'dosud'}
       </span>
-      {publication.viewCount === undefined ? null : (
-        <span className="tm-min-w-[8rem] tm-text-right">
-          Zhlédnuto: {formatCount(publication.viewCount)}
-        </span>
-      )}
+      <span className="tm-justify-self-end">
+        {publication.viewCount === undefined ? null : (
+          <ViewCountRenderer
+            count={publication.viewCount}
+            testId="job-card-publication-views"
+          />
+        )}
+      </span>
     </li>
   )
 }
 
 export function JobCardAdvertisement({
   advertisement,
-  publicationLimit,
   defaultOpen = true,
   className,
 }: JobCardAdvertisementProps) {
   const contentId = useId()
   const [isOpen, setIsOpen] = useState(defaultOpen)
-  const [showAll, setShowAll] = useState(false)
 
   const publications = advertisement.publications ?? []
-  const limit = publicationLimit === 'all' ? publications.length : publicationLimit
-  const visiblePublications = showAll ? publications : publications.slice(0, limit)
-  const hiddenCount = publications.length - visiblePublications.length
+
+  const summary = getAdvertisementSummary(advertisement)
+  const summaryParts = [
+    summary.portalCount > 0 ? portalCountLabel(summary.portalCount) : undefined,
+    summary.runsUntil ? `Inzerce do ${summary.runsUntil}` : undefined,
+  ].filter((part): part is string => part !== undefined)
+  const showCollapsedSummary =
+    !isOpen && (summaryParts.length > 0 || summary.viewCount !== undefined)
+  const collapsedSummaryItems = [
+    ...summaryParts.map((part) => (
+      <span key={part}>{part}</span>
+    )),
+    ...(summary.viewCount === undefined
+      ? []
+      : [
+          <ViewCountRenderer
+            key="views"
+            count={summary.viewCount}
+            testId="job-card-advertisement-aggregate-views"
+          />,
+        ]),
+  ]
 
   return (
     <div data-testid="job-card-advertisement" className={cn('tm-flex', 'tm-flex-col', className)}>
@@ -126,6 +135,29 @@ export function JobCardAdvertisement({
         ) : null}
       </div>
 
+      {showCollapsedSummary ? (
+        <div
+          data-testid="job-card-advertisement-summary"
+          className={cn(
+            'tm-flex',
+            'tm-flex-wrap',
+            'tm-items-center',
+            'tm-gap-x-3',
+            'tm-pl-6',
+            'tm-py-1.5',
+            'tm-text-xs',
+            'tm-text-secondary-default',
+          )}
+        >
+          {collapsedSummaryItems.map((item, index) => (
+            <Fragment key={item.key}>
+              {index > 0 ? <span aria-hidden="true">·</span> : null}
+              {item}
+            </Fragment>
+          ))}
+        </div>
+      ) : null}
+
       <div id={contentId} hidden={!isOpen} className="tm-pl-6 tm-pt-1">
         {publications.length === 0 ? (
           <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
@@ -133,21 +165,24 @@ export function JobCardAdvertisement({
           </p>
         ) : (
           <>
-            <ul className="tm-m-0 tm-list-none tm-p-0">
-              {visiblePublications.map((publication) => (
+            <ul className="tm-m-0 tm-w-full tm-list-none tm-p-0">
+              {publications.map((publication) => (
                 <PublicationRow key={publication.id} publication={publication} />
               ))}
             </ul>
-            {hiddenCount > 0 ? (
-              <Link className="tm-text-sm" onClick={() => setShowAll(true)}>
-                {showMoreLabel(hiddenCount)}
-              </Link>
-            ) : null}
-            {showAll && publications.length > limit ? (
-              <Link className="tm-text-sm" onClick={() => setShowAll(false)}>
-                Zobrazit méně
-              </Link>
-            ) : null}
+            {summary.viewCount === undefined ? null : (
+              <div
+                data-testid="job-card-advertisement-total-views"
+                className={PUBLICATION_ROW_CLASS}
+              >
+                <span />
+                <span />
+                <span />
+                <span className="tm-justify-self-end">
+                  <ViewCountRenderer count={summary.viewCount} />
+                </span>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -20,9 +20,9 @@ const activeAdvertisement: JobAdvertisement = {
   title: 'Aktuální inzerát',
   actions: advertisementActions,
   publications: [
-    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', viewCount: 842 },
-    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', viewCount: 312 },
-    { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', viewCount: 130 },
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 842 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 312 },
+    { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', endDate: '12. 8. 2026', viewCount: 130 },
   ],
 }
 
@@ -76,8 +76,8 @@ export const TwoAdvertisements: Story = {
         title: 'Inzerát pro brigádníky',
         actions: advertisementActions,
         publications: [
-          { id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.', viewCount: 96 },
-          { id: 'prace-2', channel: 'Prace.cz', startDate: '1. 8.', viewCount: 41 },
+          { id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.', endDate: '15. 9. 2026', viewCount: 96 },
+          { id: 'prace-2', channel: 'Prace.cz', startDate: '1. 8.', endDate: '20. 9. 2026', viewCount: 41 },
         ],
       },
     ],
@@ -92,7 +92,7 @@ export const ExpiredPublication: Story = {
         title: 'Aktuální inzerát',
         actions: advertisementActions,
         publications: [
-          { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', viewCount: 842 },
+          { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 842 },
           {
             id: 'prace',
             channel: 'Prace.cz',
@@ -144,14 +144,8 @@ export const StaticStats: Story = {
   },
 }
 
-export const AllPublicationsVisible: Story = {
+export const CollapsedAdvertisement: Story = {
   args: {
-    publicationLimit: 'all',
-  },
-}
-
-export const Playground: Story = {
-  args: {
-    publicationLimit: 2,
+    defaultOpenAdvertisementIds: [],
   },
 }

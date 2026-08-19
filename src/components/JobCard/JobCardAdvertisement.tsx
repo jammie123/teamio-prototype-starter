@@ -2,12 +2,13 @@ import { Fragment, useId, useState } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Icon } from '../Icon'
-import { formatExpiredPortalsLabel, getAdvertisementSummary, isAdvertisementFullyExpired } from './advertisementSummary'
+import { formatExpiredPortalsLabel, formatRemainingDaysLabel, formatViewCountLabel, getAdvertisementSummary, getRemainingCalendarDays, isAdvertisementFullyExpired } from './advertisementSummary'
 import type { JobAdvertisement, JobPublication } from './types'
 import { ViewCountRenderer } from './ViewCountRenderer'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
+  jobTitle: string
   defaultOpen?: boolean
 }
 
@@ -15,16 +16,30 @@ function publicationStatus(publication: JobPublication) {
   if (publication.status === 'expired') {
     return { label: 'Ukončeno', className: 'tm-text-emotion-danger-emphasis' }
   }
+
+  const remainingDays =
+    publication.endDate === undefined
+      ? undefined
+      : getRemainingCalendarDays(publication.endDate)
+
+  if (remainingDays !== undefined && remainingDays >= 0 && remainingDays < 7) {
+    return {
+      label: `Brzy končí · ${formatRemainingDaysLabel(remainingDays)}`,
+      className: 'tm-text-emotion-warning-emphasis',
+    }
+  }
+
   if (publication.status === 'endingSoon') {
     return { label: 'Brzy končí', className: 'tm-text-emotion-warning-emphasis' }
   }
+
   return undefined
 }
 
 const PUBLICATION_GRID_CLASS = cn(
   'tm-grid',
   'tm-w-full',
-  'tm-grid-cols-[minmax(10rem,max-content)_auto_auto_auto]',
+  'tm-grid-cols-[minmax(10rem,max-content)_auto_auto_minmax(0,1fr)]',
   'tm-items-center',
   'tm-gap-x-4',
 )
@@ -79,20 +94,22 @@ function PublicationRow({
       ) : (
         <span />
       )}
-      <span>
-        {publication.viewCount === undefined ? null : (
-          <ViewCountRenderer
-            count={publication.viewCount}
-            testId="job-card-publication-views"
-          />
-        )}
-      </span>
+      {publication.viewCount === undefined ? (
+        <span />
+      ) : (
+        <ViewCountRenderer
+          count={publication.viewCount}
+          testId="job-card-publication-views"
+          withIcon
+        />
+      )}
     </li>
   )
 }
 
 export function JobCardAdvertisement({
   advertisement,
+  jobTitle,
   defaultOpen = true,
   className,
 }: JobCardAdvertisementProps) {
@@ -141,11 +158,9 @@ export function JobCardAdvertisement({
     ...(summary.viewCount === undefined
       ? []
       : [
-          <ViewCountRenderer
-            key="views"
-            count={summary.viewCount}
-            testId="job-card-advertisement-aggregate-views"
-          />,
+          <span key="views" data-testid="job-card-advertisement-aggregate-views">
+            {formatViewCountLabel(summary.viewCount)}
+          </span>,
         ]),
   ]
 
@@ -185,7 +200,7 @@ export function JobCardAdvertisement({
             name="chevron-down"
             className={cn('tm-text-base', !isOpen && '-tm-rotate-90')}
           />
-          <span className="tm-text-sm tm-font-medium tm-text-primary-default">Inzerce</span>
+          <span className="tm-text-sm tm-font-medium tm-text-primary-default">{jobTitle}</span>
         </button>
         {showCollapsedSummary ? (
           <div
@@ -215,7 +230,7 @@ export function JobCardAdvertisement({
         id={contentId}
         hidden={!isOpen}
         data-testid="job-card-advertisement-publications"
-        className="-tm-mx-3 tm-w-full tm-pl-8 tm-pt-1"
+        className="-tm-mx-3 tm-w-full tm-pl-8"
       >
         {publications.length === 0 ? (
           <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
@@ -230,25 +245,6 @@ export function JobCardAdvertisement({
                 showDivider={index > 0}
               />
             ))}
-            {summary.viewCount === undefined ? null : (
-              <li
-                data-testid="job-card-advertisement-total-views"
-                className={cn(
-                  PUBLICATION_ROW_CLASS,
-                  'tm-border-0 tm-border-t tm-border-solid tm-border-secondary',
-                )}
-              >
-                <span />
-                <span />
-                <span />
-                <span>
-                  <ViewCountRenderer
-                    count={summary.viewCount}
-                    testId="job-card-advertisement-aggregate-views"
-                  />
-                </span>
-              </li>
-            )}
           </ul>
         )}
       </div>

@@ -3,6 +3,12 @@ import { fn } from 'storybook/test'
 import { JobCard } from './JobCard'
 import type { JobAdvertisement, JobCardAction } from './types'
 
+function czechDate(daysFromNow: number) {
+  const date = new Date()
+  date.setDate(date.getDate() + daysFromNow)
+  return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
+}
+
 const actions: JobCardAction[] = [
   { id: 'duplicate', label: 'Duplikovat nábor', onClick: fn() },
   { id: 'share', label: 'Sdílet nábor', onClick: fn() },
@@ -85,12 +91,17 @@ export const EndingSoonPublication: Story = {
           {
             id: 'jobs',
             channel: 'Jobs.cz',
-            status: 'endingSoon',
             startDate: '12. 7.',
-            endDate: '20. 8. 2026',
+            endDate: czechDate(1),
             viewCount: 842,
           },
-          { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 312 },
+          {
+            id: 'prace',
+            channel: 'Prace.cz',
+            startDate: '12. 7.',
+            endDate: czechDate(5),
+            viewCount: 312,
+          },
         ],
       },
     ],

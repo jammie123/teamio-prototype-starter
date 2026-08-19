@@ -1,4 +1,5 @@
 import type { JobAdvertisement, JobPublication } from './types'
+import { formatCount } from './formatCount'
 
 export interface JobAdvertisementSummary {
   activePortalNames: string[]
@@ -17,7 +18,7 @@ function isExpired(publication: JobPublication) {
 }
 
 /** Dates come pre-formatted as `D. M.` or `D. M. YYYY`; the year is optional in the UI. */
-function parseCzechDate(value: string) {
+function parseCzechDate(value: string, now = new Date()) {
   const match = value.trim().match(/^(\d{1,2})\.\s*(\d{1,2})\.(?:\s*(\d{4}))?\.?$/)
 
   if (!match) {
@@ -27,10 +28,42 @@ function parseCzechDate(value: string) {
   const [, day, month, year] = match
 
   return new Date(
-    year ? Number(year) : new Date().getFullYear(),
+    year ? Number(year) : now.getFullYear(),
     Number(month) - 1,
     Number(day),
   ).getTime()
+}
+
+function startOfDay(value: Date) {
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime()
+}
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000
+
+export function getRemainingCalendarDays(endDate: string, now = new Date()) {
+  const time = parseCzechDate(endDate, now)
+
+  if (time === undefined) {
+    return undefined
+  }
+
+  return Math.round((startOfDay(new Date(time)) - startOfDay(now)) / MS_PER_DAY)
+}
+
+export function formatRemainingDaysLabel(days: number) {
+  if (days === 0) {
+    return 'dnes'
+  }
+
+  if (days === 1) {
+    return '1 den'
+  }
+
+  if (days >= 2 && days <= 4) {
+    return `${days} dny`
+  }
+
+  return `${days} dní`
 }
 
 function stripYear(value: string) {
@@ -79,6 +112,20 @@ export function formatExpiredPortalsLabel(count: number) {
   }
 
   return `${count} portálů ukončeno`
+}
+
+export function formatViewCountLabel(count: number) {
+  const formatted = formatCount(count)
+
+  if (count === 1) {
+    return `${formatted} zhlédnutí`
+  }
+
+  if (count >= 2 && count <= 4) {
+    return `${formatted} zhlédnutí`
+  }
+
+  return `${formatted} zhlédnutí`
 }
 
 export function getAdvertisementSummary(advertisement: JobAdvertisement): JobAdvertisementSummary {

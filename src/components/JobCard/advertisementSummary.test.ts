@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { getAdvertisementSummary, formatExpiredPortalsLabel, isAdvertisementFullyExpired } from './advertisementSummary'
+import {
+  formatExpiredPortalsLabel,
+  formatRemainingDaysLabel,
+  formatViewCountLabel,
+  getAdvertisementSummary,
+  getRemainingCalendarDays,
+  isAdvertisementFullyExpired,
+} from './advertisementSummary'
 import type { JobAdvertisement } from './types'
 
 function advertisement(publications: JobAdvertisement['publications']): JobAdvertisement {
@@ -150,6 +157,46 @@ describe('formatExpiredPortalsLabel', () => {
     expect(formatExpiredPortalsLabel(2)).toBe('2 portály ukončeny')
     expect(formatExpiredPortalsLabel(3)).toBe('3 portály ukončeny')
     expect(formatExpiredPortalsLabel(5)).toBe('5 portálů ukončeno')
+  })
+})
+
+describe('formatViewCountLabel', () => {
+  it('uses Czech plural forms', () => {
+    expect(formatViewCountLabel(1)).toBe('1 zhlédnutí')
+    expect(formatViewCountLabel(2)).toBe('2 zhlédnutí')
+    expect(formatViewCountLabel(4)).toBe('4 zhlédnutí')
+    expect(formatViewCountLabel(5)).toBe('5 zhlédnutí')
+    expect(formatViewCountLabel(1284)).toMatch(/^1\s284 zhlédnutí$/)
+  })
+})
+
+describe('formatRemainingDaysLabel', () => {
+  it('uses Czech plural forms including today', () => {
+    expect(formatRemainingDaysLabel(0)).toBe('dnes')
+    expect(formatRemainingDaysLabel(1)).toBe('1 den')
+    expect(formatRemainingDaysLabel(2)).toBe('2 dny')
+    expect(formatRemainingDaysLabel(4)).toBe('4 dny')
+    expect(formatRemainingDaysLabel(5)).toBe('5 dní')
+    expect(formatRemainingDaysLabel(6)).toBe('6 dní')
+  })
+})
+
+describe('getRemainingCalendarDays', () => {
+  const now = new Date(2026, 7, 19)
+
+  it('counts whole days from today to the end date', () => {
+    expect(getRemainingCalendarDays('19. 8. 2026', now)).toBe(0)
+    expect(getRemainingCalendarDays('20. 8. 2026', now)).toBe(1)
+    expect(getRemainingCalendarDays('25. 8. 2026', now)).toBe(6)
+    expect(getRemainingCalendarDays('26. 8. 2026', now)).toBe(7)
+  })
+
+  it('uses the given now year when the end date omits it', () => {
+    expect(getRemainingCalendarDays('22. 8.', now)).toBe(3)
+  })
+
+  it('returns undefined for unparseable dates', () => {
+    expect(getRemainingCalendarDays('soon', now)).toBeUndefined()
   })
 })
 

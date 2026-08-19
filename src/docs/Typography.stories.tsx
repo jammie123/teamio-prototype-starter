@@ -46,6 +46,7 @@ function TypographyPage() {
 
       <h2>Velikosti písma</h2>
       <p className="tm-text-xs">tm-text-xs — 0.75rem</p>
+      <p className="tm-text-13">tm-text-13 — 0.8125rem</p>
       <p className="tm-text-sm">tm-text-sm — 0.875rem</p>
       <p className="tm-text-base">tm-text-base — 1rem</p>
       <p className="tm-text-lg">tm-text-lg — 1.125rem</p>

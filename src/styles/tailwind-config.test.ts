@@ -26,6 +26,7 @@ describe('Teamio Tailwind config', () => {
 
     expect(config.theme.fontFamily.poppins).toEqual(['Poppins', 'sans-serif'])
     expect(config.theme.fontSize.base).toBe('1rem')
+    expect(config.theme.fontSize[13]).toBe('.8125rem')
     expect(config.theme.letterSpacing.normal).toBe('-.015em')
     expect(config.theme.lineHeight.tight).toBe(1.3)
 
@@ -66,6 +67,7 @@ describe('Teamio Tailwind config', () => {
     // DEFAULT radius flattens to --border-radius (no "-default" suffix).
     expect(result.css).toContain('--color-teamio-blue: #0096ee')
     expect(result.css).toContain('--font-size-base: 1rem')
+    expect(result.css).toContain('--font-size-13: .8125rem')
     expect(result.css).toContain('--border-radius: .5rem')
     expect(result.css).toContain('--shadow-sm: 0px 2px 8px rgba(0 13 60 / .12)')
   })

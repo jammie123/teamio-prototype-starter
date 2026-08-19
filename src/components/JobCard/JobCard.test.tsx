@@ -92,29 +92,51 @@ describe('JobCard', () => {
     const user = userEvent.setup()
     renderJobCard()
 
-    const toggle = screen.getByRole('button', { name: 'Aktuální inzerát' })
+    const toggle = screen.getByRole('button', { name: 'Inzerce' })
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByText('Jobs.cz')).toBeVisible()
+    expect(within(toggle).getByText('Inzerce')).toHaveClass('tm-text-primary-default')
+    expect(within(toggle).getByText('Inzerce')).toHaveClass('tm-font-medium')
+    expect(screen.getAllByTestId('job-card-publication')[0]).toBeVisible()
 
     await user.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.getByText('Jobs.cz')).not.toBeVisible()
+    screen.getAllByTestId('job-card-publication').forEach((publication) => {
+      expect(publication).not.toBeVisible()
+    })
 
     await user.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
   })
 
-  it('summarizes portals and the latest end date only when collapsed', async () => {
+  it('wraps the advertisement in a bordered box without a section divider above it', () => {
+    renderJobCard({ defaultOpenAdvertisementIds: [] })
+
+    const advertisement = screen.getByTestId('job-card-advertisement')
+    expect(advertisement).toHaveClass('tm-rounded')
+    expect(advertisement).toHaveClass('tm-border')
+    expect(advertisement).toHaveClass('tm-border-solid')
+    expect(advertisement).toHaveClass('tm-border-secondary')
+
+    const section = screen.getByTestId('job-card-advertisements')
+    expect(section).not.toHaveClass('tm-border-t')
+    expect(section.className).not.toMatch(/tm-border-t/)
+  })
+
+  it('summarizes active portal names and the first end date on the collapsed header row', async () => {
     const user = userEvent.setup()
     renderJobCard()
 
     expect(screen.queryByTestId('job-card-advertisement-summary')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Aktuální inzerát' }))
+    await user.click(screen.getByRole('button', { name: 'Inzerce' }))
 
+    const advertisement = screen.getByTestId('job-card-advertisement')
+    const header = advertisement.firstElementChild
     const summary = screen.getByTestId('job-card-advertisement-summary')
-    expect(summary).toHaveTextContent(/3 portály\s*·\s*Inzerce do 30\. 9\. 2026/)
-    expect(summary).toHaveClass('tm-text-xs')
+    expect(header).toContainElement(screen.getByRole('button', { name: 'Inzerce' }))
+    expect(header).toContainElement(summary)
+    expect(summary).toHaveTextContent(/Jobs\.cz, Prace\.cz, Kariérní stránky\s*·\s*první končí 12\. 8\./)
+    expect(summary).toHaveClass('tm-text-13')
     expect(summary).toHaveClass('tm-text-secondary-default')
     expect(summary).toHaveClass('tm-gap-x-3')
     expect(summary.className).not.toMatch(/tm-grid-cols-\[/)
@@ -124,20 +146,20 @@ describe('JobCard', () => {
     const user = userEvent.setup()
     renderJobCard()
 
-    await user.click(screen.getByRole('button', { name: 'Aktuální inzerát' }))
+    await user.click(screen.getByRole('button', { name: 'Inzerce' }))
 
     const summary = screen.getByTestId('job-card-advertisement-summary')
     const views = within(summary).getByTestId('job-card-advertisement-aggregate-views')
-    expect(summary).toHaveTextContent(/3 portály\s*·\s*Inzerce do 30\. 9\. 2026\s*·/)
+    expect(summary).toHaveTextContent(/Jobs\.cz, Prace\.cz, Kariérní stránky\s*·\s*první končí 12\. 8\.\s*·/)
     expect(within(views).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
     expect(views).toHaveTextContent(/1\s284/)
     expect(views).toHaveAccessibleName(/Počet zhlédnutí:\s*1\s284/)
-    expect(summary.textContent?.indexOf('Inzerce do 30. 9. 2026') ?? -1).toBeLessThan(
+    expect(summary.textContent?.indexOf('první končí 12. 8.') ?? -1).toBeLessThan(
       summary.textContent?.indexOf(views.textContent ?? '') ?? -1,
     )
   })
 
-  it('uses the latest publication end date in the collapsed summary', () => {
+  it('uses the earliest active publication end date in the collapsed summary', () => {
     renderJobCard({
       defaultOpenAdvertisementIds: [],
       advertisements: [
@@ -147,17 +169,27 @@ describe('JobCard', () => {
           publications: [
             { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
             { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '1. 10. 2026' },
+            {
+              id: 'career',
+              channel: 'Kariérní stránky',
+              status: 'expired',
+              startDate: '12. 7.',
+              endDate: '1. 8. 2026',
+            },
           ],
         },
       ],
     })
 
     expect(screen.getByTestId('job-card-advertisement-summary')).toHaveTextContent(
-      /2 portály\s*·\s*Inzerce do 1\. 10\. 2026/,
+      /Jobs\.cz, Prace\.cz\s*·\s*první končí 15\. 9\./,
+    )
+    expect(screen.getByTestId('job-card-advertisement-summary')).not.toHaveTextContent(
+      'Kariérní stránky',
     )
   })
 
-  it('omits the end-date part when no publication has an end date', () => {
+  it('omits the end-date part when no active publication has an end date', () => {
     renderJobCard({
       defaultOpenAdvertisementIds: [],
       advertisements: [
@@ -170,8 +202,8 @@ describe('JobCard', () => {
     })
 
     const summary = screen.getByTestId('job-card-advertisement-summary')
-    expect(summary).toHaveTextContent('1 portál')
-    expect(summary.textContent).not.toMatch(/Inzerce do/)
+    expect(summary).toHaveTextContent('Jobs.cz')
+    expect(summary.textContent).not.toMatch(/první končí/)
   })
 
   it('omits aggregated views when no publication has a view count', () => {
@@ -187,9 +219,37 @@ describe('JobCard', () => {
     })
 
     expect(screen.getByTestId('job-card-advertisement-summary')).toHaveTextContent(
-      'Inzerce do 15. 9. 2026',
+      'první končí 15. 9.',
     )
     expect(screen.queryByTestId('job-card-advertisement-aggregate-views')).not.toBeInTheDocument()
+  })
+
+  it('omits portal names and the first-end date when every publication is expired', () => {
+    renderJobCard({
+      defaultOpenAdvertisementIds: [],
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '12. 7.',
+              viewCount: 842,
+            },
+          ],
+        },
+      ],
+    })
+
+    const summary = screen.getByTestId('job-card-advertisement-summary')
+    expect(summary).not.toHaveTextContent('Jobs.cz')
+    expect(summary.textContent).not.toMatch(/první končí/)
+    expect(within(summary).getByTestId('job-card-advertisement-aggregate-views')).toHaveTextContent(
+      '842',
+    )
   })
 
   it('shows the total view count in the views column when the advertisement is expanded', () => {
@@ -237,9 +297,11 @@ describe('JobCard', () => {
     expect(screen.getByTestId('job-card-publication-status')).toHaveClass(
       'tm-text-emotion-danger-emphasis',
     )
+    expect(screen.getByTestId('job-card-publication-status')).toHaveClass('tm-uppercase')
+    expect(screen.getByTestId('job-card-publication-status')).toHaveClass('tm-font-medium')
   })
 
-  it('aligns publication portal, status, date and views on a shared grid', () => {
+  it('aligns publication rows with the chevron and separates them with a line', () => {
     renderJobCard()
 
     const rows = screen.getAllByTestId('job-card-publication')
@@ -247,12 +309,25 @@ describe('JobCard', () => {
 
     const gridClass = rows[0].className
     expect(gridClass).toMatch(/\btm-grid\b/)
-    expect(gridClass).toMatch(/tm-grid-cols-\[/)
+    expect(gridClass).toMatch(/\btm-text-13\b/)
+    expect(gridClass).toMatch(/tm-grid-cols-\[minmax\(8rem,1fr\)/)
+    expect(gridClass).toMatch(/\btm-w-full\b/)
     expect(gridClass).not.toMatch(/\btm-flex-wrap\b/)
+    expect(rows[0]).not.toHaveClass('tm-border-t')
 
     rows.slice(1).forEach((row) => {
-      expect(row.className).toBe(gridClass)
+      expect(row).toHaveClass('tm-border-t')
+      expect(row).toHaveClass('tm-border-secondary')
     })
+
+    const expanded = screen.getByTestId('job-card-advertisement-publications')
+    expect(expanded.className).not.toMatch(/\btm-pl-10\b/)
+    expect(expanded).toHaveClass('tm-w-full')
+    expect(expanded.className).toMatch(/-tm-mx-3/)
+
+    expect(within(rows[0]).getByTestId('job-card-publication-channel')).toHaveClass(
+      'tm-font-medium',
+    )
   })
 
   it('renders publication view counts as an eye icon without the Zhlédnuto label', () => {
@@ -284,6 +359,8 @@ describe('JobCard', () => {
     const [status] = screen.getAllByTestId('job-card-publication-status')
     expect(status).toHaveTextContent('Aktivní')
     expect(status).toHaveClass('tm-text-emotion-success-emphasis')
+    expect(status).toHaveClass('tm-uppercase')
+    expect(status).toHaveClass('tm-font-medium')
   })
 
   it('renders an empty state when the job has no advertisement', async () => {

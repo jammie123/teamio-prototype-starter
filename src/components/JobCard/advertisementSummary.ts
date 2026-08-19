@@ -1,21 +1,13 @@
-import type { JobAdvertisement } from './types'
+import type { JobAdvertisement, JobPublication } from './types'
 
 export interface JobAdvertisementSummary {
-  portalCount: number
-  runsUntil?: string
+  activePortalNames: string[]
+  firstEndsOn?: string
   viewCount?: number
 }
 
-export function portalCountLabel(count: number) {
-  if (count === 1) {
-    return `${count} portál`
-  }
-
-  if (count < 5) {
-    return `${count} portály`
-  }
-
-  return `${count} portálů`
+function isActive(publication: JobPublication) {
+  return publication.status !== 'expired'
 }
 
 /** Dates come pre-formatted as `D. M.` or `D. M. YYYY`; the year is optional in the UI. */
@@ -35,33 +27,40 @@ function parseCzechDate(value: string) {
   ).getTime()
 }
 
+function stripYear(value: string) {
+  return value.replace(/\s+\d{4}\.?$/, '')
+}
+
 export function getAdvertisementSummary(advertisement: JobAdvertisement): JobAdvertisementSummary {
   const publications = advertisement.publications ?? []
+  const activePublications = publications.filter(isActive)
 
   const viewCounts = publications
     .map((publication) => publication.viewCount)
     .filter((viewCount): viewCount is number => viewCount !== undefined)
 
-  const latestEndDate = publications.reduce<{ label: string; time: number } | undefined>(
-    (latest, publication) => {
+  const earliestEndDate = activePublications.reduce<{ label: string; time: number } | undefined>(
+    (earliest, publication) => {
       if (!publication.endDate) {
-        return latest
+        return earliest
       }
 
       const time = parseCzechDate(publication.endDate)
 
       if (time === undefined) {
-        return latest ?? { label: publication.endDate, time: Number.NEGATIVE_INFINITY }
+        return earliest ?? { label: publication.endDate, time: Number.POSITIVE_INFINITY }
       }
 
-      return latest && latest.time >= time ? latest : { label: publication.endDate, time }
+      return earliest && earliest.time <= time
+        ? earliest
+        : { label: publication.endDate, time }
     },
     undefined,
   )
 
   return {
-    portalCount: publications.length,
-    runsUntil: latestEndDate?.label,
+    activePortalNames: activePublications.map((publication) => publication.channel),
+    firstEndsOn: earliestEndDate ? stripYear(earliestEndDate.label) : undefined,
     viewCount: viewCounts.length === 0 ? undefined : viewCounts.reduce((sum, count) => sum + count, 0),
   }
 }

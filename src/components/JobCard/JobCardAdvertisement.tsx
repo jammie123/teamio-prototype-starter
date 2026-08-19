@@ -2,7 +2,7 @@ import { Fragment, useId, useState } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Icon } from '../Icon'
-import { getAdvertisementSummary, portalCountLabel } from './advertisementSummary'
+import { getAdvertisementSummary } from './advertisementSummary'
 import { JobCardActions } from './JobCardActions'
 import type { JobAdvertisement, JobPublication } from './types'
 import { ViewCountRenderer } from './ViewCountRenderer'
@@ -26,20 +26,39 @@ const PUBLICATION_GRID_CLASS = cn(
 
 const PUBLICATION_ROW_CLASS = cn(
   PUBLICATION_GRID_CLASS,
+  'tm-px-3',
   'tm-py-1.5',
-  'tm-text-sm',
+  'tm-text-13',
   'tm-font-normal',
   'tm-text-primary-default',
 )
 
-function PublicationRow({ publication }: { publication: JobPublication }) {
+function PublicationRow({
+  publication,
+  showDivider = false,
+}: {
+  publication: JobPublication
+  showDivider?: boolean
+}) {
   return (
-    <li data-testid="job-card-publication" className={PUBLICATION_ROW_CLASS}>
-      <span className="tm-min-w-0 tm-truncate">{publication.channel}</span>
+    <li
+      data-testid="job-card-publication"
+      className={cn(
+        PUBLICATION_ROW_CLASS,
+        showDivider && 'tm-border-0 tm-border-t tm-border-solid tm-border-secondary',
+      )}
+    >
+      <span
+        data-testid="job-card-publication-channel"
+        className="tm-min-w-0 tm-truncate tm-font-medium"
+      >
+        {publication.channel}
+      </span>
       <span
         data-testid="job-card-publication-status"
         className={cn(
           'tm-font-medium',
+          'tm-uppercase',
           isExpired(publication)
             ? 'tm-text-emotion-danger-emphasis'
             : 'tm-text-emotion-success-emphasis',
@@ -73,16 +92,22 @@ export function JobCardAdvertisement({
   const publications = advertisement.publications ?? []
 
   const summary = getAdvertisementSummary(advertisement)
-  const summaryParts = [
-    summary.portalCount > 0 ? portalCountLabel(summary.portalCount) : undefined,
-    summary.runsUntil ? `Inzerce do ${summary.runsUntil}` : undefined,
-  ].filter((part): part is string => part !== undefined)
+  const portalNames = summary.activePortalNames.join(', ')
+  const firstEndsLabel = summary.firstEndsOn ? `první končí ${summary.firstEndsOn}` : undefined
   const showCollapsedSummary =
-    !isOpen && (summaryParts.length > 0 || summary.viewCount !== undefined)
+    !isOpen &&
+    (portalNames.length > 0 || firstEndsLabel !== undefined || summary.viewCount !== undefined)
   const collapsedSummaryItems = [
-    ...summaryParts.map((part) => (
-      <span key={part}>{part}</span>
-    )),
+    ...(portalNames
+      ? [
+          <span key="portals">{portalNames}</span>,
+        ]
+      : []),
+    ...(firstEndsLabel
+      ? [
+          <span key="first-ends">{firstEndsLabel}</span>,
+        ]
+      : []),
     ...(summary.viewCount === undefined
       ? []
       : [
@@ -95,8 +120,21 @@ export function JobCardAdvertisement({
   ]
 
   return (
-    <div data-testid="job-card-advertisement" className={cn('tm-flex', 'tm-flex-col', className)}>
-      <div className="tm-flex tm-items-center tm-gap-2">
+    <div
+      data-testid="job-card-advertisement"
+      className={cn(
+        'tm-flex',
+        'tm-flex-col',
+        'tm-rounded',
+        'tm-border',
+        'tm-border-solid',
+        'tm-border-secondary',
+        'tm-px-3',
+        'tm-py-2',
+        className,
+      )}
+    >
+      <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-3 tm-gap-y-1">
         <button
           type="button"
           onClick={() => setIsOpen((value) => !value)}
@@ -121,10 +159,30 @@ export function JobCardAdvertisement({
             name="chevron-down"
             className={cn('tm-text-base', !isOpen && '-tm-rotate-90')}
           />
-          <span className="tm-text-xs tm-font-semibold tm-uppercase tm-tracking-wide">
-            {advertisement.title ?? 'Aktuální inzerát'}
-          </span>
+          <span className="tm-text-sm tm-font-medium tm-text-primary-default">Inzerce</span>
         </button>
+        {showCollapsedSummary ? (
+          <div
+            data-testid="job-card-advertisement-summary"
+            className={cn(
+              'tm-flex',
+              'tm-min-w-0',
+              'tm-flex-1',
+              'tm-flex-wrap',
+              'tm-items-center',
+              'tm-gap-x-3',
+              'tm-text-13',
+              'tm-text-secondary-default',
+            )}
+          >
+            {collapsedSummaryItems.map((item, index) => (
+              <Fragment key={item.key}>
+                {index > 0 ? <span aria-hidden="true">·</span> : null}
+                {item}
+              </Fragment>
+            ))}
+          </div>
+        ) : null}
         {advertisement.actions?.length ? (
           <JobCardActions
             actions={advertisement.actions}
@@ -135,30 +193,12 @@ export function JobCardAdvertisement({
         ) : null}
       </div>
 
-      {showCollapsedSummary ? (
-        <div
-          data-testid="job-card-advertisement-summary"
-          className={cn(
-            'tm-flex',
-            'tm-flex-wrap',
-            'tm-items-center',
-            'tm-gap-x-3',
-            'tm-pl-6',
-            'tm-py-1.5',
-            'tm-text-xs',
-            'tm-text-secondary-default',
-          )}
-        >
-          {collapsedSummaryItems.map((item, index) => (
-            <Fragment key={item.key}>
-              {index > 0 ? <span aria-hidden="true">·</span> : null}
-              {item}
-            </Fragment>
-          ))}
-        </div>
-      ) : null}
-
-      <div id={contentId} hidden={!isOpen} className="tm-pl-6 tm-pt-1">
+      <div
+        id={contentId}
+        hidden={!isOpen}
+        data-testid="job-card-advertisement-publications"
+        className="-tm-mx-3 tm-w-full tm-pt-1"
+      >
         {publications.length === 0 ? (
           <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
             Inzerát není nikde vystavený.
@@ -166,8 +206,12 @@ export function JobCardAdvertisement({
         ) : (
           <>
             <ul className="tm-m-0 tm-w-full tm-list-none tm-p-0">
-              {publications.map((publication) => (
-                <PublicationRow key={publication.id} publication={publication} />
+              {publications.map((publication, index) => (
+                <PublicationRow
+                  key={publication.id}
+                  publication={publication}
+                  showDivider={index > 0}
+                />
               ))}
             </ul>
             {summary.viewCount === undefined ? null : (

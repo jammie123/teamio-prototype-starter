@@ -126,7 +126,7 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
           <JobCardStats candidates={candidates} onStatClick={onCandidatesClick} />
         ) : null}
 
-        <div className="tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3">
+        <div data-testid="job-card-advertisements">
           {advertisements.length === 0 ? (
             <div
               data-testid="job-card-no-advertisement"

@@ -109,14 +109,15 @@ describe('JobCard', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
   })
 
-  it('renders the advertisement without a boxed border or a section divider above it', () => {
+  it('draws a light secondary outline on advertisement hover without a fill', () => {
     renderJobCard({ defaultOpenAdvertisementIds: [] })
 
     const advertisement = screen.getByTestId('job-card-advertisement')
-    expect(advertisement).not.toHaveClass('tm-rounded')
-    expect(advertisement).not.toHaveClass('tm-border')
-    expect(advertisement.className).not.toMatch(/\btm-border-solid\b/)
-    expect(advertisement.className).not.toMatch(/\btm-border-secondary\b/)
+    expect(advertisement).toHaveClass('tm-rounded')
+    expect(advertisement).toHaveClass('tm-border')
+    expect(advertisement).toHaveClass('tm-border-transparent')
+    expect(advertisement).toHaveClass('hover:tm-border-secondary')
+    expect(advertisement.className).not.toMatch(/hover:tm-bg-/)
 
     const section = screen.getByTestId('job-card-advertisements')
     expect(section).not.toHaveClass('tm-border-t')

@@ -170,8 +170,12 @@ export function JobCardAdvertisement({
       className={cn(
         'tm-flex',
         'tm-flex-col',
+        'tm-rounded',
+        'tm-border',
+        'tm-border-transparent',
         'tm-px-3',
         'tm-py-2',
+        'hover:tm-border-secondary',
         className,
       )}
     >

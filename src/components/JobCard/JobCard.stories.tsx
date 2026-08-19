@@ -10,15 +10,9 @@ const actions: JobCardAction[] = [
   { id: 'delete', label: 'Smazat nábor', color: 'danger', onClick: fn() },
 ]
 
-const advertisementActions: JobCardAction[] = [
-  { id: 'edit-ad', label: 'Editovat inzerát', onClick: fn() },
-  { id: 'end-ad', label: 'Ukončit vystavení', onClick: fn() },
-]
-
 const activeAdvertisement: JobAdvertisement = {
   id: 'ad-1',
   title: 'Aktuální inzerát',
-  actions: advertisementActions,
   publications: [
     { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 842 },
     { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 312 },
@@ -32,12 +26,10 @@ const meta = {
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
     owner: 'Petra Nováková',
-    totalViewCount: 1284,
     status: 'open',
     candidates: { unreviewed: 14, inProgress: 6, total: 52 },
     onCandidatesClick: fn(),
     advertisements: [activeAdvertisement],
-    onEdit: fn(),
     actions,
   },
   decorators: [
@@ -74,10 +66,31 @@ export const TwoAdvertisements: Story = {
       {
         id: 'ad-2',
         title: 'Inzerát pro brigádníky',
-        actions: advertisementActions,
         publications: [
           { id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.', endDate: '15. 9. 2026', viewCount: 96 },
           { id: 'prace-2', channel: 'Prace.cz', startDate: '1. 8.', endDate: '20. 9. 2026', viewCount: 41 },
+        ],
+      },
+    ],
+  },
+}
+
+export const EndingSoonPublication: Story = {
+  args: {
+    advertisements: [
+      {
+        id: 'ad-1',
+        title: 'Aktuální inzerát',
+        publications: [
+          {
+            id: 'jobs',
+            channel: 'Jobs.cz',
+            status: 'endingSoon',
+            startDate: '12. 7.',
+            endDate: '20. 8. 2026',
+            viewCount: 842,
+          },
+          { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 312 },
         ],
       },
     ],
@@ -90,7 +103,6 @@ export const ExpiredPublication: Story = {
       {
         id: 'ad-1',
         title: 'Aktuální inzerát',
-        actions: advertisementActions,
         publications: [
           { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 842 },
           {
@@ -114,7 +126,6 @@ export const AllPublicationsExpired: Story = {
       {
         id: 'ad-1',
         title: 'Aktuální inzerát',
-        actions: advertisementActions,
         publications: [
           {
             id: 'jobs',
@@ -129,8 +140,16 @@ export const AllPublicationsExpired: Story = {
             channel: 'Prace.cz',
             status: 'expired',
             startDate: '12. 6.',
-            endDate: '12. 7.',
+            endDate: '15. 8. 2026',
             viewCount: 312,
+          },
+          {
+            id: 'career',
+            channel: 'Kariérní stránky',
+            status: 'expired',
+            startDate: '1. 6.',
+            endDate: '1. 7. 2026',
+            viewCount: 130,
           },
         ],
       },

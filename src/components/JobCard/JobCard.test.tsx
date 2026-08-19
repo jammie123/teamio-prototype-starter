@@ -19,7 +19,6 @@ function renderJobCard(props: Partial<Parameters<typeof JobCard>[0]> = {}) {
     <JobCard
       title="Řidič/ka sk. C ČB PO–PÁ"
       owner="Petra Nováková"
-      totalViewCount={1284}
       candidates={{ unreviewed: 14, inProgress: 6, total: 52 }}
       advertisements={[advertisement]}
       {...props}
@@ -28,17 +27,12 @@ function renderJobCard(props: Partial<Parameters<typeof JobCard>[0]> = {}) {
 }
 
 describe('JobCard', () => {
-  it('renders title, owner and total views', () => {
+  it('renders title and owner without a header view count', () => {
     renderJobCard()
 
     expect(screen.getByRole('heading', { name: 'Řidič/ka sk. C ČB PO–PÁ' })).toBeInTheDocument()
     expect(screen.getByText('Petra Nováková')).toBeInTheDocument()
-
-    const totalViews = screen.getByTestId('job-card-total-views')
-    expect(within(totalViews).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
-    expect(totalViews).toHaveTextContent(/1\s284/)
-    expect(totalViews).toHaveAccessibleName(/Počet zhlédnutí:\s*1\s284/)
-    expect(totalViews.textContent).not.toMatch(/Zhlédnuto/)
+    expect(screen.queryByTestId('job-card-total-views')).not.toBeInTheDocument()
   })
 
   it('renders the open status by default and the closed status on demand', () => {
@@ -108,18 +102,34 @@ describe('JobCard', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
   })
 
-  it('wraps the advertisement in a bordered box without a section divider above it', () => {
+  it('renders the advertisement without a boxed border or a section divider above it', () => {
     renderJobCard({ defaultOpenAdvertisementIds: [] })
 
     const advertisement = screen.getByTestId('job-card-advertisement')
-    expect(advertisement).toHaveClass('tm-rounded')
-    expect(advertisement).toHaveClass('tm-border')
-    expect(advertisement).toHaveClass('tm-border-solid')
-    expect(advertisement).toHaveClass('tm-border-secondary')
+    expect(advertisement).not.toHaveClass('tm-rounded')
+    expect(advertisement).not.toHaveClass('tm-border')
+    expect(advertisement.className).not.toMatch(/\btm-border-solid\b/)
+    expect(advertisement.className).not.toMatch(/\btm-border-secondary\b/)
 
     const section = screen.getByTestId('job-card-advertisements')
     expect(section).not.toHaveClass('tm-border-t')
     expect(section.className).not.toMatch(/tm-border-t/)
+  })
+
+  it('uses a small gap between multiple advertisements', () => {
+    renderJobCard({
+      advertisements: [
+        advertisement,
+        { id: 'ad-2', publications: [{ id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.' }] },
+      ],
+    })
+
+    const list = screen.getByTestId('job-card-advertisements').firstElementChild
+    expect(screen.getAllByTestId('job-card-advertisement')).toHaveLength(2)
+    expect(list).toHaveClass('tm-flex')
+    expect(list).toHaveClass('tm-flex-col')
+    expect(list).toHaveClass('tm-gap-1')
+    expect(list).not.toHaveClass('tm-gap-3')
   })
 
   it('summarizes active portal names and the first end date on the collapsed header row', async () => {
@@ -130,8 +140,8 @@ describe('JobCard', () => {
 
     await user.click(screen.getByRole('button', { name: 'Inzerce' }))
 
-    const advertisement = screen.getByTestId('job-card-advertisement')
-    const header = advertisement.firstElementChild
+    const advertisementEl = screen.getByTestId('job-card-advertisement')
+    const header = advertisementEl.firstElementChild
     const summary = screen.getByTestId('job-card-advertisement-summary')
     expect(header).toContainElement(screen.getByRole('button', { name: 'Inzerce' }))
     expect(header).toContainElement(summary)
@@ -142,7 +152,41 @@ describe('JobCard', () => {
     expect(summary.className).not.toMatch(/tm-grid-cols-\[/)
   })
 
-  it('shows the aggregated view count after the other collapsed summary parts', async () => {
+  it('shows aggregated views as the last publication row when expanded', () => {
+    renderJobCard()
+
+    const header = screen.getByTestId('job-card-advertisement').firstElementChild as HTMLElement
+    const list = within(screen.getByTestId('job-card-advertisement-publications')).getByRole(
+      'list',
+    )
+    const totals = screen.getByTestId('job-card-advertisement-total-views')
+    const views = within(totals).getByTestId('job-card-advertisement-aggregate-views')
+    const publicationViews = within(screen.getAllByTestId('job-card-publication')[0]).getByTestId(
+      'job-card-publication-views',
+    )
+
+    expect(screen.queryByTestId('job-card-advertisement-summary')).not.toBeInTheDocument()
+    expect(within(header).queryByTestId('job-card-advertisement-aggregate-views')).not.toBeInTheDocument()
+    expect(list.lastElementChild).toBe(totals)
+    expect(totals).toHaveClass('tm-grid-cols-subgrid')
+    expect(totals).toHaveClass('tm-col-span-full')
+    expect(totals).toHaveClass('tm-text-13')
+    expect(totals).toHaveClass('tm-font-normal')
+    expect(totals).toHaveClass('tm-text-primary-default')
+    expect(totals).toHaveClass('tm-border-t')
+    expect(views).toHaveClass('tm-text-13')
+    expect(views).toHaveClass('tm-font-normal')
+    expect(views).toHaveClass('tm-text-primary-default')
+    expect(publicationViews).toHaveClass('tm-text-13')
+    expect(publicationViews.parentElement).not.toHaveClass('tm-justify-self-end')
+    expect(views.parentElement).not.toHaveClass('tm-justify-self-end')
+    expect(within(views).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
+    expect(views).toHaveTextContent(/1\s284/)
+    expect(views).toHaveAccessibleName(/Počet zhlédnutí:\s*1\s284/)
+    expect(screen.queryByTestId('job-card-advertisement-actions-toggle')).not.toBeInTheDocument()
+  })
+
+  it('puts aggregated views in the collapsed summary after a middle dot', async () => {
     const user = userEvent.setup()
     renderJobCard()
 
@@ -150,10 +194,12 @@ describe('JobCard', () => {
 
     const summary = screen.getByTestId('job-card-advertisement-summary')
     const views = within(summary).getByTestId('job-card-advertisement-aggregate-views')
-    expect(summary).toHaveTextContent(/Jobs\.cz, Prace\.cz, Kariérní stránky\s*·\s*první končí 12\. 8\.\s*·/)
+    expect(summary).toHaveTextContent(
+      /Jobs\.cz, Prace\.cz, Kariérní stránky\s*·\s*první končí 12\. 8\.\s*·/,
+    )
+    expect(views).not.toHaveClass('tm-ml-auto')
     expect(within(views).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
     expect(views).toHaveTextContent(/1\s284/)
-    expect(views).toHaveAccessibleName(/Počet zhlédnutí:\s*1\s284/)
     expect(summary.textContent?.indexOf('první končí 12. 8.') ?? -1).toBeLessThan(
       summary.textContent?.indexOf(views.textContent ?? '') ?? -1,
     )
@@ -224,9 +270,51 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-advertisement-aggregate-views')).not.toBeInTheDocument()
   })
 
-  it('omits portal names and the first-end date when every publication is expired', () => {
+  it('summarizes expired portal count, last end date and views when every publication is expired', () => {
     renderJobCard({
-      defaultOpenAdvertisementIds: [],
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '12. 7.',
+              viewCount: 842,
+            },
+            {
+              id: 'prace',
+              channel: 'Prace.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '15. 8. 2026',
+              viewCount: 312,
+            },
+          ],
+        },
+      ],
+    })
+
+    const toggle = screen.getByRole('button', { name: 'Inzerce' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    screen.getAllByTestId('job-card-publication').forEach((publication) => {
+      expect(publication).not.toBeVisible()
+    })
+
+    const summary = screen.getByTestId('job-card-advertisement-summary')
+    expect(summary).toHaveTextContent(/2 portály ukončeny\s*·\s*15\. 8\.\s*·/)
+    expect(summary).not.toHaveTextContent('Jobs.cz')
+    expect(summary.textContent).not.toMatch(/první končí/)
+    expect(within(summary).getByTestId('job-card-advertisement-aggregate-views')).toHaveTextContent(
+      /1\s154/,
+    )
+  })
+
+  it('lets an all-expired advertisement expand from the collapsed summary', async () => {
+    const user = userEvent.setup()
+    renderJobCard({
       advertisements: [
         {
           id: 'ad-1',
@@ -244,23 +332,13 @@ describe('JobCard', () => {
       ],
     })
 
-    const summary = screen.getByTestId('job-card-advertisement-summary')
-    expect(summary).not.toHaveTextContent('Jobs.cz')
-    expect(summary.textContent).not.toMatch(/první končí/)
-    expect(within(summary).getByTestId('job-card-advertisement-aggregate-views')).toHaveTextContent(
-      '842',
-    )
-  })
+    const toggle = screen.getByRole('button', { name: 'Inzerce' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByTestId('job-card-advertisement-summary')).toHaveTextContent('1 portál ukončen')
 
-  it('shows the total view count in the views column when the advertisement is expanded', () => {
-    renderJobCard()
-
-    const totals = screen.getByTestId('job-card-advertisement-total-views')
-    expect(totals).toHaveClass('tm-grid')
-    expect(totals.className).toMatch(/tm-grid-cols-\[/)
-    expect(totals.className).toBe(screen.getAllByTestId('job-card-publication')[0].className)
-    expect(within(totals).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
-    expect(totals).toHaveTextContent(/1\s284/)
+    await user.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByTestId('job-card-publication')).toBeVisible()
     expect(screen.queryByTestId('job-card-advertisement-summary')).not.toBeInTheDocument()
   })
 
@@ -271,6 +349,42 @@ describe('JobCard', () => {
     expect(screen.queryByRole('button', { name: /Zobrazit další/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Zobrazit méně' })).not.toBeInTheDocument()
     expect(screen.getByTestId('job-card-advertisement-total-views')).toHaveTextContent(/1\s284/)
+  })
+
+  it('hides the status label on an active publication', () => {
+    renderJobCard()
+
+    expect(screen.queryByTestId('job-card-publication-status')).not.toBeInTheDocument()
+    expect(screen.getAllByTestId('job-card-publication')[0]).not.toHaveTextContent('Aktivní')
+  })
+
+  it('marks an ending-soon publication', () => {
+    renderJobCard({
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'endingSoon',
+              startDate: '12. 7.',
+              endDate: '20. 8.',
+            },
+          ],
+        },
+      ],
+    })
+
+    const publication = screen.getByTestId('job-card-publication')
+    const status = screen.getByTestId('job-card-publication-status')
+    const cells = [...publication.children]
+    expect(cells[1]).toHaveAttribute('data-testid', 'job-card-publication-dates')
+    expect(cells[2]).toBe(status)
+    expect(status).toHaveTextContent('Brzy končí')
+    expect(status).toHaveClass('tm-text-emotion-warning-emphasis')
+    expect(status).toHaveClass('tm-uppercase')
+    expect(status).toHaveClass('tm-font-medium')
   })
 
   it('marks an expired publication with its end date', () => {
@@ -292,28 +406,49 @@ describe('JobCard', () => {
     })
 
     const publication = screen.getByTestId('job-card-publication')
+    const status = screen.getByTestId('job-card-publication-status')
+    const cells = [...publication.children]
     expect(publication).toHaveTextContent('Ukončeno')
     expect(publication).toHaveTextContent('12. 7. – 12. 8.')
-    expect(screen.getByTestId('job-card-publication-status')).toHaveClass(
+    expect(cells[1]).toHaveAttribute('data-testid', 'job-card-publication-dates')
+    expect(cells[1]).toHaveTextContent('12. 7. – 12. 8.')
+    expect(cells[2]).toBe(status)
+    expect(status).toHaveClass(
       'tm-text-emotion-danger-emphasis',
     )
     expect(screen.getByTestId('job-card-publication-status')).toHaveClass('tm-uppercase')
     expect(screen.getByTestId('job-card-publication-status')).toHaveClass('tm-font-medium')
   })
 
-  it('aligns publication rows with the chevron and separates them with a line', () => {
+  it('aligns publication row borders with the advertisement title', () => {
     renderJobCard()
 
     const rows = screen.getAllByTestId('job-card-publication')
     expect(rows).toHaveLength(3)
 
+    const list = within(screen.getByTestId('job-card-advertisement-publications')).getByRole(
+      'list',
+    )
+    expect(list).toHaveClass('tm-grid')
+    expect(list).toHaveClass('tm-w-full')
+    expect(list).toHaveClass('tm-gap-x-4')
+    expect(list.className).toMatch(
+      /tm-grid-cols-\[minmax\(10rem,max-content\)_auto_auto_auto\]/,
+    )
+
     const gridClass = rows[0].className
     expect(gridClass).toMatch(/\btm-grid\b/)
     expect(gridClass).toMatch(/\btm-text-13\b/)
-    expect(gridClass).toMatch(/tm-grid-cols-\[minmax\(8rem,1fr\)/)
-    expect(gridClass).toMatch(/\btm-w-full\b/)
+    expect(gridClass).toMatch(/\btm-grid-cols-subgrid\b/)
+    expect(gridClass).toMatch(/\btm-col-span-full\b/)
+    expect(gridClass).not.toMatch(/tm-grid-cols-\[/)
     expect(gridClass).not.toMatch(/\btm-flex-wrap\b/)
     expect(rows[0]).not.toHaveClass('tm-border-t')
+
+    rows.forEach((row) => {
+      expect(row).toHaveClass('tm-col-span-full')
+      expect(row).toHaveClass('tm-grid-cols-subgrid')
+    })
 
     rows.slice(1).forEach((row) => {
       expect(row).toHaveClass('tm-border-t')
@@ -321,12 +456,15 @@ describe('JobCard', () => {
     })
 
     const expanded = screen.getByTestId('job-card-advertisement-publications')
-    expect(expanded.className).not.toMatch(/\btm-pl-10\b/)
+    expect(expanded).toHaveClass('tm-pl-8')
     expect(expanded).toHaveClass('tm-w-full')
     expect(expanded.className).toMatch(/-tm-mx-3/)
 
     expect(within(rows[0]).getByTestId('job-card-publication-channel')).toHaveClass(
       'tm-font-medium',
+    )
+    expect(within(rows[0]).getByTestId('job-card-publication-channel')).not.toHaveClass(
+      'tm-min-w-0',
     )
   })
 
@@ -353,16 +491,6 @@ describe('JobCard', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent(/^Počet zhlédnutí$/)
   })
 
-  it('colors an active publication status with the success emphasis token', () => {
-    renderJobCard()
-
-    const [status] = screen.getAllByTestId('job-card-publication-status')
-    expect(status).toHaveTextContent('Aktivní')
-    expect(status).toHaveClass('tm-text-emotion-success-emphasis')
-    expect(status).toHaveClass('tm-uppercase')
-    expect(status).toHaveClass('tm-font-medium')
-  })
-
   it('renders an empty state when the job has no advertisement', async () => {
     const user = userEvent.setup()
     const onCreateAdvertisement = vi.fn()
@@ -376,19 +504,14 @@ describe('JobCard', () => {
     expect(onCreateAdvertisement).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onEdit and the action from the dropdown menu', async () => {
+  it('does not render an edit button and still calls the action from the dropdown menu', async () => {
     const user = userEvent.setup()
-    const onEdit = vi.fn()
     const onDelete = vi.fn()
     renderJobCard({
-      onEdit,
       actions: [{ id: 'delete', label: 'Smazat nábor', color: 'danger', onClick: onDelete }],
     })
 
-    const editButton = screen.getByRole('button', { name: 'Editovat' })
-    expect(editButton).toHaveClass('!tm-font-medium')
-    await user.click(editButton)
-    expect(onEdit).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('button', { name: 'Editovat' })).not.toBeInTheDocument()
 
     await user.click(screen.getByTestId('job-card-actions-toggle'))
     await user.click(screen.getByRole('option', { name: 'Smazat nábor' }))

@@ -2,7 +2,7 @@ import type { OptionColor } from '../OptionList'
 
 export type JobStatus = 'open' | 'closed'
 
-export type JobPublicationStatus = 'active' | 'expired'
+export type JobPublicationStatus = 'active' | 'endingSoon' | 'expired'
 
 export interface JobCardAction {
   id: string
@@ -24,7 +24,6 @@ export interface JobAdvertisement {
   id: string
   title?: string
   publications?: JobPublication[]
-  actions?: JobCardAction[]
 }
 
 export interface JobCardCandidates {

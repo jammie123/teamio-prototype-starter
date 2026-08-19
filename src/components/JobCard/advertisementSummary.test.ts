@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getAdvertisementSummary } from './advertisementSummary'
+import { getAdvertisementSummary, formatExpiredPortalsLabel, isAdvertisementFullyExpired } from './advertisementSummary'
 import type { JobAdvertisement } from './types'
 
 function advertisement(publications: JobAdvertisement['publications']): JobAdvertisement {
@@ -63,7 +63,59 @@ describe('getAdvertisementSummary', () => {
 
     expect(summary.activePortalNames).toEqual([])
     expect(summary.firstEndsOn).toBeUndefined()
+    expect(summary.expiredPortalCount).toBe(1)
+    expect(summary.lastEndedOn).toBe('12. 7.')
     expect(summary.viewCount).toBe(842)
+  })
+
+  it('uses the latest expired end date and the expired portal count', () => {
+    const summary = getAdvertisementSummary(
+      advertisement([
+        {
+          id: 'jobs',
+          channel: 'Jobs.cz',
+          status: 'expired',
+          startDate: '12. 6.',
+          endDate: '12. 7. 2026',
+        },
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          status: 'expired',
+          startDate: '12. 6.',
+          endDate: '15. 8. 2026',
+        },
+        {
+          id: 'career',
+          channel: 'Kariérní stránky',
+          status: 'expired',
+          startDate: '1. 6.',
+          endDate: '1. 7. 2026',
+        },
+      ]),
+    )
+
+    expect(summary.expiredPortalCount).toBe(3)
+    expect(summary.lastEndedOn).toBe('15. 8.')
+  })
+
+  it('counts expired portals even while some publications remain active', () => {
+    const summary = getAdvertisementSummary(
+      advertisement([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          status: 'expired',
+          startDate: '12. 7.',
+          endDate: '1. 8. 2026',
+        },
+      ]),
+    )
+
+    expect(summary.expiredPortalCount).toBe(1)
+    expect(summary.lastEndedOn).toBe('1. 8.')
+    expect(summary.activePortalNames).toEqual(['Jobs.cz'])
   })
 
   it('sums view counts from every publication', () => {
@@ -89,5 +141,35 @@ describe('getAdvertisementSummary', () => {
     )
 
     expect(summary.viewCount).toBeUndefined()
+  })
+})
+
+describe('formatExpiredPortalsLabel', () => {
+  it('uses Czech plural forms', () => {
+    expect(formatExpiredPortalsLabel(1)).toBe('1 portál ukončen')
+    expect(formatExpiredPortalsLabel(2)).toBe('2 portály ukončeny')
+    expect(formatExpiredPortalsLabel(3)).toBe('3 portály ukončeny')
+    expect(formatExpiredPortalsLabel(5)).toBe('5 portálů ukončeno')
+  })
+})
+
+describe('isAdvertisementFullyExpired', () => {
+  it('is true only when every publication is expired', () => {
+    expect(
+      isAdvertisementFullyExpired(
+        advertisement([
+          { id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '12. 6.', endDate: '12. 7.' },
+        ]),
+      ),
+    ).toBe(true)
+    expect(
+      isAdvertisementFullyExpired(
+        advertisement([
+          { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.' },
+          { id: 'prace', channel: 'Prace.cz', status: 'expired', startDate: '12. 7.' },
+        ]),
+      ),
+    ).toBe(false)
+    expect(isAdvertisementFullyExpired(advertisement([]))).toBe(false)
   })
 })

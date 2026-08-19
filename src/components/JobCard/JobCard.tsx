@@ -1,9 +1,7 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { Button } from '../Button'
 import { Card } from '../Card'
-import { Icon } from '../Icon'
 import { Link } from '../Link'
 import { Tag, type TagColor } from '../Tag'
 import { TooltipProvider } from '../Tooltip'
@@ -11,7 +9,7 @@ import { Typography } from '../Typography'
 import { JobCardActions } from './JobCardActions'
 import { JobCardAdvertisement } from './JobCardAdvertisement'
 import { JobCardStats } from './JobCardStats'
-import { ViewCountRenderer } from './ViewCountRenderer'
+import { isAdvertisementFullyExpired } from './advertisementSummary'
 import type {
   JobAdvertisement,
   JobCandidateStat,
@@ -25,14 +23,11 @@ export interface JobCardProps
     Omit<HTMLAttributes<HTMLElement>, 'color' | 'title'> {
   title: string
   owner?: string
-  totalViewCount?: number
   status?: JobStatus
   candidates?: JobCardCandidates
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
   defaultOpenAdvertisementIds?: string[]
-  onEdit?: () => void
-  editLabel?: string
   actions?: JobCardAction[]
   onCreateAdvertisement?: () => void
 }
@@ -46,14 +41,11 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
   {
     title,
     owner,
-    totalViewCount,
     status = 'open',
     candidates,
     onCandidatesClick,
     advertisements = [],
     defaultOpenAdvertisementIds,
-    onEdit,
-    editLabel = 'Editovat',
     actions,
     onCreateAdvertisement,
     className,
@@ -77,12 +69,11 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
             <Typography variant="h3" className="tm-mb-1 tm-text-teamio-blue">
               {title}
             </Typography>
-            <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
-              {owner ? <span>{owner}</span> : null}
-              {totalViewCount === undefined ? null : (
-                <ViewCountRenderer count={totalViewCount} testId="job-card-total-views" />
-              )}
-            </div>
+            {owner ? (
+              <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
+                <span>{owner}</span>
+              </div>
+            ) : null}
           </div>
 
           <div className="tm-flex tm-flex-none tm-items-center tm-gap-2">
@@ -101,17 +92,6 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
               ) : null}
               {statusConfig.label}
             </Tag>
-            {onEdit ? (
-              <Button
-                variant="secondary"
-                size="medium"
-                onClick={onEdit}
-                className="!tm-font-medium"
-              >
-                <Icon name="edit" />
-                {editLabel}
-              </Button>
-            ) : null}
             {actions?.length ? (
               <JobCardActions
                 actions={actions}
@@ -140,7 +120,7 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
               ) : null}
             </div>
           ) : (
-            <div className="tm-flex tm-flex-col tm-gap-3">
+            <div className="tm-flex tm-flex-col tm-gap-1">
               {advertisements.map((advertisement) => (
                 <JobCardAdvertisement
                   key={advertisement.id}
@@ -148,7 +128,7 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
                   defaultOpen={
                     defaultOpenAdvertisementIds
                       ? defaultOpenAdvertisementIds.includes(advertisement.id)
-                      : true
+                      : !isAdvertisementFullyExpired(advertisement)
                   }
                 />
               ))}

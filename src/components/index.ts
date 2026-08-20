@@ -114,6 +114,7 @@ export {
   type JobCardCandidates,
   type JobCandidateStat,
   type JobCardAction,
+  type JobCardSelectableStatus,
 } from './JobCard'
 export {
   Modal,

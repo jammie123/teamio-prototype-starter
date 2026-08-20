@@ -3,6 +3,7 @@ import { useContext, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type 
 import { cn } from '../../lib/cn'
 import type { ChildrenProps, StyleProps } from '../../lib/types'
 import { DropdownContext } from '../Dropdown/DropdownContext'
+import { Icon } from '../Icon'
 
 export type OptionColor = 'primary' | 'danger'
 
@@ -24,17 +25,25 @@ function getOptionClass(color: OptionColor, isDisabled: boolean, isSelected: boo
           'tm-text-emotion-danger-active',
           'hover:tm-text-emotion-danger-active',
           'focus:tm-text-emotion-danger-active',
-          !isDisabled && 'hover:tm-bg-interactive-danger-hover',
+          !isDisabled &&
+            (isSelected
+              ? 'hover:tm-bg-interactive-danger-active'
+              : 'hover:tm-bg-interactive-danger-hover'),
           !isDisabled && 'active:tm-bg-interactive-danger-active',
-          'focus-visible:tm-bg-interactive-danger-hover',
+          isSelected
+            ? 'focus-visible:tm-bg-interactive-danger-active'
+            : 'focus-visible:tm-bg-interactive-danger-hover',
         )
       : cn(
           'tm-text-primary-default',
           'hover:tm-text-primary-default',
           'focus:tm-text-primary-default',
-          !isDisabled && 'hover:tm-bg-interactive-hover',
+          !isDisabled &&
+            (isSelected ? 'hover:tm-bg-interactive-active' : 'hover:tm-bg-interactive-hover'),
           !isDisabled && 'active:tm-bg-interactive-active',
-          'focus-visible:tm-bg-interactive-hover',
+          isSelected
+            ? 'focus-visible:tm-bg-interactive-active'
+            : 'focus-visible:tm-bg-interactive-hover',
         )
 
   return cn(
@@ -51,9 +60,14 @@ function getOptionClass(color: OptionColor, isDisabled: boolean, isSelected: boo
     'tm-no-underline',
     'tm-outline-0',
     'tm-cursor-default',
-    'tm-bg-transparent',
     'tm-border-0',
-    isSelected && 'tm-bg-interactive-active',
+    // tm-bg-transparent by přebilo token vybraného stavu, protože cn neřeší konflikty
+    // a bg-transparent je v Tailwind výstupu až za barvami z tokenů.
+    isSelected
+      ? color === 'danger'
+        ? 'tm-bg-interactive-danger-active'
+        : 'tm-bg-interactive-active'
+      : 'tm-bg-transparent',
     'hover:tm-no-underline',
     'focus:tm-no-underline',
     colorClass,
@@ -77,6 +91,18 @@ export function Option({
   const { activeIndex, getItemProps, onSelect } = useContext(DropdownContext)
   const isActive = activeIndex === index
   const optionClass = cn(getOptionClass(color, isDisabled, isSelected), className)
+  const content = (
+    <>
+      {children}
+      {isSelected && (
+        <Icon
+          name="check"
+          data-testid="option-selected-icon"
+          className="tm-ml-auto tm-shrink-0 tm-text-base"
+        />
+      )}
+    </>
+  )
 
   if (href && !isDisabled) {
     return (
@@ -97,7 +123,7 @@ export function Option({
         })}
         {...rest}
       >
-        {children}
+        {content}
       </a>
     )
   }
@@ -122,14 +148,14 @@ export function Option({
         })}
         {...buttonProps}
       >
-        {children}
+        {content}
       </button>
     )
   }
 
   return (
     <div role="option" aria-selected={isSelected} className={optionClass} {...rest}>
-      {children}
+      {content}
     </div>
   )
 }

@@ -1,12 +1,12 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
 import { Link } from '../Link'
-import { Tag, type TagColor } from '../Tag'
 import { Typography } from '../Typography'
 import { JobCardActions } from './JobCardActions'
 import { JobCardAdvertisement } from './JobCardAdvertisement'
+import { JobCardStatus } from './JobCardStatus'
 import { JobCardStats } from './JobCardStats'
 import { isAdvertisementFullyExpired } from './advertisementSummary'
 import type {
@@ -14,6 +14,7 @@ import type {
   JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
+  JobCardSelectableStatus,
   JobStatus,
 } from './types'
 
@@ -29,37 +30,21 @@ export interface JobCardProps
   defaultOpenAdvertisementIds?: string[]
   actions?: JobCardAction[]
   onCreateAdvertisement?: () => void
+  onStatusChange?: (status: JobCardSelectableStatus) => void
+  onCompleteDraft?: () => void
+  onGoToPublish?: () => void
+  onRestoreFromArchive?: () => void
 }
 
-const STATUS_CONFIG: Record<
-  JobStatus,
-  { label: string; color: TagColor; indicatorClass: string }
-> = {
-  active: {
-    label: 'Aktivní',
-    color: 'informative',
-    indicatorClass: 'tm-bg-emotion-info-emphasis',
-  },
-  published: {
-    label: 'Zveřejněný',
-    color: 'success',
-    indicatorClass: 'tm-bg-emotion-success-emphasis',
-  },
-  unpublished: {
-    label: 'Nezveřejněný',
-    color: 'warning',
-    indicatorClass: 'tm-bg-emotion-warning-emphasis',
-  },
-  draft: {
-    label: 'Rozpracovaný',
-    color: 'neutral',
-    indicatorClass: 'tm-bg-text-secondary-default',
-  },
-  archived: {
-    label: 'Archivní',
-    color: 'danger',
-    indicatorClass: 'tm-bg-emotion-danger-emphasis',
-  },
+/** An unpublished job has no live advertising, so every portal is shown as ended. */
+function asEndedAdvertisement(advertisement: JobAdvertisement): JobAdvertisement {
+  return {
+    ...advertisement,
+    publications: advertisement.publications?.map((publication) => ({
+      ...publication,
+      status: 'expired' as const,
+    })),
+  }
 }
 
 export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
@@ -73,12 +58,29 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     defaultOpenAdvertisementIds,
     actions,
     onCreateAdvertisement,
+    onStatusChange,
+    onCompleteDraft,
+    onGoToPublish,
+    onRestoreFromArchive,
     className,
     ...rest
   },
   ref,
 ) {
-  const statusConfig = STATUS_CONFIG[status]
+  const [currentStatus, setCurrentStatus] = useState<JobStatus>(status)
+
+  useEffect(() => {
+    setCurrentStatus(status)
+  }, [status])
+
+  function changeStatus(nextStatus: JobCardSelectableStatus) {
+    setCurrentStatus(nextStatus)
+    onStatusChange?.(nextStatus)
+  }
+
+  const showAdvertisements = currentStatus === 'published' || currentStatus === 'unpublished'
+  const shownAdvertisements =
+    currentStatus === 'unpublished' ? advertisements.map(asEndedAdvertisement) : advertisements
 
   return (
     <Card
@@ -101,19 +103,13 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
         </div>
 
         <div className="tm-flex tm-flex-none tm-items-center tm-gap-2">
-          <Tag
-            data-testid="job-card-status"
-            color={statusConfig.color}
-            isSubtle
-            className="tm-min-h-8 tm-px-3 !tm-font-medium"
-          >
-            <span
-              aria-hidden="true"
-              data-testid="job-card-status-indicator"
-              className={cn('tm-size-2', 'tm-flex-none', 'tm-rounded-full', statusConfig.indicatorClass)}
-            />
-            {statusConfig.label}
-          </Tag>
+          <JobCardStatus
+            status={currentStatus}
+            onStatusChange={changeStatus}
+            onCompleteDraft={onCompleteDraft}
+            onGoToPublish={onGoToPublish}
+            onRestoreFromArchive={onRestoreFromArchive}
+          />
           {actions?.length ? (
             <JobCardActions
               actions={actions}
@@ -128,36 +124,38 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
         <JobCardStats candidates={candidates} onStatClick={onCandidatesClick} />
       ) : null}
 
-      <div data-testid="job-card-advertisements">
-        {advertisements.length === 0 ? (
-          <div
-            data-testid="job-card-no-advertisement"
-            className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
-          >
-            <span>Nábor nemá žádný inzerát.</span>
-            {onCreateAdvertisement ? (
-              <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
-                Vytvořit inzerát
-              </Link>
-            ) : null}
-          </div>
-        ) : (
-          <div className="tm-flex tm-flex-col tm-gap-1">
-            {advertisements.map((advertisement) => (
-              <JobCardAdvertisement
-                key={advertisement.id}
-                advertisement={advertisement}
-                jobTitle={title}
-                defaultOpen={
-                  defaultOpenAdvertisementIds
-                    ? defaultOpenAdvertisementIds.includes(advertisement.id)
-                    : !isAdvertisementFullyExpired(advertisement)
-                }
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {showAdvertisements ? (
+        <div data-testid="job-card-advertisements">
+          {shownAdvertisements.length === 0 ? (
+            <div
+              data-testid="job-card-no-advertisement"
+              className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
+            >
+              <span>Nábor nemá žádný inzerát.</span>
+              {onCreateAdvertisement ? (
+                <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
+                  Vytvořit inzerát
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <div className="tm-flex tm-flex-col tm-gap-1">
+              {shownAdvertisements.map((advertisement) => (
+                <JobCardAdvertisement
+                  key={`${advertisement.id}-${currentStatus}`}
+                  advertisement={advertisement}
+                  jobTitle={title}
+                  defaultOpen={
+                    defaultOpenAdvertisementIds
+                      ? defaultOpenAdvertisementIds.includes(advertisement.id)
+                      : currentStatus === 'published' && !isAdvertisementFullyExpired(advertisement)
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
     </Card>
   )
 })

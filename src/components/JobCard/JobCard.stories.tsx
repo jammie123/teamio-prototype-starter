@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState } from 'react'
 import { fn } from 'storybook/test'
 import { JobCard } from './JobCard'
-import type { JobAdvertisement, JobCardAction } from './types'
+import type { JobAdvertisement, JobCardAction, JobCardSelectableStatus, JobStatus } from './types'
 
 function czechDate(daysFromNow: number) {
   const date = new Date()
@@ -12,7 +13,7 @@ function czechDate(daysFromNow: number) {
 const actions: JobCardAction[] = [
   { id: 'duplicate', label: 'Duplikovat nábor', onClick: fn() },
   { id: 'share', label: 'Sdílet nábor', onClick: fn() },
-  { id: 'close', label: 'Uzavřít nábor', onClick: fn() },
+  { id: 'archive', label: 'Archivovat', onClick: fn() },
   { id: 'delete', label: 'Smazat nábor', color: 'danger', onClick: fn() },
 ]
 
@@ -35,6 +36,10 @@ const meta = {
     status: 'published',
     candidates: { unreviewed: 14, inProgress: 6, total: 52 },
     onCandidatesClick: fn(),
+    onStatusChange: fn(),
+    onCompleteDraft: fn(),
+    onGoToPublish: fn(),
+    onRestoreFromArchive: fn(),
     advertisements: [activeAdvertisement],
     actions,
   },
@@ -73,12 +78,21 @@ export const Unpublished: Story = {
 export const Draft: Story = {
   args: {
     status: 'draft',
+    candidates: undefined,
+    advertisements: [],
   },
 }
 
 export const Archived: Story = {
   args: {
     status: 'archived',
+  },
+}
+
+export const ArchivedWithoutCandidates: Story = {
+  args: {
+    status: 'archived',
+    candidates: undefined,
   },
 }
 
@@ -156,7 +170,7 @@ export const ExpiredPublication: Story = {
 
 export const AllPublicationsExpired: Story = {
   args: {
-    status: 'archived',
+    status: 'unpublished',
     advertisements: [
       {
         id: 'ad-1',
@@ -189,6 +203,46 @@ export const AllPublicationsExpired: Story = {
         ],
       },
     ],
+  },
+}
+
+export const ChangeStatus: Story = {
+  render: function ChangeStatusStory(args) {
+    const [status, setStatus] = useState<JobStatus>(args.status ?? 'published')
+
+    return (
+      <JobCard
+        {...args}
+        status={status}
+        actions={(args.actions ?? []).map((action) =>
+          action.id === 'archive'
+            ? {
+                ...action,
+                onClick: () => {
+                  setStatus('archived')
+                  action.onClick?.()
+                },
+              }
+            : action,
+        )}
+        onStatusChange={(nextStatus: JobCardSelectableStatus) => {
+          setStatus(nextStatus)
+          args.onStatusChange?.(nextStatus)
+        }}
+        onGoToPublish={() => {
+          setStatus('published')
+          args.onGoToPublish?.()
+        }}
+        onCompleteDraft={() => {
+          setStatus('active')
+          args.onCompleteDraft?.()
+        }}
+        onRestoreFromArchive={() => {
+          setStatus('unpublished')
+          args.onRestoreFromArchive?.()
+        }}
+      />
+    )
   },
 }
 

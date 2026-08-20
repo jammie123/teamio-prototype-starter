@@ -1,28 +1,69 @@
+import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Divider } from '../Divider'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
-import { Option, OptionList } from '../OptionList'
-import type { JobCardAction } from './types'
+import { Option, OptionList, OptionSubmenu } from '../OptionList'
+import type { JobCardMenuItem, JobCardMenuSection } from './types'
 
 export interface JobCardActionsProps extends StyleProps {
-  actions: JobCardAction[]
+  sections: JobCardMenuSection[]
   label: string
   testId: string
 }
 
-export function JobCardActions({ actions, label, testId, className }: JobCardActionsProps) {
+function MenuItem({ item }: { item: JobCardMenuItem }) {
+  if (item.actions?.length) {
+    return (
+      <OptionSubmenu
+        label={item.label}
+        description={item.description}
+        count={item.count}
+        color={item.color}
+      >
+        <OptionList>
+          {item.actions.map((action) => (
+            <MenuItem key={action.id} item={action} />
+          ))}
+        </OptionList>
+      </OptionSubmenu>
+    )
+  }
+
+  return (
+    <Option color={item.color} description={item.description} onClick={item.onClick}>
+      {item.label}
+    </Option>
+  )
+}
+
+export function JobCardActions({ sections, label, testId, className }: JobCardActionsProps) {
+  const hasSubmenu = sections.some((section) =>
+    section.items.some((item) => Boolean(item.actions?.length)),
+  )
+
   return (
     <Dropdown placement="bottom-end" className={cn('tm-flex-none', className)}>
       <DropdownToggle variant="button-tertiary-circle" aria-label={label} data-testid={testId}>
         <Icon name="more-vertical" />
       </DropdownToggle>
-      <DropdownBody>
+      <DropdownBody overflow={hasSubmenu ? 'visible' : undefined}>
         <OptionList>
-          {actions.map((action) => (
-            <Option key={action.id} color={action.color} onClick={action.onClick}>
-              {action.label}
-            </Option>
+          {sections.map((section, index) => (
+            <Fragment key={section.id}>
+              {index > 0 ? (
+                <Divider
+                  role="none"
+                  aria-hidden="true"
+                  data-testid="job-card-actions-divider"
+                  className="tm-my-1"
+                />
+              ) : null}
+              {section.items.map((item) => (
+                <MenuItem key={item.id} item={item} />
+              ))}
+            </Fragment>
           ))}
         </OptionList>
       </DropdownBody>

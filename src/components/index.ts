@@ -100,12 +100,20 @@ export {
 export {
   OptionList,
   Option,
+  OptionContent,
+  OptionSubmenu,
+  optionClass,
+  optionDescriptionClass,
   type OptionListProps,
   type OptionProps,
   type OptionColor,
+  type OptionClassOptions,
+  type OptionSubmenuProps,
 } from './OptionList'
 export {
   JobCard,
+  buildJobCardMenuSections,
+  JOB_CARD_MENU_LABELS,
   type JobCardProps,
   type JobStatus,
   type JobPublication,
@@ -114,6 +122,10 @@ export {
   type JobCardCandidates,
   type JobCandidateStat,
   type JobCardAction,
+  type JobCardMenuItem,
+  type JobCardMenuSection,
+  type JobCardMenuHandlers,
+  type BuildJobCardMenuOptions,
   type JobCardSelectableStatus,
 } from './JobCard'
 export {

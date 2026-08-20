@@ -8,7 +8,7 @@ export interface DropdownBodyProps
   extends StyleProps,
     ChildrenProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  overflow?: 'scrollY'
+  overflow?: 'scrollY' | 'visible'
 }
 
 export function DropdownBody({
@@ -44,10 +44,15 @@ export function DropdownBody({
           'tm-shadow',
           'tm-outline-none',
           'tm-cursor-default',
-          'tm-overflow-x-hidden',
-          'tm-overflow-y-auto',
-          'tm-scrollbar-y',
-          'tm-overscroll-contain',
+          // A submenu has to escape the panel, so clipping is opt-out.
+          overflow === 'visible'
+            ? 'tm-overflow-visible'
+            : cn(
+                'tm-overflow-x-hidden',
+                'tm-overflow-y-auto',
+                'tm-scrollbar-y',
+                'tm-overscroll-contain',
+              ),
           overflow === 'scrollY' ? 'tm-max-h-[14.5rem]' : 'tm-max-h-screen',
           floatingProps.middlewareData?.hide?.referenceHidden && 'tm-invisible',
           className,

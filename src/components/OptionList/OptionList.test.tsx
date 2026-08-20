@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Option } from './Option'
 import { OptionList } from './OptionList'
+import { OptionSubmenu } from './OptionSubmenu'
 
 describe('OptionList', () => {
   it('renders options inside a dropdown', async () => {
@@ -67,5 +68,69 @@ describe('OptionList', () => {
     expect(unselected.querySelector('[data-icon-name="check"]')).not.toBeInTheDocument()
     expect(unselected).toHaveClass('hover:tm-bg-interactive-hover', 'tm-bg-transparent')
     expect(unselected).not.toHaveClass('tm-bg-interactive-active')
+  })
+
+  it('renders a two-line option with a description', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Dropdown>
+        <DropdownToggle>Otevřít</DropdownToggle>
+        <DropdownBody>
+          <OptionList>
+            <Option onClick={vi.fn()} description="Ukončení nebo prodloužení inzerce">
+              Místa vystavení
+            </Option>
+          </OptionList>
+        </DropdownBody>
+      </Dropdown>,
+    )
+
+    await user.click(screen.getByTestId('dropdown-toggle'))
+
+    const option = screen.getByRole('option', {
+      name: 'Místa vystavení Ukončení nebo prodloužení inzerce',
+    })
+    expect(option).toHaveClass('tm-items-start')
+    expect(screen.getByTestId('option-description')).toHaveTextContent(
+      'Ukončení nebo prodloužení inzerce',
+    )
+  })
+
+  it('opens a submenu on click and closes both menus after picking a nested action', async () => {
+    const user = userEvent.setup()
+    const onNestedClick = vi.fn()
+
+    render(
+      <Dropdown>
+        <DropdownToggle>Otevřít</DropdownToggle>
+        <DropdownBody overflow="visible">
+          <OptionList>
+            <OptionSubmenu label="Inzeráty" count={2}>
+              <OptionList>
+                <Option onClick={onNestedClick}>Editovat inzerát</Option>
+              </OptionList>
+            </OptionSubmenu>
+          </OptionList>
+        </DropdownBody>
+      </Dropdown>,
+    )
+
+    await user.click(screen.getByTestId('dropdown-toggle'))
+    const toggle = screen.getByTestId('option-submenu-toggle')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveAccessibleName('Inzeráty, 2')
+    expect(screen.getByTestId('option-submenu-count')).toHaveTextContent('2')
+    expect(screen.queryByTestId('option-submenu-body')).not.toBeInTheDocument()
+
+    await user.click(toggle)
+    expect(screen.getByTestId('option-submenu-toggle')).toHaveAttribute('aria-expanded', 'true')
+
+    const submenu = screen.getByTestId('option-submenu-body')
+    await user.click(within(submenu).getByRole('option', { name: 'Editovat inzerát' }))
+
+    expect(onNestedClick).toHaveBeenCalledTimes(1)
+    expect(screen.queryByTestId('option-submenu-body')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('option-list')).not.toBeInTheDocument()
   })
 })

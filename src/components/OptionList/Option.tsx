@@ -1,14 +1,20 @@
 import { useListItem } from '@floating-ui/react'
-import { useContext, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type MouseEvent } from 'react'
+import {
+  useContext,
+  type AnchorHTMLAttributes,
+  type ButtonHTMLAttributes,
+  type MouseEvent,
+  type ReactNode,
+} from 'react'
 import { cn } from '../../lib/cn'
 import type { ChildrenProps, StyleProps } from '../../lib/types'
 import { DropdownContext } from '../Dropdown/DropdownContext'
 import { Icon } from '../Icon'
-
-export type OptionColor = 'primary' | 'danger'
+import { optionClass, optionDescriptionClass, type OptionColor } from './optionClass'
 
 export interface OptionProps extends StyleProps, ChildrenProps {
   color?: OptionColor
+  description?: ReactNode
   href?: string
   rel?: string
   target?: AnchorHTMLAttributes<HTMLAnchorElement>['target']
@@ -18,65 +24,34 @@ export interface OptionProps extends StyleProps, ChildrenProps {
   className?: string
 }
 
-function getOptionClass(color: OptionColor, isDisabled: boolean, isSelected: boolean) {
-  const colorClass =
-    color === 'danger'
-      ? cn(
-          'tm-text-emotion-danger-active',
-          'hover:tm-text-emotion-danger-active',
-          'focus:tm-text-emotion-danger-active',
-          !isDisabled &&
-            (isSelected
-              ? 'hover:tm-bg-interactive-danger-active'
-              : 'hover:tm-bg-interactive-danger-hover'),
-          !isDisabled && 'active:tm-bg-interactive-danger-active',
-          isSelected
-            ? 'focus-visible:tm-bg-interactive-danger-active'
-            : 'focus-visible:tm-bg-interactive-danger-hover',
-        )
-      : cn(
-          'tm-text-primary-default',
-          'hover:tm-text-primary-default',
-          'focus:tm-text-primary-default',
-          !isDisabled &&
-            (isSelected ? 'hover:tm-bg-interactive-active' : 'hover:tm-bg-interactive-hover'),
-          !isDisabled && 'active:tm-bg-interactive-active',
-          isSelected
-            ? 'focus-visible:tm-bg-interactive-active'
-            : 'focus-visible:tm-bg-interactive-hover',
-        )
+function hasContent(description: ReactNode) {
+  return description !== undefined && description !== null && description !== false
+}
 
-  return cn(
-    'tm-w-full',
-    'tm-flex',
-    'tm-gap-2',
-    'tm-items-center',
-    'tm-flex-none',
-    'tm-p-2',
-    'tm-rounded',
-    'tm-text-left',
-    'tm-font-poppins',
-    'tm-text-sm',
-    'tm-no-underline',
-    'tm-outline-0',
-    'tm-cursor-default',
-    'tm-border-0',
-    // tm-bg-transparent by přebilo token vybraného stavu, protože cn neřeší konflikty
-    // a bg-transparent je v Tailwind výstupu až za barvami z tokenů.
-    isSelected
-      ? color === 'danger'
-        ? 'tm-bg-interactive-danger-active'
-        : 'tm-bg-interactive-active'
-      : 'tm-bg-transparent',
-    'hover:tm-no-underline',
-    'focus:tm-no-underline',
-    colorClass,
-    isDisabled && 'tm-opacity-40',
+export function OptionContent({
+  color = 'primary',
+  description,
+  children,
+}: Pick<OptionProps, 'color' | 'description' | 'children'>) {
+  if (!hasContent(description)) {
+    return children
+  }
+
+  return (
+    <span className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
+      <span>{children}</span>
+      <span data-testid="option-description" className={optionDescriptionClass(color)}>
+        {description}
+      </span>
+    </span>
   )
 }
 
+OptionContent.displayName = 'OptionContent'
+
 export function Option({
   color = 'primary',
+  description,
   href,
   onClick,
   isDisabled = false,
@@ -90,10 +65,15 @@ export function Option({
   const { ref, index } = useListItem()
   const { activeIndex, getItemProps, onSelect } = useContext(DropdownContext)
   const isActive = activeIndex === index
-  const optionClass = cn(getOptionClass(color, isDisabled, isSelected), className)
+  const itemClass = cn(
+    optionClass({ color, isDisabled, isSelected, hasDescription: hasContent(description) }),
+    className,
+  )
   const content = (
     <>
-      {children}
+      <OptionContent color={color} description={description}>
+        {children}
+      </OptionContent>
       {isSelected && (
         <Icon
           name="check"
@@ -114,7 +94,7 @@ export function Option({
         tabIndex={isActive ? 0 : -1}
         rel={rel}
         target={target}
-        className={optionClass}
+        className={itemClass}
         {...getItemProps({
           onClick: (event) => {
             onSelect(index)
@@ -138,7 +118,7 @@ export function Option({
         aria-selected={isSelected}
         tabIndex={isActive ? 0 : -1}
         disabled={isDisabled}
-        className={optionClass}
+        className={itemClass}
         {...getItemProps({
           onClick: (event) => {
             if (isDisabled) return
@@ -154,7 +134,7 @@ export function Option({
   }
 
   return (
-    <div role="option" aria-selected={isSelected} className={optionClass} {...rest}>
+    <div role="option" aria-selected={isSelected} className={itemClass} {...rest}>
       {content}
     </div>
   )

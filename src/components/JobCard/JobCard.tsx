@@ -9,6 +9,7 @@ import { JobCardAdvertisement } from './JobCardAdvertisement'
 import { JobCardStatus } from './JobCardStatus'
 import { JobCardStats } from './JobCardStats'
 import { isAdvertisementFullyExpired } from './advertisementSummary'
+import { buildJobCardMenuSections, type JobCardMenuHandlers } from './jobCardMenu'
 import type {
   JobAdvertisement,
   JobCandidateStat,
@@ -20,6 +21,7 @@ import type {
 
 export interface JobCardProps
   extends StyleProps,
+    JobCardMenuHandlers,
     Omit<HTMLAttributes<HTMLElement>, 'color' | 'title'> {
   title: string
   owner?: string
@@ -28,8 +30,8 @@ export interface JobCardProps
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
   defaultOpenAdvertisementIds?: string[]
+  /** Extra job actions appended after the built-in ones. */
   actions?: JobCardAction[]
-  onCreateAdvertisement?: () => void
   onStatusChange?: (status: JobCardSelectableStatus) => void
   onCompleteDraft?: () => void
   onGoToPublish?: () => void
@@ -58,6 +60,13 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     defaultOpenAdvertisementIds,
     actions,
     onCreateAdvertisement,
+    onEditJob,
+    onDuplicateJob,
+    onInviteColleagues,
+    onTransferJob,
+    onArchiveJob,
+    onEditAdvertisement,
+    onManagePublications,
     onStatusChange,
     onCompleteDraft,
     onGoToPublish,
@@ -77,6 +86,19 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     setCurrentStatus(nextStatus)
     onStatusChange?.(nextStatus)
   }
+
+  const menuSections = buildJobCardMenuSections({
+    advertisements,
+    actions,
+    onEditJob,
+    onDuplicateJob,
+    onInviteColleagues,
+    onTransferJob,
+    onArchiveJob,
+    onEditAdvertisement,
+    onManagePublications,
+    onCreateAdvertisement,
+  })
 
   const showAdvertisements = currentStatus === 'published' || currentStatus === 'unpublished'
   const shownAdvertisements =
@@ -110,10 +132,10 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
             onGoToPublish={onGoToPublish}
             onRestoreFromArchive={onRestoreFromArchive}
           />
-          {actions?.length ? (
+          {menuSections.length ? (
             <JobCardActions
-              actions={actions}
-              label="Další akce náboru"
+              sections={menuSections}
+              label="Akce nad náborem a inzerátem"
               testId="job-card-actions-toggle"
             />
           ) : null}

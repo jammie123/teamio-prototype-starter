@@ -3,6 +3,7 @@ import { fn } from 'storybook/test'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Option } from './Option'
 import { OptionList } from './OptionList'
+import { OptionSubmenu } from './OptionSubmenu'
 
 const meta = {
   title: 'Components/OptionList',
@@ -12,7 +13,7 @@ const meta = {
       <div className="tm-mb-[180px]">
         <Dropdown isOpen onOpenChange={() => undefined}>
           <DropdownToggle>Menu</DropdownToggle>
-          <DropdownBody>
+          <DropdownBody overflow="visible">
             <Story />
           </DropdownBody>
         </Dropdown>
@@ -49,6 +50,37 @@ export const Sorting: Story = {
       </Option>
       <Option onClick={fn()}>Nejstarší</Option>
       <Option onClick={fn()}>Podle názvu</Option>
+    </OptionList>
+  ),
+}
+
+export const WithDescription: Story = {
+  render: () => (
+    <OptionList>
+      <Option onClick={fn()} description="Popis a znění inzerátu">
+        Editovat inzerát
+      </Option>
+      <Option onClick={fn()} description="Ukončení nebo prodloužení inzerce">
+        Místa vystavení
+      </Option>
+    </OptionList>
+  ),
+}
+
+export const WithSubmenu: Story = {
+  render: () => (
+    <OptionList>
+      <OptionSubmenu label="Další akce" count={2}>
+        <OptionList>
+          <Option onClick={fn()} description="Popis a znění inzerátu">
+            Editovat inzerát
+          </Option>
+          <Option onClick={fn()} description="Ukončení nebo prodloužení inzerce">
+            Místa vystavení
+          </Option>
+        </OptionList>
+      </OptionSubmenu>
+      <Option onClick={fn()}>Editovat nábor</Option>
     </OptionList>
   ),
 }

@@ -579,6 +579,99 @@ describe('JobCard', () => {
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
+  it('lists advertisement actions above the job actions, split by a divider', async () => {
+    const user = userEvent.setup()
+    const onManagePublications = vi.fn()
+    renderJobCard({
+      onEditJob: vi.fn(),
+      onDuplicateJob: vi.fn(),
+      onInviteColleagues: vi.fn(),
+      onTransferJob: vi.fn(),
+      onArchiveJob: vi.fn(),
+      onEditAdvertisement: vi.fn(),
+      onManagePublications,
+    })
+
+    await user.click(screen.getByTestId('job-card-actions-toggle'))
+
+    const options = screen.getAllByRole('option')
+    expect(options.map((option) => option.textContent)).toEqual([
+      'Editovat inzerátPopis a znění inzerátu',
+      'Místa vystaveníUkončení nebo prodloužení inzerce',
+      'Editovat nábor',
+      'Duplikovat',
+      'Zapojit kolegy',
+      'Předat nábor',
+      'Archivovat',
+    ])
+    expect(screen.getByTestId('job-card-actions-divider')).toBeInTheDocument()
+    expect(screen.queryByTestId('option-submenu-toggle')).not.toBeInTheDocument()
+
+    await user.click(options[1])
+    expect(onManagePublications).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps advertisement actions flat when the job has several advertisements', async () => {
+    const user = userEvent.setup()
+    const onEditAdvertisement = vi.fn()
+    const secondAdvertisement: JobAdvertisement = {
+      id: 'ad-2',
+      title: 'Inzerát pro brigádníky',
+      publications: [
+        { id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.', endDate: '15. 9. 2026' },
+      ],
+    }
+
+    renderJobCard({
+      advertisements: [advertisement, secondAdvertisement],
+      onEditAdvertisement,
+      onManagePublications: vi.fn(),
+      onEditJob: vi.fn(),
+    })
+
+    await user.click(screen.getByTestId('job-card-actions-toggle'))
+
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Editovat inzerátPopis a znění inzerátu',
+      'Místa vystaveníUkončení nebo prodloužení inzerce',
+      'Editovat nábor',
+    ])
+    expect(screen.queryByTestId('option-submenu-toggle')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('option', { name: 'Editovat inzerát Popis a znění inzerátu' }))
+    expect(onEditAdvertisement).toHaveBeenCalledTimes(1)
+  })
+
+  it('lists Přidat inzerát instead of advertisement actions when the job has none', async () => {
+    const user = userEvent.setup()
+    const onCreateAdvertisement = vi.fn()
+    renderJobCard({
+      advertisements: [],
+      onCreateAdvertisement,
+      onEditAdvertisement: vi.fn(),
+      onManagePublications: vi.fn(),
+      onEditJob: vi.fn(),
+    })
+
+    await user.click(screen.getByTestId('job-card-actions-toggle'))
+
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Přidat inzerát',
+      'Editovat nábor',
+    ])
+    expect(screen.queryByRole('option', { name: /Editovat inzerát/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Místa vystavení/ })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('option', { name: 'Přidat inzerát' }))
+    expect(onCreateAdvertisement).toHaveBeenCalledTimes(1)
+  })
+
+  it('omits the action menu when no handler is passed', () => {
+    renderJobCard()
+
+    expect(screen.queryByTestId('job-card-actions-toggle')).not.toBeInTheDocument()
+  })
+
   it('forwards the ref to the card element', () => {
     const ref = { current: null as HTMLElement | null }
     render(<JobCard ref={ref} title="Nábor" />)

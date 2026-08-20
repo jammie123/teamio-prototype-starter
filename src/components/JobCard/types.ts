@@ -9,8 +9,20 @@ export type JobPublicationStatus = 'active' | 'endingSoon' | 'expired'
 export interface JobCardAction {
   id: string
   label: string
+  description?: string
   color?: OptionColor
   onClick?: () => void
+}
+
+/** A menu item turns into a submenu once it carries nested actions. */
+export interface JobCardMenuItem extends JobCardAction {
+  count?: number
+  actions?: JobCardMenuItem[]
+}
+
+export interface JobCardMenuSection {
+  id: string
+  items: JobCardMenuItem[]
 }
 
 export interface JobPublication {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { fn } from 'storybook/test'
+import { fn, userEvent, within } from 'storybook/test'
 import { JobCard } from './JobCard'
 import type { JobAdvertisement, JobCardAction, JobCardSelectableStatus, JobStatus } from './types'
 
@@ -10,10 +10,19 @@ function czechDate(daysFromNow: number) {
   return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
 }
 
-const actions: JobCardAction[] = [
-  { id: 'duplicate', label: 'Duplikovat nábor', onClick: fn() },
+const menuHandlers = {
+  onEditJob: fn(),
+  onDuplicateJob: fn(),
+  onInviteColleagues: fn(),
+  onTransferJob: fn(),
+  onArchiveJob: fn(),
+  onEditAdvertisement: fn(),
+  onManagePublications: fn(),
+}
+
+/** Extra actions are appended after the built-in job actions. */
+const extraActions: JobCardAction[] = [
   { id: 'share', label: 'Sdílet nábor', onClick: fn() },
-  { id: 'archive', label: 'Archivovat', onClick: fn() },
   { id: 'delete', label: 'Smazat nábor', color: 'danger', onClick: fn() },
 ]
 
@@ -41,7 +50,7 @@ const meta = {
     onGoToPublish: fn(),
     onRestoreFromArchive: fn(),
     advertisements: [activeAdvertisement],
-    actions,
+    ...menuHandlers,
   },
   decorators: [
     (Story) => (
@@ -55,7 +64,33 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const openMenu: Story['play'] = async ({ canvasElement }) => {
+  await userEvent.click(within(canvasElement).getByTestId('job-card-actions-toggle'))
+}
+
+/** An open menu is taller than the card, so the story needs room below it. */
+const roomForMenu: Story['decorators'] = [
+  (Story) => (
+    <div className="tm-min-h-[28rem]">
+      <Story />
+    </div>
+  ),
+]
+
 export const Default: Story = {}
+
+export const MenuOpen: Story = {
+  decorators: roomForMenu,
+  play: openMenu,
+}
+
+export const MenuWithExtraActions: Story = {
+  args: {
+    actions: extraActions,
+  },
+  decorators: roomForMenu,
+  play: openMenu,
+}
 
 export const Active: Story = {
   args: {
@@ -101,6 +136,15 @@ export const WithoutAdvertisement: Story = {
     advertisements: [],
     onCreateAdvertisement: fn(),
   },
+}
+
+export const MenuOpenWithoutAdvertisement: Story = {
+  args: {
+    advertisements: [],
+    onCreateAdvertisement: fn(),
+  },
+  decorators: roomForMenu,
+  play: openMenu,
 }
 
 export const TwoAdvertisements: Story = {
@@ -214,17 +258,10 @@ export const ChangeStatus: Story = {
       <JobCard
         {...args}
         status={status}
-        actions={(args.actions ?? []).map((action) =>
-          action.id === 'archive'
-            ? {
-                ...action,
-                onClick: () => {
-                  setStatus('archived')
-                  action.onClick?.()
-                },
-              }
-            : action,
-        )}
+        onArchiveJob={() => {
+          setStatus('archived')
+          args.onArchiveJob?.()
+        }}
         onStatusChange={(nextStatus: JobCardSelectableStatus) => {
           setStatus(nextStatus)
           args.onStatusChange?.(nextStatus)

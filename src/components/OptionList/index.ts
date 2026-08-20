@@ -1,2 +1,9 @@
 export { OptionList, type OptionListProps } from './OptionList'
-export { Option, type OptionProps, type OptionColor } from './Option'
+export { Option, OptionContent, type OptionProps } from './Option'
+export { OptionSubmenu, type OptionSubmenuProps } from './OptionSubmenu'
+export {
+  optionClass,
+  optionDescriptionClass,
+  type OptionColor,
+  type OptionClassOptions,
+} from './optionClass'

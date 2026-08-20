@@ -40,3 +40,15 @@ export const Default: Story = {
     </OptionList>
   ),
 }
+
+export const Sorting: Story = {
+  render: () => (
+    <OptionList>
+      <Option onClick={fn()} isSelected>
+        Nejnovější
+      </Option>
+      <Option onClick={fn()}>Nejstarší</Option>
+      <Option onClick={fn()}>Podle názvu</Option>
+    </OptionList>
+  ),
+}

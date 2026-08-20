@@ -4,6 +4,7 @@ export type {
   JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
+  JobCardSelectableStatus,
   JobPublication,
   JobPublicationStatus,
   JobStatus,

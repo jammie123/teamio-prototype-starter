@@ -35,7 +35,7 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-total-views')).not.toBeInTheDocument()
   })
 
-  it('renders the published status by default and another status on demand', () => {
+  it('renders the published status by default and status actions on demand', () => {
     const { unmount } = renderJobCard()
     const publishedStatus = screen.getByTestId('job-card-status')
     expect(publishedStatus).toHaveTextContent('Zveřejněný')
@@ -45,11 +45,16 @@ describe('JobCard', () => {
     )
 
     unmount()
-    renderJobCard({ status: 'archived' })
-    expect(screen.getByTestId('job-card-status')).toHaveTextContent('Archivní')
+    const unpublished = renderJobCard({ status: 'unpublished' })
+    expect(screen.getByTestId('job-card-status')).toHaveTextContent('Nezveřejněný')
     expect(screen.getByTestId('job-card-status-indicator')).toHaveClass(
-      'tm-bg-emotion-danger-emphasis',
+      'tm-bg-emotion-warning-emphasis',
     )
+
+    unpublished.unmount()
+    renderJobCard({ status: 'archived' })
+    expect(screen.getByRole('button', { name: 'Obnovit z archivu' })).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-status')).not.toBeInTheDocument()
   })
 
   it('renders candidate counts with labels', () => {

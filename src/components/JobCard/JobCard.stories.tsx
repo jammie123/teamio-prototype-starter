@@ -32,7 +32,7 @@ const meta = {
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
     owner: 'Petra Nováková',
-    status: 'open',
+    status: 'published',
     candidates: { unreviewed: 14, inProgress: 6, total: 52 },
     onCandidatesClick: fn(),
     advertisements: [activeAdvertisement],
@@ -52,9 +52,33 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-export const Closed: Story = {
+export const Active: Story = {
   args: {
-    status: 'closed',
+    status: 'active',
+  },
+}
+
+export const Published: Story = {
+  args: {
+    status: 'published',
+  },
+}
+
+export const Unpublished: Story = {
+  args: {
+    status: 'unpublished',
+  },
+}
+
+export const Draft: Story = {
+  args: {
+    status: 'draft',
+  },
+}
+
+export const Archived: Story = {
+  args: {
+    status: 'archived',
   },
 }
 
@@ -132,7 +156,7 @@ export const ExpiredPublication: Story = {
 
 export const AllPublicationsExpired: Story = {
   args: {
-    status: 'closed',
+    status: 'archived',
     advertisements: [
       {
         id: 'ad-1',

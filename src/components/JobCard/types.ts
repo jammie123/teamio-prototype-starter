@@ -1,6 +1,6 @@
 import type { OptionColor } from '../OptionList'
 
-export type JobStatus = 'open' | 'closed'
+export type JobStatus = 'active' | 'published' | 'unpublished' | 'draft' | 'archived'
 
 export type JobPublicationStatus = 'active' | 'endingSoon' | 'expired'
 

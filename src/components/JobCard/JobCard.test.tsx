@@ -35,19 +35,21 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-total-views')).not.toBeInTheDocument()
   })
 
-  it('renders the open status by default and the closed status on demand', () => {
+  it('renders the published status by default and another status on demand', () => {
     const { unmount } = renderJobCard()
-    const openStatus = screen.getByTestId('job-card-status')
-    expect(openStatus).toHaveTextContent('Otevřený')
-    expect(openStatus).toHaveClass('!tm-font-medium')
+    const publishedStatus = screen.getByTestId('job-card-status')
+    expect(publishedStatus).toHaveTextContent('Zveřejněný')
+    expect(publishedStatus).toHaveClass('!tm-font-medium')
     expect(screen.getByTestId('job-card-status-indicator')).toHaveClass(
       'tm-bg-emotion-success-emphasis',
     )
 
     unmount()
-    renderJobCard({ status: 'closed' })
-    expect(screen.getByTestId('job-card-status')).toHaveTextContent('Uzavřený')
-    expect(screen.queryByTestId('job-card-status-indicator')).not.toBeInTheDocument()
+    renderJobCard({ status: 'archived' })
+    expect(screen.getByTestId('job-card-status')).toHaveTextContent('Archivní')
+    expect(screen.getByTestId('job-card-status-indicator')).toHaveClass(
+      'tm-bg-emotion-danger-emphasis',
+    )
   })
 
   it('renders candidate counts with labels', () => {

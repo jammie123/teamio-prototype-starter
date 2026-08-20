@@ -31,16 +31,42 @@ export interface JobCardProps
   onCreateAdvertisement?: () => void
 }
 
-const STATUS_CONFIG: Record<JobStatus, { label: string; color: TagColor }> = {
-  open: { label: 'Otevřený', color: 'success' },
-  closed: { label: 'Uzavřený', color: 'neutral' },
+const STATUS_CONFIG: Record<
+  JobStatus,
+  { label: string; color: TagColor; indicatorClass: string }
+> = {
+  active: {
+    label: 'Aktivní',
+    color: 'informative',
+    indicatorClass: 'tm-bg-emotion-info-emphasis',
+  },
+  published: {
+    label: 'Zveřejněný',
+    color: 'success',
+    indicatorClass: 'tm-bg-emotion-success-emphasis',
+  },
+  unpublished: {
+    label: 'Nezveřejněný',
+    color: 'warning',
+    indicatorClass: 'tm-bg-emotion-warning-emphasis',
+  },
+  draft: {
+    label: 'Rozpracovaný',
+    color: 'neutral',
+    indicatorClass: 'tm-bg-text-secondary-default',
+  },
+  archived: {
+    label: 'Archivní',
+    color: 'danger',
+    indicatorClass: 'tm-bg-emotion-danger-emphasis',
+  },
 }
 
 export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
   {
     title,
     owner,
-    status = 'open',
+    status = 'published',
     candidates,
     onCandidatesClick,
     advertisements = [],
@@ -81,13 +107,11 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
             isSubtle
             className="tm-min-h-8 tm-px-3 !tm-font-medium"
           >
-            {status === 'open' ? (
-              <span
-                aria-hidden="true"
-                data-testid="job-card-status-indicator"
-                className="tm-size-2 tm-flex-none tm-rounded-full tm-bg-emotion-success-emphasis"
-              />
-            ) : null}
+            <span
+              aria-hidden="true"
+              data-testid="job-card-status-indicator"
+              className={cn('tm-size-2', 'tm-flex-none', 'tm-rounded-full', statusConfig.indicatorClass)}
+            />
             {statusConfig.label}
           </Tag>
           {actions?.length ? (

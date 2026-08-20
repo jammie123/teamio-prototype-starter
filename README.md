@@ -75,7 +75,9 @@ teamio-prototype-starter/
   - `tailwind.config.js` — spacing, typography, radii, shadows, breakpoints, animations, CSS variable generation
   - `src/styles/colors.js` — color palette imported by Tailwind
   - `src/styles/global.css` + `src/styles/modules/*` — scaffolding, typography, forms, scrollbar, truncate
-- Poppins is self-hosted via `@fontsource/poppins` (no Google Fonts CDN).
+- Poppins is self-hosted via `@fontsource/poppins` (no Google Fonts CDN). Import the full weight
+  stylesheets (`400.css`…`700.css`), not the `latin-*` ones — Czech caron/ring letters live in the
+  `latin-ext` subset and would otherwise fall back to the system font.
 
 ### Components: import and contribution
 
@@ -230,7 +232,9 @@ teamio-prototype-starter/
   - `tailwind.config.js` — spacing, typografie, radiusy, stíny, breakpointy, animace, CSS proměnné
   - `src/styles/colors.js` — paleta barev
   - `src/styles/global.css` + `src/styles/modules/*` — scaffolding, typografie, formuláře, scrollbar, truncate
-- Poppins je self-hosted přes `@fontsource/poppins`.
+- Poppins je self-hosted přes `@fontsource/poppins`. Importují se plné soubory řezů
+  (`400.css`…`700.css`), ne `latin-*` — znaky s háčky a kroužkem jsou v subsetu `latin-ext`
+  a jinak by padaly na systémový font.
 
 ### Komponenty: import a přispívání
 

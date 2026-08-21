@@ -32,8 +32,29 @@ describe('JobCard', () => {
     renderJobCard()
 
     expect(screen.getByRole('heading', { name: 'Řidič/ka sk. C ČB PO–PÁ' })).toBeInTheDocument()
-    expect(screen.getByText('Petra Nováková')).toBeInTheDocument()
+    expect(screen.getByTestId('job-card-owner')).toHaveTextContent('Petra Nováková')
+    expect(screen.queryByTestId('job-card-department')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-hiring-managers')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-total-views')).not.toBeInTheDocument()
+  })
+
+  it('renders department and hiring managers next to the owner when provided', () => {
+    renderJobCard({
+      department: 'České Budějovice',
+      hiringManagers: ['Lukáš Procházka', 'Hana Veselá'],
+    })
+
+    expect(screen.getByTestId('job-card-department')).toHaveTextContent('České Budějovice')
+    expect(screen.getByTestId('job-card-hiring-managers')).toHaveTextContent(
+      'Lukáš Procházka, Hana Veselá',
+    )
+  })
+
+  it('hides department and hiring managers when they are empty', () => {
+    renderJobCard({ department: '', hiringManagers: [] })
+
+    expect(screen.queryByTestId('job-card-department')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-hiring-managers')).not.toBeInTheDocument()
   })
 
   it('renders the published status by default and status actions on demand', () => {
@@ -143,15 +164,69 @@ describe('JobCard', () => {
     )
   })
 
-  it('renders the advertisement as an always-expanded card without an Inzerát title', () => {
+  it('renders the advertisement as an always-expanded card with the title beside Běží by default', () => {
     renderJobCard()
 
     const card = screen.getByTestId('job-card-advertisement')
     expect(card).toHaveClass('tm-rounded', 'tm-border', 'tm-border-secondary', 'tm-px-3', 'tm-py-3')
+    expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
+
+    const title = screen.getByTestId('job-card-advertisement-title')
+    const heading = screen.getByTestId('job-card-advertisement-running-heading')
+    expect(title).toHaveTextContent('Aktuální inzerát')
+    expect(title).toHaveClass('tm-text-sm', 'tm-font-medium', 'tm-text-primary-default')
+    expect(heading).toHaveTextContent('Běží')
+    expect(title.parentElement).toBe(heading.parentElement)
+    expect(title.parentElement).toHaveClass('tm-flex', 'tm-items-center')
+    expect(screen.getByTestId('job-card-advertisement-title-separator')).toHaveTextContent('·')
+  })
+
+  it('hides the advertisement title when showAdvertisementTitle is false', () => {
+    renderJobCard({ showAdvertisementTitle: false })
+
     expect(screen.queryByTestId('job-card-advertisement-title')).not.toBeInTheDocument()
     expect(screen.queryByText('Aktuální inzerát')).not.toBeInTheDocument()
-    expect(screen.queryByText('Inzerát #1')).not.toBeInTheDocument()
-    expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
+    expect(screen.getByTestId('job-card-advertisement-running-heading')).toHaveTextContent('Běží')
+  })
+
+  it('does not render an advertisement title when the advertisement has none', () => {
+    renderJobCard({
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [{ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '30. 9. 2026' }],
+        },
+      ],
+    })
+
+    expect(screen.queryByTestId('job-card-advertisement-title')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-title-separator')).not.toBeInTheDocument()
+  })
+
+  it('places the advertisement title beside Ukončeno when every portal has ended', () => {
+    renderJobCard({
+      advertisements: [
+        {
+          id: 'ad-1',
+          title: 'Aktuální inzerát',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '1. 9. 2026',
+            },
+          ],
+        },
+      ],
+    })
+
+    const title = screen.getByTestId('job-card-advertisement-title')
+    const ended = screen.getByTestId('job-card-publication-ended-heading')
+    expect(title.parentElement).toBe(ended.parentElement)
+    expect(ended).toHaveTextContent('Ukončeno')
+    expect(screen.queryByTestId('job-card-advertisement-running-heading')).not.toBeInTheDocument()
   })
 
   it('shows aggregated views in the advertisement header without per-portal counts', () => {
@@ -192,6 +267,63 @@ describe('JobCard', () => {
     const list = screen.getByTestId('job-card-advertisements').firstElementChild
     expect(screen.getAllByTestId('job-card-advertisement')).toHaveLength(2)
     expect(list).toHaveClass('tm-flex', 'tm-flex-col', 'tm-gap-3')
+    expect(screen.queryByTestId('job-card-additional-advertisements')).not.toBeInTheDocument()
+  })
+
+  it('shows only the first advertisement and a remaining-count link when the extra-ads link is enabled', async () => {
+    const user = userEvent.setup()
+    const onAdditionalAdvertisementsClick = vi.fn()
+    const secondAdvertisement: JobAdvertisement = {
+      id: 'ad-2',
+      title: 'Inzerát pro brigádníky',
+      publications: [{ id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.' }],
+    }
+    const thirdAdvertisement: JobAdvertisement = {
+      id: 'ad-3',
+      title: 'Inzerát pro studenty',
+      publications: [{ id: 'jobs-3', channel: 'Jobs.cz', startDate: '2. 8.' }],
+    }
+
+    renderJobCard({
+      advertisements: [advertisement, secondAdvertisement, thirdAdvertisement],
+      showAdditionalAdvertisementsLink: true,
+      onAdditionalAdvertisementsClick,
+    })
+
+    expect(screen.getAllByTestId('job-card-advertisement')).toHaveLength(1)
+    const link = screen.getByTestId('job-card-additional-advertisements')
+    expect(link).toHaveTextContent('Zobrazit další inzeráty (2)')
+
+    await user.click(link)
+    expect(onAdditionalAdvertisementsClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not show the extra-ads link when the flag is on but the job has a single advertisement', () => {
+    renderJobCard({
+      showAdditionalAdvertisementsLink: true,
+      onAdditionalAdvertisementsClick: vi.fn(),
+    })
+
+    expect(screen.getAllByTestId('job-card-advertisement')).toHaveLength(1)
+    expect(screen.queryByTestId('job-card-additional-advertisements')).not.toBeInTheDocument()
+  })
+
+  it('keeps unpublished advertisements ended when collapsing extra ads behind the link', () => {
+    renderJobCard({
+      status: 'unpublished',
+      showAdditionalAdvertisementsLink: true,
+      advertisements: [
+        advertisement,
+        { id: 'ad-2', title: 'Inzerát pro brigádníky', publications: [{ id: 'jobs-2', channel: 'Jobs.cz', startDate: '1. 8.' }] },
+      ],
+    })
+
+    expect(screen.getAllByTestId('job-card-advertisement')).toHaveLength(1)
+    expect(screen.queryByTestId('job-card-advertisement-running-heading')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-publication-ended-heading')).toBeInTheDocument()
+    expect(screen.getByTestId('job-card-additional-advertisements')).toHaveTextContent(
+      'Zobrazit další inzeráty (1)',
+    )
   })
 
   it('puts Běží and the until-date on the heading when every running portal shares an end date', () => {
@@ -286,10 +418,14 @@ describe('JobCard', () => {
     expect(screen.getByTestId('job-card-advertisement-running-heading').textContent).toBe(
       'Běží do 15. 9.',
     )
+    expect(screen.getByTestId('job-card-advertisement-title').parentElement).toBe(
+      screen.getByTestId('job-card-advertisement-running-heading').parentElement,
+    )
     const ended = screen.getByTestId('job-card-publication-ended-heading')
     expect(ended.textContent).toBe('Ukončeno 1. 9.')
-    expect(ended).toHaveClass('tm-text-primary-default', 'tm-text-sm', 'tm-font-medium')
-    expect(ended.parentElement).toHaveClass('tm-border-t', 'tm-border-secondary')
+    expect(ended.parentElement).not.toContainElement(screen.getByTestId('job-card-advertisement-title'))
+    expect(ended).toHaveClass('tm-text-emotion-warning-emphasis', 'tm-text-sm', 'tm-font-medium')
+    expect(ended.parentElement?.parentElement).toHaveClass('tm-border-t', 'tm-border-secondary')
 
     const portals = screen.getAllByTestId('job-card-publication')
     expect(portals).toHaveLength(3)
@@ -332,7 +468,7 @@ describe('JobCard', () => {
     expect(screen.getByTestId('job-card-publication-ended-heading')).toHaveClass(
       'tm-text-sm',
       'tm-font-medium',
-      'tm-text-primary-default',
+      'tm-text-emotion-warning-emphasis',
     )
     const portals = screen.getAllByTestId('job-card-publication')
     expect(portals.map((portal) => within(portal).getByTestId('job-card-publication-dates').textContent)).toEqual([
@@ -357,6 +493,8 @@ describe('JobCard', () => {
       advertisements: [{ id: 'ad-1', title: 'Aktuální inzerát', publications: [] }],
     })
 
+    expect(screen.getByTestId('job-card-advertisement-title')).toHaveTextContent('Aktuální inzerát')
+    expect(screen.queryByTestId('job-card-advertisement-title-separator')).not.toBeInTheDocument()
     expect(screen.getByTestId('job-card-advertisement-publications')).toHaveTextContent(
       'Inzerát není nikde vystavený.',
     )

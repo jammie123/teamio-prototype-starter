@@ -24,10 +24,17 @@ export interface JobCardProps
     Omit<HTMLAttributes<HTMLElement>, 'color' | 'title'> {
   title: string
   owner?: string
+  department?: string
+  hiringManagers?: string[]
   status?: JobStatus
   candidates?: JobCardCandidates
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
+  /** When true and there is more than one ad, show only the first ad plus a footer link. Default false. */
+  showAdditionalAdvertisementsLink?: boolean
+  onAdditionalAdvertisementsClick?: () => void
+  /** When false, advertisement titles are hidden. Default true. */
+  showAdvertisementTitle?: boolean
   /** Extra job actions appended after the built-in ones. */
   actions?: JobCardAction[]
   onStatusChange?: (status: JobCardSelectableStatus) => void
@@ -51,10 +58,15 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
   {
     title,
     owner,
+    department,
+    hiringManagers,
     status = 'published',
     candidates,
     onCandidatesClick,
     advertisements = [],
+    showAdditionalAdvertisementsLink = false,
+    onAdditionalAdvertisementsClick,
+    showAdvertisementTitle = true,
     actions,
     onCreateAdvertisement,
     onEditJob,
@@ -100,6 +112,12 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
   const showAdvertisements = currentStatus === 'published' || currentStatus === 'unpublished'
   const shownAdvertisements =
     currentStatus === 'unpublished' ? advertisements.map(asEndedAdvertisement) : advertisements
+  const additionalAdvertisementsCount = shownAdvertisements.length - 1
+  const collapseToFirstAd =
+    showAdditionalAdvertisementsLink && shownAdvertisements.length > 1
+  const visibleAdvertisements = collapseToFirstAd
+    ? shownAdvertisements.slice(0, 1)
+    : shownAdvertisements
 
   return (
     <Card
@@ -114,9 +132,13 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
           <Typography variant="h3" className="tm-mb-1 tm-text-teamio-blue">
             {title}
           </Typography>
-          {owner ? (
+          {owner || department || hiringManagers?.length ? (
             <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
-              <span>{owner}</span>
+              {owner ? <span data-testid="job-card-owner">{owner}</span> : null}
+              {department ? <span data-testid="job-card-department">{department}</span> : null}
+              {hiringManagers?.length ? (
+                <span data-testid="job-card-hiring-managers">{hiringManagers.join(', ')}</span>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -159,12 +181,22 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
             </div>
           ) : (
             <div className="tm-flex tm-flex-col tm-gap-3">
-              {shownAdvertisements.map((advertisement) => (
+              {visibleAdvertisements.map((advertisement) => (
                 <JobCardAdvertisement
                   key={`${advertisement.id}-${currentStatus}`}
                   advertisement={advertisement}
+                  showTitle={showAdvertisementTitle}
                 />
               ))}
+              {collapseToFirstAd ? (
+                <Link
+                  className="tm-text-sm"
+                  data-testid="job-card-additional-advertisements"
+                  onClick={onAdditionalAdvertisementsClick}
+                >
+                  {`Zobrazit další inzeráty (${additionalAdvertisementsCount})`}
+                </Link>
+              ) : null}
             </div>
           )}
         </div>

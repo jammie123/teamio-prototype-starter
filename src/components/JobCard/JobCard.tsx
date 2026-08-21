@@ -8,7 +8,6 @@ import { JobCardActions } from './JobCardActions'
 import { JobCardAdvertisement } from './JobCardAdvertisement'
 import { JobCardStatus } from './JobCardStatus'
 import { JobCardStats } from './JobCardStats'
-import { isAdvertisementFullyExpired } from './advertisementSummary'
 import { buildJobCardMenuSections, type JobCardMenuHandlers } from './jobCardMenu'
 import type {
   JobAdvertisement,
@@ -29,7 +28,6 @@ export interface JobCardProps
   candidates?: JobCardCandidates
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
-  defaultOpenAdvertisementIds?: string[]
   /** Extra job actions appended after the built-in ones. */
   actions?: JobCardAction[]
   onStatusChange?: (status: JobCardSelectableStatus) => void
@@ -57,7 +55,6 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     candidates,
     onCandidatesClick,
     advertisements = [],
-    defaultOpenAdvertisementIds,
     actions,
     onCreateAdvertisement,
     onEditJob,
@@ -161,17 +158,11 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
               ) : null}
             </div>
           ) : (
-            <div className="tm-flex tm-flex-col tm-gap-1">
+            <div className="tm-flex tm-flex-col tm-gap-3">
               {shownAdvertisements.map((advertisement) => (
                 <JobCardAdvertisement
                   key={`${advertisement.id}-${currentStatus}`}
                   advertisement={advertisement}
-                  jobTitle={title}
-                  defaultOpen={
-                    defaultOpenAdvertisementIds
-                      ? defaultOpenAdvertisementIds.includes(advertisement.id)
-                      : currentStatus === 'published' && !isAdvertisementFullyExpired(advertisement)
-                  }
                 />
               ))}
             </div>

@@ -142,6 +142,34 @@ export function formatExpiredPortalsLabel(count: number) {
   return `${count} portálů ukončeno`
 }
 
+export function formatRunningHeading({
+  sameDate,
+  date,
+}: {
+  sameDate: boolean
+  date?: string
+}) {
+  if (!sameDate || !date) {
+    return 'Běží'
+  }
+
+  return `Běží do ${date}`
+}
+
+export function formatEndedHeading({
+  sameDate,
+  date,
+}: {
+  sameDate: boolean
+  date?: string
+}) {
+  if (!sameDate || !date) {
+    return 'Ukončeno'
+  }
+
+  return `Ukončeno ${date}`
+}
+
 export function formatViewCountLabel(count: number) {
   const formatted = formatCount(count)
 

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatEndedHeading,
   formatExpiredPortalsLabel,
   formatRemainingDaysLabel,
+  formatRunningHeading,
   formatUntilDate,
   formatViewCountLabel,
   getAdvertisementSummary,
@@ -160,6 +162,28 @@ describe('formatExpiredPortalsLabel', () => {
     expect(formatExpiredPortalsLabel(2)).toBe('2 portály ukončeny')
     expect(formatExpiredPortalsLabel(3)).toBe('3 portály ukončeny')
     expect(formatExpiredPortalsLabel(5)).toBe('5 portálů ukončeno')
+  })
+})
+
+describe('formatRunningHeading', () => {
+  it('puts the until-date on the heading when dates match', () => {
+    expect(formatRunningHeading({ sameDate: true, date: '30. 9.' })).toBe('Běží do 30. 9.')
+  })
+
+  it('is only Běží when dates differ or the date is missing', () => {
+    expect(formatRunningHeading({ sameDate: false, date: '30. 9.' })).toBe('Běží')
+    expect(formatRunningHeading({ sameDate: true })).toBe('Běží')
+  })
+})
+
+describe('formatEndedHeading', () => {
+  it('puts the date on the heading when dates match, without do', () => {
+    expect(formatEndedHeading({ sameDate: true, date: '1. 9.' })).toBe('Ukončeno 1. 9.')
+  })
+
+  it('is only Ukončeno when dates differ or the date is missing', () => {
+    expect(formatEndedHeading({ sameDate: false, date: '1. 9.' })).toBe('Ukončeno')
+    expect(formatEndedHeading({ sameDate: true })).toBe('Ukončeno')
   })
 })
 

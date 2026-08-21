@@ -74,5 +74,6 @@ describe('components barrel', () => {
 
   it('exports job components', () => {
     expect(components.JobCard).toBeTypeOf('object')
+    expect(components.JobsFilter).toBeTypeOf('function')
   })
 })

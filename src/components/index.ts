@@ -139,6 +139,14 @@ export {
   type JobCardSelectableStatus,
 } from './JobCard'
 export {
+  JobsFilter,
+  type JobsFilterAdvertisementStatus,
+  type JobsFilterEmploymentType,
+  type JobsFilterOption,
+  type JobsFilterProps,
+  type JobsFilterValue,
+} from './JobsFilter'
+export {
   Modal,
   ModalTrigger,
   ModalPortal,

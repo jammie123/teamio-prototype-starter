@@ -24,7 +24,6 @@ export interface JobCardProps
     Omit<HTMLAttributes<HTMLElement>, 'color' | 'title'> {
   title: string
   owner?: string
-  department?: string
   hiringManagers?: string[]
   status?: JobStatus
   candidates?: JobCardCandidates
@@ -58,7 +57,6 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
   {
     title,
     owner,
-    department,
     hiringManagers,
     status = 'published',
     candidates,
@@ -132,10 +130,9 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
           <Typography variant="h3" className="tm-mb-1 tm-text-teamio-blue">
             {title}
           </Typography>
-          {owner || department || hiringManagers?.length ? (
+          {owner || hiringManagers?.length ? (
             <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
               {owner ? <span data-testid="job-card-owner">{owner}</span> : null}
-              {department ? <span data-testid="job-card-department">{department}</span> : null}
               {hiringManagers?.length ? (
                 <span data-testid="job-card-hiring-managers">{hiringManagers.join(', ')}</span>
               ) : null}

@@ -87,7 +87,6 @@ const meta = {
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
     owner: 'Petra Nováková',
-    department: 'České Budějovice',
     hiringManagers: ['Lukáš Procházka'],
     status: 'published',
     candidates: { new: 5, unassessed: 14, inProgress: 6, total: 52 },
@@ -161,9 +160,8 @@ export const HiddenAdvertisementTitle: Story = {
   },
 }
 
-export const WithoutDepartment: Story = {
+export const MultipleHiringManagers: Story = {
   args: {
-    department: undefined,
     hiringManagers: ['Klára Benešová', 'Michal Král'],
     candidates: { new: 0, unassessed: 14, inProgress: 6, total: 52 },
   },

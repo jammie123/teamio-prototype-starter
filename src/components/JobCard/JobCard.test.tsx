@@ -33,27 +33,23 @@ describe('JobCard', () => {
 
     expect(screen.getByRole('heading', { name: 'Řidič/ka sk. C ČB PO–PÁ' })).toBeInTheDocument()
     expect(screen.getByTestId('job-card-owner')).toHaveTextContent('Petra Nováková')
-    expect(screen.queryByTestId('job-card-department')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-hiring-managers')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-total-views')).not.toBeInTheDocument()
   })
 
-  it('renders department and hiring managers next to the owner when provided', () => {
+  it('renders hiring managers next to the owner when provided', () => {
     renderJobCard({
-      department: 'České Budějovice',
       hiringManagers: ['Lukáš Procházka', 'Hana Veselá'],
     })
 
-    expect(screen.getByTestId('job-card-department')).toHaveTextContent('České Budějovice')
     expect(screen.getByTestId('job-card-hiring-managers')).toHaveTextContent(
       'Lukáš Procházka, Hana Veselá',
     )
   })
 
-  it('hides department and hiring managers when they are empty', () => {
-    renderJobCard({ department: '', hiringManagers: [] })
+  it('hides hiring managers when the list is empty', () => {
+    renderJobCard({ hiringManagers: [] })
 
-    expect(screen.queryByTestId('job-card-department')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-hiring-managers')).not.toBeInTheDocument()
   })
 

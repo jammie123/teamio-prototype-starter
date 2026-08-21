@@ -15,6 +15,10 @@ export function pageTemplateColumnClass(isCollapsed: boolean) {
   )
 }
 
-export function pageTemplateMainClass() {
-  return cn('tm-flex-1', 'tm-bg-cover-light', 'tm-p-6')
+export function pageTemplateMainClass(hasPageHeader = false) {
+  return cn('tm-flex-1', 'tm-bg-cover-light', !hasPageHeader && 'tm-p-6')
+}
+
+export function pageTemplateBodyClass() {
+  return cn('tm-p-6')
 }

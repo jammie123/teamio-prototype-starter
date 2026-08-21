@@ -6,4 +6,5 @@ export {
   pageTemplateClass,
   pageTemplateColumnClass,
   pageTemplateMainClass,
+  pageTemplateBodyClass,
 } from './pageTemplateClass'

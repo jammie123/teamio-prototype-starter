@@ -41,9 +41,10 @@ export interface JobAdvertisement {
 }
 
 export interface JobCardCandidates {
-  unreviewed?: number
+  new?: number
+  unassessed?: number
   inProgress?: number
   total?: number
 }
 
-export type JobCandidateStat = keyof JobCardCandidates
+export type JobCandidateStat = Exclude<keyof JobCardCandidates, 'new'>

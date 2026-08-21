@@ -1,6 +1,10 @@
 export { Typography, type TypographyProps } from './Typography'
 export { Container, type ContainerProps } from './Container'
 export { Button, type ButtonProps } from './Button'
+export {
+  SplitButton,
+  type SplitButtonProps,
+} from './SplitButton'
 export { ButtonLink, type ButtonLinkProps } from './ButtonLink'
 export { Link, type LinkProps } from './Link'
 export { Icon, type IconProps, type IconName, type KnownIconName } from './Icon'
@@ -80,10 +84,16 @@ export {
   type HeaderTopMenuItem,
 } from './HeaderTop'
 export {
+  PageHeader,
+  pageHeaderClass,
+  type PageHeaderProps,
+} from './PageHeader'
+export {
   PageTemplate,
   pageTemplateClass,
   pageTemplateColumnClass,
   pageTemplateMainClass,
+  pageTemplateBodyClass,
   type PageTemplateProps,
 } from './PageTemplate'
 export {

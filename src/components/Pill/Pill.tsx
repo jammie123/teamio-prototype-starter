@@ -11,6 +11,7 @@ export type PillColor =
   | 'success'
   | 'warning'
   | 'danger'
+  | 'pink'
 
 export interface PillProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, 'color'>,
@@ -33,6 +34,8 @@ function colorClasses(color: PillColor) {
       return 'tm-text-primary-inverted-default tm-bg-emotion-success-active'
     case 'warning':
       return 'tm-text-primary-inverted-default tm-bg-emotion-warning-active'
+    case 'pink':
+      return 'tm-text-primary-inverted-default tm-bg-teamio-pink'
     case 'danger':
     case 'primary':
     default:

@@ -10,6 +10,7 @@ import type { StyleProps } from '../../lib/types'
 import { HeaderTop, type HeaderTopProps } from '../HeaderTop'
 import { LeftMenu, type LeftMenuProps } from '../LeftMenu'
 import {
+  pageTemplateBodyClass,
   pageTemplateClass,
   pageTemplateColumnClass,
   pageTemplateMainClass,
@@ -20,12 +21,13 @@ export interface PageTemplateProps
     Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   leftMenu: LeftMenuProps
   headerTop: HeaderTopProps
+  pageHeader?: ReactNode
   children?: ReactNode
 }
 
 export const PageTemplate = forwardRef<HTMLDivElement, PageTemplateProps>(
   function PageTemplate(
-    { leftMenu, headerTop, children, className, ...rest },
+    { leftMenu, headerTop, pageHeader, children, className, ...rest },
     ref,
   ) {
     const {
@@ -76,9 +78,16 @@ export const PageTemplate = forwardRef<HTMLDivElement, PageTemplateProps>(
           <HeaderTop {...headerTop} />
           <main
             data-testid="page-template-content"
-            className={cn(pageTemplateMainClass())}
+            className={cn(pageTemplateMainClass(Boolean(pageHeader)))}
           >
-            {children}
+            {pageHeader}
+            {pageHeader ? (
+              <div data-testid="page-template-body" className={pageTemplateBodyClass()}>
+                {children}
+              </div>
+            ) : (
+              children
+            )}
           </main>
         </div>
       </div>

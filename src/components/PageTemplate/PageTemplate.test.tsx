@@ -97,4 +97,33 @@ describe('PageTemplate', () => {
     render(<PageTemplate ref={ref} leftMenu={leftMenu} headerTop={headerTop} />)
     expect(ref.current).toBe(screen.getByTestId('page-template'))
   })
+
+  it('pads main when pageHeader is omitted', () => {
+    render(
+      <PageTemplate leftMenu={leftMenu} headerTop={headerTop}>
+        obsah
+      </PageTemplate>,
+    )
+
+    expect(screen.getByTestId('page-template-content')).toHaveClass('tm-p-6')
+    expect(screen.queryByTestId('page-template-body')).not.toBeInTheDocument()
+  })
+
+  it('renders pageHeader flush and pads only the body', () => {
+    render(
+      <PageTemplate
+        leftMenu={leftMenu}
+        headerTop={headerTop}
+        pageHeader={<header>Hlavička stránky</header>}
+      >
+        obsah
+      </PageTemplate>,
+    )
+
+    const main = screen.getByTestId('page-template-content')
+    expect(main).not.toHaveClass('tm-p-6')
+    expect(main).toHaveTextContent('Hlavička stránky')
+    expect(screen.getByTestId('page-template-body')).toHaveClass('tm-p-6')
+    expect(screen.getByTestId('page-template-body')).toHaveTextContent('obsah')
+  })
 })

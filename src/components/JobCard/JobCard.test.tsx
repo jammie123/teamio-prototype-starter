@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { JobCard } from './JobCard'
+import { formatCount } from './formatCount'
 import type { JobAdvertisement } from './types'
 
 const advertisement: JobAdvertisement = {
@@ -19,7 +20,7 @@ function renderJobCard(props: Partial<Parameters<typeof JobCard>[0]> = {}) {
     <JobCard
       title="Řidič/ka sk. C ČB PO–PÁ"
       owner="Petra Nováková"
-      candidates={{ unreviewed: 14, inProgress: 6, total: 52 }}
+      candidates={{ unassessed: 14, inProgress: 6, total: 52 }}
       advertisements={[advertisement]}
       {...props}
     />,
@@ -57,13 +58,21 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-status')).not.toBeInTheDocument()
   })
 
-  it('renders candidate counts with labels', () => {
-    renderJobCard()
+  it('renders candidate counts with labels stacked under the numbers', () => {
+    renderJobCard({ onCandidatesClick: vi.fn() })
 
     const stats = screen.getByTestId('job-card-stats')
     expect(stats).toHaveTextContent('14Neposouzení')
     expect(stats).toHaveTextContent('6Ve hře')
     expect(stats).toHaveTextContent('52Celkem')
+
+    const unassessed = screen.getByTestId('job-card-stat-unassessed')
+    expect(unassessed).toHaveClass('tm-flex-col', 'tm-items-center', 'tm-text-center')
+    expect(unassessed).not.toHaveClass('tm-items-baseline')
+    expect(unassessed.children[0]).toHaveTextContent('14')
+    expect(unassessed.children[1]).toHaveTextContent('Neposouzení')
+    expect(unassessed.children[0]).toHaveClass('tm-group-hover:tm-text-action-link-active')
+    expect(unassessed.children[1]).toHaveClass('tm-group-hover:tm-text-action-link-active')
   })
 
   it('makes the candidate stats clickable only when a handler is passed', async () => {
@@ -71,13 +80,13 @@ describe('JobCard', () => {
     const onCandidatesClick = vi.fn()
     const { unmount } = renderJobCard()
 
-    expect(screen.queryByTestId('job-card-stat-unreviewed')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-stat-unassessed')).not.toBeInTheDocument()
 
     unmount()
     renderJobCard({ onCandidatesClick })
 
-    await user.click(screen.getByTestId('job-card-stat-unreviewed'))
-    expect(onCandidatesClick).toHaveBeenCalledWith('unreviewed')
+    await user.click(screen.getByTestId('job-card-stat-unassessed'))
+    expect(onCandidatesClick).toHaveBeenCalledWith('unassessed')
 
     await user.click(screen.getByTestId('job-card-stat-total'))
     expect(onCandidatesClick).toHaveBeenLastCalledWith('total')
@@ -87,6 +96,51 @@ describe('JobCard', () => {
     renderJobCard({ candidates: undefined })
 
     expect(screen.queryByTestId('job-card-stats')).not.toBeInTheDocument()
+  })
+
+  it('hides the new-candidates pill when new is omitted or zero', () => {
+    const { unmount } = renderJobCard()
+    expect(screen.queryByTestId('job-card-new-candidates')).not.toBeInTheDocument()
+
+    unmount()
+    renderJobCard({ candidates: { new: 0, unassessed: 14, inProgress: 6, total: 52 } })
+    expect(screen.queryByTestId('job-card-new-candidates')).not.toBeInTheDocument()
+  })
+
+  it('shows a pink pill with the formatted new-candidate count in the unassessed column', () => {
+    renderJobCard({ candidates: { new: 5, unassessed: 14, inProgress: 6, total: 52 } })
+
+    const pill = screen.getByTestId('job-card-new-candidates')
+    expect(pill).toHaveTextContent(`${formatCount(5)} nových`)
+    expect(pill).toHaveAttribute('aria-label', `Noví kandidáti: ${formatCount(5)}`)
+    expect(pill).toHaveClass(
+      'tm-bg-teamio-pink',
+      'tm-text-primary-inverted-default',
+      'tm-absolute',
+      'tm-left-full',
+    )
+    expect(pill.parentElement).toHaveClass('tm-relative')
+    expect(screen.queryByTestId('job-card-stat-new')).not.toBeInTheDocument()
+
+    const stats = screen.getByTestId('job-card-stats')
+    const unassessedColumn = stats.firstElementChild
+    expect(unassessedColumn).toHaveClass('tm-flex-col')
+    expect(unassessedColumn).toContainElement(pill)
+    expect(unassessedColumn).toHaveTextContent('14')
+    expect(unassessedColumn).toHaveTextContent('Neposouzení')
+    expect(stats).toHaveTextContent('6Ve hře')
+    expect(stats).toHaveTextContent('52Celkem')
+
+    const title = screen.getByRole('heading', { name: 'Řidič/ka sk. C ČB PO–PÁ' })
+    expect(title).not.toContainElement(pill)
+  })
+
+  it('formats large new-candidate counts with cs-CZ grouping', () => {
+    renderJobCard({ candidates: { new: 1234, unassessed: 14, inProgress: 6, total: 52 } })
+
+    expect(screen.getByTestId('job-card-new-candidates').textContent).toBe(
+      `${formatCount(1234)} nových`,
+    )
   })
 
   it('labels the advertisement toggle with the recruitment title', () => {
@@ -392,11 +446,11 @@ describe('JobCard', () => {
         ],
       })
 
-      const publication = screen.getByTestId('job-card-publication')
+      const dates = screen.getByTestId('job-card-publication-dates')
       const status = screen.getByTestId('job-card-publication-status')
-      const cells = [...publication.children]
-      expect(cells[1]).toHaveAttribute('data-testid', 'job-card-publication-dates')
-      expect(cells[2]).toBe(status)
+      expect(dates).toHaveTextContent('do 22. 8.')
+      expect(dates).toHaveClass('tm-tabular-nums', 'tm-text-right')
+      expect(dates).toContainElement(status)
       expect(status).toHaveTextContent('Brzy končí · 3 dny')
       expect(status).toHaveClass('tm-text-emotion-warning-emphasis')
       expect(status).toHaveClass('tm-uppercase')
@@ -442,18 +496,17 @@ describe('JobCard', () => {
       ],
     })
 
-    const publication = screen.getByTestId('job-card-publication')
     const status = screen.getByTestId('job-card-publication-status')
-    const cells = [...publication.children]
-    expect(cells[1]).toHaveAttribute('data-testid', 'job-card-publication-dates')
-    expect(cells[2]).toBe(status)
+    const dates = screen.getByTestId('job-card-publication-dates')
+    expect(dates).toHaveTextContent('do 15. 9.')
+    expect(dates).toContainElement(status)
     expect(status).toHaveTextContent('Brzy končí')
     expect(status).toHaveClass('tm-text-emotion-warning-emphasis')
     expect(status).toHaveClass('tm-uppercase')
     expect(status).toHaveClass('tm-font-medium')
   })
 
-  it('marks an expired publication with its end date', () => {
+  it('marks an expired publication with a shared ended-until date', () => {
     renderJobCard({
       advertisements: [
         {
@@ -472,18 +525,84 @@ describe('JobCard', () => {
     })
 
     const publication = screen.getByTestId('job-card-publication')
-    const status = screen.getByTestId('job-card-publication-status')
-    const cells = [...publication.children]
-    expect(publication).toHaveTextContent('Ukončeno')
-    expect(publication).toHaveTextContent('12. 7. – 12. 8.')
-    expect(cells[1]).toHaveAttribute('data-testid', 'job-card-publication-dates')
-    expect(cells[1]).toHaveTextContent('12. 7. – 12. 8.')
-    expect(cells[2]).toBe(status)
-    expect(status).toHaveClass(
-      'tm-text-emotion-danger-emphasis',
+    const dates = screen.getByTestId('job-card-publication-dates')
+    expect(publication).toHaveTextContent('ukončeno do 12. 8.')
+    expect(dates).toHaveTextContent('ukončeno do 12. 8.')
+    expect(dates).toHaveClass('tm-tabular-nums', 'tm-text-right')
+    expect(screen.queryByTestId('job-card-publication-status')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-publication-ended-heading')).not.toBeInTheDocument()
+  })
+
+  it('collapses portals that share an end date into one until-date row', () => {
+    renderJobCard({
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 10 },
+            { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '15. 9.', viewCount: 4 },
+          ],
+        },
+      ],
+    })
+
+    const rows = screen.getAllByTestId('job-card-publication')
+    expect(rows).toHaveLength(1)
+    expect(within(rows[0]).getByTestId('job-card-publication-channel')).toHaveTextContent(
+      'Jobs.cz, Prace.cz',
     )
-    expect(screen.getByTestId('job-card-publication-status')).toHaveClass('tm-uppercase')
-    expect(screen.getByTestId('job-card-publication-status')).toHaveClass('tm-font-medium')
+    expect(within(rows[0]).getByTestId('job-card-publication-dates')).toHaveTextContent('do 15. 9.')
+    expect(within(rows[0]).getByTestId('job-card-publication-views')).toHaveTextContent('14')
+  })
+
+  it('lists each expired portal under Ukončeno when end dates differ', () => {
+    renderJobCard({
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '15. 9. 2026',
+            },
+            {
+              id: 'prace',
+              channel: 'Prace.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '30. 9. 2026',
+            },
+            {
+              id: 'career',
+              channel: 'Kariérní stránky',
+              status: 'expired',
+              startDate: '1. 6.',
+              endDate: '12. 8. 2026',
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(screen.getByTestId('job-card-publication-ended-heading')).toHaveTextContent('Ukončeno')
+    const rows = screen.getAllByTestId('job-card-publication')
+    expect(rows.map((row) => within(row).getByTestId('job-card-publication-channel').textContent)).toEqual([
+      'Jobs.cz',
+      'Prace.cz',
+      'Kariérní stránky',
+    ])
+    expect(rows.map((row) => within(row).getByTestId('job-card-publication-dates').textContent)).toEqual([
+      'do 15. 9.',
+      'do 30. 9.',
+      'do 12. 8.',
+    ])
+    expect(within(rows[0]).getByTestId('job-card-publication-dates')).toHaveClass(
+      'tm-tabular-nums',
+      'tm-text-right',
+    )
   })
 
   it('aligns publication row borders with the advertisement title', () => {
@@ -499,7 +618,7 @@ describe('JobCard', () => {
     expect(list).toHaveClass('tm-w-full')
     expect(list).toHaveClass('tm-gap-x-4')
     expect(list.className).toMatch(
-      /tm-grid-cols-\[minmax\(10rem,max-content\)_auto_auto_minmax\(0,1fr\)\]/,
+      /tm-grid-cols-\[minmax\(0,1fr\)_auto_auto\]/,
     )
 
     const gridClass = rows[0].className
@@ -529,8 +648,14 @@ describe('JobCard', () => {
     expect(within(rows[0]).getByTestId('job-card-publication-channel')).toHaveClass(
       'tm-font-medium',
     )
-    expect(within(rows[0]).getByTestId('job-card-publication-channel')).not.toHaveClass(
+    expect(within(rows[0]).getByTestId('job-card-publication-channel')).toHaveClass(
       'tm-min-w-0',
+    )
+    expect(within(rows[0]).getByTestId('job-card-publication-dates')).toHaveTextContent(
+      'do 15. 9.',
+    )
+    expect(within(rows[0]).getByTestId('job-card-publication-dates')).toHaveClass(
+      'tm-tabular-nums',
     )
   })
 

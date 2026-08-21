@@ -20,6 +20,7 @@ export const Informative: Story = { args: { color: 'informative', children: 8 } 
 export const Success: Story = { args: { color: 'success', children: 2 } }
 export const Warning: Story = { args: { color: 'warning', children: 1 } }
 export const Danger: Story = { args: { color: 'danger', children: 9 } }
+export const Pink: Story = { args: { color: 'pink', children: 5 } }
 
 export const Dismissible: Story = {
   render: function DismissiblePill() {

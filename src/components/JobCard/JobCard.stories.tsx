@@ -43,7 +43,7 @@ const meta = {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
     owner: 'Petra Nováková',
     status: 'published',
-    candidates: { unreviewed: 14, inProgress: 6, total: 52 },
+    candidates: { unassessed: 14, inProgress: 6, total: 52 },
     onCandidatesClick: fn(),
     onStatusChange: fn(),
     onCompleteDraft: fn(),
@@ -78,6 +78,12 @@ const roomForMenu: Story['decorators'] = [
 ]
 
 export const Default: Story = {}
+
+export const WithNewCandidates: Story = {
+  args: {
+    candidates: { new: 5, unassessed: 14, inProgress: 6, total: 52 },
+  },
+}
 
 export const MenuOpen: Story = {
   decorators: roomForMenu,

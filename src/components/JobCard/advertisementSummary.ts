@@ -66,8 +66,36 @@ export function formatRemainingDaysLabel(days: number) {
   return `${days} dní`
 }
 
-function stripYear(value: string) {
+export function stripYear(value: string) {
   return value.replace(/\s+\d{4}\.?$/, '')
+}
+
+export function formatUntilDate(endDate: string, { expiredSameDate = false } = {}) {
+  const date = stripYear(endDate)
+  return expiredSameDate ? `ukončeno do ${date}` : `do ${date}`
+}
+
+export function shareSameEndDate(publications: JobPublication[]) {
+  if (publications.length === 0) {
+    return false
+  }
+
+  const labels = publications.map((publication) =>
+    publication.endDate ? stripYear(publication.endDate) : undefined,
+  )
+
+  if (labels.some((label) => label === undefined)) {
+    return false
+  }
+
+  return labels.every((label) => label === labels[0])
+}
+
+export function partitionPublications(publications: JobPublication[]) {
+  return {
+    active: publications.filter((publication) => !isExpired(publication)),
+    expired: publications.filter(isExpired),
+  }
 }
 
 function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest') {

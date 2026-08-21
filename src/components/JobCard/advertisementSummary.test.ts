@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 import {
   formatExpiredPortalsLabel,
   formatRemainingDaysLabel,
+  formatUntilDate,
   formatViewCountLabel,
   getAdvertisementSummary,
   getRemainingCalendarDays,
   isAdvertisementFullyExpired,
+  partitionPublications,
+  shareSameEndDate,
 } from './advertisementSummary'
 import type { JobAdvertisement } from './types'
 
@@ -218,5 +221,65 @@ describe('isAdvertisementFullyExpired', () => {
       ),
     ).toBe(false)
     expect(isAdvertisementFullyExpired(advertisement([]))).toBe(false)
+  })
+})
+
+describe('formatUntilDate', () => {
+  it('strips the year and prefixes do, or ukončeno do when all expired share a date', () => {
+    expect(formatUntilDate('15. 9. 2026')).toBe('do 15. 9.')
+    expect(formatUntilDate('12. 8.')).toBe('do 12. 8.')
+    expect(formatUntilDate('15. 9. 2026', { expiredSameDate: true })).toBe('ukončeno do 15. 9.')
+  })
+})
+
+describe('shareSameEndDate', () => {
+  it('is true when every publication ends on the same calendar day', () => {
+    expect(
+      shareSameEndDate([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
+        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '15. 9.' },
+      ]),
+    ).toBe(true)
+  })
+
+  it('is false when dates differ or any end date is missing', () => {
+    expect(
+      shareSameEndDate([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
+        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026' },
+      ]),
+    ).toBe(false)
+    expect(
+      shareSameEndDate([{ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.' }]),
+    ).toBe(false)
+    expect(shareSameEndDate([])).toBe(false)
+  })
+})
+
+describe('partitionPublications', () => {
+  it('splits active and expired publications', () => {
+    expect(
+      partitionPublications([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          status: 'expired',
+          startDate: '12. 7.',
+          endDate: '12. 8.',
+        },
+      ]),
+    ).toEqual({
+      active: [{ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' }],
+      expired: [
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          status: 'expired',
+          startDate: '12. 7.',
+          endDate: '12. 8.',
+        },
+      ],
+    })
   })
 })

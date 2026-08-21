@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '../Table'
 import { Typography } from '../Typography'
+import { PageHeader } from '../PageHeader'
 import { PageTemplate } from './PageTemplate'
 
 const demoUser = {
@@ -152,6 +153,21 @@ export const Collapsed: Story = {
       activeItemId: 'prehled',
       isCollapsed: true,
     },
+  },
+}
+
+export const WithPageHeader: Story = {
+  args: {
+    leftMenu: {
+      items: leftMenuItems,
+      activeItemId: 'nabory',
+    },
+    pageHeader: <PageHeader title="Nábory" />,
+    children: (
+      <Typography variant="body" className="tm-text-secondary-default">
+        PageHeader navazuje na HeaderTop a levé menu. Padding je jen u obsahu.
+      </Typography>
+    ),
   },
 }
 

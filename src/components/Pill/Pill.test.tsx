@@ -40,6 +40,12 @@ describe('Pill', () => {
 
     rerender(<Pill color="danger">D</Pill>)
     expect(screen.getByText('D')).toHaveClass('tm-bg-emotion-danger-active')
+
+    rerender(<Pill color="pink">P</Pill>)
+    expect(screen.getByText('P')).toHaveClass(
+      'tm-text-primary-inverted-default',
+      'tm-bg-teamio-pink',
+    )
   })
 
   it('supports optional dismiss with accessible label', async () => {

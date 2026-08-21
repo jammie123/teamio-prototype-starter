@@ -2,7 +2,17 @@ import { Fragment, useId, useState } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Icon } from '../Icon'
-import { formatExpiredPortalsLabel, formatRemainingDaysLabel, formatViewCountLabel, getAdvertisementSummary, getRemainingCalendarDays, isAdvertisementFullyExpired } from './advertisementSummary'
+import {
+  formatExpiredPortalsLabel,
+  formatRemainingDaysLabel,
+  formatUntilDate,
+  formatViewCountLabel,
+  getAdvertisementSummary,
+  getRemainingCalendarDays,
+  isAdvertisementFullyExpired,
+  partitionPublications,
+  shareSameEndDate,
+} from './advertisementSummary'
 import type { JobAdvertisement, JobPublication } from './types'
 import { ViewCountRenderer } from './ViewCountRenderer'
 
@@ -14,7 +24,7 @@ export interface JobCardAdvertisementProps extends StyleProps {
 
 function publicationStatus(publication: JobPublication) {
   if (publication.status === 'expired') {
-    return { label: 'Ukončeno', className: 'tm-text-emotion-danger-emphasis' }
+    return undefined
   }
 
   const remainingDays =
@@ -36,10 +46,18 @@ function publicationStatus(publication: JobPublication) {
   return undefined
 }
 
+function sumViewCounts(publications: JobPublication[]) {
+  const counts = publications
+    .map((publication) => publication.viewCount)
+    .filter((count): count is number => count !== undefined)
+
+  return counts.length === 0 ? undefined : counts.reduce((sum, count) => sum + count, 0)
+}
+
 const PUBLICATION_GRID_CLASS = cn(
   'tm-grid',
   'tm-w-full',
-  'tm-grid-cols-[minmax(10rem,max-content)_auto_auto_minmax(0,1fr)]',
+  'tm-grid-cols-[minmax(0,1fr)_auto_auto]',
   'tm-items-center',
   'tm-gap-x-4',
 )
@@ -55,14 +73,46 @@ const PUBLICATION_ROW_CLASS = cn(
   'tm-text-primary-default',
 )
 
+function PublicationDateCell({
+  endDate,
+  expiredSameDate = false,
+  status,
+}: {
+  endDate?: string
+  expiredSameDate?: boolean
+  status?: ReturnType<typeof publicationStatus>
+}) {
+  return (
+    <span
+      data-testid="job-card-publication-dates"
+      className="tm-flex tm-min-w-0 tm-flex-col tm-items-end tm-whitespace-nowrap tm-tabular-nums tm-text-right"
+    >
+      {endDate ? formatUntilDate(endDate, { expiredSameDate }) : null}
+      {status ? (
+        <span
+          data-testid="job-card-publication-status"
+          className={cn('tm-font-medium', 'tm-uppercase', status.className)}
+        >
+          {status.label}
+        </span>
+      ) : null}
+    </span>
+  )
+}
+
 function PublicationRow({
+  channel,
   publication,
+  expiredSameDate = false,
   showDivider = false,
 }: {
+  channel: string
   publication: JobPublication
+  expiredSameDate?: boolean
   showDivider?: boolean
 }) {
   const status = publicationStatus(publication)
+  const viewCount = publication.viewCount
 
   return (
     <li
@@ -72,38 +122,78 @@ function PublicationRow({
         showDivider && 'tm-border-0 tm-border-t tm-border-solid tm-border-secondary',
       )}
     >
-      <span
-        data-testid="job-card-publication-channel"
-        className="tm-truncate tm-font-medium"
-      >
-        {publication.channel}
+      <span data-testid="job-card-publication-channel" className="tm-min-w-0 tm-truncate tm-font-medium">
+        {channel}
       </span>
-      <span
-        data-testid="job-card-publication-dates"
-        className="tm-min-w-0 tm-whitespace-nowrap"
-      >
-        {publication.startDate} – {publication.endDate ?? 'dosud'}
-      </span>
-      {status ? (
-        <span
-          data-testid="job-card-publication-status"
-          className={cn('tm-font-medium', 'tm-uppercase', status.className)}
-        >
-          {status.label}
-        </span>
-      ) : (
-        <span />
-      )}
-      {publication.viewCount === undefined ? (
+      <PublicationDateCell
+        endDate={publication.endDate}
+        expiredSameDate={expiredSameDate}
+        status={status}
+      />
+      {viewCount === undefined ? (
         <span />
       ) : (
-        <ViewCountRenderer
-          count={publication.viewCount}
-          testId="job-card-publication-views"
-          withIcon
-        />
+        <ViewCountRenderer count={viewCount} testId="job-card-publication-views" withIcon />
       )}
     </li>
+  )
+}
+
+function PublicationGroup({
+  publications,
+  expired,
+  showLeadingDivider = false,
+}: {
+  publications: JobPublication[]
+  expired: boolean
+  showLeadingDivider?: boolean
+}) {
+  if (publications.length === 0) {
+    return null
+  }
+
+  const sameEndDate = shareSameEndDate(publications)
+
+  if (sameEndDate) {
+    const combined: JobPublication = {
+      ...publications[0],
+      id: publications.map((publication) => publication.id).join('-'),
+      channel: publications.map((publication) => publication.channel).join(', '),
+      viewCount: sumViewCounts(publications),
+      status: publications.find((publication) => publication.status === 'endingSoon')?.status,
+    }
+
+    return (
+      <PublicationRow
+        channel={combined.channel}
+        publication={combined}
+        expiredSameDate={expired}
+        showDivider={showLeadingDivider}
+      />
+    )
+  }
+
+  return (
+    <>
+      {expired ? (
+        <li
+          data-testid="job-card-publication-ended-heading"
+          className={cn(PUBLICATION_ROW_CLASS, showLeadingDivider && 'tm-pt-2')}
+        >
+          <span />
+          <span className="tm-font-medium tm-text-right">Ukončeno</span>
+          <span />
+        </li>
+      ) : null}
+      {publications.map((publication, index) => (
+        <PublicationRow
+          key={publication.id}
+          channel={publication.channel}
+          publication={publication}
+          showDivider={!expired && (showLeadingDivider || index > 0)}
+        />
+      ))}
+    </>
   )
 }
 
@@ -117,6 +207,7 @@ export function JobCardAdvertisement({
   const [isOpen, setIsOpen] = useState(defaultOpen)
 
   const publications = advertisement.publications ?? []
+  const { active, expired } = partitionPublications(publications)
 
   const summary = getAdvertisementSummary(advertisement)
   const allExpired = isAdvertisementFullyExpired(advertisement)
@@ -242,13 +333,12 @@ export function JobCardAdvertisement({
           </p>
         ) : (
           <ul className={cn(PUBLICATION_GRID_CLASS, 'tm-m-0 tm-list-none tm-p-0')}>
-            {publications.map((publication, index) => (
-              <PublicationRow
-                key={publication.id}
-                publication={publication}
-                showDivider={index > 0}
-              />
-            ))}
+            <PublicationGroup publications={active} expired={false} />
+            <PublicationGroup
+              publications={expired}
+              expired
+              showLeadingDivider={active.length > 0}
+            />
           </ul>
         )}
       </div>

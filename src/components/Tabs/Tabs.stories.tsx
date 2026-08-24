@@ -57,6 +57,35 @@ export const WithDisabled: Story = {
   ),
 }
 
+export const WithCounts: Story = {
+  render: () => (
+    <Tabs defaultValue="published">
+      <TabsList aria-label="Filtry náborů">
+        <TabsTrigger value="active" count={14}>
+          Aktivní
+        </TabsTrigger>
+        <TabsTrigger value="published" count={11}>
+          Zveřejněný
+        </TabsTrigger>
+        <TabsTrigger value="unpublished" count={3}>
+          Nezveřejněný
+        </TabsTrigger>
+        <TabsTrigger value="draft" count={3}>
+          Rozpracovaný
+        </TabsTrigger>
+        <TabsTrigger value="archived" count={6}>
+          Archivní
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="active">Aktivní nábory ve stavu Open.</TabsContent>
+      <TabsContent value="published">Nábory s živou inzercí.</TabsContent>
+      <TabsContent value="unpublished">Nábory bez živé inzerce.</TabsContent>
+      <TabsContent value="draft">Rozpracované nábory.</TabsContent>
+      <TabsContent value="archived">Archivní nábory.</TabsContent>
+    </Tabs>
+  ),
+}
+
 export const Controlled: Story = {
   render: function ControlledTabs() {
     const [value, setValue] = useState('jedna')

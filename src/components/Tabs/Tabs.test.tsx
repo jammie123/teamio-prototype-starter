@@ -75,4 +75,29 @@ describe('Tabs', () => {
     expect(screen.getByRole('tab', { name: 'Jiná' })).toHaveClass('tm-text-secondary-default')
     expect(screen.getByRole('tab', { name: 'Jiná' })).toHaveAttribute('data-state', 'inactive')
   })
+
+  it('shows a subtle count pill on a trigger when count is set', () => {
+    render(
+      <Tabs defaultValue="active">
+        <TabsList>
+          <TabsTrigger value="active" count={14}>
+            Aktivní
+          </TabsTrigger>
+          <TabsTrigger value="published" count={11}>
+            Zveřejněný
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="active">Open</TabsContent>
+        <TabsContent value="published">Live</TabsContent>
+      </Tabs>,
+    )
+
+    expect(screen.getByRole('tab', { name: 'Aktivní 14' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Zveřejněný 11' })).toBeInTheDocument()
+    expect(screen.getAllByTestId('tabs-trigger-count').map((pill) => pill.textContent)).toEqual([
+      '14',
+      '11',
+    ])
+    expect(screen.getAllByTestId('tabs-trigger-count')[0]).toHaveClass('tm-bg-teamio-dark/5')
+  })
 })

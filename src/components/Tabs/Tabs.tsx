@@ -1,6 +1,7 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { forwardRef, type ComponentPropsWithoutRef, type ElementRef } from 'react'
 import { cn } from '../../lib/cn'
+import { Pill } from '../Pill'
 
 export const Tabs = TabsPrimitive.Root
 
@@ -30,10 +31,14 @@ export const TabsList = forwardRef<
 
 TabsList.displayName = 'TabsList'
 
+export interface TabsTriggerProps extends ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> {
+  count?: number
+}
+
 export const TabsTrigger = forwardRef<
   ElementRef<typeof TabsPrimitive.Trigger>,
-  ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(function TabsTrigger({ className, ...rest }, ref) {
+  TabsTriggerProps
+>(function TabsTrigger({ className, children, count, ...rest }, ref) {
   return (
     <TabsPrimitive.Trigger
       ref={ref}
@@ -41,6 +46,7 @@ export const TabsTrigger = forwardRef<
         'tm-relative',
         'tm-inline-flex',
         'tm-items-center',
+        'tm-gap-2',
         'tm-p-2',
         'tm-m-0',
         'tm-border-0',
@@ -68,7 +74,18 @@ export const TabsTrigger = forwardRef<
         className,
       )}
       {...rest}
-    />
+    >
+      {children}
+      {count !== undefined ? (
+        <Pill
+          color="tertiary"
+          data-testid="tabs-trigger-count"
+          className="tm-flex-none tm-tabular-nums"
+        >
+          {count}
+        </Pill>
+      ) : null}
+    </TabsPrimitive.Trigger>
   )
 })
 
@@ -91,5 +108,4 @@ TabsContent.displayName = 'TabsContent'
 
 export type TabsProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Root>
 export type TabsListProps = ComponentPropsWithoutRef<typeof TabsPrimitive.List>
-export type TabsTriggerProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
 export type TabsContentProps = ComponentPropsWithoutRef<typeof TabsPrimitive.Content>

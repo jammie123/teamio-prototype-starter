@@ -37,13 +37,14 @@ const STATUS_ACTIONS: Array<{
 }> = [
   {
     status: 'published',
-    label: 'Zveřejnit',
-    subtitle: 'Inzerát se vystaví na zvolené pracovní portály',
+    label: 'Zveřejněný',
+    subtitle: 'Inzerát je viditelný na jobportálech a dalších místech vystavení.',
   },
   {
     status: 'unpublished',
-    label: 'Nezveřejněné',
-    subtitle: 'Ukončí se inzerce na pracovních portálech. Viditelné pouze interně',
+    label: 'Nezveřejněný',
+    subtitle:
+      'Inzerát je dostupný pouze skrze interní odkaz na inzerát. Na všech ostatních místech je skrytý.',
   },
 ]
 

@@ -53,13 +53,22 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-hiring-managers')).not.toBeInTheDocument()
   })
 
-  it('renders the published status by default and status actions on demand', () => {
+  it('renders the published status by default and status actions on demand', async () => {
+    const user = userEvent.setup()
     const { unmount } = renderJobCard()
     const publishedStatus = screen.getByTestId('job-card-status')
     expect(publishedStatus).toHaveTextContent('Zveřejněný')
     expect(publishedStatus).toHaveClass('!tm-font-medium')
     expect(screen.getByTestId('job-card-status-indicator')).toHaveClass(
       'tm-bg-emotion-success-emphasis',
+    )
+
+    await user.click(publishedStatus)
+    expect(screen.getByRole('option', { name: /Zveřejněný/ })).toHaveTextContent(
+      'Inzerát je zveřejněný na jobportálech, je viditelný na jobportálech.',
+    )
+    expect(screen.getByRole('option', { name: /Nezveřejněný/ })).toHaveTextContent(
+      'Inzerát není viditelný na portálech a je dostupný pouze skrze interní odkaz na inzerát.',
     )
 
     unmount()

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatCompactDateRange,
   formatEndedHeading,
   formatExpiredPortalsLabel,
   formatRemainingDaysLabel,
@@ -165,14 +166,38 @@ describe('formatExpiredPortalsLabel', () => {
   })
 })
 
-describe('formatRunningHeading', () => {
-  it('puts the until-date on the heading when dates match', () => {
-    expect(formatRunningHeading({ sameDate: true, date: '30. 9.' })).toBe('Běží do 30. 9.')
+describe('formatCompactDateRange', () => {
+  it('keeps the year only once when both dates share it', () => {
+    expect(formatCompactDateRange('12. 7. 2026', '30. 9. 2026')).toBe('12. 7. – 30. 9. 2026')
   })
 
-  it('is only Běží when dates differ or the date is missing', () => {
-    expect(formatRunningHeading({ sameDate: false, date: '30. 9.' })).toBe('Běží')
-    expect(formatRunningHeading({ sameDate: true })).toBe('Běží')
+  it('keeps both years when the range crosses a year', () => {
+    expect(formatCompactDateRange('12. 12. 2025', '30. 3. 2026')).toBe(
+      '12. 12. 2025 – 30. 3. 2026',
+    )
+  })
+
+  it('collapses to one date when start and end are the same day', () => {
+    expect(formatCompactDateRange('12. 7. 2026', '12. 7. 2026')).toBe('12. 7. 2026')
+  })
+})
+
+describe('formatRunningHeading', () => {
+  it('puts the from-to range on the heading when dates match', () => {
+    expect(
+      formatRunningHeading({ sameDate: true, startDate: '12. 7. 2026', endDate: '30. 9. 2026' }),
+    ).toBe('Běží 12. 7. – 30. 9. 2026')
+  })
+
+  it('falls back to Běží do when only the end date is present', () => {
+    expect(formatRunningHeading({ sameDate: true, endDate: '30. 9. 2026' })).toBe('Běží do 30. 9. 2026')
+  })
+
+  it('is only Běží when dates differ or the end date is missing', () => {
+    expect(
+      formatRunningHeading({ sameDate: false, startDate: '12. 7. 2026', endDate: '30. 9. 2026' }),
+    ).toBe('Běží')
+    expect(formatRunningHeading({ sameDate: true, startDate: '12. 7. 2026' })).toBe('Běží')
   })
 })
 
@@ -249,10 +274,10 @@ describe('isAdvertisementFullyExpired', () => {
 })
 
 describe('formatUntilDate', () => {
-  it('strips the year and prefixes do, or ukončeno do when all expired share a date', () => {
-    expect(formatUntilDate('15. 9. 2026')).toBe('do 15. 9.')
+  it('keeps the full date and prefixes do, or ukončeno do when all expired share a date', () => {
+    expect(formatUntilDate('15. 9. 2026')).toBe('do 15. 9. 2026')
     expect(formatUntilDate('12. 8.')).toBe('do 12. 8.')
-    expect(formatUntilDate('15. 9. 2026', { expiredSameDate: true })).toBe('ukončeno do 15. 9.')
+    expect(formatUntilDate('15. 9. 2026', { expiredSameDate: true })).toBe('ukončeno do 15. 9. 2026')
   })
 })
 

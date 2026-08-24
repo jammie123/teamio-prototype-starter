@@ -70,9 +70,62 @@ export function stripYear(value: string) {
   return value.replace(/\s+\d{4}\.?$/, '')
 }
 
+function dateYear(value: string) {
+  return value.trim().match(/(\d{4})\.?$/)?.[1]
+}
+
+/** Same year once at the end; both years only when the range crosses a year. */
+export function formatCompactDateRange(startDate: string, endDate: string) {
+  const startYear = dateYear(startDate)
+  const endYear = dateYear(endDate)
+  const startDay = stripYear(startDate)
+  const endDay = stripYear(endDate)
+  const yearsDiffer = Boolean(startYear && endYear && startYear !== endYear)
+
+  if (startDay === endDay && !yearsDiffer) {
+    const year = endYear ?? startYear
+    return year ? `${startDay} ${year}` : startDay
+  }
+
+  if (yearsDiffer) {
+    return `${startDay} ${startYear} – ${endDay} ${endYear}`
+  }
+
+  const year = endYear ?? startYear
+  const endLabel = year ? `${endDay} ${year}` : endDay
+  return `${startDay} – ${endLabel}`
+}
+
 export function formatUntilDate(endDate: string, { expiredSameDate = false } = {}) {
-  const date = stripYear(endDate)
-  return expiredSameDate ? `ukončeno do ${date}` : `do ${date}`
+  return expiredSameDate ? `ukončeno do ${endDate}` : `do ${endDate}`
+}
+
+export function formatPublicationRange(startDate: string, endDate?: string) {
+  if (!endDate) {
+    return startDate
+  }
+
+  return formatCompactDateRange(startDate, endDate)
+}
+
+export function shareSameStartDate(publications: JobPublication[]) {
+  if (publications.length === 0) {
+    return false
+  }
+
+  const labels = publications.map((publication) =>
+    publication.startDate ? stripYear(publication.startDate) : undefined,
+  )
+
+  if (labels.some((label) => label === undefined)) {
+    return false
+  }
+
+  return labels.every((label) => label === labels[0])
+}
+
+export function richestDateLabel(dates: string[]) {
+  return dates.find((date) => /\d{4}/.test(date)) ?? dates[0]
 }
 
 export function shareSameEndDate(publications: JobPublication[]) {
@@ -98,20 +151,25 @@ export function partitionPublications(publications: JobPublication[]) {
   }
 }
 
-function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest') {
+function pickDate(
+  publications: JobPublication[],
+  field: 'startDate' | 'endDate',
+  pick: 'earliest' | 'latest',
+) {
   return publications.reduce<{ label: string; time: number } | undefined>((current, publication) => {
-    if (!publication.endDate) {
+    const value = publication[field]
+    if (!value) {
       return current
     }
 
-    const time = parseCzechDate(publication.endDate)
+    const time = parseCzechDate(value)
     const candidate =
       time === undefined
         ? {
-            label: publication.endDate,
+            label: value,
             time: pick === 'earliest' ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY,
           }
-        : { label: publication.endDate, time }
+        : { label: value, time }
 
     if (!current) {
       return candidate
@@ -123,6 +181,14 @@ function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest'
 
     return current.time >= candidate.time ? current : candidate
   }, undefined)
+}
+
+function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest') {
+  return pickDate(publications, 'endDate', pick)
+}
+
+export function earliestStartDateLabel(publications: JobPublication[]) {
+  return pickDate(publications, 'startDate', 'earliest')?.label
 }
 
 export function isAdvertisementFullyExpired(advertisement: JobAdvertisement) {
@@ -144,16 +210,22 @@ export function formatExpiredPortalsLabel(count: number) {
 
 export function formatRunningHeading({
   sameDate,
-  date,
+  startDate,
+  endDate,
 }: {
   sameDate: boolean
-  date?: string
+  startDate?: string
+  endDate?: string
 }) {
-  if (!sameDate || !date) {
+  if (!sameDate || !endDate) {
     return 'Běží'
   }
 
-  return `Běží do ${date}`
+  if (startDate) {
+    return `Běží ${formatCompactDateRange(startDate, endDate)}`
+  }
+
+  return `Běží do ${endDate}`
 }
 
 export function formatEndedHeading({

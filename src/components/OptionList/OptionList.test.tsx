@@ -78,8 +78,8 @@ describe('OptionList', () => {
         <DropdownToggle>Otevřít</DropdownToggle>
         <DropdownBody>
           <OptionList>
-            <Option onClick={vi.fn()} description="Ukončení nebo prodloužení inzerce">
-              Místa vystavení
+            <Option onClick={vi.fn()} description="Popis a znění inzerátu">
+              Editovat inzerát
             </Option>
           </OptionList>
         </DropdownBody>
@@ -89,12 +89,10 @@ describe('OptionList', () => {
     await user.click(screen.getByTestId('dropdown-toggle'))
 
     const option = screen.getByRole('option', {
-      name: 'Místa vystavení Ukončení nebo prodloužení inzerce',
+      name: 'Editovat inzerát Popis a znění inzerátu',
     })
     expect(option).toHaveClass('tm-items-start')
-    expect(screen.getByTestId('option-description')).toHaveTextContent(
-      'Ukončení nebo prodloužení inzerce',
-    )
+    expect(screen.getByTestId('option-description')).toHaveTextContent('Popis a znění inzerátu')
   })
 
   it('opens a submenu on click and closes both menus after picking a nested action', async () => {

@@ -160,7 +160,7 @@ describe('JobCard', () => {
     )
   })
 
-  it('renders the advertisement as an always-expanded card with the title beside Běží by default', () => {
+  it('renders the advertisement as an always-expanded card with a secondary title beside views', () => {
     renderJobCard()
 
     const card = screen.getByTestId('job-card-advertisement')
@@ -169,11 +169,13 @@ describe('JobCard', () => {
 
     const title = screen.getByTestId('job-card-advertisement-title')
     const heading = screen.getByTestId('job-card-advertisement-running-heading')
+    const views = screen.getByTestId('job-card-advertisement-aggregate-views')
     expect(title).toHaveTextContent('Aktuální inzerát')
-    expect(title).toHaveClass('tm-text-sm', 'tm-font-medium', 'tm-text-primary-default')
+    expect(title).toHaveClass('tm-font-normal')
+    expect(title.parentElement).toHaveClass('tm-text-secondary-default')
     expect(heading).toHaveTextContent('Běží')
-    expect(title.parentElement).toBe(heading.parentElement)
-    expect(title.parentElement).toHaveClass('tm-flex', 'tm-items-center')
+    expect(title.parentElement).not.toBe(heading.parentElement)
+    expect(title.parentElement).toContainElement(views)
     expect(screen.getByTestId('job-card-advertisement-title-separator')).toHaveTextContent('·')
   })
 
@@ -199,7 +201,7 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-advertisement-title-separator')).not.toBeInTheDocument()
   })
 
-  it('places the advertisement title beside Ukončeno when every portal has ended', () => {
+  it('keeps the advertisement title secondary on the right when every portal has ended', () => {
     renderJobCard({
       advertisements: [
         {
@@ -220,7 +222,8 @@ describe('JobCard', () => {
 
     const title = screen.getByTestId('job-card-advertisement-title')
     const ended = screen.getByTestId('job-card-publication-ended-heading')
-    expect(title.parentElement).toBe(ended.parentElement)
+    expect(title.parentElement).not.toBe(ended.parentElement)
+    expect(title.parentElement).toHaveClass('tm-text-secondary-default')
     expect(ended).toHaveTextContent('Ukončeno')
     expect(screen.queryByTestId('job-card-advertisement-running-heading')).not.toBeInTheDocument()
   })
@@ -233,9 +236,10 @@ describe('JobCard', () => {
     expect(views).toHaveTextContent(/1\s284 zhlédnutí/)
     expect(screen.queryByTestId('job-card-publication-views')).not.toBeInTheDocument()
     expect(within(views).queryByTestId('icon')).not.toBeInTheDocument()
-    expect(card).toHaveClass('tm-relative')
     expect(card).toContainElement(views)
-    expect(views).toHaveClass('tm-absolute', 'tm-right-3', 'tm-top-3', 'tm-text-13', 'tm-text-secondary-default')
+    expect(views.parentElement).toHaveClass('tm-text-13', 'tm-text-secondary-default')
+    expect(views).not.toHaveClass('tm-absolute')
+    expect(screen.getByTestId('job-card-advertisement-title-separator')).toHaveTextContent('·')
   })
 
   it('omits aggregated views when no publication has a view count', () => {
@@ -414,8 +418,8 @@ describe('JobCard', () => {
     expect(screen.getByTestId('job-card-advertisement-running-heading').textContent).toBe(
       'Běží do 15. 9.',
     )
-    expect(screen.getByTestId('job-card-advertisement-title').parentElement).toBe(
-      screen.getByTestId('job-card-advertisement-running-heading').parentElement,
+    expect(screen.getByTestId('job-card-advertisement-title').parentElement).toContainElement(
+      screen.getByTestId('job-card-advertisement-aggregate-views'),
     )
     const ended = screen.getByTestId('job-card-publication-ended-heading')
     expect(ended.textContent).toBe('Ukončeno 1. 9.')
@@ -525,7 +529,8 @@ describe('JobCard', () => {
 
   it('lists advertisement actions above the job actions, split by a divider', async () => {
     const user = userEvent.setup()
-    const onManagePublications = vi.fn()
+    const onExtendAndRepublish = vi.fn()
+    const onEndPublication = vi.fn()
     renderJobCard({
       onEditJob: vi.fn(),
       onDuplicateJob: vi.fn(),
@@ -533,7 +538,8 @@ describe('JobCard', () => {
       onTransferJob: vi.fn(),
       onArchiveJob: vi.fn(),
       onEditAdvertisement: vi.fn(),
-      onManagePublications,
+      onExtendAndRepublish,
+      onEndPublication,
     })
 
     await user.click(screen.getByTestId('job-card-actions-toggle'))
@@ -541,7 +547,8 @@ describe('JobCard', () => {
     const options = screen.getAllByRole('option')
     expect(options.map((option) => option.textContent)).toEqual([
       'Editovat inzerátPopis a znění inzerátu',
-      'Místa vystaveníUkončení nebo prodloužení inzerce',
+      'Prodloužit a znovu vystavit',
+      'Ukončit vystavení',
       'Editovat nábor',
       'Duplikovat',
       'Zapojit kolegy',
@@ -552,7 +559,12 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('option-submenu-toggle')).not.toBeInTheDocument()
 
     await user.click(options[1])
-    expect(onManagePublications).toHaveBeenCalledTimes(1)
+    expect(onExtendAndRepublish).toHaveBeenCalledTimes(1)
+    expect(onEndPublication).not.toHaveBeenCalled()
+
+    await user.click(screen.getByTestId('job-card-actions-toggle'))
+    await user.click(screen.getByRole('option', { name: 'Ukončit vystavení' }))
+    expect(onEndPublication).toHaveBeenCalledTimes(1)
   })
 
   it('keeps advertisement actions flat when the job has several advertisements', async () => {
@@ -569,7 +581,8 @@ describe('JobCard', () => {
     renderJobCard({
       advertisements: [advertisement, secondAdvertisement],
       onEditAdvertisement,
-      onManagePublications: vi.fn(),
+      onExtendAndRepublish: vi.fn(),
+      onEndPublication: vi.fn(),
       onEditJob: vi.fn(),
     })
 
@@ -577,7 +590,8 @@ describe('JobCard', () => {
 
     expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
       'Editovat inzerátPopis a znění inzerátu',
-      'Místa vystaveníUkončení nebo prodloužení inzerce',
+      'Prodloužit a znovu vystavit',
+      'Ukončit vystavení',
       'Editovat nábor',
     ])
     expect(screen.queryByTestId('option-submenu-toggle')).not.toBeInTheDocument()
@@ -593,7 +607,8 @@ describe('JobCard', () => {
       advertisements: [],
       onCreateAdvertisement,
       onEditAdvertisement: vi.fn(),
-      onManagePublications: vi.fn(),
+      onExtendAndRepublish: vi.fn(),
+      onEndPublication: vi.fn(),
       onEditJob: vi.fn(),
     })
 
@@ -604,7 +619,8 @@ describe('JobCard', () => {
       'Editovat nábor',
     ])
     expect(screen.queryByRole('option', { name: /Editovat inzerát/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: /Místa vystavení/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Prodloužit a znovu vystavit/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /Ukončit vystavení/ })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('option', { name: 'Přidat inzerát' }))
     expect(onCreateAdvertisement).toHaveBeenCalledTimes(1)

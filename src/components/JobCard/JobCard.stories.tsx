@@ -10,7 +10,8 @@ const menuHandlers = {
   onTransferJob: fn(),
   onArchiveJob: fn(),
   onEditAdvertisement: fn(),
-  onManagePublications: fn(),
+  onExtendAndRepublish: fn(),
+  onEndPublication: fn(),
 }
 
 /** All portals still run and share one until-date → heading "Běží do 30. 9." and a portal row. */

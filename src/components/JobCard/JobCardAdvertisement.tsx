@@ -66,16 +66,41 @@ function PublicationPortal({
   )
 }
 
+function AdvertisementMeta({ title, viewCount }: { title?: string; viewCount?: number }) {
+  if (!title && viewCount === undefined) {
+    return null
+  }
+
+  return (
+    <div className="tm-flex tm-shrink-0 tm-items-baseline tm-gap-2 tm-text-13 tm-text-secondary-default">
+      {title ? (
+        <span
+          data-testid="job-card-advertisement-title"
+          className="tm-max-w-48 tm-truncate tm-font-normal"
+        >
+          {title}
+        </span>
+      ) : null}
+      {title && viewCount !== undefined ? (
+        <span data-testid="job-card-advertisement-title-separator" aria-hidden>
+          ·
+        </span>
+      ) : null}
+      {viewCount === undefined ? null : (
+        <span data-testid="job-card-advertisement-aggregate-views">{formatViewCountLabel(viewCount)}</span>
+      )}
+    </div>
+  )
+}
+
 function PublicationGroup({
   publications,
   expired,
   showLeadingDivider = false,
-  title,
 }: {
   publications: JobPublication[]
   expired: boolean
   showLeadingDivider?: boolean
-  title?: string
 }) {
   if (publications.length === 0) {
     return null
@@ -94,23 +119,6 @@ function PublicationGroup({
       )}
     >
       <div className="tm-mb-1.5 tm-flex tm-flex-wrap tm-items-center tm-gap-x-1.5">
-        {title ? (
-          <>
-            <span
-              data-testid="job-card-advertisement-title"
-              className="tm-text-sm tm-font-medium tm-text-primary-default"
-            >
-              {title}
-            </span>
-            <span
-              data-testid="job-card-advertisement-title-separator"
-              className="tm-text-secondary-default"
-              aria-hidden
-            >
-              ·
-            </span>
-          </>
-        ) : null}
         <div
           data-testid={
             expired ? 'job-card-publication-ended-heading' : 'job-card-advertisement-running-heading'
@@ -168,7 +176,6 @@ export function JobCardAdvertisement({
     <div
       data-testid="job-card-advertisement"
       className={cn(
-        'tm-relative',
         'tm-flex',
         'tm-flex-col',
         'tm-gap-2',
@@ -180,44 +187,24 @@ export function JobCardAdvertisement({
         className,
       )}
     >
-      {summary.viewCount === undefined ? null : (
-        <span
-          data-testid="job-card-advertisement-aggregate-views"
-          className="tm-absolute tm-right-3 tm-top-3 tm-text-13 tm-text-secondary-default"
-        >
-          {formatViewCountLabel(summary.viewCount)}
-        </span>
-      )}
-
-      <div
-        data-testid="job-card-advertisement-publications"
-        className={cn(summary.viewCount !== undefined && 'tm-pr-20')}
-      >
-        {publications.length === 0 ? (
-          <div className="tm-flex tm-flex-col tm-gap-1.5">
-            {visibleTitle ? (
-              <span
-                data-testid="job-card-advertisement-title"
-                className="tm-text-sm tm-font-medium tm-text-primary-default"
-              >
-                {visibleTitle}
-              </span>
-            ) : null}
+      <div className="tm-flex tm-items-start tm-justify-between tm-gap-3">
+        <div data-testid="job-card-advertisement-publications" className="tm-min-w-0 tm-flex-1">
+          {publications.length === 0 ? (
             <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
               Inzerát není nikde vystavený.
             </p>
-          </div>
-        ) : (
-          <div className="tm-flex tm-flex-col tm-gap-2">
-            <PublicationGroup publications={active} expired={false} title={visibleTitle} />
-            <PublicationGroup
-              publications={expired}
-              expired
-              showLeadingDivider={active.length > 0}
-              title={active.length === 0 ? visibleTitle : undefined}
-            />
-          </div>
-        )}
+          ) : (
+            <div className="tm-flex tm-flex-col tm-gap-2">
+              <PublicationGroup publications={active} expired={false} />
+              <PublicationGroup
+                publications={expired}
+                expired
+                showLeadingDivider={active.length > 0}
+              />
+            </div>
+          )}
+        </div>
+        <AdvertisementMeta title={visibleTitle} viewCount={summary.viewCount} />
       </div>
     </div>
   )

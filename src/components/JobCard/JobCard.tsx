@@ -73,7 +73,8 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     onTransferJob,
     onArchiveJob,
     onEditAdvertisement,
-    onManagePublications,
+    onExtendAndRepublish,
+    onEndPublication,
     onStatusChange,
     onCompleteDraft,
     onGoToPublish,
@@ -103,7 +104,8 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     onTransferJob,
     onArchiveJob,
     onEditAdvertisement,
-    onManagePublications,
+    onExtendAndRepublish,
+    onEndPublication,
     onCreateAdvertisement,
   })
 

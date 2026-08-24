@@ -6,7 +6,8 @@ describe('buildJobCardMenuSections', () => {
     const sections = buildJobCardMenuSections({
       advertisements: [{ id: 'ad-1' }],
       onEditAdvertisement: vi.fn(),
-      onManagePublications: vi.fn(),
+      onExtendAndRepublish: vi.fn(),
+      onEndPublication: vi.fn(),
       onEditJob: vi.fn(),
       onDuplicateJob: vi.fn(),
       onInviteColleagues: vi.fn(),
@@ -17,7 +18,8 @@ describe('buildJobCardMenuSections', () => {
     expect(sections.map((section) => section.id)).toEqual(['advertisement', 'job'])
     expect(sections[0].items.map((item) => ({ label: item.label, description: item.description }))).toEqual([
       { label: 'Editovat inzerát', description: 'Popis a znění inzerátu' },
-      { label: 'Místa vystavení', description: 'Ukončení nebo prodloužení inzerce' },
+      { label: 'Prodloužit a znovu vystavit', description: undefined },
+      { label: 'Ukončit vystavení', description: undefined },
     ])
     expect(sections[0].items.every((item) => item.actions === undefined)).toBe(true)
     expect(sections[1].items.map((item) => item.label)).toEqual([
@@ -35,7 +37,8 @@ describe('buildJobCardMenuSections', () => {
       advertisements: [],
       onCreateAdvertisement,
       onEditAdvertisement: vi.fn(),
-      onManagePublications: vi.fn(),
+      onExtendAndRepublish: vi.fn(),
+      onEndPublication: vi.fn(),
       onEditJob: vi.fn(),
     })
 

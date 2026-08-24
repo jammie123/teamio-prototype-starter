@@ -60,9 +60,8 @@ export const WithDescription: Story = {
       <Option onClick={fn()} description="Popis a znění inzerátu">
         Editovat inzerát
       </Option>
-      <Option onClick={fn()} description="Ukončení nebo prodloužení inzerce">
-        Místa vystavení
-      </Option>
+      <Option onClick={fn()}>Prodloužit a znovu vystavit</Option>
+      <Option onClick={fn()}>Ukončit vystavení</Option>
     </OptionList>
   ),
 }
@@ -70,14 +69,13 @@ export const WithDescription: Story = {
 export const WithSubmenu: Story = {
   render: () => (
     <OptionList>
-      <OptionSubmenu label="Další akce" count={2}>
+      <OptionSubmenu label="Další akce" count={3}>
         <OptionList>
           <Option onClick={fn()} description="Popis a znění inzerátu">
             Editovat inzerát
           </Option>
-          <Option onClick={fn()} description="Ukončení nebo prodloužení inzerce">
-            Místa vystavení
-          </Option>
+          <Option onClick={fn()}>Prodloužit a znovu vystavit</Option>
+          <Option onClick={fn()}>Ukončit vystavení</Option>
         </OptionList>
       </OptionSubmenu>
       <Option onClick={fn()}>Editovat nábor</Option>

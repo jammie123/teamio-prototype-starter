@@ -8,8 +8,8 @@ import type {
 export const JOB_CARD_MENU_LABELS = {
   editAdvertisement: 'Editovat inzerát',
   editAdvertisementDescription: 'Popis a znění inzerátu',
-  publications: 'Místa vystavení',
-  publicationsDescription: 'Ukončení nebo prodloužení inzerce',
+  extendAndRepublish: 'Prodloužit a znovu vystavit',
+  endPublication: 'Ukončit vystavení',
   editJob: 'Editovat nábor',
   duplicateJob: 'Duplikovat',
   inviteColleagues: 'Zapojit kolegy',
@@ -25,7 +25,8 @@ export interface JobCardMenuHandlers {
   onTransferJob?: () => void
   onArchiveJob?: () => void
   onEditAdvertisement?: () => void
-  onManagePublications?: () => void
+  onExtendAndRepublish?: () => void
+  onEndPublication?: () => void
   onCreateAdvertisement?: () => void
 }
 
@@ -37,7 +38,8 @@ export interface BuildJobCardMenuOptions extends JobCardMenuHandlers {
 function advertisementItems({
   advertisements = [],
   onEditAdvertisement,
-  onManagePublications,
+  onExtendAndRepublish,
+  onEndPublication,
   onCreateAdvertisement,
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   if (advertisements.length === 0) {
@@ -65,12 +67,19 @@ function advertisementItems({
     })
   }
 
-  if (onManagePublications) {
+  if (onExtendAndRepublish) {
     items.push({
-      id: 'advertisement-publications',
-      label: JOB_CARD_MENU_LABELS.publications,
-      description: JOB_CARD_MENU_LABELS.publicationsDescription,
-      onClick: onManagePublications,
+      id: 'advertisement-extend',
+      label: JOB_CARD_MENU_LABELS.extendAndRepublish,
+      onClick: onExtendAndRepublish,
+    })
+  }
+
+  if (onEndPublication) {
+    items.push({
+      id: 'advertisement-end-publication',
+      label: JOB_CARD_MENU_LABELS.endPublication,
+      onClick: onEndPublication,
     })
   }
 

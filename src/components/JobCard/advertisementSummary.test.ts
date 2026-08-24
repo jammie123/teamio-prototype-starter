@@ -2,14 +2,20 @@ import { describe, expect, it } from 'vitest'
 import {
   formatCompactDateRange,
   formatEndedHeading,
+  formatEndingSoonLabel,
+  formatEndingSoonWithDate,
   formatExpiredPortalsLabel,
+  formatPublicationDateLabel,
   formatRemainingDaysLabel,
   formatRunningHeading,
   formatUntilDate,
   formatViewCountLabel,
+  formatConversionRate,
   getAdvertisementSummary,
   getRemainingCalendarDays,
+  groupPublicationsByDate,
   isAdvertisementFullyExpired,
+  isEndingSoon,
   partitionPublications,
   shareSameEndDate,
 } from './advertisementSummary'
@@ -199,6 +205,46 @@ describe('formatRunningHeading', () => {
     ).toBe('Běží')
     expect(formatRunningHeading({ sameDate: true, startDate: '12. 7. 2026' })).toBe('Běží')
   })
+
+  it('replaces Běží with Končí za and the end date when a shared insertion ends within a week', () => {
+    expect(
+      formatRunningHeading({
+        sameDate: true,
+        startDate: '12. 7. 2026',
+        endDate: '30. 8. 2026',
+        remainingDays: 6,
+      }),
+    ).toBe('Končí za 6 dní · 30. 8. 2026')
+    expect(
+      formatRunningHeading({
+        sameDate: true,
+        endDate: '27. 8. 2026',
+        remainingDays: 3,
+      }),
+    ).toBe('Končí za 3 dny · 27. 8. 2026')
+  })
+
+  it('keeps only Běží when dates differ even if some portals end soon', () => {
+    expect(
+      formatRunningHeading({
+        sameDate: false,
+        startDate: '12. 7. 2026',
+        endDate: '30. 8. 2026',
+        remainingDays: 6,
+      }),
+    ).toBe('Běží')
+  })
+
+  it('does not switch copy when remaining days are over a week', () => {
+    expect(
+      formatRunningHeading({
+        sameDate: true,
+        startDate: '12. 7. 2026',
+        endDate: '30. 9. 2026',
+        remainingDays: 8,
+      }),
+    ).toBe('Běží 12. 7. – 30. 9. 2026')
+  })
 })
 
 describe('formatEndedHeading', () => {
@@ -230,6 +276,61 @@ describe('formatRemainingDaysLabel', () => {
     expect(formatRemainingDaysLabel(4)).toBe('4 dny')
     expect(formatRemainingDaysLabel(5)).toBe('5 dní')
     expect(formatRemainingDaysLabel(6)).toBe('6 dní')
+  })
+})
+
+describe('formatEndingSoonLabel', () => {
+  it('uses Končí za with Czech day counts, and Končí dnes for today', () => {
+    expect(formatEndingSoonLabel(0)).toBe('Končí dnes')
+    expect(formatEndingSoonLabel(1)).toBe('Končí za 1 den')
+    expect(formatEndingSoonLabel(3)).toBe('Končí za 3 dny')
+    expect(formatEndingSoonLabel(6)).toBe('Končí za 6 dní')
+    expect(formatEndingSoonLabel(7)).toBe('Končí za 7 dní')
+  })
+})
+
+describe('formatEndingSoonWithDate', () => {
+  it('joins the remaining-days copy with the end date', () => {
+    expect(formatEndingSoonWithDate(6, '30. 8. 2026')).toBe('Končí za 6 dní · 30. 8. 2026')
+    expect(formatEndingSoonWithDate(3, '27. 8.')).toBe('Končí za 3 dny · 27. 8.')
+  })
+})
+
+describe('isEndingSoon', () => {
+  const now = new Date(2026, 7, 24)
+
+  it('is true from today through seven remaining days', () => {
+    expect(isEndingSoon('24. 8. 2026', now)).toBe(true)
+    expect(isEndingSoon('27. 8. 2026', now)).toBe(true)
+    expect(isEndingSoon('31. 8. 2026', now)).toBe(true)
+  })
+
+  it('is false when the insertion is more than a week away, already past, or unparseable', () => {
+    expect(isEndingSoon('1. 9. 2026', now)).toBe(false)
+    expect(isEndingSoon('20. 8. 2026', now)).toBe(false)
+    expect(isEndingSoon('soon', now)).toBe(false)
+    expect(isEndingSoon(undefined, now)).toBe(false)
+  })
+})
+
+describe('formatPublicationDateLabel', () => {
+  it('keeps the from-to range when the portal is not ending soon', () => {
+    expect(
+      formatPublicationDateLabel({
+        startDate: '12. 7. 2026',
+        endDate: '30. 9. 2026',
+      }),
+    ).toBe('12. 7. – 30. 9. 2026')
+  })
+
+  it('shows Končí za and the end date when that portal ends within a week', () => {
+    expect(
+      formatPublicationDateLabel({
+        startDate: '12. 7. 2026',
+        endDate: '30. 8. 2026',
+        remainingDays: 6,
+      }),
+    ).toBe('Končí za 6 dní · 30. 8. 2026')
   })
 })
 
@@ -305,6 +406,38 @@ describe('shareSameEndDate', () => {
   })
 })
 
+describe('groupPublicationsByDate', () => {
+  it('keeps first-seen order and groups portals that share a start and end day', () => {
+    expect(
+      groupPublicationsByDate([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9.' },
+        { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+        { id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '12. 8. 2026' },
+      ]).map((group) => group.map((publication) => publication.id)),
+    ).toEqual([['jobs', 'prace', 'career'], ['atmoskop']])
+  })
+
+  it('does not group portals that only share an end date', () => {
+    expect(
+      groupPublicationsByDate([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 7. 2026', endDate: '30. 9. 2026' },
+        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+      ]).map((group) => group.map((publication) => publication.id)),
+    ).toEqual([['jobs'], ['prace']])
+  })
+
+  it('leaves every portal on its own row when dates all differ', () => {
+    expect(
+      groupPublicationsByDate([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
+        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026' },
+        { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', endDate: '12. 8. 2026' },
+      ]).map((group) => group.map((publication) => publication.id)),
+    ).toEqual([['jobs'], ['prace'], ['career']])
+  })
+})
+
 describe('partitionPublications', () => {
   it('splits active and expired publications', () => {
     expect(
@@ -330,5 +463,18 @@ describe('partitionPublications', () => {
         },
       ],
     })
+  })
+})
+
+describe('formatConversionRate', () => {
+  it('is reactions divided by views as a Czech percent', () => {
+    expect(formatConversionRate(42, 1840)).toBe('2,3 %')
+    expect(formatConversionRate(0, 1840)).toBe('0 %')
+  })
+
+  it('is undefined when views are missing or zero', () => {
+    expect(formatConversionRate(42, 0)).toBeUndefined()
+    expect(formatConversionRate(42)).toBeUndefined()
+    expect(formatConversionRate(undefined, 1840)).toBeUndefined()
   })
 })

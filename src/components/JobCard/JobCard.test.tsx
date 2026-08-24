@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, within, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobCard } from './JobCard'
@@ -411,6 +411,8 @@ describe('JobCard', () => {
     const heading = screen.getByTestId('job-card-advertisement-running-heading')
     expect(heading.textContent).toBe('Běží 12. 7. – 30. 9. 2026')
     expect(heading).toHaveClass('tm-text-emotion-success-emphasis', 'tm-text-sm', 'tm-font-medium')
+    expect(heading).not.toHaveClass('tm-text-emotion-warning-emphasis')
+    expect(heading).not.toHaveClass('tm-font-semibold')
 
     const portals = screen.getAllByTestId('job-card-publication')
     expect(portals.map((portal) => within(portal).getByTestId('job-card-publication-channel').textContent)).toEqual([
@@ -420,6 +422,7 @@ describe('JobCard', () => {
     ])
     portals.forEach((portal) => {
       expect(portal).toHaveClass('tm-text-sm', 'tm-font-normal', 'tm-text-primary-default')
+      expect(within(portal).getByTestId('job-card-publication-channel')).toHaveClass('tm-font-medium')
     })
     expect(screen.queryByTestId('job-card-publication-dates')).not.toBeInTheDocument()
     expect(screen.getByTestId('job-card-advertisement-active-publications')).toHaveClass(
@@ -427,7 +430,7 @@ describe('JobCard', () => {
     )
   })
 
-  it('keeps Běží without a date and lists until-dates on portals when they differ', () => {
+  it('keeps Běží without a date and lists until-dates on date rows when they differ', () => {
     renderJobCard()
 
     const heading = screen.getByTestId('job-card-advertisement-running-heading')
@@ -435,17 +438,218 @@ describe('JobCard', () => {
     expect(heading).not.toHaveTextContent('do')
     expect(heading).toHaveClass('tm-text-emotion-success-emphasis')
 
-    const portals = screen.getAllByTestId('job-card-publication')
-    expect(portals.map((portal) => within(portal).getByTestId('job-card-publication-dates').textContent)).toEqual([
+    const groups = screen.getAllByTestId('job-card-publication-date-group')
+    expect(groups.map((group) => within(group).getByTestId('job-card-publication-dates').textContent)).toEqual([
       '12. 7. – 15. 9. 2026',
       '12. 7. – 30. 9. 2026',
       '12. 7. – 12. 8. 2026',
+    ])
+    expect(groups.map((group) => within(group).getByTestId('job-card-publication-channel').textContent)).toEqual([
+      'Jobs.cz',
+      'Prace.cz',
+      'Kariérní stránky',
     ])
     expect(screen.getByTestId('job-card-advertisement-active-publications')).toHaveClass(
       'tm-grid',
       'tm-grid-cols-[auto_auto]',
     )
     expect(screen.queryByTestId('job-card-publication-separator')).not.toBeInTheDocument()
+  })
+
+  it('groups portals that share a date onto one row with the date first', () => {
+    renderJobCard({
+      advertisements: [
+        {
+          id: 'ad-grouped',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '12. 8. 2026' },
+          ],
+        },
+      ],
+    })
+
+    expect(screen.getByTestId('job-card-advertisement-running-heading')).toHaveTextContent('Běží')
+    const groups = screen.getAllByTestId('job-card-publication-date-group')
+    expect(groups).toHaveLength(2)
+    expect(within(groups[0]).getByTestId('job-card-publication-dates').textContent).toBe(
+      '12. 7. – 30. 9. 2026',
+    )
+    expect(
+      within(groups[0]).getAllByTestId('job-card-publication-channel').map((channel) => channel.textContent),
+    ).toEqual(['Jobs.cz', 'Prace.cz', 'Kariérní stránky'])
+    expect(within(groups[1]).getByTestId('job-card-publication-dates').textContent).toBe(
+      '12. 7. – 12. 8. 2026',
+    )
+    expect(within(groups[1]).getByTestId('job-card-publication-channel').textContent).toBe('Atmoskop')
+    expect(within(groups[0]).getAllByTestId('job-card-publication-separator')).toHaveLength(2)
+
+    const firstDate = within(groups[0]).getByTestId('job-card-publication-dates')
+    const firstPortal = within(groups[0]).getAllByTestId('job-card-publication')[0]
+    expect(
+      firstDate.compareDocumentPosition(firstPortal) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('warns on the shared heading when every running portal ends within a week', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      renderJobCard({
+        advertisements: [
+          {
+            id: 'ad-ending-same',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 8. 2026' },
+              { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 8. 2026' },
+            ],
+          },
+        ],
+      })
+
+      const heading = screen.getByTestId('job-card-advertisement-running-heading')
+      expect(heading.textContent).toBe('Končí za 6 dní · 30. 8. 2026')
+      expect(heading).toHaveClass(
+        'tm-text-emotion-warning-emphasis',
+        'tm-font-semibold',
+        'tm-text-sm',
+      )
+      expect(heading).not.toHaveClass('tm-text-emotion-success-emphasis')
+      expect(heading).not.toHaveClass('tm-font-medium')
+      expect(screen.queryByTestId('job-card-publication-dates')).not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('warns only on the portal whose insertion ends within a week', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      renderJobCard({
+        advertisements: [
+          {
+            id: 'ad-ending-diff',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 8. 2026' },
+              { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            ],
+          },
+        ],
+      })
+
+      const heading = screen.getByTestId('job-card-advertisement-running-heading')
+      expect(heading).toHaveTextContent('Běží')
+      expect(heading).not.toHaveTextContent('Končí')
+      expect(heading).toHaveClass('tm-text-emotion-success-emphasis', 'tm-font-medium')
+      expect(heading).not.toHaveClass('tm-text-emotion-warning-emphasis')
+      expect(heading).not.toHaveClass('tm-font-semibold')
+
+      const groups = screen.getAllByTestId('job-card-publication-date-group')
+      const jobsDate = within(groups[0]).getByTestId('job-card-publication-dates')
+      const praceDate = within(groups[1]).getByTestId('job-card-publication-dates')
+      expect(within(groups[0]).getByTestId('job-card-publication-channel')).toHaveTextContent('Jobs.cz')
+      expect(jobsDate).toHaveTextContent('Končí za 6 dní · 30. 8. 2026')
+      expect(jobsDate).toHaveClass('tm-font-semibold', 'tm-text-emotion-warning-emphasis')
+      expect(within(groups[1]).getByTestId('job-card-publication-channel')).toHaveTextContent('Prace.cz')
+      expect(praceDate).toHaveTextContent('12. 7. – 30. 9. 2026')
+      expect(praceDate).not.toHaveClass('tm-font-semibold')
+      expect(praceDate).not.toHaveClass('tm-text-emotion-warning-emphasis')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('underlines each portal name with a dotted border', () => {
+    renderJobCard()
+
+    screen.getAllByTestId('job-card-publication-channel').forEach((channel) => {
+      expect(channel).toHaveClass('tm-border-b', 'tm-border-dotted', 'tm-font-medium')
+    })
+  })
+
+  it('opens a running-portal dropdown on hover with logo, period, stats and preview', async () => {
+    const user = userEvent.setup()
+    const onPreviewPublication = vi.fn()
+    renderJobCard({
+      onPreviewPublication,
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 9. 2026',
+              viewCount: 1840,
+              reactionCount: 42,
+            },
+          ],
+        },
+      ],
+    })
+
+    await user.hover(screen.getByTestId('job-card-publication-channel'))
+    const dropdown = await screen.findByTestId('job-card-publication-dropdown')
+    expect(dropdown.firstElementChild).toHaveClass('tm-w-[200px]')
+    expect(dropdown).toHaveTextContent('Jobs.cz')
+    expect(within(dropdown).getByTestId('job-portal-logo')).toHaveAttribute('data-logo-type', 'jobs-cz')
+    expect(dropdown).toHaveTextContent('12. 7. – 30. 9. 2026')
+    expect(dropdown).toHaveTextContent('Zhlédnutí')
+    expect(dropdown).toHaveTextContent(/1\s840/)
+    expect(dropdown).toHaveTextContent('Reakce')
+    expect(dropdown).toHaveTextContent('42')
+    expect(dropdown).toHaveTextContent('Konverze')
+    expect(dropdown).toHaveTextContent(/2,3\s%/)
+    expect(dropdown).not.toHaveTextContent('Předvybraní')
+    expect(dropdown).not.toHaveTextContent('Hired')
+    expect(dropdown).not.toHaveTextContent('Úspěch')
+    expect(within(dropdown).queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+    fireEvent.click(within(dropdown).getByRole('button', { name: 'Zobrazit náhled' }))
+    expect(onPreviewPublication).toHaveBeenCalledTimes(1)
+  })
+
+  it('strikes through ended portals and shows Prodloužit in the hover dropdown', async () => {
+    const user = userEvent.setup()
+    const onExtendPublication = vi.fn()
+    renderJobCard({
+      onExtendPublication,
+      advertisements: [
+        {
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'expired',
+              startDate: '12. 6. 2026',
+              endDate: '1. 9. 2026',
+              viewCount: 2100,
+              reactionCount: 30,
+            },
+          ],
+        },
+      ],
+    })
+
+    const channel = screen.getByTestId('job-card-publication-channel')
+    expect(channel).toHaveClass('tm-line-through', 'tm-group-hover:tm-no-underline')
+
+    await user.hover(channel)
+    const dropdown = await screen.findByTestId('job-card-publication-dropdown')
+    expect(dropdown).toHaveTextContent('Jobs.cz')
+    expect(dropdown).toHaveTextContent('12. 6. – 1. 9. 2026')
+    expect(within(dropdown).queryByRole('button', { name: 'Zobrazit náhled' })).not.toBeInTheDocument()
+
+    fireEvent.click(within(dropdown).getByRole('button', { name: 'Prodloužit' }))
+    expect(onExtendPublication).toHaveBeenCalledTimes(1)
   })
 
   it('separates multiple portals with a middle dot and omits status dots', () => {
@@ -499,13 +703,15 @@ describe('JobCard', () => {
     expect(screen.queryByTestId('job-card-advertisement-title')).not.toBeInTheDocument()
     const ended = screen.getByTestId('job-card-publication-ended-heading')
     expect(ended.textContent).toBe('Ukončeno 1. 9.')
-    expect(ended).toHaveClass('tm-text-emotion-warning-emphasis', 'tm-text-sm', 'tm-font-medium')
+    expect(ended).toHaveClass('tm-text-secondary-default', 'tm-text-sm', 'tm-font-medium')
+    expect(ended).not.toHaveClass('tm-text-emotion-warning-emphasis')
     expect(ended.parentElement).toHaveClass('tm-border-t', 'tm-border-secondary', 'tm-gap-0.5')
 
     const portals = screen.getAllByTestId('job-card-publication')
     expect(portals).toHaveLength(3)
     expect(within(portals[2]).getByTestId('job-card-publication-channel')).toHaveTextContent('Atmoskop')
     expect(portals[2]).toHaveClass('tm-text-sm', 'tm-font-normal', 'tm-text-primary-default')
+    expect(within(portals[2]).getByTestId('job-card-publication-channel')).toHaveClass('tm-font-medium')
     expect(within(portals[2]).getByTestId('job-card-publication-channel')).not.toHaveClass(
       'tm-text-secondary-default',
     )
@@ -543,10 +749,10 @@ describe('JobCard', () => {
     expect(screen.getByTestId('job-card-publication-ended-heading')).toHaveClass(
       'tm-text-sm',
       'tm-font-medium',
-      'tm-text-emotion-warning-emphasis',
+      'tm-text-secondary-default',
     )
-    const portals = screen.getAllByTestId('job-card-publication')
-    expect(portals.map((portal) => within(portal).getByTestId('job-card-publication-dates').textContent)).toEqual([
+    const groups = screen.getAllByTestId('job-card-publication-date-group')
+    expect(groups.map((group) => within(group).getByTestId('job-card-publication-dates').textContent)).toEqual([
       '12. 6. – 15. 9. 2026',
       '12. 6. – 30. 9. 2026',
     ])
@@ -555,8 +761,9 @@ describe('JobCard', () => {
       'tm-grid-cols-[auto_auto]',
     )
     expect(screen.queryByTestId('job-card-publication-separator')).not.toBeInTheDocument()
-    portals.forEach((portal) => {
+    screen.getAllByTestId('job-card-publication').forEach((portal) => {
       expect(portal).toHaveClass('tm-text-sm', 'tm-font-normal', 'tm-text-primary-default')
+      expect(within(portal).getByTestId('job-card-publication-channel')).toHaveClass('tm-font-medium')
     })
   })
 
@@ -566,18 +773,19 @@ describe('JobCard', () => {
         {
           id: 'ad-mixed-diff',
           publications: [
-            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
             { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
             {
-              id: 'career',
-              channel: 'Kariérní stránky',
+              id: 'atmoskop',
+              channel: 'Atmoskop',
               status: 'expired',
               startDate: '12. 7. 2026',
               endDate: '1. 9. 2026',
             },
             {
-              id: 'atmoskop',
-              channel: 'Atmoskop',
+              id: 'nearby',
+              channel: 'Práce za rohem',
               status: 'expired',
               startDate: '12. 7. 2026',
               endDate: '12. 8. 2026',
@@ -594,6 +802,14 @@ describe('JobCard', () => {
     expect(screen.getByTestId('job-card-advertisement-active-publications')).toHaveClass('tm-contents')
     expect(screen.getByTestId('job-card-advertisement-ended-publications')).toHaveClass('tm-contents')
     expect(screen.getByTestId('job-card-publication-ended-heading')).toHaveClass('tm-col-span-2')
+    const groups = screen.getAllByTestId('job-card-publication-date-group')
+    expect(groups).toHaveLength(4)
+    expect(
+      within(groups[0]).getAllByTestId('job-card-publication-channel').map((channel) => channel.textContent),
+    ).toEqual(['Jobs.cz', 'Prace.cz'])
+    expect(within(groups[1]).getByTestId('job-card-publication-channel')).toHaveTextContent(
+      'Kariérní stránky',
+    )
     expect(screen.getAllByTestId('job-card-publication-dates')).toHaveLength(4)
   })
 

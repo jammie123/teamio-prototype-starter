@@ -70,6 +70,14 @@ export {
   type KnownEdition,
 } from './TeamioLogo'
 export {
+  JOB_PORTAL_LOGO_TYPES,
+  JobPortalLogo,
+  jobPortalLogoTypeFromChannel,
+  type JobPortalLogoProps,
+  type JobPortalLogoType,
+  type KnownJobPortalLogoType,
+} from './JobPortalLogo'
+export {
   LeftMenu,
   leftMenuItemClass,
   type LeftMenuProps,

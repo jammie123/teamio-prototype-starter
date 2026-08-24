@@ -17,6 +17,7 @@ import type {
   JobCardAction,
   JobCardCandidates,
   JobCardSelectableStatus,
+  JobPublication,
   JobStatus,
 } from './types'
 
@@ -38,6 +39,8 @@ export interface JobCardProps
   onGoToPublish?: () => void
   onRestoreFromArchive?: () => void
   onViewStatisticsClick?: () => void
+  onPreviewPublication?: (publication: JobPublication) => void
+  onExtendPublication?: (publication: JobPublication) => void
 }
 
 /** An unpublished job has no live advertising, so every portal is shown as ended. */
@@ -75,6 +78,8 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
     onGoToPublish,
     onRestoreFromArchive,
     onViewStatisticsClick,
+    onPreviewPublication,
+    onExtendPublication,
     className,
     ...rest
   },
@@ -220,6 +225,11 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
                   key={`${selectedAdvertisement.id}-${currentStatus}`}
                   advertisement={selectedAdvertisement}
                   onViewStatisticsClick={onViewStatisticsClick}
+                  onPreviewPublication={onPreviewPublication}
+                  onExtendPublication={
+                    onExtendPublication ??
+                    (onExtendAndRepublish ? () => onExtendAndRepublish() : undefined)
+                  }
                 />
               </div>
             ) : null}

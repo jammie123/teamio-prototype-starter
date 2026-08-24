@@ -5,10 +5,13 @@ import { Link } from '../Link'
 import {
   earliestStartDateLabel,
   formatEndedHeading,
-  formatPublicationRange,
+  formatPublicationDateLabel,
   formatRunningHeading,
   formatViewCountLabel,
   getAdvertisementSummary,
+  getRemainingCalendarDays,
+  groupPublicationsByDate,
+  isEndingSoonDays,
   partitionPublications,
   richestDateLabel,
   shareSameEndDate,
@@ -16,10 +19,13 @@ import {
   stripYear,
 } from './advertisementSummary'
 import type { JobAdvertisement, JobPublication } from './types'
+import { JobCardPublicationPortal } from './JobCardPublicationPortal'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
   onViewStatisticsClick?: () => void
+  onPreviewPublication?: (publication: JobPublication) => void
+  onExtendPublication?: (publication: JobPublication) => void
 }
 
 function sharedFieldDateLabel(
@@ -53,55 +59,67 @@ function runningStartDateLabel(publications: JobPublication[]) {
   return earliestStartDateLabel(publications)
 }
 
-function PublicationPortal({
-  publication,
-  showDate,
-  withSeparator,
-}: {
-  publication: JobPublication
-  showDate: boolean
-  withSeparator: boolean
-}) {
-  if (showDate) {
-    return (
-      <li
-        data-testid="job-card-publication"
-        className="tm-contents tm-text-sm tm-font-normal tm-text-primary-default"
-      >
-        <span data-testid="job-card-publication-channel">{publication.channel}</span>
-        {publication.endDate ? (
-          <span data-testid="job-card-publication-dates" className="tm-tabular-nums">
-            {formatPublicationRange(publication.startDate, publication.endDate)}
-          </span>
-        ) : (
-          <span />
-        )}
-      </li>
-    )
+function publicationGroupDateLabel(publications: JobPublication[], expired: boolean) {
+  const startDate = richestDateLabel(publications.map((publication) => publication.startDate))
+  const endDates = publications
+    .map((publication) => publication.endDate)
+    .filter((value): value is string => Boolean(value))
+  const endDate = endDates.length > 0 ? richestDateLabel(endDates) : undefined
+  const remainingDays = !expired && endDate ? getRemainingCalendarDays(endDate) : undefined
+
+  if (!endDate) {
+    return { label: startDate, endingSoon: false }
   }
+
+  return {
+    label: formatPublicationDateLabel({ startDate, endDate, remainingDays }),
+    endingSoon: isEndingSoonDays(remainingDays),
+  }
+}
+
+function PublicationDateGroup({
+  publications,
+  expired,
+  onPreview,
+  onExtend,
+}: {
+  publications: JobPublication[]
+  expired: boolean
+  onPreview?: (publication: JobPublication) => void
+  onExtend?: (publication: JobPublication) => void
+}) {
+  const { label, endingSoon } = publicationGroupDateLabel(publications, expired)
 
   return (
     <li
-      data-testid="job-card-publication"
-      className={cn(
-        'tm-flex',
-        'tm-items-center',
-        'tm-gap-1.5',
-        'tm-font-normal',
-        'tm-text-primary-default',
-        'tm-text-sm',
-      )}
+      data-testid="job-card-publication-date-group"
+      className="tm-contents tm-text-sm tm-font-normal tm-text-primary-default"
     >
-      {withSeparator ? (
+      {label ? (
         <span
-          aria-hidden
-          data-testid="job-card-publication-separator"
-          className="tm-text-secondary-default"
+          data-testid="job-card-publication-dates"
+          className={cn(
+            'tm-tabular-nums',
+            endingSoon && 'tm-font-semibold tm-text-emotion-warning-emphasis',
+          )}
         >
-          ·
+          {label}
         </span>
-      ) : null}
-      <span data-testid="job-card-publication-channel">{publication.channel}</span>
+      ) : (
+        <span />
+      )}
+      <ul className="tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1.5 tm-list-none tm-p-0">
+        {publications.map((publication, index) => (
+          <JobCardPublicationPortal
+            key={publication.id}
+            publication={publication}
+            expired={expired}
+            withSeparator={index > 0}
+            onPreview={onPreview}
+            onExtend={onExtend}
+          />
+        ))}
+      </ul>
     </li>
   )
 }
@@ -146,11 +164,15 @@ function PublicationGroup({
   expired,
   showLeadingDivider = false,
   sharedDateGrid = false,
+  onPreview,
+  onExtend,
 }: {
   publications: JobPublication[]
   expired: boolean
   showLeadingDivider?: boolean
   sharedDateGrid?: boolean
+  onPreview?: (publication: JobPublication) => void
+  onExtend?: (publication: JobPublication) => void
 }) {
   if (publications.length === 0) {
     return null
@@ -159,12 +181,15 @@ function PublicationGroup({
   const sameDate = shareSameEndDate(publications)
   const stacked = !sameDate
   const date = sharedEndDateLabel(publications)
+  const remainingDays = !expired && date ? getRemainingCalendarDays(date) : undefined
+  const endingSoon = isEndingSoonDays(remainingDays)
   const heading = expired
     ? formatEndedHeading({ sameDate, date: date ? stripYear(date) : undefined })
     : formatRunningHeading({
         sameDate,
         startDate: runningStartDateLabel(publications),
         endDate: date,
+        remainingDays,
       })
   const headingTestId = expired
     ? 'job-card-publication-ended-heading'
@@ -174,17 +199,32 @@ function PublicationGroup({
     : 'job-card-advertisement-active-publications'
   const headingClassName = cn(
     'tm-text-sm',
-    'tm-font-medium',
-    expired ? 'tm-text-emotion-warning-emphasis' : 'tm-text-emotion-success-emphasis',
+    expired
+      ? 'tm-font-medium tm-text-secondary-default'
+      : endingSoon && sameDate
+        ? 'tm-font-semibold tm-text-emotion-warning-emphasis'
+        : 'tm-font-medium tm-text-emotion-success-emphasis',
   )
-  const portals = publications.map((publication, index) => (
-    <PublicationPortal
-      key={publication.id}
-      publication={publication}
-      showDate={stacked}
-      withSeparator={sameDate && index > 0}
-    />
-  ))
+  const portals = stacked
+    ? groupPublicationsByDate(publications).map((group) => (
+        <PublicationDateGroup
+          key={group.map((publication) => publication.id).join('|')}
+          publications={group}
+          expired={expired}
+          onPreview={onPreview}
+          onExtend={onExtend}
+        />
+      ))
+    : publications.map((publication, index) => (
+        <JobCardPublicationPortal
+          key={publication.id}
+          publication={publication}
+          expired={expired}
+          withSeparator={index > 0}
+          onPreview={onPreview}
+          onExtend={onExtend}
+        />
+      ))
 
   if (sharedDateGrid && stacked) {
     return (
@@ -195,7 +235,7 @@ function PublicationGroup({
             headingClassName,
             'tm-col-span-2',
             showLeadingDivider &&
-              'tm-mt-1 tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-2',
+              'tm-mt-1 tm-border-0  tm-pt-2',
           )}
         >
           {heading}
@@ -214,7 +254,7 @@ function PublicationGroup({
         'tm-flex-col',
         'tm-gap-0.5',
         sharedDateGrid && 'tm-col-span-2',
-        showLeadingDivider && 'tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-2',
+        showLeadingDivider && ' tm-pt-2',
       )}
     >
       <div data-testid={headingTestId} className={headingClassName}>
@@ -240,6 +280,8 @@ function PublicationGroup({
 export function JobCardAdvertisement({
   advertisement,
   onViewStatisticsClick,
+  onPreviewPublication,
+  onExtendPublication,
   className,
 }: JobCardAdvertisementProps) {
   const publications = advertisement.publications ?? []
@@ -274,12 +316,16 @@ export function JobCardAdvertisement({
               publications={active}
               expired={false}
               sharedDateGrid={sharedDateGrid}
+              onPreview={onPreviewPublication}
+              onExtend={onExtendPublication}
             />
             <PublicationGroup
               publications={expired}
               expired
               showLeadingDivider={active.length > 0}
               sharedDateGrid={sharedDateGrid}
+              onPreview={onPreviewPublication}
+              onExtend={onExtendPublication}
             />
           </div>
         )}

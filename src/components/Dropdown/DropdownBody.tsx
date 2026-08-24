@@ -9,10 +9,13 @@ export interface DropdownBodyProps
     ChildrenProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   overflow?: 'scrollY' | 'visible'
+  /** Skip moving focus into the panel. Use for hover cards so inner tooltips do not open. */
+  initialFocus?: -1 | 0
 }
 
 export function DropdownBody({
   overflow,
+  initialFocus,
   children,
   className,
   ...rest
@@ -25,7 +28,12 @@ export function DropdownBody({
   }
 
   return (
-    <FloatingFocusManager context={context} modal={false}>
+    <FloatingFocusManager
+      context={context}
+      modal={false}
+      initialFocus={initialFocus}
+      returnFocus={initialFocus !== -1}
+    >
       <div
         ref={refs.setFloating}
         data-testid="dropdown-body"

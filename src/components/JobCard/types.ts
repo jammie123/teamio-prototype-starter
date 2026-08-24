@@ -32,6 +32,7 @@ export interface JobPublication {
   startDate: string
   endDate?: string
   viewCount?: number
+  reactionCount?: number
 }
 
 export interface JobAdvertisement {

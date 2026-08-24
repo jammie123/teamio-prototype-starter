@@ -66,6 +66,49 @@ export function formatRemainingDaysLabel(days: number) {
   return `${days} dní`
 }
 
+/** Insertions ending today through one week from now get the warning treatment. */
+export const ENDING_SOON_MAX_DAYS = 7
+
+export function isEndingSoonDays(days: number | undefined) {
+  return days !== undefined && days >= 0 && days <= ENDING_SOON_MAX_DAYS
+}
+
+export function isEndingSoon(endDate?: string, now = new Date()) {
+  if (!endDate) {
+    return false
+  }
+
+  return isEndingSoonDays(getRemainingCalendarDays(endDate, now))
+}
+
+export function formatEndingSoonLabel(days: number) {
+  if (days === 0) {
+    return 'Končí dnes'
+  }
+
+  return `Končí za ${formatRemainingDaysLabel(days)}`
+}
+
+export function formatEndingSoonWithDate(days: number, endDate: string) {
+  return `${formatEndingSoonLabel(days)} · ${endDate}`
+}
+
+export function formatPublicationDateLabel({
+  startDate,
+  endDate,
+  remainingDays,
+}: {
+  startDate: string
+  endDate?: string
+  remainingDays?: number
+}) {
+  if (endDate && remainingDays !== undefined && isEndingSoonDays(remainingDays)) {
+    return formatEndingSoonWithDate(remainingDays, endDate)
+  }
+
+  return formatPublicationRange(startDate, endDate)
+}
+
 export function stripYear(value: string) {
   return value.replace(/\s+\d{4}\.?$/, '')
 }
@@ -144,6 +187,34 @@ export function shareSameEndDate(publications: JobPublication[]) {
   return labels.every((label) => label === labels[0])
 }
 
+export function publicationDateKey(publication: JobPublication) {
+  return [
+    publication.startDate ? stripYear(publication.startDate) : '',
+    publication.endDate ? stripYear(publication.endDate) : '',
+  ].join('|')
+}
+
+/** Portals that share a start and end day stay in first-seen order, one group per date. */
+export function groupPublicationsByDate(publications: JobPublication[]) {
+  const groups: JobPublication[][] = []
+  const indexByKey = new Map<string, number>()
+
+  for (const publication of publications) {
+    const key = publicationDateKey(publication)
+    const existing = indexByKey.get(key)
+
+    if (existing === undefined) {
+      indexByKey.set(key, groups.length)
+      groups.push([publication])
+      continue
+    }
+
+    groups[existing].push(publication)
+  }
+
+  return groups
+}
+
 export function partitionPublications(publications: JobPublication[]) {
   return {
     active: publications.filter((publication) => !isExpired(publication)),
@@ -212,13 +283,19 @@ export function formatRunningHeading({
   sameDate,
   startDate,
   endDate,
+  remainingDays,
 }: {
   sameDate: boolean
   startDate?: string
   endDate?: string
+  remainingDays?: number
 }) {
   if (!sameDate || !endDate) {
     return 'Běží'
+  }
+
+  if (remainingDays !== undefined && isEndingSoonDays(remainingDays)) {
+    return formatEndingSoonWithDate(remainingDays, endDate)
   }
 
   if (startDate) {
@@ -254,6 +331,20 @@ export function formatViewCountLabel(count: number) {
   }
 
   return `${formatted} zhlédnutí`
+}
+
+const conversionPercentFormat = new Intl.NumberFormat('cs-CZ', {
+  maximumFractionDigits: 1,
+  minimumFractionDigits: 0,
+})
+
+/** Conversion = reactions / views, shown as a Czech percent. */
+export function formatConversionRate(reactionCount?: number, viewCount?: number) {
+  if (reactionCount === undefined || viewCount === undefined || viewCount <= 0) {
+    return undefined
+  }
+
+  return `${conversionPercentFormat.format((reactionCount / viewCount) * 100)} %`
 }
 
 export function getAdvertisementSummary(advertisement: JobAdvertisement): JobAdvertisementSummary {

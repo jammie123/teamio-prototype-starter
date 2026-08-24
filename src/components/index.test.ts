@@ -57,6 +57,9 @@ describe('components barrel', () => {
 
   it('exports complex components', () => {
     expect(components.TeamioLogo).toBeTypeOf('object')
+    expect(components.JobPortalLogo).toBeTypeOf('object')
+    expect(components.jobPortalLogoTypeFromChannel).toBeTypeOf('function')
+    expect(components.JOB_PORTAL_LOGO_TYPES).toBeInstanceOf(Array)
     expect(components.LeftMenu).toBeTypeOf('object')
     expect(components.leftMenuItemClass).toBeTypeOf('function')
     expect(components.HeaderTop).toBeTypeOf('object')

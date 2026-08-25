@@ -123,6 +123,72 @@ const mixedDifferentDates: JobAdvertisement = {
   ],
 }
 
+/** Running paid highlights sit after their parent portal in Teamio pink. Ended highlights stay hidden. */
+const withHighlights: JobAdvertisement = {
+  id: 'ad-highlights',
+  title: 'Hlavní inzerát',
+  publications: [
+    withReactions(
+      {
+        id: 'jobs',
+        channel: 'Jobs.cz',
+        startDate: '1. 6. 2026',
+        endDate: '30. 9. 2026',
+        viewCount: 1840,
+        highlights: [
+          {
+            id: 'jobs-jobstip',
+            name: 'Jobstip',
+            startDate: '8. 6. 2026',
+            endDate: '30. 9. 2026',
+            viewCount: 699,
+            reactionCount: 13,
+          },
+          {
+            id: 'jobs-top',
+            name: 'Topováno',
+            startDate: '22. 6. 2026',
+            endDate: '30. 9. 2026',
+            viewCount: 331,
+            reactionCount: 6,
+          },
+        ],
+      },
+      34,
+    ),
+    withReactions(
+      {
+        id: 'prace',
+        channel: 'Prace.cz',
+        startDate: '1. 6. 2026',
+        endDate: '30. 9. 2026',
+        viewCount: 920,
+        highlights: [
+          {
+            id: 'prace-supermax',
+            name: 'Supermax',
+            startDate: '8. 6. 2026',
+            endDate: '30. 9. 2026',
+            viewCount: 331,
+            reactionCount: 5,
+          },
+        ],
+      },
+      15,
+    ),
+    withReactions(
+      {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        startDate: '1. 6. 2026',
+        endDate: '30. 9. 2026',
+        viewCount: 410,
+      },
+      8,
+    ),
+  ],
+}
+
 const meta = {
   title: 'Jobs/JobCardOld',
   component: JobCardOld,
@@ -138,6 +204,7 @@ const meta = {
     onGoToPublish: fn(),
     onRestoreFromArchive: fn(),
     onViewStatisticsClick: fn(),
+    onPreviewAdvertisement: fn(),
     advertisements: [runningSameDate],
     ...menuHandlers,
   },
@@ -204,6 +271,12 @@ export const MixedDifferentDates: Story = {
   },
 }
 
+export const WithHighlights: Story = {
+  args: {
+    advertisements: [withHighlights],
+  },
+}
+
 export const MultipleAdvertisements: Story = {
   args: {
     advertisements: [runningSameDate, mixedSameDates, endedSameDate],
@@ -214,5 +287,18 @@ export const MultipleHiringManagers: Story = {
   args: {
     hiringManagers: ['Klára Benešová', 'Michal Král'],
     candidates: { new: 0, unassessed: 14, inProgress: 6, total: 52 },
+  },
+}
+
+export const NoAdvertisement: Story = {
+  args: {
+    advertisements: [],
+    onCreateAdvertisement: fn(),
+  },
+}
+
+export const AdvertisementNotPublished: Story = {
+  args: {
+    advertisements: [{ id: 'ad-unpublished', title: 'Hlavní inzerát', publications: [] }],
   },
 }

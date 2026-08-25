@@ -135,6 +135,7 @@ export {
   type JobCardProps,
   type JobStatus,
   type JobPublication,
+  type JobPublicationHighlight,
   type JobPublicationStatus,
   type JobAdvertisement,
   type JobCardCandidates,

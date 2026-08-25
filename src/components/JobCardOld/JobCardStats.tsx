@@ -1,5 +1,6 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Pill } from '../Pill'
 import { formatCount } from './formatCount'
 import type { JobCandidateStat, JobCardCandidates } from './types'
 
@@ -31,6 +32,10 @@ export function JobCardStats({ candidates, onStatClick, className }: JobCardStat
       {items.map((key, index) => {
         const count = candidates[key] as number
         const label = STAT_LABELS[key]
+        const newCount =
+          key === 'unassessed' && typeof candidates.new === 'number' && candidates.new > 0
+            ? candidates.new
+            : undefined
         const layout = cn(
           'tm-flex',
       
@@ -48,15 +53,34 @@ export function JobCardStats({ candidates, onStatClick, className }: JobCardStat
           <>
             <span
               className={cn(
-                'tm-text-xl',
-                'tm-font-semibold',
-                'tm-text-teamio-blue',
-                'tm-leading-tight',
-                'tm-text-primary-default',
+                'tm-inline-flex',
+                'tm-items-center',
+                'tm-gap-1.5',
                 onStatClick && 'tm-group-hover:tm-text-action-link-active',
               )}
             >
-              {formatCount(count)}
+              <span
+                className={cn(
+                  'tm-text-xl',
+                  'tm-font-semibold',
+                  'tm-text-teamio-blue',
+                  'tm-leading-tight',
+                  'tm-text-primary-default',
+                  onStatClick && 'tm-group-hover:tm-text-action-link-active',
+                )}
+              >
+                {formatCount(count)}
+              </span>
+              {newCount != null ? (
+                <Pill
+                  color="pink"
+                  data-testid="job-card-new-candidates"
+                  aria-label={`Noví kandidáti: ${formatCount(newCount)}`}
+                  className="tm-h-6 tm-min-w-6 tm-px-2 tm-text-sm tm-font-semibold"
+                >
+                  {formatCount(newCount)}
+                </Pill>
+              ) : null}
             </span>
             <span
               className={cn(
@@ -84,7 +108,11 @@ export function JobCardStats({ candidates, onStatClick, className }: JobCardStat
             key={key}
             type="button"
             data-testid={`job-card-stat-${key}`}
-            aria-label={`${label}: ${formatCount(count)}`}
+            aria-label={
+              newCount != null
+                ? `${label}: ${formatCount(count)}, Noví kandidáti: ${formatCount(newCount)}`
+                : `${label}: ${formatCount(count)}`
+            }
             onClick={() => onStatClick(key)}
             className={cn(
               layout,

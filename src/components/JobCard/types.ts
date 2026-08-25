@@ -25,6 +25,16 @@ export interface JobCardMenuSection {
   items: JobCardMenuItem[]
 }
 
+export interface JobPublicationHighlight {
+  id: string
+  name: string
+  status?: JobPublicationStatus
+  startDate: string
+  endDate?: string
+  viewCount?: number
+  reactionCount?: number
+}
+
 export interface JobPublication {
   id: string
   channel: string
@@ -33,6 +43,7 @@ export interface JobPublication {
   endDate?: string
   viewCount?: number
   reactionCount?: number
+  highlights?: JobPublicationHighlight[]
 }
 
 export interface JobAdvertisement {

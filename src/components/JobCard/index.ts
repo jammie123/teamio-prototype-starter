@@ -14,6 +14,7 @@ export type {
   JobCardMenuSection,
   JobCardSelectableStatus,
   JobPublication,
+  JobPublicationHighlight,
   JobPublicationStatus,
   JobStatus,
 } from './types'

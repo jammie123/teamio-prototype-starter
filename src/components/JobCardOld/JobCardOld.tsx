@@ -39,6 +39,7 @@ export interface JobCardOldProps
   onGoToPublish?: () => void
   onRestoreFromArchive?: () => void
   onViewStatisticsClick?: () => void
+  onPreviewAdvertisement?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
 }
@@ -50,6 +51,10 @@ function asEndedAdvertisement(advertisement: JobAdvertisement): JobAdvertisement
     publications: advertisement.publications?.map((publication) => ({
       ...publication,
       status: 'expired' as const,
+      highlights: publication.highlights?.map((highlight) => ({
+        ...highlight,
+        status: 'expired' as const,
+      })),
     })),
   }
 }
@@ -78,6 +83,7 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
     onGoToPublish,
     onRestoreFromArchive,
     onViewStatisticsClick,
+    onPreviewAdvertisement,
     onPreviewPublication,
     onExtendPublication,
     className,
@@ -201,9 +207,14 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
             {shownAdvertisements.length === 0 ? (
               <div
                 data-testid="job-card-no-advertisement"
-                className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
+                className="tm-flex tm-flex-col tm-items-start tm-gap-1"
               >
-                <span>Nábor nemá žádný inzerát.</span>
+                <div className="tm-text-sm tm-font-medium tm-text-primary-default">
+                  Zatím žádný inzerát
+                </div>
+                <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
+                  Vytvořte inzerát, publikujte ho, ať vás uchazeči najdou.
+                </p>
                 {onCreateAdvertisement ? (
                   <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
                     Vytvořit inzerát
@@ -224,7 +235,9 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
                 <JobCardAdvertisement
                   key={`${selectedAdvertisement.id}-${currentStatus}`}
                   advertisement={selectedAdvertisement}
+                  showTitle={!hasSwitcher}
                   onViewStatisticsClick={onViewStatisticsClick}
+                  onPreviewAdvertisement={onPreviewAdvertisement}
                   onPreviewPublication={onPreviewPublication}
                   onExtendPublication={
                     onExtendPublication ??

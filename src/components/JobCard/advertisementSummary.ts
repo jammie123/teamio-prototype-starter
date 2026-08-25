@@ -1,4 +1,4 @@
-import type { JobAdvertisement, JobPublication } from './types'
+import type { JobAdvertisement, JobPublication, JobPublicationHighlight } from './types'
 import { formatCount } from './formatCount'
 
 export interface JobAdvertisementSummary {
@@ -66,49 +66,6 @@ export function formatRemainingDaysLabel(days: number) {
   return `${days} dní`
 }
 
-/** Insertions ending today through one week from now get the warning treatment. */
-export const ENDING_SOON_MAX_DAYS = 7
-
-export function isEndingSoonDays(days: number | undefined) {
-  return days !== undefined && days >= 0 && days <= ENDING_SOON_MAX_DAYS
-}
-
-export function isEndingSoon(endDate?: string, now = new Date()) {
-  if (!endDate) {
-    return false
-  }
-
-  return isEndingSoonDays(getRemainingCalendarDays(endDate, now))
-}
-
-export function formatEndingSoonLabel(days: number) {
-  if (days === 0) {
-    return 'Končí dnes'
-  }
-
-  return `Končí za ${formatRemainingDaysLabel(days)}`
-}
-
-export function formatEndingSoonWithDate(days: number, endDate: string) {
-  return `${formatEndingSoonLabel(days)} · ${endDate}`
-}
-
-export function formatPublicationDateLabel({
-  startDate,
-  endDate,
-  remainingDays,
-}: {
-  startDate: string
-  endDate?: string
-  remainingDays?: number
-}) {
-  if (endDate && remainingDays !== undefined && isEndingSoonDays(remainingDays)) {
-    return formatEndingSoonWithDate(remainingDays, endDate)
-  }
-
-  return formatPublicationRange(startDate, endDate)
-}
-
 export function stripYear(value: string) {
   return value.replace(/\s+\d{4}\.?$/, '')
 }
@@ -139,10 +96,6 @@ export function formatCompactDateRange(startDate: string, endDate: string) {
   return `${startDay} – ${endLabel}`
 }
 
-export function formatUntilDate(endDate: string, { expiredSameDate = false } = {}) {
-  return expiredSameDate ? `ukončeno do ${endDate}` : `do ${endDate}`
-}
-
 export function formatPublicationRange(startDate: string, endDate?: string) {
   if (!endDate) {
     return startDate
@@ -151,24 +104,31 @@ export function formatPublicationRange(startDate: string, endDate?: string) {
   return formatCompactDateRange(startDate, endDate)
 }
 
-export function shareSameStartDate(publications: JobPublication[]) {
-  if (publications.length === 0) {
-    return false
+const conversionPercentFormat = new Intl.NumberFormat('cs-CZ', {
+  maximumFractionDigits: 1,
+  minimumFractionDigits: 0,
+})
+
+/** Conversion = reactions / views, shown as a Czech percent. */
+export function formatConversionRate(reactionCount?: number, viewCount?: number) {
+  if (reactionCount === undefined || viewCount === undefined || viewCount <= 0) {
+    return undefined
   }
 
-  const labels = publications.map((publication) =>
-    publication.startDate ? stripYear(publication.startDate) : undefined,
-  )
-
-  if (labels.some((label) => label === undefined)) {
-    return false
-  }
-
-  return labels.every((label) => label === labels[0])
+  return `${conversionPercentFormat.format((reactionCount / viewCount) * 100)} %`
 }
 
-export function richestDateLabel(dates: string[]) {
-  return dates.find((date) => /\d{4}/.test(date)) ?? dates[0]
+export function visibleHighlights(publication: JobPublication): JobPublicationHighlight[] {
+  if (publication.status === 'expired') {
+    return []
+  }
+
+  return (publication.highlights ?? []).filter((highlight) => highlight.status !== 'expired')
+}
+
+export function formatUntilDate(endDate: string, { expiredSameDate = false } = {}) {
+  const date = stripYear(endDate)
+  return expiredSameDate ? `ukončeno do ${date}` : `do ${date}`
 }
 
 export function shareSameEndDate(publications: JobPublication[]) {
@@ -187,34 +147,6 @@ export function shareSameEndDate(publications: JobPublication[]) {
   return labels.every((label) => label === labels[0])
 }
 
-export function publicationDateKey(publication: JobPublication) {
-  return [
-    publication.startDate ? stripYear(publication.startDate) : '',
-    publication.endDate ? stripYear(publication.endDate) : '',
-  ].join('|')
-}
-
-/** Portals that share a start and end day stay in first-seen order, one group per date. */
-export function groupPublicationsByDate(publications: JobPublication[]) {
-  const groups: JobPublication[][] = []
-  const indexByKey = new Map<string, number>()
-
-  for (const publication of publications) {
-    const key = publicationDateKey(publication)
-    const existing = indexByKey.get(key)
-
-    if (existing === undefined) {
-      indexByKey.set(key, groups.length)
-      groups.push([publication])
-      continue
-    }
-
-    groups[existing].push(publication)
-  }
-
-  return groups
-}
-
 export function partitionPublications(publications: JobPublication[]) {
   return {
     active: publications.filter((publication) => !isExpired(publication)),
@@ -222,25 +154,20 @@ export function partitionPublications(publications: JobPublication[]) {
   }
 }
 
-function pickDate(
-  publications: JobPublication[],
-  field: 'startDate' | 'endDate',
-  pick: 'earliest' | 'latest',
-) {
+function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest') {
   return publications.reduce<{ label: string; time: number } | undefined>((current, publication) => {
-    const value = publication[field]
-    if (!value) {
+    if (!publication.endDate) {
       return current
     }
 
-    const time = parseCzechDate(value)
+    const time = parseCzechDate(publication.endDate)
     const candidate =
       time === undefined
         ? {
-            label: value,
+            label: publication.endDate,
             time: pick === 'earliest' ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY,
           }
-        : { label: value, time }
+        : { label: publication.endDate, time }
 
     if (!current) {
       return candidate
@@ -252,14 +179,6 @@ function pickDate(
 
     return current.time >= candidate.time ? current : candidate
   }, undefined)
-}
-
-function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest') {
-  return pickDate(publications, 'endDate', pick)
-}
-
-export function earliestStartDateLabel(publications: JobPublication[]) {
-  return pickDate(publications, 'startDate', 'earliest')?.label
 }
 
 export function isAdvertisementFullyExpired(advertisement: JobAdvertisement) {
@@ -281,28 +200,16 @@ export function formatExpiredPortalsLabel(count: number) {
 
 export function formatRunningHeading({
   sameDate,
-  startDate,
-  endDate,
-  remainingDays,
+  date,
 }: {
   sameDate: boolean
-  startDate?: string
-  endDate?: string
-  remainingDays?: number
+  date?: string
 }) {
-  if (!sameDate || !endDate) {
+  if (!sameDate || !date) {
     return 'Běží'
   }
 
-  if (remainingDays !== undefined && isEndingSoonDays(remainingDays)) {
-    return formatEndingSoonWithDate(remainingDays, endDate)
-  }
-
-  if (startDate) {
-    return `Běží ${formatCompactDateRange(startDate, endDate)}`
-  }
-
-  return `Běží do ${endDate}`
+  return `Běží do ${date}`
 }
 
 export function formatEndedHeading({
@@ -331,20 +238,6 @@ export function formatViewCountLabel(count: number) {
   }
 
   return `${formatted} zhlédnutí`
-}
-
-const conversionPercentFormat = new Intl.NumberFormat('cs-CZ', {
-  maximumFractionDigits: 1,
-  minimumFractionDigits: 0,
-})
-
-/** Conversion = reactions / views, shown as a Czech percent. */
-export function formatConversionRate(reactionCount?: number, viewCount?: number) {
-  if (reactionCount === undefined || viewCount === undefined || viewCount <= 0) {
-    return undefined
-  }
-
-  return `${conversionPercentFormat.format((reactionCount / viewCount) * 100)} %`
 }
 
 export function getAdvertisementSummary(advertisement: JobAdvertisement): JobAdvertisementSummary {

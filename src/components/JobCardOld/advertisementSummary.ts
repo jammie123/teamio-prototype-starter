@@ -1,4 +1,4 @@
-import type { JobAdvertisement, JobPublication } from './types'
+import type { JobAdvertisement, JobPublication, JobPublicationHighlight } from './types'
 import { formatCount } from './formatCount'
 
 export interface JobAdvertisementSummary {
@@ -345,6 +345,14 @@ export function formatConversionRate(reactionCount?: number, viewCount?: number)
   }
 
   return `${conversionPercentFormat.format((reactionCount / viewCount) * 100)} %`
+}
+
+export function visibleHighlights(publication: JobPublication): JobPublicationHighlight[] {
+  if (publication.status === 'expired') {
+    return []
+  }
+
+  return (publication.highlights ?? []).filter((highlight) => highlight.status !== 'expired')
 }
 
 export function getAdvertisementSummary(advertisement: JobAdvertisement): JobAdvertisementSummary {

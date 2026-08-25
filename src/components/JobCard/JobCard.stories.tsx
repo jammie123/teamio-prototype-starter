@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { JobCard } from './JobCard'
-import type { JobAdvertisement, JobPublication } from './types'
+import type { JobAdvertisement } from './types'
 
 const menuHandlers = {
   onEditJob: fn(),
@@ -12,25 +12,18 @@ const menuHandlers = {
   onEditAdvertisement: fn(),
   onExtendAndRepublish: fn(),
   onEndPublication: fn(),
-  onPreviewPublication: fn(),
-  onExtendPublication: fn(),
+  onHighlightAdvertisement: fn(),
+  onTopAdvertisement: fn(),
 }
 
-function withReactions(publication: JobPublication, reactionCount: number): JobPublication {
-  return {
-    ...publication,
-    reactionCount,
-  }
-}
-
-/** All portals still run and share one until-date → heading "Běží 12. 7. – 30. 9. 2026" and a portal row. */
+/** All portals still run and share one until-date → heading "Běží do 30. 9." and a portal row. */
 const runningSameDate: JobAdvertisement = {
   id: 'ad-running-same',
   title: 'Hlavní inzerát',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 1840 }, 56),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 920 }, 28),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 410 }, 9),
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 1840 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 920 },
+    { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 410 },
   ],
 }
 
@@ -39,9 +32,9 @@ const endedSameDate: JobAdvertisement = {
   id: 'ad-ended-same',
   title: 'Ukončený inzerát',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '12. 6. 2026', endDate: '1. 9. 2026', viewCount: 2100 }, 48),
-    withReactions({ id: 'prace', channel: 'Prace.cz', status: 'expired', startDate: '12. 6. 2026', endDate: '1. 9. 2026', viewCount: 760 }, 22),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '12. 6. 2026', endDate: '1. 9. 2026', viewCount: 310 }, 7),
+    { id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '12. 6.', endDate: '1. 9. 2026', viewCount: 2100 },
+    { id: 'prace', channel: 'Prace.cz', status: 'expired', startDate: '12. 6.', endDate: '1. 9. 2026', viewCount: 760 },
+    { id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '12. 6.', endDate: '1. 9. 2026', viewCount: 310 },
   ],
 }
 
@@ -50,76 +43,104 @@ const mixedSameDates: JobAdvertisement = {
   id: 'ad-mixed-same',
   title: 'Inzerát pro brigádníky',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 1200 }, 40),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 640 }, 18),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '12. 7. 2026', endDate: '1. 9. 2026', viewCount: 280 }, 6),
-    withReactions({ id: 'atmoskop', channel: 'Atmoskop', status: 'expired', startDate: '12. 7. 2026', endDate: '1. 9. 2026', viewCount: 90 }, 3),
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 1200 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 640 },
+    { id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '12. 7.', endDate: '1. 9. 2026', viewCount: 280 },
+    { id: 'atmoskop', channel: 'Atmoskop', status: 'expired', startDate: '12. 7.', endDate: '1. 9. 2026', viewCount: 90 },
   ],
 }
 
-/** Most running portals share an until-date; one ends earlier → grouped date rows. */
+/** Running portals with different until-dates → heading "Běží" and a date on each portal. */
 const runningDifferentDates: JobAdvertisement = {
   id: 'ad-running-diff',
   title: 'Hlavní inzerát',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 800 }, 31),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 440 }, 14),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 210 }, 5),
-    withReactions({ id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '12. 8. 2026', viewCount: 90 }, 2),
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '20. 9. 2026', viewCount: 800 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 440 },
+    { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 210 },
   ],
 }
 
-/** Most ended portals share an end date; one ended earlier → grouped date rows. */
+/** Ended portals with different end dates → heading "Ukončeno" and a date on each portal. */
 const endedDifferentDates: JobAdvertisement = {
   id: 'ad-ended-diff',
   title: 'Ukončený inzerát',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '12. 6. 2026', endDate: '1. 9. 2026', viewCount: 1900 }, 44),
-    withReactions({ id: 'prace', channel: 'Prace.cz', status: 'expired', startDate: '12. 6. 2026', endDate: '1. 9. 2026', viewCount: 510 }, 16),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '12. 6. 2026', endDate: '1. 9. 2026', viewCount: 180 }, 4),
-    withReactions({ id: 'atmoskop', channel: 'Atmoskop', status: 'expired', startDate: '1. 6. 2026', endDate: '12. 8. 2026', viewCount: 70 }, 2),
+    { id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '12. 6.', endDate: '15. 8. 2026', viewCount: 1900 },
+    { id: 'prace', channel: 'Prace.cz', status: 'expired', startDate: '12. 6.', endDate: '1. 9. 2026', viewCount: 510 },
+    { id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '1. 6.', endDate: '12. 7. 2026', viewCount: 180 },
   ],
 }
 
-function daysFromNow(days: number) {
-  const date = new Date()
-  date.setDate(date.getDate() + days)
-  return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
-}
-
-/** Shared until-date within a week → warning heading "Končí za 6 dní · …". */
-const endingSoonSameDate: JobAdvertisement = {
-  id: 'ad-ending-same',
-  title: 'Hlavní inzerát',
-  publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: daysFromNow(6), viewCount: 1840 }, 56),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: daysFromNow(6), viewCount: 920 }, 28),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: daysFromNow(6), viewCount: 410 }, 9),
-  ],
-}
-
-/** Three portals still run to September; Jobs.cz ends within a week → warning on that date row. */
-const endingSoonDifferentDates: JobAdvertisement = {
-  id: 'ad-ending-diff',
-  title: 'Hlavní inzerát',
-  publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: daysFromNow(6), viewCount: 800 }, 31),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 440 }, 14),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 210 }, 5),
-    withReactions({ id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 90 }, 2),
-  ],
-}
-
-/** Mixed running/ended portals; each group has a shared date plus one outlier. */
+/** Mixed running/ended portals, each group with mismatched dates. */
 const mixedDifferentDates: JobAdvertisement = {
   id: 'ad-mixed-diff',
   title: 'Inzerát pro brigádníky',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 700 }, 24),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 380 }, 12),
-    withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026', viewCount: 210 }, 5),
-    withReactions({ id: 'atmoskop', channel: 'Atmoskop', status: 'expired', startDate: '12. 7. 2026', endDate: '1. 9. 2026', viewCount: 220 }, 5),
-    withReactions({ id: 'nearby', channel: 'Práce za rohem', status: 'expired', startDate: '12. 7. 2026', endDate: '12. 8. 2026', viewCount: 70 }, 2),
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '20. 9. 2026', viewCount: 700 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 380 },
+    { id: 'career', channel: 'Kariérní stránky', status: 'expired', startDate: '12. 7.', endDate: '1. 9. 2026', viewCount: 220 },
+    { id: 'atmoskop', channel: 'Atmoskop', status: 'expired', startDate: '12. 7.', endDate: '12. 8. 2026', viewCount: 70 },
+  ],
+}
+
+/** Running paid highlights sit after their parent portal in Teamio pink. Ended highlights stay hidden. */
+const withHighlights: JobAdvertisement = {
+  id: 'ad-highlights',
+  title: 'Hlavní inzerát',
+  publications: [
+    {
+      id: 'jobs',
+      channel: 'Jobs.cz',
+      startDate: '1. 6.',
+      endDate: '30. 9. 2026',
+      viewCount: 1840,
+      reactionCount: 34,
+      highlights: [
+        {
+          id: 'jobs-jobstip',
+          name: 'Jobstip',
+          startDate: '8. 6.',
+          endDate: '30. 9. 2026',
+          viewCount: 699,
+          reactionCount: 13,
+        },
+        {
+          id: 'jobs-top',
+          name: 'Topováno',
+          startDate: '22. 6.',
+          endDate: '30. 9. 2026',
+          viewCount: 331,
+          reactionCount: 6,
+        },
+      ],
+    },
+    {
+      id: 'prace',
+      channel: 'Prace.cz',
+      startDate: '1. 6.',
+      endDate: '30. 9. 2026',
+      viewCount: 920,
+      reactionCount: 15,
+      highlights: [
+        {
+          id: 'prace-supermax',
+          name: 'Supermax',
+          startDate: '8. 6.',
+          endDate: '30. 9. 2026',
+          viewCount: 331,
+          reactionCount: 5,
+        },
+      ],
+    },
+    {
+      id: 'career',
+      channel: 'Kariérní stránky',
+      startDate: '1. 6.',
+      endDate: '30. 9. 2026',
+      viewCount: 410,
+      reactionCount: 8,
+    },
   ],
 }
 
@@ -137,16 +158,12 @@ const meta = {
     onCompleteDraft: fn(),
     onGoToPublish: fn(),
     onRestoreFromArchive: fn(),
-    onViewStatisticsClick: fn(),
     advertisements: [runningSameDate],
     ...menuHandlers,
   },
-  parameters: {
-    layout: 'padded',
-  },
   decorators: [
     (Story) => (
-      <div className="tm-min-w-[1300px] tm-w-full tm-bg-cover-light tm-p-6">
+      <div className="tm-max-w-[64rem] tm-bg-cover-light tm-p-6">
         <Story />
       </div>
     ),
@@ -174,18 +191,6 @@ export const MixedSameDates: Story = {
   },
 }
 
-export const EndingSoonSameDate: Story = {
-  args: {
-    advertisements: [endingSoonSameDate],
-  },
-}
-
-export const EndingSoonDifferentDates: Story = {
-  args: {
-    advertisements: [endingSoonDifferentDates],
-  },
-}
-
 export const RunningDifferentDates: Story = {
   args: {
     advertisements: [runningDifferentDates],
@@ -204,9 +209,23 @@ export const MixedDifferentDates: Story = {
   },
 }
 
-export const MultipleAdvertisements: Story = {
+export const WithHighlights: Story = {
+  args: {
+    advertisements: [withHighlights],
+  },
+}
+
+export const AdditionalAdvertisements: Story = {
   args: {
     advertisements: [runningSameDate, mixedSameDates, endedSameDate],
+    showAdditionalAdvertisementsLink: true,
+    onAdditionalAdvertisementsClick: fn(),
+  },
+}
+
+export const HiddenAdvertisementTitle: Story = {
+  args: {
+    showAdvertisementTitle: false,
   },
 }
 

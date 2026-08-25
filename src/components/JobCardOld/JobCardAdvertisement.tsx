@@ -17,13 +17,17 @@ import {
   shareSameEndDate,
   shareSameStartDate,
   stripYear,
+  visibleHighlights,
 } from './advertisementSummary'
 import type { JobAdvertisement, JobPublication } from './types'
-import { JobCardPublicationPortal } from './JobCardPublicationPortal'
+import { JobCardPublicationHighlight, JobCardPublicationPortal } from './JobCardPublicationPortal'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
+  /** When true and the advertisement has no portals, show the advertisement title. Default true. */
+  showTitle?: boolean
   onViewStatisticsClick?: () => void
+  onPreviewAdvertisement?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
 }
@@ -77,6 +81,54 @@ function publicationGroupDateLabel(publications: JobPublication[], expired: bool
   }
 }
 
+function publicationRowItems(
+  publications: JobPublication[],
+  expired: boolean,
+) {
+  return publications.flatMap((publication) => [
+    { kind: 'portal' as const, publication },
+    ...(expired
+      ? []
+      : visibleHighlights(publication).map((highlight) => ({
+          kind: 'highlight' as const,
+          publication,
+          highlight,
+        }))),
+  ])
+}
+
+function PublicationItems({
+  publications,
+  expired,
+  onPreview,
+  onExtend,
+}: {
+  publications: JobPublication[]
+  expired: boolean
+  onPreview?: (publication: JobPublication) => void
+  onExtend?: (publication: JobPublication) => void
+}) {
+  return publicationRowItems(publications, expired).map((item, index) =>
+    item.kind === 'portal' ? (
+      <JobCardPublicationPortal
+        key={item.publication.id}
+        publication={item.publication}
+        expired={expired}
+        withSeparator={index > 0}
+        onPreview={onPreview}
+        onExtend={onExtend}
+      />
+    ) : (
+      <JobCardPublicationHighlight
+        key={item.highlight.id}
+        publication={item.publication}
+        highlight={item.highlight}
+        withSeparator={index > 0}
+      />
+    ),
+  )
+}
+
 function PublicationDateGroup({
   publications,
   expired,
@@ -109,16 +161,12 @@ function PublicationDateGroup({
         <span />
       )}
       <ul className="tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1.5 tm-list-none tm-p-0">
-        {publications.map((publication, index) => (
-          <JobCardPublicationPortal
-            key={publication.id}
-            publication={publication}
-            expired={expired}
-            withSeparator={index > 0}
-            onPreview={onPreview}
-            onExtend={onExtend}
-          />
-        ))}
+        <PublicationItems
+          publications={publications}
+          expired={expired}
+          onPreview={onPreview}
+          onExtend={onExtend}
+        />
       </ul>
     </li>
   )
@@ -127,9 +175,11 @@ function PublicationDateGroup({
 function AdvertisementMeta({
   viewCount,
   onViewStatisticsClick,
+  onPreviewAdvertisement,
 }: {
   viewCount?: number
   onViewStatisticsClick?: () => void
+  onPreviewAdvertisement?: () => void
 }) {
   return (
     <div
@@ -154,6 +204,18 @@ function AdvertisementMeta({
       >
         <Icon name="bar-chart" />
         Zobrazit více statistik
+      </Link>
+      <span aria-hidden data-testid="job-card-advertisement-preview-separator">
+        ·
+      </span>
+      <Link
+        variant="secondary"
+        className="tm-inline-flex tm-items-center tm-gap-1 tm-text-13 tm-text-secondary-default"
+        data-testid="job-card-advertisement-preview"
+        onClick={onPreviewAdvertisement}
+      >
+        <Icon name="search" />
+        Zobrazit náhled
       </Link>
     </div>
   )
@@ -215,16 +277,14 @@ function PublicationGroup({
           onExtend={onExtend}
         />
       ))
-    : publications.map((publication, index) => (
-        <JobCardPublicationPortal
-          key={publication.id}
-          publication={publication}
+    : (
+        <PublicationItems
+          publications={publications}
           expired={expired}
-          withSeparator={index > 0}
           onPreview={onPreview}
           onExtend={onExtend}
         />
-      ))
+      )
 
   if (sharedDateGrid && stacked) {
     return (
@@ -279,7 +339,9 @@ function PublicationGroup({
 
 export function JobCardAdvertisement({
   advertisement,
+  showTitle = true,
   onViewStatisticsClick,
+  onPreviewAdvertisement,
   onPreviewPublication,
   onExtendPublication,
   className,
@@ -292,6 +354,7 @@ export function JobCardAdvertisement({
     expired.length > 0 &&
     !shareSameEndDate(active) &&
     !shareSameEndDate(expired)
+  const unpublishedTitle = advertisement.title ?? 'Inzerát'
 
   return (
     <div
@@ -300,9 +363,19 @@ export function JobCardAdvertisement({
     >
       <div data-testid="job-card-advertisement-publications" className="tm-min-w-0">
         {publications.length === 0 ? (
-          <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
-            Inzerát není nikde vystavený.
-          </p>
+          <div className="tm-flex tm-flex-col tm-gap-1">
+            {showTitle ? (
+              <div
+                data-testid="job-card-advertisement-title"
+                className="tm-text-sm tm-font-medium tm-text-primary-default"
+              >
+                {unpublishedTitle}
+              </div>
+            ) : null}
+            <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
+              Inzerát je vytvořený, ale zatím není vystavený na žádném portálu.
+            </p>
+          </div>
         ) : (
           <div
             data-testid="job-card-publication-groups"
@@ -330,10 +403,13 @@ export function JobCardAdvertisement({
           </div>
         )}
       </div>
-      <AdvertisementMeta
-        viewCount={summary.viewCount}
-        onViewStatisticsClick={onViewStatisticsClick}
-      />
+      {publications.length > 0 ? (
+        <AdvertisementMeta
+          viewCount={summary.viewCount}
+          onViewStatisticsClick={onViewStatisticsClick}
+          onPreviewAdvertisement={onPreviewAdvertisement}
+        />
+      ) : null}
     </div>
   )
 }

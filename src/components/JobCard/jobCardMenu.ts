@@ -7,9 +7,10 @@ import type {
 
 export const JOB_CARD_MENU_LABELS = {
   editAdvertisement: 'Editovat inzerát',
-  editAdvertisementDescription: 'Popis a znění inzerátu',
   extendAndRepublish: 'Prodloužit a znovu vystavit',
   endPublication: 'Ukončit vystavení',
+  highlightAdvertisement: 'Zvýraznit',
+  topAdvertisement: 'Topovat',
   editJob: 'Editovat nábor',
   duplicateJob: 'Duplikovat',
   inviteColleagues: 'Zapojit kolegy',
@@ -27,6 +28,8 @@ export interface JobCardMenuHandlers {
   onEditAdvertisement?: () => void
   onExtendAndRepublish?: () => void
   onEndPublication?: () => void
+  onHighlightAdvertisement?: () => void
+  onTopAdvertisement?: () => void
   onCreateAdvertisement?: () => void
 }
 
@@ -40,6 +43,8 @@ function advertisementItems({
   onEditAdvertisement,
   onExtendAndRepublish,
   onEndPublication,
+  onHighlightAdvertisement,
+  onTopAdvertisement,
   onCreateAdvertisement,
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   if (advertisements.length === 0) {
@@ -62,7 +67,6 @@ function advertisementItems({
     items.push({
       id: 'advertisement-edit',
       label: JOB_CARD_MENU_LABELS.editAdvertisement,
-      description: JOB_CARD_MENU_LABELS.editAdvertisementDescription,
       onClick: onEditAdvertisement,
     })
   }
@@ -80,6 +84,22 @@ function advertisementItems({
       id: 'advertisement-end-publication',
       label: JOB_CARD_MENU_LABELS.endPublication,
       onClick: onEndPublication,
+    })
+  }
+
+  if (onHighlightAdvertisement) {
+    items.push({
+      id: 'advertisement-highlight',
+      label: JOB_CARD_MENU_LABELS.highlightAdvertisement,
+      onClick: onHighlightAdvertisement,
+    })
+  }
+
+  if (onTopAdvertisement) {
+    items.push({
+      id: 'advertisement-top',
+      label: JOB_CARD_MENU_LABELS.topAdvertisement,
+      onClick: onTopAdvertisement,
     })
   }
 

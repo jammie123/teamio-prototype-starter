@@ -5,7 +5,7 @@ import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { cn } from '../../lib/cn'
 import { formatCount } from './formatCount'
 import { formatConversionRate, formatPublicationRange } from './advertisementSummary'
-import type { JobPublication } from './types'
+import type { JobPublication, JobPublicationHighlight } from './types'
 
 export interface JobCardPublicationPortalProps {
   publication: JobPublication
@@ -15,10 +15,88 @@ export interface JobCardPublicationPortalProps {
   onExtend?: (publication: JobPublication) => void
 }
 
+export interface JobCardPublicationHighlightProps {
+  publication: JobPublication
+  highlight: JobPublicationHighlight
+  withSeparator: boolean
+}
+
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
   { key: 'viewCount', label: 'Zhlédnutí' },
   { key: 'reactionCount', label: 'Reakce' },
 ]
+
+function PlacementStats({
+  viewCount,
+  reactionCount,
+  testId,
+}: {
+  viewCount?: number
+  reactionCount?: number
+  testId: string
+}) {
+  const conversion = formatConversionRate(reactionCount, viewCount)
+
+  return (
+    <dl data-testid={testId} className="tm-m-0 tm-grid tm-grid-cols-3 tm-gap-2">
+      {STATS.map((stat) => {
+        const value = stat.key === 'viewCount' ? viewCount : reactionCount
+
+        return (
+          <div key={stat.key} className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
+            <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">{stat.label}</dt>
+            <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
+              {value === undefined ? '–' : formatCount(value)}
+            </dd>
+          </div>
+        )
+      })}
+      <div className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
+        <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">Konverze</dt>
+        <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
+          {conversion ?? '–'}
+        </dd>
+      </div>
+    </dl>
+  )
+}
+
+function PortalCard({ publication }: { publication: JobPublication }) {
+  return (
+    <div className="tm-flex tm-min-w-0 tm-flex-1 tm-items-start tm-gap-2">
+      <JobPortalLogo
+        type={jobPortalLogoTypeFromChannel(publication.channel)}
+        title=""
+        className="tm-size-8"
+      />
+      <div className="tm-min-w-0 tm-flex-1">
+        <div className="tm-text-sm tm-font-medium tm-text-primary-default">{publication.channel}</div>
+        <div
+          data-testid="job-card-publication-dropdown-period"
+          className="tm-text-13 tm-tabular-nums tm-text-secondary-default"
+        >
+          {formatPublicationRange(publication.startDate, publication.endDate)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Separator({ show }: { show: boolean }) {
+  if (!show) {
+    return null
+  }
+
+  return (
+    <span
+      aria-hidden
+      data-testid="job-card-publication-separator"
+      className="tm-text-secondary-default"
+    >
+      ·
+    </span>
+  )
+}
 
 function PublicationDropdown({
   publication,
@@ -31,9 +109,6 @@ function PublicationDropdown({
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
 }) {
-  const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
-  const period = formatPublicationRange(publication.startDate, publication.endDate)
-
   return (
     <Dropdown
       openOnHover
@@ -66,22 +141,7 @@ function PublicationDropdown({
         >
           <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">
             <div className="tm-flex tm-items-start tm-justify-between tm-gap-4">
-              <div className="tm-flex tm-min-w-0 tm-flex-1 tm-items-start tm-gap-2">
-                <JobPortalLogo
-                  type={jobPortalLogoTypeFromChannel(publication.channel)}
-                  title=""
-                  className="tm-size-8"
-                />
-                <div className="tm-min-w-0 tm-flex-1">
-                  <div className="tm-text-sm tm-font-medium tm-text-primary-default">{publication.channel}</div>
-                  <div
-                    data-testid="job-card-publication-dropdown-period"
-                    className="tm-text-13 tm-tabular-nums tm-text-secondary-default"
-                  >
-                    {period}
-                  </div>
-                </div>
-              </div>
+              <PortalCard publication={publication} />
               {expired ? null : (
                 <Button
                   variant="tertiary"
@@ -101,25 +161,11 @@ function PublicationDropdown({
               )}
             </div>
 
-            <dl
-              data-testid="job-card-publication-stats"
-              className="tm-m-0 tm-grid tm-grid-cols-3 tm-gap-2"
-            >
-              {STATS.map((stat) => (
-                <div key={stat.key} className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
-                  <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">{stat.label}</dt>
-                  <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
-                    {publication[stat.key] === undefined ? '–' : formatCount(publication[stat.key] as number)}
-                  </dd>
-                </div>
-              ))}
-              <div className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
-                <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">Konverze</dt>
-                <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
-                  {conversion ?? '–'}
-                </dd>
-              </div>
-            </dl>
+            <PlacementStats
+              viewCount={publication.viewCount}
+              reactionCount={publication.reactionCount}
+              testId="job-card-publication-stats"
+            />
 
             {expired ? (
               <Button
@@ -160,15 +206,7 @@ export function JobCardPublicationPortal({
         'tm-text-sm',
       )}
     >
-      {withSeparator ? (
-        <span
-          aria-hidden
-          data-testid="job-card-publication-separator"
-          className="tm-text-secondary-default"
-        >
-          ·
-        </span>
-      ) : null}
+      <Separator show={withSeparator} />
       <PublicationDropdown
         publication={publication}
         expired={expired}
@@ -179,4 +217,75 @@ export function JobCardPublicationPortal({
   )
 }
 
+export function JobCardPublicationHighlight({
+  publication,
+  highlight,
+  withSeparator,
+}: JobCardPublicationHighlightProps) {
+  return (
+    <li
+      data-testid="job-card-publication-highlight"
+      className={cn('tm-flex', 'tm-items-center', 'tm-gap-1.5', 'tm-font-normal', 'tm-text-sm')}
+    >
+      <Separator show={withSeparator} />
+      <Dropdown
+        openOnHover
+        hoverDelay={150}
+        autoClose={false}
+        placement="bottom-start"
+        strategy="fixed"
+        className="tm-group tm-inline-flex"
+      >
+        <DropdownToggle variant="custom" className="tm-rounded-none tm-bg-transparent">
+          <span
+            data-testid="job-card-publication-highlight-name"
+            className={cn(
+              'tm-border-0',
+              'tm-border-b',
+              'tm-border-dotted',
+              'tm-border-secondary',
+              'tm-font-medium',
+              'tm-text-teamio-pink',
+            )}
+          >
+            {highlight.name}
+          </span>
+        </DropdownToggle>
+        <DropdownBody
+          data-testid="job-card-publication-highlight-dropdown"
+          overflow="visible"
+          initialFocus={-1}
+          className="tm-p-3"
+        >
+          <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">
+            <PortalCard publication={publication} />
+            <PlacementStats
+              viewCount={publication.viewCount}
+              reactionCount={publication.reactionCount}
+              testId="job-card-publication-stats"
+            />
+            <div className="tm-flex tm-flex-col tm-gap-3">
+              <div>
+                <div className="tm-text-sm tm-font-medium tm-text-teamio-pink">{highlight.name}</div>
+                <div
+                  data-testid="job-card-publication-highlight-period"
+                  className="tm-text-13 tm-tabular-nums tm-text-secondary-default"
+                >
+                  {formatPublicationRange(highlight.startDate, highlight.endDate)}
+                </div>
+              </div>
+              <PlacementStats
+                viewCount={highlight.viewCount}
+                reactionCount={highlight.reactionCount}
+                testId="job-card-publication-highlight-stats"
+              />
+            </div>
+          </div>
+        </DropdownBody>
+      </Dropdown>
+    </li>
+  )
+}
+
 JobCardPublicationPortal.displayName = 'JobCardPublicationPortal'
+JobCardPublicationHighlight.displayName = 'JobCardPublicationHighlight'

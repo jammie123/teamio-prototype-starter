@@ -146,6 +146,7 @@ export {
   type BuildJobCardMenuOptions,
   type JobCardSelectableStatus,
 } from './JobCard'
+export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,

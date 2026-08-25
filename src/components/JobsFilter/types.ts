@@ -20,6 +20,9 @@ export interface JobsFilterProps extends StyleProps {
   recruiters: JobsFilterOption[]
   managers: JobsFilterOption[]
   departments: JobsFilterOption[]
+  sortValue?: string
+  sortOptions?: JobsFilterOption[]
+  onSortChange?: (next: string) => void
   moreFiltersOpen?: boolean
   defaultMoreFiltersOpen?: boolean
   onMoreFiltersOpenChange?: (open: boolean) => void

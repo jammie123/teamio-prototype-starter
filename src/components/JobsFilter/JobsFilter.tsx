@@ -40,7 +40,7 @@ function FilterDropdown({
   onChange,
 }: {
   label: string
-  emptyLabel: string
+  emptyLabel?: string
   value: string
   options: JobsFilterOption[]
   onChange: (next: string) => void
@@ -73,9 +73,11 @@ function FilterDropdown({
       </DropdownToggle>
       <DropdownBody className="tm-w-full tm-min-w-full tm-max-w-none">
         <OptionList aria-label={label}>
-          <Option isSelected={!value} onClick={() => onChange('')}>
-            {emptyLabel}
-          </Option>
+          {emptyLabel ? (
+            <Option isSelected={!value} onClick={() => onChange('')}>
+              {emptyLabel}
+            </Option>
+          ) : null}
           {options.map((option) => (
             <Option
               key={option.value}
@@ -97,6 +99,9 @@ export function JobsFilter({
   recruiters,
   managers,
   departments,
+  sortValue,
+  sortOptions,
+  onSortChange,
   moreFiltersOpen,
   defaultMoreFiltersOpen = false,
   onMoreFiltersOpenChange,
@@ -142,6 +147,15 @@ export function JobsFilter({
           options={recruiters}
           onChange={(next) => patch('recruiterId', next)}
         />
+
+        {sortOptions && onSortChange ? (
+          <FilterDropdown
+            label="Řazení"
+            value={sortValue ?? ''}
+            options={sortOptions}
+            onChange={onSortChange}
+          />
+        ) : null}
 
         <Button
           variant="tertiary"

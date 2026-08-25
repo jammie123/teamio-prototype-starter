@@ -99,5 +99,8 @@ describe('Tabs', () => {
       '11',
     ])
     expect(screen.getAllByTestId('tabs-trigger-count')[0]).toHaveClass('tm-bg-teamio-dark/5')
+    expect(screen.getAllByTestId('tabs-trigger-count')[0].querySelector('span')).toHaveClass(
+      'tm-text-secondary-default',
+    )
   })
 })

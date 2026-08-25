@@ -43,15 +43,26 @@ const filledValue: JobsFilterValue = {
   advertisementStatus: 'active',
 }
 
+const sortOptions: JobsFilterOption[] = [
+  { value: 'latestAd', label: 'Nejnověji vystavený inzerát' },
+  { value: 'newestJob', label: 'Nejnovější nábor' },
+  { value: 'endingSoon', label: 'Nejdřív končí inzerát' },
+  { value: 'mostCandidates', label: 'Nejvíc uchazečů' },
+  { value: 'titleAz', label: 'Název A–Z' },
+]
+
 function InteractiveJobsFilter({
   value: initialValue,
   onChange,
   moreFiltersOpen: initialOpen,
   defaultMoreFiltersOpen,
   onMoreFiltersOpenChange,
+  sortValue: initialSort,
+  onSortChange,
   ...rest
 }: JobsFilterProps) {
   const [value, setValue] = useState(initialValue)
+  const [sortValue, setSortValue] = useState(initialSort ?? 'latestAd')
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(
     initialOpen ?? defaultMoreFiltersOpen ?? false,
   )
@@ -60,10 +71,15 @@ function InteractiveJobsFilter({
     <JobsFilter
       {...rest}
       value={value}
+      sortValue={sortValue}
       moreFiltersOpen={moreFiltersOpen}
       onChange={(next) => {
         setValue(next)
         onChange(next)
+      }}
+      onSortChange={(next) => {
+        setSortValue(next)
+        onSortChange?.(next)
       }}
       onMoreFiltersOpenChange={(open) => {
         setMoreFiltersOpen(open)
@@ -82,6 +98,9 @@ const meta = {
     recruiters,
     managers,
     departments,
+    sortValue: 'latestAd',
+    sortOptions,
+    onSortChange: fn(),
     onMoreFiltersOpenChange: fn(),
   },
   render: (args) => <InteractiveJobsFilter {...args} />,

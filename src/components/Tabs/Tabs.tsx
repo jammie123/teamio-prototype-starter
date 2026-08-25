@@ -82,7 +82,7 @@ export const TabsTrigger = forwardRef<
           data-testid="tabs-trigger-count"
           className="tm-flex-none tm-tabular-nums"
         >
-          {count}
+          <span className="tm-text-secondary-default">{count}</span>
         </Pill>
       ) : null}
     </TabsPrimitive.Trigger>

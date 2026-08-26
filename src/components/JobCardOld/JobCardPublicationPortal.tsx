@@ -140,26 +140,7 @@ function PublicationDropdown({
           className="tm-p-3"
         >
           <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">
-            <div className="tm-flex tm-items-start tm-justify-between tm-gap-4">
-              <PortalCard publication={publication} />
-              {expired ? null : (
-                <Button
-                  variant="tertiary"
-                  size="small"
-                  isCircle
-                  aria-label="Zobrazit náhled"
-                  data-testid="job-card-publication-preview"
-                  className="tm-shrink-0"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    onPreview?.(publication)
-                  }}
-                >
-                  <Icon name="eye" />
-                </Button>
-              )}
-            </div>
+            <PortalCard publication={publication} />
 
             <PlacementStats
               viewCount={publication.viewCount}
@@ -180,7 +161,21 @@ function PublicationDropdown({
               >
                 Prodloužit
               </Button>
-            ) : null}
+            ) : (
+              <Button
+                variant="secondary"
+                size="small"
+                data-testid="job-card-publication-preview"
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  onPreview?.(publication)
+                }}
+              >
+                <Icon name="external-link" />
+                Zobrazit inzerát
+              </Button>
+            )}
           </div>
         </DropdownBody>
     </Dropdown>

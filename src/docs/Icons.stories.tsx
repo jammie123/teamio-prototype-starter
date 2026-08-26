@@ -10,6 +10,7 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   info: 'Informace',
   warning: 'Varování',
   eye: 'Zobrazit',
+  'external-link': 'Externí odkaz',
   download: 'Stáhnout',
   'arrow-left': 'Šipka vlevo',
   'arrow-right': 'Šipka vpravo',

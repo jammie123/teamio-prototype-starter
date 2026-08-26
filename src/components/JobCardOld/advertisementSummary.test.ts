@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   formatCompactDateRange,
   formatEndedHeading,
+  formatEndingSoonHeading,
   formatEndingSoonLabel,
   formatEndingSoonWithDate,
   formatExpiredPortalsLabel,
@@ -264,6 +265,28 @@ describe('formatRunningHeading', () => {
   })
 })
 
+describe('formatEndingSoonHeading', () => {
+  it('uses Končí za and the end date when every portal in the group shares that date', () => {
+    expect(
+      formatEndingSoonHeading({
+        sameDate: true,
+        endDate: '31. 8. 2026',
+        remainingDays: 5,
+      }),
+    ).toBe('Končí za 5 dní · 31. 8. 2026')
+  })
+
+  it('is only Končí when dates in the group differ', () => {
+    expect(
+      formatEndingSoonHeading({
+        sameDate: false,
+        endDate: '31. 8. 2026',
+        remainingDays: 5,
+      }),
+    ).toBe('Končí')
+  })
+})
+
 describe('formatEndedHeading', () => {
   it('puts the date on the heading when dates match, without do', () => {
     expect(formatEndedHeading({ sameDate: true, date: '1. 9.' })).toBe('Ukončeno 1. 9.')
@@ -470,6 +493,8 @@ describe('partitionPublications', () => {
       ]),
     ).toEqual({
       active: [{ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' }],
+      running: [{ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' }],
+      endingSoon: [],
       expired: [
         {
           id: 'prace',
@@ -480,6 +505,32 @@ describe('partitionPublications', () => {
         },
       ],
     })
+  })
+
+  it('splits ending-soon publications out of the running group', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 26))
+
+    try {
+      const jobs = { id: 'jobs', channel: 'Jobs.cz', startDate: '20. 8. 2026', endDate: '31. 8. 2026' }
+      const prace = { id: 'prace', channel: 'Prace.cz', startDate: '20. 8. 2026', endDate: '31. 10. 2026' }
+      const career = {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        status: 'expired' as const,
+        startDate: '2. 6. 2026',
+        endDate: '10. 8. 2026',
+      }
+
+      expect(partitionPublications([jobs, prace, career])).toEqual({
+        active: [jobs, prace],
+        running: [prace],
+        endingSoon: [jobs],
+        expired: [career],
+      })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

@@ -5,6 +5,7 @@ import { Link } from '../Link'
 import {
   earliestStartDateLabel,
   formatEndedHeading,
+  formatEndingSoonHeading,
   formatPublicationDateLabel,
   formatRunningHeading,
   formatViewCountLabel,
@@ -152,7 +153,7 @@ function PublicationDateGroup({
           data-testid="job-card-publication-dates"
           className={cn(
             'tm-tabular-nums',
-            endingSoon && 'tm-font-semibold tm-text-emotion-warning-emphasis',
+            endingSoon && 'tm-font-medium tm-text-emotion-warning-emphasis',
           )}
         >
           {label}
@@ -221,16 +222,18 @@ function AdvertisementMeta({
   )
 }
 
+type PublicationGroupKind = 'running' | 'endingSoon' | 'expired'
+
 function PublicationGroup({
   publications,
-  expired,
+  kind,
   showLeadingDivider = false,
   sharedDateGrid = false,
   onPreview,
   onExtend,
 }: {
   publications: JobPublication[]
-  expired: boolean
+  kind: PublicationGroupKind
   showLeadingDivider?: boolean
   sharedDateGrid?: boolean
   onPreview?: (publication: JobPublication) => void
@@ -240,32 +243,40 @@ function PublicationGroup({
     return null
   }
 
+  const expired = kind === 'expired'
   const sameDate = shareSameEndDate(publications)
   const stacked = !sameDate
   const date = sharedEndDateLabel(publications)
   const remainingDays = !expired && date ? getRemainingCalendarDays(date) : undefined
-  const endingSoon = isEndingSoonDays(remainingDays)
-  const heading = expired
-    ? formatEndedHeading({ sameDate, date: date ? stripYear(date) : undefined })
-    : formatRunningHeading({
-        sameDate,
-        startDate: runningStartDateLabel(publications),
-        endDate: date,
-        remainingDays,
-      })
-  const headingTestId = expired
-    ? 'job-card-publication-ended-heading'
-    : 'job-card-advertisement-running-heading'
-  const listTestId = expired
-    ? 'job-card-advertisement-ended-publications'
-    : 'job-card-advertisement-active-publications'
+  const heading =
+    kind === 'expired'
+      ? formatEndedHeading({ sameDate, date: date ? stripYear(date) : undefined })
+      : kind === 'endingSoon'
+        ? formatEndingSoonHeading({ sameDate, endDate: date, remainingDays })
+        : formatRunningHeading({
+            sameDate,
+            startDate: runningStartDateLabel(publications),
+            endDate: date,
+            remainingDays,
+          })
+  const headingTestId =
+    kind === 'expired'
+      ? 'job-card-publication-ended-heading'
+      : kind === 'endingSoon'
+        ? 'job-card-advertisement-ending-soon-heading'
+        : 'job-card-advertisement-running-heading'
+  const listTestId =
+    kind === 'expired'
+      ? 'job-card-advertisement-ended-publications'
+      : kind === 'endingSoon'
+        ? 'job-card-advertisement-ending-soon-publications'
+        : 'job-card-advertisement-active-publications'
   const headingClassName = cn(
     'tm-text-sm',
-    expired
-      ? 'tm-font-normal tm-text-secondary-default'
-      : endingSoon && sameDate
-        ? 'tm-font-semibold tm-text-emotion-warning-emphasis'
-        : 'tm-font-medium tm-text-emotion-success-emphasis',
+    'tm-font-normal',
+    kind === 'expired' && 'tm-text-secondary-default',
+    kind === 'endingSoon' && 'tm-text-emotion-warning-emphasis',
+    kind === 'running' && 'tm-text-emotion-success-emphasis',
   )
   const portals = stacked
     ? groupPublicationsByDate(publications).map((group) => (
@@ -347,12 +358,12 @@ export function JobCardAdvertisement({
   className,
 }: JobCardAdvertisementProps) {
   const publications = advertisement.publications ?? []
-  const { active, expired } = partitionPublications(publications)
+  const { running, endingSoon, expired } = partitionPublications(publications)
   const summary = getAdvertisementSummary(advertisement)
   const sharedDateGrid =
-    active.length > 0 &&
+    running.length > 0 &&
     expired.length > 0 &&
-    !shareSameEndDate(active) &&
+    !shareSameEndDate(running) &&
     !shareSameEndDate(expired)
   const unpublishedTitle = advertisement.title ?? 'Inzerát'
 
@@ -380,26 +391,54 @@ export function JobCardAdvertisement({
           <div
             data-testid="job-card-publication-groups"
             className={
-              sharedDateGrid
+              sharedDateGrid && endingSoon.length === 0
                 ? 'tm-grid tm-grid-cols-[auto_auto] tm-justify-start tm-gap-x-4 tm-gap-y-1'
                 : 'tm-flex tm-flex-col tm-gap-2'
             }
           >
             <PublicationGroup
-              publications={active}
-              expired={false}
-              sharedDateGrid={sharedDateGrid}
+              kind="endingSoon"
+              publications={endingSoon}
               onPreview={onPreviewPublication}
               onExtend={onExtendPublication}
             />
-            <PublicationGroup
-              publications={expired}
-              expired
-              showLeadingDivider={active.length > 0}
-              sharedDateGrid={sharedDateGrid}
-              onPreview={onPreviewPublication}
-              onExtend={onExtendPublication}
-            />
+            {sharedDateGrid && endingSoon.length > 0 ? (
+              <div className="tm-grid tm-grid-cols-[auto_auto] tm-justify-start tm-gap-x-4 tm-gap-y-1">
+                <PublicationGroup
+                  kind="running"
+                  publications={running}
+                  sharedDateGrid
+                  onPreview={onPreviewPublication}
+                  onExtend={onExtendPublication}
+                />
+                <PublicationGroup
+                  kind="expired"
+                  publications={expired}
+                  showLeadingDivider={running.length > 0}
+                  sharedDateGrid
+                  onPreview={onPreviewPublication}
+                  onExtend={onExtendPublication}
+                />
+              </div>
+            ) : (
+              <>
+                <PublicationGroup
+                  kind="running"
+                  publications={running}
+                  sharedDateGrid={sharedDateGrid}
+                  onPreview={onPreviewPublication}
+                  onExtend={onExtendPublication}
+                />
+                <PublicationGroup
+                  kind="expired"
+                  publications={expired}
+                  showLeadingDivider={running.length > 0 || endingSoon.length > 0}
+                  sharedDateGrid={sharedDateGrid}
+                  onPreview={onPreviewPublication}
+                  onExtend={onExtendPublication}
+                />
+              </>
+            )}
           </div>
         )}
       </div>

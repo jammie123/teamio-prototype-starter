@@ -471,7 +471,7 @@ describe('JobCardOld', () => {
 
     const heading = screen.getByTestId('job-card-advertisement-running-heading')
     expect(heading.textContent).toBe('Běží 12. 7. – 30. 9. 2026')
-    expect(heading).toHaveClass('tm-text-emotion-success-emphasis', 'tm-text-sm', 'tm-font-medium')
+    expect(heading).toHaveClass('tm-text-emotion-success-emphasis', 'tm-text-sm', 'tm-font-normal')
     expect(heading).not.toHaveClass('tm-text-emotion-warning-emphasis')
     expect(heading).not.toHaveClass('tm-font-semibold')
 
@@ -571,24 +571,24 @@ describe('JobCardOld', () => {
         ],
       })
 
-      const heading = screen.getByTestId('job-card-advertisement-running-heading')
+      const heading = screen.getByTestId('job-card-advertisement-ending-soon-heading')
       expect(heading.textContent).toBe('Končí za 6 dní · 30. 8. 2026')
       expect(heading).toHaveClass(
         'tm-text-emotion-warning-emphasis',
-        'tm-font-semibold',
+        'tm-font-normal',
         'tm-text-sm',
       )
       expect(heading).not.toHaveClass('tm-text-emotion-success-emphasis')
-      expect(heading).not.toHaveClass('tm-font-medium')
+      expect(screen.queryByTestId('job-card-advertisement-running-heading')).not.toBeInTheDocument()
       expect(screen.queryByTestId('job-card-publication-dates')).not.toBeInTheDocument()
     } finally {
       vi.useRealTimers()
     }
   })
 
-  it('warns only on the portal whose insertion ends within a week', () => {
+  it('lifts an ending-soon portal into its own Končí heading when other dates still run', () => {
     vi.useFakeTimers()
-    vi.setSystemTime(new Date(2026, 7, 24))
+    vi.setSystemTime(new Date(2026, 7, 26))
 
     try {
       renderJobCardOld({
@@ -596,30 +596,75 @@ describe('JobCardOld', () => {
           {
             id: 'ad-ending-diff',
             publications: [
-              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 8. 2026' },
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '31. 8. 2026' },
               { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
             ],
           },
         ],
       })
 
-      const heading = screen.getByTestId('job-card-advertisement-running-heading')
-      expect(heading).toHaveTextContent('Běží')
-      expect(heading).not.toHaveTextContent('Končí')
-      expect(heading).toHaveClass('tm-text-emotion-success-emphasis', 'tm-font-medium')
-      expect(heading).not.toHaveClass('tm-text-emotion-warning-emphasis')
-      expect(heading).not.toHaveClass('tm-font-semibold')
+      const endingSoon = screen.getByTestId('job-card-advertisement-ending-soon-heading')
+      expect(endingSoon.textContent).toBe('Končí za 5 dní · 31. 8. 2026')
+      expect(endingSoon).toHaveClass('tm-font-normal', 'tm-text-emotion-warning-emphasis')
+      expect(
+        within(screen.getByTestId('job-card-advertisement-ending-soon-publications')).getByTestId(
+          'job-card-publication-channel',
+        ),
+      ).toHaveTextContent('Jobs.cz')
+      expect(screen.queryByTestId('job-card-publication-dates')).not.toBeInTheDocument()
 
-      const groups = screen.getAllByTestId('job-card-publication-date-group')
-      const jobsDate = within(groups[0]).getByTestId('job-card-publication-dates')
-      const praceDate = within(groups[1]).getByTestId('job-card-publication-dates')
-      expect(within(groups[0]).getByTestId('job-card-publication-channel')).toHaveTextContent('Jobs.cz')
-      expect(jobsDate).toHaveTextContent('Končí za 6 dní · 30. 8. 2026')
-      expect(jobsDate).toHaveClass('tm-font-semibold', 'tm-text-emotion-warning-emphasis')
-      expect(within(groups[1]).getByTestId('job-card-publication-channel')).toHaveTextContent('Prace.cz')
-      expect(praceDate).toHaveTextContent('12. 7. – 30. 9. 2026')
-      expect(praceDate).not.toHaveClass('tm-font-semibold')
-      expect(praceDate).not.toHaveClass('tm-text-emotion-warning-emphasis')
+      const running = screen.getByTestId('job-card-advertisement-running-heading')
+      expect(running.textContent).toBe('Běží 12. 7. – 30. 9. 2026')
+      expect(running).toHaveClass('tm-text-emotion-success-emphasis', 'tm-font-normal')
+      expect(running).not.toHaveClass('tm-text-emotion-warning-emphasis')
+      expect(
+        within(screen.getByTestId('job-card-advertisement-active-publications')).getByTestId(
+          'job-card-publication-channel',
+        ),
+      ).toHaveTextContent('Prace.cz')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('shows Končí, Běží and Ukončeno as three medium-weight category headings', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 26))
+
+    try {
+      renderJobCardOld({
+        advertisements: [
+          {
+            id: 'ad-ending-mixed',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '20. 8. 2026', endDate: '31. 8. 2026' },
+              { id: 'prace', channel: 'Prace.cz', startDate: '20. 8. 2026', endDate: '31. 10. 2026' },
+              {
+                id: 'career',
+                channel: 'Kariérní stránky',
+                status: 'expired',
+                startDate: '2. 6. 2026',
+                endDate: '10. 8. 2026',
+              },
+            ],
+          },
+        ],
+      })
+
+      const endingSoon = screen.getByTestId('job-card-advertisement-ending-soon-heading')
+      const running = screen.getByTestId('job-card-advertisement-running-heading')
+      const ended = screen.getByTestId('job-card-publication-ended-heading')
+
+      expect(endingSoon.textContent).toBe('Končí za 5 dní · 31. 8. 2026')
+      expect(running.textContent).toBe('Běží 20. 8. – 31. 10. 2026')
+      expect(ended.textContent).toBe('Ukončeno 10. 8.')
+      expect(endingSoon).toHaveClass('tm-font-normal')
+      expect(running).toHaveClass('tm-font-normal')
+      expect(ended).toHaveClass('tm-font-normal')
+      expect(
+        endingSoon.compareDocumentPosition(running) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+      expect(running.compareDocumentPosition(ended) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     } finally {
       vi.useRealTimers()
     }
@@ -633,7 +678,7 @@ describe('JobCardOld', () => {
     })
   })
 
-  it('opens a running-portal dropdown on hover with logo, period, stats and preview', async () => {
+  it('opens a running-portal dropdown on hover with logo, period, stats and Zobrazit inzerát', async () => {
     const user = userEvent.setup()
     const onPreviewPublication = vi.fn()
     renderJobCardOld({
@@ -673,7 +718,9 @@ describe('JobCardOld', () => {
     expect(within(dropdown).queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-    fireEvent.click(within(dropdown).getByRole('button', { name: 'Zobrazit náhled' }))
+    const preview = within(dropdown).getByRole('button', { name: 'Zobrazit inzerát' })
+    expect(within(preview).getByTestId('icon')).toHaveAttribute('data-icon-name', 'external-link')
+    fireEvent.click(preview)
     expect(onPreviewPublication).toHaveBeenCalledTimes(1)
   })
 
@@ -707,6 +754,7 @@ describe('JobCardOld', () => {
     const dropdown = await screen.findByTestId('job-card-publication-dropdown')
     expect(dropdown).toHaveTextContent('Jobs.cz')
     expect(dropdown).toHaveTextContent('12. 6. – 1. 9. 2026')
+    expect(within(dropdown).queryByRole('button', { name: 'Zobrazit inzerát' })).not.toBeInTheDocument()
     expect(within(dropdown).queryByRole('button', { name: 'Zobrazit náhled' })).not.toBeInTheDocument()
 
     fireEvent.click(within(dropdown).getByRole('button', { name: 'Prodloužit' }))
@@ -1057,6 +1105,7 @@ describe('JobCardOld', () => {
     expect(dropdown).toHaveTextContent('8. 6. – 30. 9. 2026')
     expect(dropdown).toHaveTextContent('699')
     expect(dropdown).toHaveTextContent('13')
+    expect(within(dropdown).queryByRole('button', { name: 'Zobrazit inzerát' })).not.toBeInTheDocument()
     expect(within(dropdown).queryByRole('button', { name: 'Zobrazit náhled' })).not.toBeInTheDocument()
     expect(within(dropdown).queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-publication-dropdown')).not.toBeInTheDocument()

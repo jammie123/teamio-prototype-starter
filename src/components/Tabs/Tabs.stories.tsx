@@ -61,13 +61,25 @@ export const WithCounts: Story = {
   render: () => (
     <Tabs defaultValue="published">
       <TabsList aria-label="Filtry náborů">
-        <TabsTrigger value="active" count={14}>
+        <TabsTrigger
+          value="active"
+          count={14}
+          info="Aktivní nábor, který mohou a nemusí mít inzeráty"
+        >
           Aktivní
         </TabsTrigger>
-        <TabsTrigger value="published" count={11}>
+        <TabsTrigger
+          value="published"
+          count={11}
+          info="Aktivní nábor, na kterém běží vystavená inzerce"
+        >
           Zveřejněný
         </TabsTrigger>
-        <TabsTrigger value="unpublished" count={3}>
+        <TabsTrigger
+          value="unpublished"
+          count={3}
+          info="Aktivní nábor s ukončenou nebo vypršelou inzercí"
+        >
           Nezveřejněný
         </TabsTrigger>
         <TabsTrigger value="draft" count={3}>

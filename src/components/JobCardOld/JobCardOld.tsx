@@ -78,6 +78,8 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
     onEditAdvertisement,
     onExtendAndRepublish,
     onEndPublication,
+    onHighlightAndTop,
+    onAddNote,
     onStatusChange,
     onCompleteDraft,
     onGoToPublish,
@@ -114,7 +116,9 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
     onEditAdvertisement,
     onExtendAndRepublish,
     onEndPublication,
+    onHighlightAndTop,
     onCreateAdvertisement,
+    onAddNote,
   })
 
   const showAdvertisements = currentStatus === 'published' || currentStatus === 'unpublished'
@@ -155,7 +159,7 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
       >
         <div
           data-testid="job-card-recruitment"
-          className="tm-min-w-0 md:tm-w-[400px] md:tm-min-w-[350px] md:tm-flex-none"
+          className="tm-min-w-0 md:tm-w-[500px] md:tm-min-w-[350px] md:tm-flex-none"
         >
           <div className="tm-flex tm-items-start tm-gap-2">
             {menuSections.length ? (

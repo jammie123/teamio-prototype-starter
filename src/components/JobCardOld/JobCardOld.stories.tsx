@@ -12,6 +12,8 @@ const menuHandlers = {
   onEditAdvertisement: fn(),
   onExtendAndRepublish: fn(),
   onEndPublication: fn(),
+  onHighlightAndTop: fn(),
+  onAddNote: fn(),
   onPreviewPublication: fn(),
   onExtendPublication: fn(),
 }
@@ -185,6 +187,26 @@ const withHighlights: JobAdvertisement = {
         viewCount: 410,
       },
       8,
+    ),
+    withReactions(
+      {
+        id: 'pzr',
+        channel: 'Práce za rohem',
+        startDate: '1. 7. 2026',
+        endDate: '30. 9. 2026',
+        viewCount: 560,
+        highlights: [
+          {
+            id: 'pzr-highlight',
+            name: 'Zvýraznění inzerátu na Práce za rohem',
+            startDate: '4. 7. 2026',
+            endDate: '30. 9. 2026',
+            viewCount: 157,
+            reactionCount: 3,
+          },
+        ],
+      },
+      11,
     ),
   ],
 }

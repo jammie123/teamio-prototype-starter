@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs'
@@ -101,6 +101,41 @@ describe('Tabs', () => {
     expect(screen.getAllByTestId('tabs-trigger-count')[0]).toHaveClass('tm-bg-teamio-dark/5')
     expect(screen.getAllByTestId('tabs-trigger-count')[0].querySelector('span')).toHaveClass(
       'tm-text-secondary-default',
+    )
+  })
+
+  it('replaces the count with an informative icon on hover and shows the tab info tooltip', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    render(
+      <Tabs defaultValue="active">
+        <TabsList>
+          <TabsTrigger
+            value="active"
+            count={14}
+            info="Aktivní nábor, který mohou a nemusí mít inzeráty"
+          >
+            Aktivní
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="active">Open</TabsContent>
+      </Tabs>,
+    )
+
+    const tab = screen.getByRole('tab', { name: 'Aktivní 14' })
+    const count = screen.getByTestId('tabs-trigger-count')
+    const info = screen.getByTestId('tabs-trigger-info')
+
+    expect(count).toHaveClass('tm-group-hover:tm-hidden')
+    expect(info).toHaveClass('tm-hidden', 'tm-group-hover:tm-inline-flex')
+    expect(info.firstElementChild).toHaveClass('tm-bg-emotion-info-active')
+    expect(within(info).getByTestId('icon')).toHaveAttribute('data-icon-name', 'info')
+
+    await user.hover(tab)
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+    await user.hover(info)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Aktivní nábor, který mohou a nemusí mít inzeráty',
     )
   })
 })

@@ -17,7 +17,7 @@ describe('buildJobCardMenuSections', () => {
 
     expect(sections.map((section) => section.id)).toEqual(['advertisement', 'job'])
     expect(sections[0].items.map((item) => ({ label: item.label, description: item.description }))).toEqual([
-      { label: 'Editovat inzerát', description: 'Popis a znění inzerátu' },
+      { label: 'Editovat inzerát', description: undefined },
       { label: 'Prodloužit a znovu vystavit', description: undefined },
       { label: 'Ukončit vystavení', description: undefined },
     ])
@@ -61,5 +61,30 @@ describe('buildJobCardMenuSections', () => {
     })
 
     expect(sections[0].items.map((item) => item.label)).toEqual(['Editovat nábor', 'Další akce'])
+  })
+
+  it('adds highlight-and-top after advertisement actions and a note at the end of job actions', () => {
+    const sections = buildJobCardMenuSections({
+      advertisements: [{ id: 'ad-1' }],
+      onEditAdvertisement: vi.fn(),
+      onExtendAndRepublish: vi.fn(),
+      onEndPublication: vi.fn(),
+      onHighlightAndTop: vi.fn(),
+      onEditJob: vi.fn(),
+      onArchiveJob: vi.fn(),
+      onAddNote: vi.fn(),
+    })
+
+    expect(sections[0].items.map((item) => item.label)).toEqual([
+      'Editovat inzerát',
+      'Prodloužit a znovu vystavit',
+      'Ukončit vystavení',
+      'Zvýraznit a topovat',
+    ])
+    expect(sections[1].items.map((item) => item.label)).toEqual([
+      'Editovat nábor',
+      'Archivovat',
+      'Přidat poznámku',
+    ])
   })
 })

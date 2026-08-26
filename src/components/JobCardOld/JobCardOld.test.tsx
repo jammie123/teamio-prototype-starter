@@ -216,7 +216,7 @@ describe('JobCardOld', () => {
     expect(layout).toContainElement(screen.getByTestId('job-card-stats'))
     expect(layout).toContainElement(screen.getByTestId('job-card-advertisements'))
     expect(screen.getByTestId('job-card-recruitment')).toHaveClass(
-      'md:tm-w-[400px]',
+      'md:tm-w-[500px]',
       'md:tm-min-w-[350px]',
       'md:tm-flex-none',
     )
@@ -1129,6 +1129,8 @@ describe('JobCardOld', () => {
     const user = userEvent.setup()
     const onExtendAndRepublish = vi.fn()
     const onEndPublication = vi.fn()
+    const onHighlightAndTop = vi.fn()
+    const onAddNote = vi.fn()
     renderJobCardOld({
       onEditJob: vi.fn(),
       onDuplicateJob: vi.fn(),
@@ -1138,20 +1140,24 @@ describe('JobCardOld', () => {
       onEditAdvertisement: vi.fn(),
       onExtendAndRepublish,
       onEndPublication,
+      onHighlightAndTop,
+      onAddNote,
     })
 
     await user.click(screen.getByTestId('job-card-actions-toggle'))
 
     const options = screen.getAllByRole('option')
     expect(options.map((option) => option.textContent)).toEqual([
-      'Editovat inzerátPopis a znění inzerátu',
+      'Editovat inzerát',
       'Prodloužit a znovu vystavit',
       'Ukončit vystavení',
+      'Zvýraznit a topovat',
       'Editovat nábor',
       'Duplikovat',
       'Zapojit kolegy',
       'Předat nábor',
       'Archivovat',
+      'Přidat poznámku',
     ])
     expect(screen.getByTestId('job-card-actions-divider')).toBeInTheDocument()
     expect(screen.queryByTestId('option-submenu-toggle')).not.toBeInTheDocument()
@@ -1163,6 +1169,25 @@ describe('JobCardOld', () => {
     await user.click(screen.getByTestId('job-card-actions-toggle'))
     await user.click(screen.getByRole('option', { name: 'Ukončit vystavení' }))
     expect(onEndPublication).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls highlight-and-top and add-note from the actions menu', async () => {
+    const user = userEvent.setup()
+    const onHighlightAndTop = vi.fn()
+    const onAddNote = vi.fn()
+    renderJobCardOld({
+      onEditAdvertisement: vi.fn(),
+      onHighlightAndTop,
+      onAddNote,
+    })
+
+    await user.click(screen.getByTestId('job-card-actions-toggle'))
+    await user.click(screen.getByRole('option', { name: 'Zvýraznit a topovat' }))
+    expect(onHighlightAndTop).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByTestId('job-card-actions-toggle'))
+    await user.click(screen.getByRole('option', { name: 'Přidat poznámku' }))
+    expect(onAddNote).toHaveBeenCalledTimes(1)
   })
 
   it('keeps advertisement actions flat when the job has several advertisements', async () => {
@@ -1187,14 +1212,14 @@ describe('JobCardOld', () => {
     await user.click(screen.getByTestId('job-card-actions-toggle'))
 
     expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
-      'Editovat inzerátPopis a znění inzerátu',
+      'Editovat inzerát',
       'Prodloužit a znovu vystavit',
       'Ukončit vystavení',
       'Editovat nábor',
     ])
     expect(screen.queryByTestId('option-submenu-toggle')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('option', { name: 'Editovat inzerát Popis a znění inzerátu' }))
+    await user.click(screen.getByRole('option', { name: 'Editovat inzerát' }))
     expect(onEditAdvertisement).toHaveBeenCalledTimes(1)
   })
 

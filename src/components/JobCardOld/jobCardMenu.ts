@@ -7,14 +7,15 @@ import type {
 
 export const JOB_CARD_MENU_LABELS = {
   editAdvertisement: 'Editovat inzerát',
-  editAdvertisementDescription: 'Popis a znění inzerátu',
   extendAndRepublish: 'Prodloužit a znovu vystavit',
   endPublication: 'Ukončit vystavení',
+  highlightAndTop: 'Zvýraznit a topovat',
   editJob: 'Editovat nábor',
   duplicateJob: 'Duplikovat',
   inviteColleagues: 'Zapojit kolegy',
   transferJob: 'Předat nábor',
   archiveJob: 'Archivovat',
+  addNote: 'Přidat poznámku',
   addAdvertisement: 'Přidat inzerát',
 } as const
 
@@ -27,7 +28,9 @@ export interface JobCardMenuHandlers {
   onEditAdvertisement?: () => void
   onExtendAndRepublish?: () => void
   onEndPublication?: () => void
+  onHighlightAndTop?: () => void
   onCreateAdvertisement?: () => void
+  onAddNote?: () => void
 }
 
 export interface BuildJobCardMenuOptions extends JobCardMenuHandlers {
@@ -40,6 +43,7 @@ function advertisementItems({
   onEditAdvertisement,
   onExtendAndRepublish,
   onEndPublication,
+  onHighlightAndTop,
   onCreateAdvertisement,
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   if (advertisements.length === 0) {
@@ -62,7 +66,6 @@ function advertisementItems({
     items.push({
       id: 'advertisement-edit',
       label: JOB_CARD_MENU_LABELS.editAdvertisement,
-      description: JOB_CARD_MENU_LABELS.editAdvertisementDescription,
       onClick: onEditAdvertisement,
     })
   }
@@ -83,6 +86,14 @@ function advertisementItems({
     })
   }
 
+  if (onHighlightAndTop) {
+    items.push({
+      id: 'advertisement-highlight-and-top',
+      label: JOB_CARD_MENU_LABELS.highlightAndTop,
+      onClick: onHighlightAndTop,
+    })
+  }
+
   return items
 }
 
@@ -92,6 +103,7 @@ function jobItems({
   onInviteColleagues,
   onTransferJob,
   onArchiveJob,
+  onAddNote,
   actions = [],
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   const items: JobCardMenuItem[] = []
@@ -129,6 +141,14 @@ function jobItems({
       id: 'job-archive',
       label: JOB_CARD_MENU_LABELS.archiveJob,
       onClick: onArchiveJob,
+    })
+  }
+
+  if (onAddNote) {
+    items.push({
+      id: 'job-add-note',
+      label: JOB_CARD_MENU_LABELS.addNote,
+      onClick: onAddNote,
     })
   }
 

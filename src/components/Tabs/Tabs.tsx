@@ -1,7 +1,9 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { forwardRef, type ComponentPropsWithoutRef, type ElementRef } from 'react'
 import { cn } from '../../lib/cn'
+import { Icon } from '../Icon'
 import { Pill } from '../Pill'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip'
 
 export const Tabs = TabsPrimitive.Root
 
@@ -33,16 +35,19 @@ TabsList.displayName = 'TabsList'
 
 export interface TabsTriggerProps extends ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> {
   count?: number
+  /** Replaces the count pill with an info icon on hover and shows this tooltip on the icon. */
+  info?: string
 }
 
 export const TabsTrigger = forwardRef<
   ElementRef<typeof TabsPrimitive.Trigger>,
   TabsTriggerProps
->(function TabsTrigger({ className, children, count, ...rest }, ref) {
+>(function TabsTrigger({ className, children, count, info, ...rest }, ref) {
   return (
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
+        'tm-group',
         'tm-relative',
         'tm-inline-flex',
         'tm-items-center',
@@ -80,10 +85,27 @@ export const TabsTrigger = forwardRef<
         <Pill
           color="tertiary"
           data-testid="tabs-trigger-count"
-          className="tm-flex-none tm-tabular-nums"
+          className={cn('tm-flex-none', 'tm-tabular-nums', info && 'tm-group-hover:tm-hidden')}
         >
           <span className="tm-text-secondary-default">{count}</span>
         </Pill>
+      ) : null}
+      {count !== undefined && info ? (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                data-testid="tabs-trigger-info"
+                className="tm-hidden tm-flex-none tm-group-hover:tm-inline-flex"
+              >
+                <Pill color="informative" className="tm-px-1">
+                  <Icon name="info" />
+                </Pill>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{info}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ) : null}
     </TabsPrimitive.Trigger>
   )

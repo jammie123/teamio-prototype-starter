@@ -8,6 +8,7 @@ import { DropdownContext } from './DropdownContext'
 export type DropdownToggleVariant =
   | 'button-tertiary'
   | 'button-tertiary-circle'
+  | 'button-secondary-circle'
   | 'custom'
 
 export interface DropdownToggleProps
@@ -24,6 +25,8 @@ function toggleClass(variant: DropdownToggleVariant | undefined) {
       return buttonClass({ variant: 'tertiary' })
     case 'button-tertiary-circle':
       return buttonClass({ variant: 'tertiary', isCircle: true })
+    case 'button-secondary-circle':
+      return buttonClass({ variant: 'secondary', isCircle: true })
     case 'custom':
       return 'focus-visible:tm-rounded-sm'
     default:

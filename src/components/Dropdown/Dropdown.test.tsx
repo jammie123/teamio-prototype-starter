@@ -87,4 +87,21 @@ describe('Dropdown', () => {
 
     expect(screen.getByTestId('dropdown-toggle')).toHaveClass('tm-bg-transparent')
   })
+
+  it('applies secondary circle button classes on toggle variant', () => {
+    render(
+      <Dropdown>
+        <DropdownToggle variant="button-secondary-circle" aria-label="Další akce">
+          ⋮
+        </DropdownToggle>
+        <DropdownBody>Tělo</DropdownBody>
+      </Dropdown>,
+    )
+
+    expect(screen.getByTestId('dropdown-toggle')).toHaveClass(
+      'tm-bg-basic',
+      'tm-border-action-secondary-default',
+      'tm-size-8',
+    )
+  })
 })

@@ -71,6 +71,21 @@ export const IconButton: Story = {
   ),
 }
 
+export const SecondaryIconButton: Story = {
+  render: () => (
+    <Dropdown>
+      <DropdownToggle variant="button-secondary-circle" aria-label="Další akce">
+        <Icon name="more-vertical" className="tm-text-lg" />
+      </DropdownToggle>
+      <DropdownBody>
+        <OptionList>
+          <Option onClick={fn()}>Akce</Option>
+        </OptionList>
+      </DropdownBody>
+    </Dropdown>
+  ),
+}
+
 export const CustomToggle: Story = {
   render: () => (
     <Dropdown placement="bottom-end">

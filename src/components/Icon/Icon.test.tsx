@@ -32,4 +32,10 @@ describe('Icon', () => {
     const svg = screen.getByTestId('icon').querySelector('svg')
     expect(svg).toHaveClass('tm-stroke-current')
   })
+
+  it('forwards a custom stroke width to the Lucide SVG', () => {
+    render(<Icon name="chevron-down" strokeWidth={2.75} />)
+    const svg = screen.getByTestId('icon').querySelector('svg')
+    expect(svg).toHaveAttribute('stroke-width', '2.75')
+  })
 })

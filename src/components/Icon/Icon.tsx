@@ -77,6 +77,7 @@ export type IconName = KnownIconName | (string & {})
 export interface IconProps extends StyleProps, Omit<HTMLAttributes<HTMLSpanElement>, 'color'> {
   name: IconName
   title?: string
+  strokeWidth?: number
 }
 
 const FALLBACK_ICON = CircleHelp
@@ -89,7 +90,7 @@ function resolveIcon(name: IconName): { Icon: LucideIcon; isFallback: boolean } 
 }
 
 export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
-  { name, className, title, ...rest },
+  { name, className, title, strokeWidth, ...rest },
   ref,
 ) {
   const { Icon: SvgIcon, isFallback } = resolveIcon(name)
@@ -111,6 +112,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
         aria-hidden="true"
         className="tm-inline-block tm-h-[1em] tm-w-[1em] tm-stroke-current"
         focusable="false"
+        strokeWidth={strokeWidth}
       />
     </span>
   )

@@ -10,6 +10,7 @@ describe('JobPortalLogo', () => {
     const logo = screen.getByRole('img', { name: 'Jobs.cz' })
     expect(logo).toHaveAttribute('data-testid', 'job-portal-logo')
     expect(logo).toHaveAttribute('data-logo-type', 'jobs-cz')
+    expect(logo).toHaveClass('tm-size-6')
     expect(logo).not.toHaveAttribute('data-logo-fallback')
     expect(logo.querySelector('img')).toHaveAttribute('src')
   })

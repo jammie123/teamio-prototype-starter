@@ -101,7 +101,7 @@ export const JobPortalLogo = forwardRef<HTMLSpanElement, JobPortalLogoProps>(
         role={resolvedTitle ? 'img' : undefined}
         aria-label={resolvedTitle || undefined}
         aria-hidden={resolvedTitle ? undefined : true}
-        className={cn('tm-inline-flex', 'tm-size-6', 'tm-shrink-0', 'tm-leading-none', className)}
+        className={cn('tm-inline-flex', 'tm-shrink-0', 'tm-leading-none', className ?? 'tm-size-6')}
         {...rest}
       >
         <img src={src} alt="" aria-hidden="true" className="tm-block tm-size-full" />

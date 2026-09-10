@@ -44,18 +44,27 @@ function PublicationDropdown({
       className="tm-group tm-inline-flex"
     >
         <DropdownToggle variant="custom" className="tm-rounded-none tm-bg-transparent">
-          <span
-            data-testid="job-card-publication-channel"
-            className={cn(
-              'tm-border-0',
-              'tm-border-b',
-              'tm-border-dotted',
-              'tm-border-secondary',
-              expired ? 'tm-font-normal tm-text-secondary-default' : 'tm-font-medium',
-              expired && 'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
-            )}
-          >
-            {publication.channel}
+          <span className="tm-inline-flex tm-items-center tm-gap-1">
+            <JobPortalLogo
+              type={jobPortalLogoTypeFromChannel(publication.channel)}
+              title=""
+              data-testid="job-card-publication-channel-logo"
+              className="tm-size-[18px]"
+            />
+            <span
+              data-testid="job-card-publication-channel"
+              className={cn(
+                'tm-border-0',
+                'tm-border-b',
+                'tm-border-dotted',
+                'tm-border-secondary',
+                'tm-font-normal',
+                expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+                expired && 'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
+              )}
+            >
+              {publication.channel}
+            </span>
           </span>
         </DropdownToggle>
         <DropdownBody

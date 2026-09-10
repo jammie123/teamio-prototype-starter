@@ -114,16 +114,16 @@ export const JobCardSynteza = forwardRef<HTMLElement, JobCardSyntezaProps>(funct
       as="article"
       ref={ref}
       data-testid="job-card"
-      className={cn('tm-flex', 'tm-flex-col', className)}
+      className={cn('tm-flex', 'tm-flex-col', '!tm-p-0', className)}
       {...rest}
     >
       <div
         data-testid="job-card-layout"
-        className="tm-flex tm-flex-col tm-gap-4 md:tm-flex-row md:tm-items-start md:tm-gap-4"
+        className="tm-flex tm-flex-col tm-gap-4 md:tm-flex-row md:tm-items-stretch md:tm-gap-0"
       >
         <div
           data-testid="job-card-recruitment"
-          className="tm-min-w-0 md:tm-flex-1"
+          className="tm-min-w-0 tm-p-4 md:tm-flex-1"
         >
           <div className="tm-flex tm-flex-col tm-gap-2">
             <div
@@ -140,14 +140,19 @@ export const JobCardSynteza = forwardRef<HTMLElement, JobCardSyntezaProps>(funct
                 {owner || hiringManagers?.length ? (
                   <JobCardPeople people={buildJobCardPeople(owner, hiringManagers)} />
                 ) : null}
-                <JobCardActivity activities={activities} onActivityClick={onActivityClick} />
-                {menuSections.length ? (
-                  <JobCardActions
-                    sections={menuSections}
-                    label="Akce nad náborem a inzerátem"
-                    testId="job-card-actions-toggle"
-                  />
-                ) : null}
+                <div
+                  data-testid="job-card-icon-buttons"
+                  className="tm-flex tm-items-center tm-gap-0"
+                >
+                  <JobCardActivity activities={activities} onActivityClick={onActivityClick} />
+                  {menuSections.length ? (
+                    <JobCardActions
+                      sections={menuSections}
+                      label="Akce nad náborem a inzerátem"
+                      testId="job-card-actions-toggle"
+                    />
+                  ) : null}
+                </div>
               </div>
             </div>
             {candidates ? (
@@ -173,7 +178,7 @@ export const JobCardSynteza = forwardRef<HTMLElement, JobCardSyntezaProps>(funct
 
         <div
             data-testid="job-card-advertisements"
-            className="tm-w-full tm-min-w-0 md:tm-w-2/5 md:tm-flex-none md:tm-border-0 md:tm-border-l md:tm-border-solid md:tm-border-secondary md:tm-pl-6"
+            className="tm-w-full tm-min-w-0 tm-p-6 md:tm-w-2/5 md:tm-flex-none md:tm-self-stretch md:tm-border-0 md:tm-border-l md:tm-border-solid md:tm-border-secondary"
           >
               {advertisements.length === 0 ? (
                 <div

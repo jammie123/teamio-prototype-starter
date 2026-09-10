@@ -41,13 +41,18 @@ describe('JobCardSynteza', () => {
     expect(titleRow).toContainElement(actions)
     expect(people.compareDocumentPosition(activity) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(activity.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const iconButtons = screen.getByTestId('job-card-icon-buttons')
+    expect(iconButtons).toHaveClass('tm-gap-0')
+    expect(iconButtons).toContainElement(activity)
+    expect(iconButtons).toContainElement(actions)
+    expect(iconButtons.parentElement).toHaveClass('tm-gap-2')
     expect(activity.querySelector('[data-icon-name="notification"]')).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-status')).not.toBeInTheDocument()
     expect(screen.queryByText('Zveřejněný')).not.toBeInTheDocument()
     expect(screen.queryByText('Nezveřejněný')).not.toBeInTheDocument()
   })
 
-  it('shows falling dots when a hiring manager has unread activity', () => {
+  it('shows an unread dot when a hiring manager has unread activity', () => {
     renderJobCardSynteza({
       activities: [
         {
@@ -61,10 +66,10 @@ describe('JobCardSynteza', () => {
       ],
     })
 
-    expect(screen.getAllByTestId('job-card-activity-dot')).toHaveLength(4)
+    expect(screen.getAllByTestId('job-card-activity-dot')).toHaveLength(1)
   })
 
-  it('hides falling dots when there are no unread activities', () => {
+  it('hides the unread dot when there are no unread activities', () => {
     renderJobCardSynteza({ activities: [] })
 
     expect(screen.getByTestId('job-card-activity-toggle')).toBeInTheDocument()
@@ -123,6 +128,19 @@ describe('JobCardSynteza', () => {
     expect(screen.queryByTestId('job-card-advertisement-more-stats')).not.toBeInTheDocument()
     expect(screen.queryByText('Zobrazit více statistik')).not.toBeInTheDocument()
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
+  })
+
+  it('uses column padding and stretches the advertisement border the full card height', () => {
+    renderJobCardSynteza()
+
+    expect(screen.getByTestId('job-card')).toHaveClass('!tm-p-0')
+    expect(screen.getByTestId('job-card-layout')).toHaveClass('md:tm-items-stretch', 'md:tm-gap-0')
+    expect(screen.getByTestId('job-card-recruitment')).toHaveClass('tm-p-4')
+    expect(screen.getByTestId('job-card-advertisements')).toHaveClass(
+      'tm-p-6',
+      'md:tm-self-stretch',
+      'md:tm-border-l',
+    )
   })
 
   it('renders a note in the recruitment column', () => {

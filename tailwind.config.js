@@ -343,15 +343,9 @@ export default {
                     '0%': { backgroundPosition: '200% 0' },
                     '100%': { backgroundPosition: '-200% 0' },
                 },
-                'fall-dot': {
-                    '0%': { transform: 'translateY(-8px)', opacity: '0' },
-                    '20%': { opacity: '1' },
-                    '100%': { transform: 'translateY(16px)', opacity: '0' },
-                },
             },
             animation: {
                 shimmer: 'shimmer 2s infinite linear',
-                'fall-dot': 'fall-dot 1.2s ease-in infinite',
             },
         },
     },

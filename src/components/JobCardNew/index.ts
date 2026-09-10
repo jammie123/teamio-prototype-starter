@@ -10,6 +10,7 @@ export type {
   JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
+  JobCardNote,
   JobCardMenuItem,
   JobCardMenuSection,
   JobCardSelectableStatus,

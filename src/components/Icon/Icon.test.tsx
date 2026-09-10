@@ -38,4 +38,12 @@ describe('Icon', () => {
     const svg = screen.getByTestId('icon').querySelector('svg')
     expect(svg).toHaveAttribute('stroke-width', '2.75')
   })
+
+  it('resolves maximize as a known lucide icon', () => {
+    render(<Icon name="maximize" title="Na celou obrazovku" />)
+    const wrapper = screen.getByTestId('icon')
+    expect(wrapper).toHaveAttribute('data-icon-name', 'maximize')
+    expect(wrapper).not.toHaveAttribute('data-icon-fallback')
+    expect(screen.getByRole('img', { name: 'Na celou obrazovku' })).toBeInTheDocument()
+  })
 })

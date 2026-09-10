@@ -3,6 +3,7 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
 import { Link } from '../Link'
+import { Note } from '../Note'
 import { Typography } from '../Typography'
 import { JobCardActions } from './JobCardActions'
 import { JobCardAdvertisement } from './JobCardAdvertisement'
@@ -16,6 +17,7 @@ import type {
   JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
+  JobCardNote,
   JobCardSelectableStatus,
   JobPublication,
   JobStatus,
@@ -32,6 +34,8 @@ export interface JobCardNewProps
   candidates?: JobCardCandidates
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
+  note?: JobCardNote
+  onExpandNote?: () => void
   /** Extra job actions appended after the built-in ones. */
   actions?: JobCardAction[]
   onStatusChange?: (status: JobCardSelectableStatus) => void
@@ -63,6 +67,8 @@ export const JobCardNew = forwardRef<HTMLElement, JobCardNewProps>(function JobC
     candidates,
     onCandidatesClick,
     advertisements = [],
+    note,
+    onExpandNote,
     actions,
     onCreateAdvertisement,
     onEditJob,
@@ -182,6 +188,16 @@ export const JobCardNew = forwardRef<HTMLElement, JobCardNewProps>(function JobC
               >
                 <JobCardStats candidates={candidates} onStatClick={onCandidatesClick} />
               </div>
+            ) : null}
+            {note ? (
+              <Note
+                author={note.author}
+                text={note.text}
+                addedAt={note.addedAt}
+                showDate={note.showDate}
+                onExpand={onExpandNote}
+                data-testid="job-card-note"
+              />
             ) : null}
           </div>
         </div>

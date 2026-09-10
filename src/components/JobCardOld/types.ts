@@ -60,3 +60,10 @@ export interface JobCardCandidates {
 }
 
 export type JobCandidateStat = Exclude<keyof JobCardCandidates, 'new'>
+
+export interface JobCardNote {
+  author: string
+  text: string
+  addedAt: string
+  showDate?: boolean
+}

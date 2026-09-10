@@ -29,6 +29,7 @@ export { Checkbox, type CheckboxProps } from './Checkbox'
 export { Radio, type RadioProps } from './Radio'
 export { Tag, type TagProps, type TagColor } from './Tag'
 export { Pill, type PillProps, type PillColor } from './Pill'
+export { Note, type NoteProps } from './Note'
 export {
   Table,
   TableHead,

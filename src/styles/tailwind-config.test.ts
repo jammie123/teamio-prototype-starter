@@ -46,6 +46,9 @@ describe('Teamio Tailwind config', () => {
     expect(config.theme.extend.backgroundImage['skeleton-light']).toContain(
       'linear-gradient',
     )
+    expect(config.theme.extend.backgroundImage['note-expand-overlay']).toContain(
+      'linear-gradient(to left, var(--color-background-cover-dark)',
+    )
     expect(config.theme.extend.keyframes.shimmer['0%']).toEqual({
       backgroundPosition: '200% 0',
     })

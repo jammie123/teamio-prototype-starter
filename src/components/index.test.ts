@@ -31,6 +31,7 @@ describe('components barrel', () => {
   it('exports data display and overlay components', () => {
     expect(components.Tag).toBeTypeOf('object')
     expect(components.Pill).toBeTypeOf('object')
+    expect(components.Note).toBeTypeOf('object')
     expect(components.Table).toBeTypeOf('object')
     expect(components.TableHead).toBeTypeOf('object')
     expect(components.TableBody).toBeTypeOf('object')

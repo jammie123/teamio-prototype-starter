@@ -3,6 +3,7 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
 import { Link } from '../Link'
+import { Note } from '../Note'
 import { Typography } from '../Typography'
 import { JobCardActions } from './JobCardActions'
 import { JobCardAdvertisement } from './JobCardAdvertisement'
@@ -16,6 +17,7 @@ import type {
   JobCandidateStat,
   JobCardAction,
   JobCardCandidates,
+  JobCardNote,
   JobCardSelectableStatus,
   JobPublication,
   JobStatus,
@@ -32,6 +34,8 @@ export interface JobCardOldProps
   candidates?: JobCardCandidates
   onCandidatesClick?: (stat: JobCandidateStat) => void
   advertisements?: JobAdvertisement[]
+  note?: JobCardNote
+  onExpandNote?: () => void
   /** Extra job actions appended after the built-in ones. */
   actions?: JobCardAction[]
   onStatusChange?: (status: JobCardSelectableStatus) => void
@@ -68,6 +72,8 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
     candidates,
     onCandidatesClick,
     advertisements = [],
+    note,
+    onExpandNote,
     actions,
     onCreateAdvertisement,
     onEditJob,
@@ -161,39 +167,53 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
           data-testid="job-card-recruitment"
           className="tm-min-w-0 md:tm-w-[500px] md:tm-min-w-[350px] md:tm-flex-none"
         >
-          <div className="tm-flex tm-items-start tm-gap-2">
-            {menuSections.length ? (
-              <JobCardActions
-                sections={menuSections}
-                label="Akce nad náborem a inzerátem"
-                testId="job-card-actions-toggle"
-              />
-            ) : null}
+          <div className="tm-flex tm-flex-col tm-gap-2">
+            <div className="tm-flex tm-items-start tm-gap-2">
+              {menuSections.length ? (
+                <JobCardActions
+                  sections={menuSections}
+                  label="Akce nad náborem a inzerátem"
+                  testId="job-card-actions-toggle"
+                />
+              ) : null}
 
-            <div className="tm-min-w-0 tm-flex-1">
-              <div className="tm-flex tm-items-start tm-justify-between tm-gap-3">
-                <Typography
-                  variant="h3"
-                  className="tm-mb-1 !tm-text-base !tm-font-medium tm-text-teamio-blue"
-                >
-                  {title}
-                </Typography>
-                {currentStatus === 'draft' ||
-                currentStatus === 'active' ||
-                currentStatus === 'archived' ? (
-                  <JobCardStatus
-                    status={currentStatus}
-                    onStatusChange={changeStatus}
-                    onCompleteDraft={onCompleteDraft}
-                    onGoToPublish={onGoToPublish}
-                    onRestoreFromArchive={onRestoreFromArchive}
-                  />
+              <div className="tm-min-w-0 tm-flex-1">
+                <div className="tm-flex tm-items-start tm-justify-between tm-gap-3">
+                  <Typography
+                    variant="h3"
+                    className="tm-mb-1 !tm-text-base !tm-font-medium tm-text-teamio-blue"
+                  >
+                    {title}
+                  </Typography>
+                  {currentStatus === 'draft' ||
+                  currentStatus === 'active' ||
+                  currentStatus === 'archived' ? (
+                    <JobCardStatus
+                      status={currentStatus}
+                      onStatusChange={changeStatus}
+                      onCompleteDraft={onCompleteDraft}
+                      onGoToPublish={onGoToPublish}
+                      onRestoreFromArchive={onRestoreFromArchive}
+                    />
+                  ) : null}
+                </div>
+                {owner || hiringManagers?.length ? (
+                  <JobCardPeople people={buildJobCardPeople(owner, hiringManagers)} />
                 ) : null}
               </div>
-              {owner || hiringManagers?.length ? (
-                <JobCardPeople people={buildJobCardPeople(owner, hiringManagers)} />
-              ) : null}
             </div>
+            {note ? (
+              <div data-testid="job-card-note-container" className="tm-ml-10">
+              <Note
+                author={note.author}
+                  text={note.text}
+                  addedAt={note.addedAt}
+                  showDate={note.showDate}
+                  onExpand={onExpandNote}
+                  data-testid="job-card-note"
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -226,7 +246,7 @@ export const JobCardOld = forwardRef<HTMLElement, JobCardOldProps>(function JobC
                 ) : null}
               </div>
             ) : selectedAdvertisement ? (
-              <div className="tm-flex tm-flex-col tm-gap-2">
+              <div className="tm-flex tm-flex-col tm-gap-3">
                 {hasSwitcher ? (
                   <JobCardAdvertisementSwitcher
                     title={selectedAdvertisement.title ?? `Inzerát ${selectedAdIndex + 1}`}

@@ -24,6 +24,7 @@ import {
   Home,
   Info,
   Mail,
+  Maximize2,
   Menu,
   Pencil,
   Plus,
@@ -69,6 +70,7 @@ const iconMap = {
   'bar-chart': BarChart3,
   mail: Mail,
   notification: Bell,
+  maximize: Maximize2,
 } as const satisfies Record<string, LucideIcon>
 
 export type KnownIconName = keyof typeof iconMap

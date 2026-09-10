@@ -332,6 +332,8 @@ export default {
                     'url(\'data:image/svg+xml,%3csvg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" width="18" height="18"%3e%3cpath style="fill:%23fff" d="M4 8h10v2H4z"/%3e%3c/svg%3e\')',
                 'skeleton-light': 'linear-gradient(90deg, #f5f7fd 0%, #f1f3fb 50%, #f5f7fd 100%)',
                 'skeleton-dark': 'linear-gradient(90deg, #e7e9f3 0%, #dde0ee 50%, #e7e9f3 100%)',
+                'note-expand-overlay':
+                    'linear-gradient(to left, var(--color-background-cover-dark) 0%, var(--color-background-cover-light) 100%)',
             },
             scale: {
                 '-100': '-1',

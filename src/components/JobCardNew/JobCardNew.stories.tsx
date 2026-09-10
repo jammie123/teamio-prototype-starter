@@ -247,3 +247,14 @@ export const Archived: Story = {
     status: 'archived',
   },
 }
+
+export const WithNote: Story = {
+  args: {
+    note: {
+      author: 'Petra Nováková',
+      text: 'Nástup ideálně od 1. 9. 2026, možné se domluvit i na pozdější termín.',
+      addedAt: '9. 9. 2026',
+    },
+    onExpandNote: fn(),
+  },
+}

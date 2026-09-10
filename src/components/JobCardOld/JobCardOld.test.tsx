@@ -1310,4 +1310,58 @@ describe('JobCardOld', () => {
 
     expect(ref.current).toBe(screen.getByTestId('job-card'))
   })
+
+  it('does not render a note when none is provided', () => {
+    renderJobCardOld()
+
+    expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
+  })
+
+  it('renders a note inside the recruitment column', () => {
+    renderJobCardOld({
+      note: {
+        author: 'Petra Nováková',
+        text: 'Nástup ideálně od 1. 9. 2026.',
+        addedAt: '9. 9. 2026',
+      },
+    })
+
+    const recruitment = screen.getByTestId('job-card-recruitment')
+    const note = screen.getByTestId('job-card-note')
+    expect(recruitment).toContainElement(note)
+    expect(note).toHaveTextContent('Nástup ideálně od 1. 9. 2026.')
+    expect(note).toHaveTextContent('9. 9. 2026')
+    expect(note).toHaveClass('tm-bg-cover-light')
+    expect(screen.queryByTestId('note-author')).not.toBeInTheDocument()
+    expect(note).not.toHaveTextContent('Nováková')
+  })
+
+  it('hides the note date when showDate is false', () => {
+    renderJobCardOld({
+      note: {
+        author: 'Petra Nováková',
+        text: 'Nástup ideálně od 1. 9. 2026.',
+        addedAt: '9. 9. 2026',
+        showDate: false,
+      },
+    })
+
+    expect(screen.queryByTestId('note-added-at')).not.toBeInTheDocument()
+  })
+
+  it('calls onExpandNote from the note maximize button', async () => {
+    const user = userEvent.setup()
+    const onExpandNote = vi.fn()
+    renderJobCardOld({
+      note: {
+        author: 'Petra Nováková',
+        text: 'Nástup ideálně od 1. 9. 2026.',
+        addedAt: '9. 9. 2026',
+      },
+      onExpandNote,
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Zobrazit celou poznámku' }))
+    expect(onExpandNote).toHaveBeenCalledTimes(1)
+  })
 })

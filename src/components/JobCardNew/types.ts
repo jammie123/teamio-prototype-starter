@@ -49,3 +49,10 @@ export interface JobCardCandidates {
 }
 
 export type JobCandidateStat = keyof JobCardCandidates
+
+export interface JobCardNote {
+  author: string
+  text: string
+  addedAt: string
+  showDate?: boolean
+}

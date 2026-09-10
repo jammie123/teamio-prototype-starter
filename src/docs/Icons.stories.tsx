@@ -33,6 +33,7 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   'bar-chart': 'Statistiky',
   mail: 'Zprávy',
   notification: 'Notifikace',
+  maximize: 'Na celou obrazovku',
 }
 
 const KNOWN_ICONS = Object.keys(ICON_LABELS) as KnownIconName[]

@@ -55,6 +55,13 @@ describe('Teamio Tailwind config', () => {
     expect(config.theme.extend.animation.shimmer).toBe(
       'shimmer 2s infinite linear',
     )
+    expect(config.theme.extend.keyframes['fall-dot']['0%']).toEqual({
+      transform: 'translateY(-8px)',
+      opacity: '0',
+    })
+    expect(config.theme.extend.animation['fall-dot']).toBe(
+      'fall-dot 1.2s ease-in infinite',
+    )
 
     expect(config.plugins).toHaveLength(1)
     expect(config.theme.ringColor.DEFAULT).toBe('#0096ee')

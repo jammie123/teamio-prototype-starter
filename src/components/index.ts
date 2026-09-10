@@ -150,6 +150,7 @@ export {
 } from './JobCard'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
+export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'
 export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,

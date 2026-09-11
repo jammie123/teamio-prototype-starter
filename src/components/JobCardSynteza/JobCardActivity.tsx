@@ -60,7 +60,7 @@ export function JobCardActivity({
                 data-testid="job-card-activity-toggle"
                 className="tm-relative tm-overflow-visible"
               >
-                <Icon name="notification" />
+                <Icon name="notification" strokeWidth={2.5} />
                 {hasUnread ? (
                   <span
                     data-testid="job-card-activity-dot"

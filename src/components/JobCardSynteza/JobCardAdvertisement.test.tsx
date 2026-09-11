@@ -212,5 +212,34 @@ describe('JobCardAdvertisement stats dropdown', () => {
     expect(screen.getByTestId('job-card-advertisement-detailed-stats')).toHaveTextContent(
       'Přejít na podrobné statistiky',
     )
+
+    const preview = screen.getByTestId('job-card-advertisement-preview')
+    expect(preview).toHaveTextContent('Zobrazit náhled')
+    expect(within(preview).getByTestId('icon')).toHaveAttribute('data-icon-name', 'search')
+    expect(dropdown).not.toContainElement(preview)
+  })
+
+  it('calls onPreviewAdvertisement from the preview action next to the statistics', () => {
+    const onPreviewAdvertisement = vi.fn()
+    render(
+      <JobCardAdvertisement
+        advertisement={{
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7.',
+              endDate: '15. 9. 2026',
+              viewCount: 842,
+            },
+          ],
+        }}
+        onPreviewAdvertisement={onPreviewAdvertisement}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('job-card-advertisement-preview'))
+    expect(onPreviewAdvertisement).toHaveBeenCalledTimes(1)
   })
 })

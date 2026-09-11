@@ -39,6 +39,7 @@ export interface JobCardSyntezaPipelineProps
   activities?: JobCardActivityItem[]
   onActivityClick?: (activity: JobCardActivityItem) => void
   onViewStatisticsClick?: () => void
+  onPreviewAdvertisement?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
 }
@@ -67,6 +68,7 @@ export const JobCardSyntezaPipeline = forwardRef<HTMLElement, JobCardSyntezaPipe
       onExtendAndRepublish,
       onEndPublication,
       onViewStatisticsClick,
+      onPreviewAdvertisement,
       onPreviewPublication,
       onExtendPublication,
       className,
@@ -205,6 +207,7 @@ export const JobCardSyntezaPipeline = forwardRef<HTMLElement, JobCardSyntezaPipe
                   key={selectedAdvertisement.id}
                   advertisement={selectedAdvertisement}
                   onViewStatisticsClick={onViewStatisticsClick}
+                  onPreviewAdvertisement={onPreviewAdvertisement}
                   onPreviewPublication={onPreviewPublication}
                   onExtendPublication={
                     onExtendPublication ??

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { formatCount } from '../JobCardSynteza/formatCount'
@@ -113,5 +113,16 @@ describe('JobCardSyntezaPipeline', () => {
     render(<JobCardSyntezaPipeline ref={ref} title="Nábor" />)
 
     expect(ref.current).toBe(screen.getByTestId('job-card'))
+  })
+
+  it('opens advertisement preview from the action next to the statistics', () => {
+    const onPreviewAdvertisement = vi.fn()
+    renderPipeline({ onPreviewAdvertisement })
+
+    const preview = screen.getByTestId('job-card-advertisement-preview')
+    expect(preview).toHaveTextContent('Zobrazit náhled')
+    expect(preview.querySelector('[data-icon-name="search"]')).toBeInTheDocument()
+    fireEvent.click(preview)
+    expect(onPreviewAdvertisement).toHaveBeenCalledTimes(1)
   })
 })

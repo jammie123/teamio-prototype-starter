@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
-import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import {
   earliestStartDateLabel,

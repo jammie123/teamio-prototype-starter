@@ -81,6 +81,7 @@ describe('components barrel', () => {
     expect(components.JobCardOld).toBeTypeOf('object')
     expect(components.JobCardNew).toBeTypeOf('object')
     expect(components.JobCardSynteza).toBeTypeOf('object')
+    expect(components.JobCardSyntezaPipeline).toBeTypeOf('object')
     expect(components.JobsFilter).toBeTypeOf('function')
   })
 })

@@ -152,6 +152,10 @@ export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'
 export {
+  JobCardSyntezaPipeline,
+  type JobCardSyntezaPipelineProps,
+} from './JobCardSyntezaPipeline'
+export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,
   type JobsFilterEmploymentType,

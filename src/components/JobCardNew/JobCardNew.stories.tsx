@@ -125,7 +125,7 @@ const mixedDifferentDates: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-new',
-  title: 'Jobs/JobCard New',
+  title: 'Jobs/Job Cards Variant/JobCard New',
   component: JobCardNew,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',

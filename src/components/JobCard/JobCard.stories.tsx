@@ -72,6 +72,35 @@ const endedDifferentDates: JobAdvertisement = {
   ],
 }
 
+function daysFromNow(days: number) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
+}
+
+/** Shared until-date within a week → heading uses the near end date. */
+const endingSoonSameDate: JobAdvertisement = {
+  id: 'ad-ending-same',
+  title: 'Hlavní inzerát',
+  publications: [
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: daysFromNow(6), viewCount: 1840 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: daysFromNow(6), viewCount: 920 },
+    { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', endDate: daysFromNow(6), viewCount: 410 },
+  ],
+}
+
+/** Jobs.cz ends within a week; the other portals still run to September. */
+const endingSoonDifferentDates: JobAdvertisement = {
+  id: 'ad-ending-diff',
+  title: 'Hlavní inzerát',
+  publications: [
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: daysFromNow(6), viewCount: 800 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 440 },
+    { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 210 },
+    { id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7.', endDate: '30. 9. 2026', viewCount: 90 },
+  ],
+}
+
 /** Mixed running/ended portals, each group with mismatched dates. */
 const mixedDifferentDates: JobAdvertisement = {
   id: 'ad-mixed-diff',
@@ -145,7 +174,7 @@ const withHighlights: JobAdvertisement = {
 }
 
 const meta = {
-  title: 'Jobs/JobCard',
+  title: 'Jobs/Job Cards Variant/JobCard',
   component: JobCard,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
@@ -191,6 +220,18 @@ export const MixedSameDates: Story = {
   },
 }
 
+export const EndingSoonSameDate: Story = {
+  args: {
+    advertisements: [endingSoonSameDate],
+  },
+}
+
+export const EndingSoonDifferentDates: Story = {
+  args: {
+    advertisements: [endingSoonDifferentDates],
+  },
+}
+
 export const RunningDifferentDates: Story = {
   args: {
     advertisements: [runningDifferentDates],
@@ -212,6 +253,12 @@ export const MixedDifferentDates: Story = {
 export const WithHighlights: Story = {
   args: {
     advertisements: [withHighlights],
+  },
+}
+
+export const MultipleAdvertisements: Story = {
+  args: {
+    advertisements: [runningSameDate, mixedSameDates, endedSameDate],
   },
 }
 

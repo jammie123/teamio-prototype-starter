@@ -215,11 +215,21 @@ export function groupPublicationsByDate(publications: JobPublication[]) {
   return groups
 }
 
-export function partitionPublications(publications: JobPublication[]) {
-  return {
-    active: publications.filter((publication) => !isExpired(publication)),
-    expired: publications.filter(isExpired),
+export function isEndingSoonPublication(publication: JobPublication, now = new Date()) {
+  if (isExpired(publication) || !publication.endDate) {
+    return false
   }
+
+  return isEndingSoonDays(getRemainingCalendarDays(publication.endDate, now))
+}
+
+export function partitionPublications(publications: JobPublication[], now = new Date()) {
+  const expired = publications.filter(isExpired)
+  const active = publications.filter((publication) => !isExpired(publication))
+  const endingSoon = active.filter((publication) => isEndingSoonPublication(publication, now))
+  const running = active.filter((publication) => !isEndingSoonPublication(publication, now))
+
+  return { active, running, endingSoon, expired }
 }
 
 function pickDate(
@@ -303,6 +313,22 @@ export function formatRunningHeading({
   }
 
   return `Běží do ${endDate}`
+}
+
+export function formatEndingSoonHeading({
+  sameDate,
+  endDate,
+  remainingDays,
+}: {
+  sameDate: boolean
+  endDate?: string
+  remainingDays?: number
+}) {
+  if (sameDate && endDate && remainingDays !== undefined && isEndingSoonDays(remainingDays)) {
+    return formatEndingSoonWithDate(remainingDays, endDate)
+  }
+
+  return 'Končí brzy'
 }
 
 export function formatEndedHeading({

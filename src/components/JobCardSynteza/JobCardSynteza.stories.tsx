@@ -117,7 +117,7 @@ const endingSoonSameDate: JobAdvertisement = {
   ],
 }
 
-/** Three portals still run to September; Jobs.cz ends within a week → warning on that date row. */
+/** Jobs.cz ends within a week → own "Končí za …" heading; the rest stay under Běží. */
 const endingSoonDifferentDates: JobAdvertisement = {
   id: 'ad-ending-diff',
   title: 'Hlavní inzerát',
@@ -126,6 +126,50 @@ const endingSoonDifferentDates: JobAdvertisement = {
     withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 440 }, 14),
     withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 210 }, 5),
     withReactions({ id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 90 }, 2),
+  ],
+}
+
+/** Two different ending-soon dates → heading "Končí brzy" and date rows; the rest stay under Běží. */
+const endingSoonMultipleDates: JobAdvertisement = {
+  id: 'ad-ending-many',
+  title: 'Hlavní inzerát',
+  publications: [
+    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: daysFromNow(2), viewCount: 800 }, 31),
+    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: daysFromNow(5), viewCount: 440 }, 14),
+    withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 210 }, 5),
+    withReactions({ id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '30. 9. 2026', viewCount: 90 }, 2),
+  ],
+}
+
+/** Ending soon, still running, and already ended — three category headings. */
+const endingSoonMixed: JobAdvertisement = {
+  id: 'ad-ending-mixed',
+  title: 'Disponent dopravy',
+  publications: [
+    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '20. 8. 2026', endDate: daysFromNow(5), viewCount: 410 }, 7),
+    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '20. 8. 2026', endDate: '31. 10. 2026', viewCount: 260 }, 4),
+    withReactions(
+      {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        status: 'expired',
+        startDate: '2. 6. 2026',
+        endDate: '10. 8. 2026',
+        viewCount: 95,
+      },
+      1,
+    ),
+    withReactions(
+      {
+        id: 'atmoskop',
+        channel: 'Atmoskop',
+        status: 'expired',
+        startDate: '2. 6. 2026',
+        endDate: '10. 8. 2026',
+        viewCount: 48,
+      },
+      0,
+    ),
   ],
 }
 
@@ -144,7 +188,7 @@ const mixedDifferentDates: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-synteza',
-  title: 'Jobs/JobCard Syntéza',
+  title: 'Jobs/Job Cards Variant/JobCard Syntéza',
   component: JobCardSynteza,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
@@ -200,6 +244,18 @@ export const EndingSoonSameDate: Story = {
 export const EndingSoonDifferentDates: Story = {
   args: {
     advertisements: [endingSoonDifferentDates],
+  },
+}
+
+export const EndingSoonMultipleDates: Story = {
+  args: {
+    advertisements: [endingSoonMultipleDates],
+  },
+}
+
+export const EndingSoonMixed: Story = {
+  args: {
+    advertisements: [endingSoonMixed],
   },
 }
 

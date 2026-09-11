@@ -28,6 +28,7 @@ const preview: Preview = {
           'Components',
           'Complex components',
           'Jobs',
+          ['Job Cards Variant', 'JobsFilter'],
           'Page',
           'App',
         ],

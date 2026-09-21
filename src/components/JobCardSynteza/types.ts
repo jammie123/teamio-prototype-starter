@@ -31,9 +31,12 @@ export interface JobPublication {
   reactionCount?: number
 }
 
+export type JobAdvertisementStatus = 'draft'
+
 export interface JobAdvertisement {
   id: string
   title?: string
+  status?: JobAdvertisementStatus
   publications?: JobPublication[]
 }
 

@@ -155,6 +155,8 @@ export {
   JobCardSyntezaPipeline,
   type JobCardSyntezaPipelineProps,
 } from './JobCardSyntezaPipeline'
+export { JobCardSyntezaAds, type JobCardSyntezaAdsProps } from './JobCardSyntezaAds'
+export { JobCardSyntezaMoreAds, type JobCardSyntezaMoreAdsProps } from './JobCardSyntezaMoreAds'
 export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,

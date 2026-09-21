@@ -7,6 +7,7 @@ export {
 } from './jobCardMenu'
 export type {
   JobAdvertisement,
+  JobAdvertisementStatus,
   JobCandidateStat,
   JobCardAction,
   JobCardActivity,

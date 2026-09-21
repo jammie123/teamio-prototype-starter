@@ -4,6 +4,7 @@ export {
 } from './JobCardSyntezaPipeline'
 export type {
   JobAdvertisement,
+  JobAdvertisementStatus,
   JobCandidateStat,
   JobCardAction,
   JobCardActivity,

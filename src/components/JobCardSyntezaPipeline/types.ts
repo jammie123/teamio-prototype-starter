@@ -1,5 +1,6 @@
 export type {
   JobAdvertisement,
+  JobAdvertisementStatus,
   JobCardAction,
   JobCardActivity,
   JobCardActivityType,

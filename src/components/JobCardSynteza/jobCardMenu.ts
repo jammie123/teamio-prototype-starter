@@ -10,6 +10,7 @@ export const JOB_CARD_MENU_LABELS = {
   editAdvertisementDescription: 'Popis a znění inzerátu',
   extendAndRepublish: 'Prodloužit a znovu vystavit',
   endPublication: 'Ukončit vystavení',
+  topAdvertisement: 'Topovat',
   editJob: 'Editovat nábor',
   duplicateJob: 'Duplikovat',
   inviteColleagues: 'Zapojit kolegy',
@@ -27,6 +28,7 @@ export interface JobCardMenuHandlers {
   onEditAdvertisement?: () => void
   onExtendAndRepublish?: () => void
   onEndPublication?: () => void
+  onTopAdvertisement?: () => void
   onCreateAdvertisement?: () => void
 }
 
@@ -40,6 +42,7 @@ function advertisementItems({
   onEditAdvertisement,
   onExtendAndRepublish,
   onEndPublication,
+  onTopAdvertisement,
   onCreateAdvertisement,
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   if (advertisements.length === 0) {
@@ -80,6 +83,14 @@ function advertisementItems({
       id: 'advertisement-end-publication',
       label: JOB_CARD_MENU_LABELS.endPublication,
       onClick: onEndPublication,
+    })
+  }
+
+  if (onTopAdvertisement) {
+    items.push({
+      id: 'advertisement-top',
+      label: JOB_CARD_MENU_LABELS.topAdvertisement,
+      onClick: onTopAdvertisement,
     })
   }
 

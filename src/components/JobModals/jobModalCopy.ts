@@ -21,4 +21,8 @@ export const JOB_MODAL_COPY = {
     title: 'Zvýraznit inzerát',
     confirm: 'Zvýraznit',
   },
+  top: {
+    title: 'Topovat',
+    confirm: 'Topovat',
+  },
 } as const

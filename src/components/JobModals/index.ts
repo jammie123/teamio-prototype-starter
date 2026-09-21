@@ -16,4 +16,5 @@ export { JobModalUnpublish, type JobModalUnpublishProps } from './JobModalUnpubl
 export { JobModalProlong, type JobModalProlongProps } from './JobModalProlong'
 export { JobModalPublish, type JobModalPublishProps } from './JobModalPublish'
 export { JobModalBoost, type JobModalBoostProps } from './JobModalBoost'
+export { JobModalTop, type JobModalTopProps } from './JobModalTop'
 export { JOB_MODAL_COPY } from './jobModalCopy'

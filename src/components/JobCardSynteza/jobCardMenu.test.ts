@@ -8,6 +8,7 @@ describe('buildJobCardMenuSections', () => {
       onEditAdvertisement: vi.fn(),
       onExtendAndRepublish: vi.fn(),
       onEndPublication: vi.fn(),
+      onTopAdvertisement: vi.fn(),
       onEditJob: vi.fn(),
       onDuplicateJob: vi.fn(),
       onInviteColleagues: vi.fn(),
@@ -20,6 +21,7 @@ describe('buildJobCardMenuSections', () => {
       { label: 'Editovat inzerát', description: 'Popis a znění inzerátu' },
       { label: 'Prodloužit a znovu vystavit', description: undefined },
       { label: 'Ukončit vystavení', description: undefined },
+      { label: 'Topovat', description: undefined },
     ])
     expect(sections[0].items.every((item) => item.actions === undefined)).toBe(true)
     expect(sections[1].items.map((item) => item.label)).toEqual([
@@ -52,6 +54,15 @@ describe('buildJobCardMenuSections', () => {
     expect(buildJobCardMenuSections({ onEditJob: vi.fn() })).toEqual([
       { id: 'job', items: [expect.objectContaining({ label: 'Editovat nábor' })] },
     ])
+  })
+
+  it('omits Topovat when onTopAdvertisement is missing', () => {
+    const sections = buildJobCardMenuSections({
+      advertisements: [{ id: 'ad-1' }],
+      onEndPublication: vi.fn(),
+    })
+
+    expect(sections[0].items.map((item) => item.label)).toEqual(['Ukončit vystavení'])
   })
 
   it('appends custom actions after the built-in job actions', () => {

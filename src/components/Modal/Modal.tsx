@@ -39,15 +39,16 @@ ModalOverlay.displayName = 'ModalOverlay'
 export interface ModalContentProps
   extends ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   size?: ModalSize
+  overlayClassName?: string
 }
 
 export const ModalContent = forwardRef<
   ElementRef<typeof DialogPrimitive.Content>,
   ModalContentProps
->(function ModalContent({ className, size = 'default', children, ...rest }, ref) {
+>(function ModalContent({ className, overlayClassName, size = 'default', children, ...rest }, ref) {
   return (
     <ModalPortal>
-      <ModalOverlay />
+      <ModalOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(

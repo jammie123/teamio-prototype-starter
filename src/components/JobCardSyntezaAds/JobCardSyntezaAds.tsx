@@ -2,12 +2,12 @@ import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
-import { JobCardActions } from '../JobCardSynteza/JobCardActions'
 import { JobCardActivity } from '../JobCardSynteza/JobCardActivity'
 import { JobCardAdvertisementSwitcher } from '../JobCardSynteza/JobCardAdvertisementSwitcher'
 import { buildJobCardPeople, JobCardPeople } from '../JobCardSynteza/JobCardPeople'
-import { buildJobCardMenuSections, type JobCardMenuHandlers } from '../JobCardSynteza/jobCardMenu'
+import type { JobCardMenuHandlers } from '../JobCardSynteza/jobCardMenu'
 import { JobCardStats } from '../JobCardSyntezaPipeline/JobCardStats'
+import { JobMenu } from '../JobMenu'
 import type {
   JobAdvertisement,
   JobCandidateStat,
@@ -69,6 +69,7 @@ export const JobCardSyntezaAds = forwardRef<HTMLElement, JobCardSyntezaAdsProps>
       onEditAdvertisement,
       onExtendAndRepublish,
       onEndPublication,
+      onTopAdvertisement,
       onViewStatisticsClick,
       onPreviewAdvertisement,
       onPreviewPublication,
@@ -85,20 +86,6 @@ export const JobCardSyntezaAds = forwardRef<HTMLElement, JobCardSyntezaAdsProps>
     useEffect(() => {
       setSelectedAdIndex(0)
     }, [advertisementKey])
-
-    const menuSections = buildJobCardMenuSections({
-      advertisements,
-      actions,
-      onEditJob,
-      onDuplicateJob,
-      onInviteColleagues,
-      onTransferJob,
-      onArchiveJob,
-      onEditAdvertisement,
-      onExtendAndRepublish,
-      onEndPublication,
-      onCreateAdvertisement,
-    })
 
     const selectedAdvertisement = advertisements[selectedAdIndex]
     const hasSwitcher = advertisements.length > 1
@@ -148,13 +135,21 @@ export const JobCardSyntezaAds = forwardRef<HTMLElement, JobCardSyntezaAdsProps>
                     className="tm-flex tm-items-center tm-gap-0"
                   >
                     <JobCardActivity activities={activities} onActivityClick={onActivityClick} />
-                    {menuSections.length ? (
-                      <JobCardActions
-                        sections={menuSections}
-                        label="Akce nad náborem a inzerátem"
-                        testId="job-card-actions-toggle"
-                      />
-                    ) : null}
+                    <JobMenu
+                      advertisements={advertisements}
+                      actions={actions}
+                      onEditJob={onEditJob}
+                      onDuplicateJob={onDuplicateJob}
+                      onInviteColleagues={onInviteColleagues}
+                      onTransferJob={onTransferJob}
+                      onArchiveJob={onArchiveJob}
+                      onEditAdvertisement={onEditAdvertisement}
+                      onExtendAndRepublish={onExtendAndRepublish}
+                      onEndPublication={onEndPublication}
+                      onTopAdvertisement={onTopAdvertisement}
+                      onCreateAdvertisement={onCreateAdvertisement}
+                      testId="job-card-actions-toggle"
+                    />
                   </div>
                 </div>
               </div>

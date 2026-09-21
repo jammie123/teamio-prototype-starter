@@ -31,5 +31,6 @@ describe('App', () => {
     expect(screen.getByRole('tablist', { name: 'Ukázkové záložky' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tooltip' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Open Modal' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Open Drawer' })).toBeInTheDocument()
   })
 })

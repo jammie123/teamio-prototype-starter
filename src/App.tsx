@@ -6,6 +6,14 @@ import {
   Checkbox,
   Container,
   Divider,
+  Drawer,
+  DrawerBody,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerTrigger,
   FormGroup,
   FormLabel,
   FormMessage,
@@ -190,6 +198,20 @@ function App() {
                   </ModalFooter>
                 </ModalContent>
               </Modal>
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <Button variant="secondary">Open Drawer</Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <DrawerTitle>Historie inzerce</DrawerTitle>
+                  <DrawerClose aria-label="Zavřít panel" />
+                  <DrawerDescription>Ukázkový pravý panel.</DrawerDescription>
+                  <DrawerBody>Ukázkový obsah draweru.</DrawerBody>
+                  <DrawerFooter>
+                    <Button>Confirm</Button>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
             </div>
           </Card>
         </Container>

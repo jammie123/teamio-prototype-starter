@@ -12,6 +12,7 @@ const menuHandlers = {
   onEditAdvertisement: fn(),
   onExtendAndRepublish: fn(),
   onEndPublication: fn(),
+  onTopAdvertisement: fn(),
   onPreviewPublication: fn(),
   onPreviewAdvertisement: fn(),
   onExtendPublication: fn(),

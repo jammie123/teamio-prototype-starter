@@ -122,6 +122,20 @@ describe('Modal', () => {
     expect(dialog).toHaveClass('tm-max-w-[900px]')
   })
 
+  it('forwards overlayClassName onto the overlay', async () => {
+    render(
+      <Modal open onOpenChange={() => undefined}>
+        <ModalContent overlayClassName="tm-z-[60]">
+          <ModalTitle>Overlay</ModalTitle>
+        </ModalContent>
+      </Modal>,
+    )
+
+    await screen.findByRole('dialog')
+    const overlay = document.querySelector('.tm-bg-inverted\\/20')
+    expect(overlay).toHaveClass('tm-z-[60]')
+  })
+
   it('applies the default size constraint when no size is given', async () => {
     render(
       <Modal open onOpenChange={() => undefined}>

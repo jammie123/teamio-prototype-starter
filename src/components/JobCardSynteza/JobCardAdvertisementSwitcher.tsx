@@ -10,6 +10,7 @@ export interface JobCardAdvertisementSwitcherProps extends StyleProps {
   total: number
   onPrev: () => void
   onNext: () => void
+  hideTitle?: boolean
 }
 
 function SwitcherArrow({
@@ -48,20 +49,29 @@ export function JobCardAdvertisementSwitcher({
   total,
   onPrev,
   onNext,
+  hideTitle = false,
   className,
 }: JobCardAdvertisementSwitcherProps) {
   return (
     <TooltipProvider delayDuration={200}>
       <div
         data-testid="job-card-advertisement-switcher"
-        className={cn('tm-flex', 'tm-items-center', 'tm-justify-between', 'tm-gap-2', className)}
+        className={cn(
+          'tm-flex',
+          'tm-items-center',
+          hideTitle ? 'tm-justify-end' : 'tm-justify-between',
+          'tm-gap-2',
+          className,
+        )}
       >
-        <span
-          data-testid="job-card-advertisement-title"
-          className="tm-min-w-0 tm-truncate tm-text-sm tm-font-medium tm-text-primary-default"
-        >
-          {title}
-        </span>
+        {hideTitle ? null : (
+          <span
+            data-testid="job-card-advertisement-title"
+            className="tm-min-w-0 tm-truncate tm-text-sm tm-font-medium tm-text-primary-default"
+          >
+            {title}
+          </span>
+        )}
         <div className="tm-flex tm-shrink-0 tm-items-center tm-gap-1 tm-text-sm tm-text-secondary-default">
           <SwitcherArrow
             label="Zobrazit předchozí inzerát"

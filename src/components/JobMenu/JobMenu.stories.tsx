@@ -24,6 +24,7 @@ const meta = {
     onInviteColleagues: fn(),
     onTransferJob: fn(),
     onArchiveJob: fn(),
+    onAddNote: fn(),
   },
   parameters: {
     layout: 'padded',

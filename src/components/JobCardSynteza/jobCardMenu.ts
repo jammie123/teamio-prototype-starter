@@ -16,6 +16,7 @@ export const JOB_CARD_MENU_LABELS = {
   inviteColleagues: 'Zapojit kolegy',
   transferJob: 'Předat nábor',
   archiveJob: 'Archivovat',
+  addNote: 'Přidat poznámku',
   addAdvertisement: 'Přidat inzerát',
 } as const
 
@@ -30,6 +31,7 @@ export interface JobCardMenuHandlers {
   onEndPublication?: () => void
   onTopAdvertisement?: () => void
   onCreateAdvertisement?: () => void
+  onAddNote?: () => void
 }
 
 export interface BuildJobCardMenuOptions extends JobCardMenuHandlers {
@@ -103,6 +105,7 @@ function jobItems({
   onInviteColleagues,
   onTransferJob,
   onArchiveJob,
+  onAddNote,
   actions = [],
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   const items: JobCardMenuItem[] = []
@@ -140,6 +143,14 @@ function jobItems({
       id: 'job-archive',
       label: JOB_CARD_MENU_LABELS.archiveJob,
       onClick: onArchiveJob,
+    })
+  }
+
+  if (onAddNote) {
+    items.push({
+      id: 'job-add-note',
+      label: JOB_CARD_MENU_LABELS.addNote,
+      onClick: onAddNote,
     })
   }
 

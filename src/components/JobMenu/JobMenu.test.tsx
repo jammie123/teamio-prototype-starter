@@ -96,4 +96,29 @@ describe('JobMenu', () => {
     const { container } = render(<JobMenu advertisements={[advertisement]} />)
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('lists Přidat poznámku in the job section and fires onAddNote', async () => {
+    const user = userEvent.setup()
+    const onAddNote = vi.fn()
+
+    render(
+      <JobMenu
+        advertisements={[advertisement]}
+        onEditJob={vi.fn()}
+        onArchiveJob={vi.fn()}
+        onAddNote={onAddNote}
+      />,
+    )
+
+    await user.click(screen.getByTestId('job-menu-toggle'))
+
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Editovat nábor',
+      'Archivovat',
+      'Přidat poznámku',
+    ])
+
+    await user.click(screen.getByRole('option', { name: 'Přidat poznámku' }))
+    expect(onAddNote).toHaveBeenCalledTimes(1)
+  })
 })

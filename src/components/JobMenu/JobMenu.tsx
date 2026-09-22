@@ -28,6 +28,7 @@ export function JobMenu({
   onEndPublication,
   onTopAdvertisement,
   onCreateAdvertisement,
+  onAddNote,
   label = JOB_MENU_LABEL,
   testId = 'job-menu-toggle',
   className,
@@ -45,6 +46,7 @@ export function JobMenu({
     onEndPublication,
     onTopAdvertisement,
     onCreateAdvertisement,
+    onAddNote,
   })
 
   if (!sections.length) {

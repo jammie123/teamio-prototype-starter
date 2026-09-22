@@ -432,4 +432,41 @@ describe('JobCardAdvertisement stats dropdown', () => {
     fireEvent.click(screen.getByTestId('job-card-advertisement-detailed-stats'))
     expect(onViewStatisticsClick).toHaveBeenCalledTimes(1)
   })
+
+  it('keeps the Zobrazit náhled link next to the view count by default', () => {
+    render(
+      <JobCardAdvertisement
+        advertisement={{
+          id: 'ad-1',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 842 },
+          ],
+        }}
+        onPreviewAdvertisement={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-advertisement-preview')).toHaveTextContent('Zobrazit náhled')
+    expect(screen.getByTestId('job-card-advertisement-preview-separator')).toBeInTheDocument()
+    expect(screen.getByTestId('job-card-advertisement-aggregate-views')).toBeInTheDocument()
+  })
+
+  it('hides the preview link and separator when showPreviewLink is false', () => {
+    render(
+      <JobCardAdvertisement
+        advertisement={{
+          id: 'ad-1',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026', viewCount: 842 },
+          ],
+        }}
+        showPreviewLink={false}
+        onPreviewAdvertisement={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-advertisement-aggregate-views')).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-preview')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-preview-separator')).not.toBeInTheDocument()
+  })
 })

@@ -42,6 +42,7 @@ export interface JobCardAdvertisementProps extends StyleProps {
   onPreviewAdvertisement?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
+  showPreviewLink?: boolean
 }
 
 function sharedFieldDateLabel(
@@ -80,11 +81,13 @@ function AdvertisementMeta({
   viewCount,
   onViewStatisticsClick,
   onPreviewAdvertisement,
+  showPreviewLink = true,
 }: {
   publications: JobPublication[]
   viewCount?: number
   onViewStatisticsClick?: () => void
   onPreviewAdvertisement?: () => void
+  showPreviewLink?: boolean
 }) {
   const [open, setOpen] = useState(false)
 
@@ -170,22 +173,26 @@ function AdvertisementMeta({
           </div>
         ) : null}
       </div>
-      <span aria-hidden data-testid="job-card-advertisement-preview-separator">
-        ·
-      </span>
-      <Link
-        variant="secondary"
-        className="tm-inline-flex tm-items-center tm-gap-1 tm-text-13 tm-text-secondary-default"
-        data-testid="job-card-advertisement-preview"
-        onClick={(event) => {
-          event.preventDefault()
-          event.stopPropagation()
-          onPreviewAdvertisement?.()
-        }}
-      >
-        <Icon name="search" />
-        Zobrazit náhled
-      </Link>
+      {showPreviewLink ? (
+        <>
+          <span aria-hidden data-testid="job-card-advertisement-preview-separator">
+            ·
+          </span>
+          <Link
+            variant="secondary"
+            className="tm-inline-flex tm-items-center tm-gap-1 tm-text-13 tm-text-secondary-default"
+            data-testid="job-card-advertisement-preview"
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              onPreviewAdvertisement?.()
+            }}
+          >
+            <Icon name="search" />
+            Zobrazit náhled
+          </Link>
+        </>
+      ) : null}
     </div>
   )
 }
@@ -378,6 +385,7 @@ export function JobCardAdvertisement({
   onPreviewAdvertisement,
   onPreviewPublication,
   onExtendPublication,
+  showPreviewLink = true,
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -501,6 +509,7 @@ export function JobCardAdvertisement({
       <AdvertisementMeta
         publications={publications}
         viewCount={summary.viewCount}
+        showPreviewLink={showPreviewLink}
         onViewStatisticsClick={onViewStatisticsClick}
         onPreviewAdvertisement={
           onPreviewAdvertisement ??

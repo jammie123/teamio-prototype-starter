@@ -73,4 +73,31 @@ describe('buildJobCardMenuSections', () => {
 
     expect(sections[0].items.map((item) => item.label)).toEqual(['Editovat nábor', 'Další akce'])
   })
+
+  it('appends Přidat poznámku after Archivovat when onAddNote is passed', () => {
+    const onAddNote = vi.fn()
+    const sections = buildJobCardMenuSections({
+      onEditJob: vi.fn(),
+      onArchiveJob: vi.fn(),
+      onAddNote,
+      actions: [{ id: 'extra', label: 'Další akce' }],
+    })
+
+    expect(sections[0].items.map((item) => ({ id: item.id, label: item.label }))).toEqual([
+      { id: 'job-edit', label: 'Editovat nábor' },
+      { id: 'job-archive', label: 'Archivovat' },
+      { id: 'job-add-note', label: 'Přidat poznámku' },
+      { id: 'extra', label: 'Další akce' },
+    ])
+    expect(sections[0].items[2].onClick).toBe(onAddNote)
+  })
+
+  it('omits Přidat poznámku when onAddNote is missing', () => {
+    const sections = buildJobCardMenuSections({
+      onEditJob: vi.fn(),
+      onArchiveJob: vi.fn(),
+    })
+
+    expect(sections[0].items.map((item) => item.label)).toEqual(['Editovat nábor', 'Archivovat'])
+  })
 })

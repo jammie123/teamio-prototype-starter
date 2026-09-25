@@ -8,6 +8,7 @@ import {
   isDraftAdvertisement,
   MIXED_PERIOD_HEADING,
   publicationPeriodBadge,
+  sortPublicationsBySoonestEnd,
   splitIntoBalancedColumns,
 } from './advertisementSummaryAds'
 
@@ -38,14 +39,21 @@ describe('advertisementSummaryAds', () => {
   })
 
   it('returns an informative badge with the end date when the portal still runs later', () => {
-    expect(
-      publicationPeriodBadge({
-        id: 'prace',
-        channel: 'Prace.cz',
-        startDate: '12. 7. 2026',
-        endDate: '30. 9. 2026',
-      }),
-    ).toEqual({ color: 'informative', label: '30. 9. 2026' })
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      expect(
+        publicationPeriodBadge({
+          id: 'prace',
+          channel: 'Prace.cz',
+          startDate: '12. 7. 2026',
+          endDate: '30. 9. 2026',
+        }),
+      ).toEqual({ color: 'informative', label: '30. 9. 2026' })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('uses an informative end-date badge for expired portals', () => {
@@ -92,6 +100,72 @@ describe('advertisementSwitcherTitle', () => {
       DRAFT_ADVERTISEMENT_HEADING,
     )
     expect(advertisementSwitcherTitle({ id: 'ad-2' }, 1)).toBe('Inzerát 2')
+  })
+})
+
+describe('sortPublicationsBySoonestEnd', () => {
+  it('puts the soonest end date first and keeps equal dates stable', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      const jobs = { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' }
+      const career = {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        startDate: '12. 7. 2026',
+        endDate: '20. 9. 2026',
+      }
+      const prace = { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' }
+
+      expect(sortPublicationsBySoonestEnd([jobs, career, prace]).map((publication) => publication.id)).toEqual([
+        'career',
+        'jobs',
+        'prace',
+      ])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('keeps still-running soonest dates before already-ended ones', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 8, 25))
+
+    try {
+      const jobs = { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' }
+      const careerEnded = {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        startDate: '12. 7. 2026',
+        endDate: '20. 9. 2026',
+      }
+      const atmoskopLater = {
+        id: 'atmoskop',
+        channel: 'Atmoskop',
+        startDate: '12. 7. 2026',
+        endDate: '12. 10. 2026',
+      }
+      const atmoskopPast = {
+        id: 'atmoskop-past',
+        channel: 'Atmoskop',
+        startDate: '12. 7. 2026',
+        endDate: '12. 8. 2026',
+      }
+
+      expect(
+        sortPublicationsBySoonestEnd([careerEnded, atmoskopLater, jobs]).map(
+          (publication) => publication.id,
+        ),
+      ).toEqual(['jobs', 'atmoskop', 'career'])
+      expect(
+        sortPublicationsBySoonestEnd([jobs, careerEnded, atmoskopPast]).map(
+          (publication) => publication.id,
+        ),
+      ).toEqual(['jobs', 'atmoskop-past', 'career'])
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

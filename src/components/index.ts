@@ -157,6 +157,7 @@ export {
 } from './JobCardSyntezaPipeline'
 export { JobCardSyntezaAds, type JobCardSyntezaAdsProps } from './JobCardSyntezaAds'
 export { JobCardSimplify, type JobCardSimplifyProps } from './JobCardSimplify'
+export { JobCardSimplify2, type JobCardSimplify2Props } from './JobCardSimplify2'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
 export { JobCardSyntezaMoreAds, type JobCardSyntezaMoreAdsProps } from './JobCardSyntezaMoreAds'
 export {

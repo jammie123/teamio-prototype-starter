@@ -37,6 +37,7 @@ import {
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { OpalIcon } from './customIcons'
 
 const iconMap = {
   plus: Plus,
@@ -73,7 +74,11 @@ const iconMap = {
   maximize: Maximize2,
 } as const satisfies Record<string, LucideIcon>
 
-export type KnownIconName = keyof typeof iconMap
+const customIconMap = {
+  opal: OpalIcon,
+} as const satisfies Record<string, LucideIcon>
+
+export type KnownIconName = keyof typeof iconMap | keyof typeof customIconMap
 export type IconName = KnownIconName | (string & {})
 
 export interface IconProps extends StyleProps, Omit<HTMLAttributes<HTMLSpanElement>, 'color'> {
@@ -84,18 +89,29 @@ export interface IconProps extends StyleProps, Omit<HTMLAttributes<HTMLSpanEleme
 
 const FALLBACK_ICON = CircleHelp
 
-function resolveIcon(name: IconName): { Icon: LucideIcon; isFallback: boolean } {
-  if (Object.prototype.hasOwnProperty.call(iconMap, name)) {
-    return { Icon: iconMap[name as KnownIconName], isFallback: false }
+function resolveIcon(name: IconName): {
+  Icon: LucideIcon
+  isFallback: boolean
+  variant: 'stroke' | 'fill'
+} {
+  if (Object.prototype.hasOwnProperty.call(customIconMap, name)) {
+    return {
+      Icon: customIconMap[name as keyof typeof customIconMap],
+      isFallback: false,
+      variant: 'fill',
+    }
   }
-  return { Icon: FALLBACK_ICON, isFallback: true }
+  if (Object.prototype.hasOwnProperty.call(iconMap, name)) {
+    return { Icon: iconMap[name as keyof typeof iconMap], isFallback: false, variant: 'stroke' }
+  }
+  return { Icon: FALLBACK_ICON, isFallback: true, variant: 'stroke' }
 }
 
 export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
   { name, className, title, strokeWidth, ...rest },
   ref,
 ) {
-  const { Icon: SvgIcon, isFallback } = resolveIcon(name)
+  const { Icon: SvgIcon, isFallback, variant } = resolveIcon(name)
 
   return (
     <span
@@ -112,9 +128,14 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
       {'\u200B'}
       <SvgIcon
         aria-hidden="true"
-        className="tm-inline-block tm-h-[1em] tm-w-[1em] tm-stroke-current"
+        className={cn(
+          'tm-inline-block',
+          'tm-h-[1em]',
+          'tm-w-[1em]',
+          variant === 'fill' ? 'tm-fill-current' : 'tm-stroke-current',
+        )}
         focusable="false"
-        strokeWidth={strokeWidth}
+        strokeWidth={variant === 'fill' ? undefined : strokeWidth}
       />
     </span>
   )

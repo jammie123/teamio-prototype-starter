@@ -39,6 +39,17 @@ describe('Icon', () => {
     expect(svg).toHaveAttribute('stroke-width', '2.75')
   })
 
+  it('renders the custom filled opal icon without falling back', () => {
+    render(<Icon name="opal" title="Opalcování" />)
+    const wrapper = screen.getByTestId('icon')
+    expect(wrapper).toHaveAttribute('data-icon-name', 'opal')
+    expect(wrapper).not.toHaveAttribute('data-icon-fallback')
+    const svg = wrapper.querySelector('svg')
+    expect(svg).toHaveClass('tm-fill-current')
+    expect(svg).not.toHaveClass('tm-stroke-current')
+    expect(screen.getByRole('img', { name: 'Opalcování' })).toBeInTheDocument()
+  })
+
   it('resolves maximize as a known lucide icon', () => {
     render(<Icon name="maximize" title="Na celou obrazovku" />)
     const wrapper = screen.getByTestId('icon')

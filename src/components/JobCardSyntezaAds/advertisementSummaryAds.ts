@@ -39,6 +39,40 @@ export function splitIntoBalancedColumns<T>(items: T[]): T[][] {
   return [items.slice(0, firstColumnLength), items.slice(firstColumnLength)]
 }
 
+function remainingDaysRank(publication: JobPublication) {
+  if (!publication.endDate) {
+    return undefined
+  }
+
+  return getRemainingCalendarDays(publication.endDate)
+}
+
+/** Still-running soonest first (left column); already-ended dates after; missing dates last. */
+export function sortPublicationsBySoonestEnd(publications: JobPublication[]): JobPublication[] {
+  return publications
+    .map((publication, index) => ({ publication, index }))
+    .sort((left, right) => {
+      const leftDays = remainingDaysRank(left.publication)
+      const rightDays = remainingDaysRank(right.publication)
+      const leftRunning = leftDays !== undefined && leftDays >= 0
+      const rightRunning = rightDays !== undefined && rightDays >= 0
+
+      if (leftRunning !== rightRunning) {
+        return leftRunning ? -1 : 1
+      }
+
+      const leftRank = leftDays ?? Number.POSITIVE_INFINITY
+      const rightRank = rightDays ?? Number.POSITIVE_INFINITY
+
+      if (leftRank !== rightRank) {
+        return leftRank - rightRank
+      }
+
+      return left.index - right.index
+    })
+    .map(({ publication }) => publication)
+}
+
 export function formatRemainingBadgeLabel(days: number) {
   return `zbývá ${formatRemainingDaysLabel(days)}`
 }

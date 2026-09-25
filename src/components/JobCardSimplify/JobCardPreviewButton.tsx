@@ -8,10 +8,12 @@ export const JOB_CARD_PREVIEW_LABEL = 'Zobrazit náhled inzerátu'
 
 export interface JobCardPreviewButtonProps extends StyleProps {
   onPreviewAdvertisement?: () => void
+  label?: string
 }
 
 export function JobCardPreviewButton({
   onPreviewAdvertisement,
+  label = JOB_CARD_PREVIEW_LABEL,
   className,
 }: JobCardPreviewButtonProps) {
   return (
@@ -22,7 +24,7 @@ export function JobCardPreviewButton({
             <Button
               variant="tertiary"
               isCircle
-              aria-label={JOB_CARD_PREVIEW_LABEL}
+              aria-label={label}
               data-testid="job-card-preview-toggle"
               onClick={onPreviewAdvertisement}
             >
@@ -30,7 +32,7 @@ export function JobCardPreviewButton({
             </Button>
           </span>
         </TooltipTrigger>
-        <TooltipContent side="bottom">{JOB_CARD_PREVIEW_LABEL}</TooltipContent>
+        <TooltipContent side="bottom">{label}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )

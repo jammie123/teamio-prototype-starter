@@ -1,5 +1,6 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { getInitials } from './getInitials'
 
@@ -10,6 +11,7 @@ export interface JobCardPerson {
 
 export interface JobCardPeopleProps extends StyleProps {
   people: JobCardPerson[]
+  onInviteMore?: () => void
 }
 
 function PersonAvatar({
@@ -48,7 +50,7 @@ function PersonAvatar({
   )
 }
 
-export function JobCardPeople({ people, className }: JobCardPeopleProps) {
+export function JobCardPeople({ people, onInviteMore, className }: JobCardPeopleProps) {
   if (people.length === 0) {
     return null
   }
@@ -86,7 +88,11 @@ export function JobCardPeople({ people, className }: JobCardPeopleProps) {
           ))}
         </span>
       </DropdownToggle>
-      <DropdownBody data-testid="job-card-people-dropdown">
+      <DropdownBody
+        data-testid="job-card-people-dropdown"
+        initialFocus={-1}
+        className="tm-min-w-72"
+      >
         <ul className="tm-m-0 tm-flex tm-list-none tm-flex-col tm-gap-2 tm-p-0">
           {people.map((person) => (
             <li
@@ -106,6 +112,22 @@ export function JobCardPeople({ people, className }: JobCardPeopleProps) {
             </li>
           ))}
         </ul>
+        {onInviteMore ? (
+          <Button
+            variant="secondary"
+            isBlock
+            data-testid="job-card-people-invite"
+            className="tm-mt-3"
+            tabIndex={-1}
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              onInviteMore()
+            }}
+          >
+            Zapojit další
+          </Button>
+        ) : null}
       </DropdownBody>
     </Dropdown>
   )

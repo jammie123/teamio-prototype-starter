@@ -36,17 +36,24 @@ describe('JobCardAdvertisement same-date groups', () => {
   })
 
   it('keeps Běží with the date range when every running portal shares a later date', () => {
-    renderAdvertisement({
-      id: 'ad-running-same',
-      publications: [
-        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
-        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
-      ],
-    })
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
 
-    const heading = screen.getByTestId('job-card-advertisement-running-heading')
-    expect(heading.textContent).toBe('Běží 12. 7. – 30. 9. 2026')
-    expect(screen.queryByTestId('job-card-publication-period-badge')).not.toBeInTheDocument()
+    try {
+      renderAdvertisement({
+        id: 'ad-running-same',
+        publications: [
+          { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+          { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+        ],
+      })
+
+      const heading = screen.getByTestId('job-card-advertisement-running-heading')
+      expect(heading.textContent).toBe('Běží 12. 7. – 30. 9. 2026')
+      expect(screen.queryByTestId('job-card-publication-period-badge')).not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 
@@ -66,7 +73,7 @@ describe('JobCardAdvertisement mixed periods', () => {
 
       const heading = screen.getByTestId('job-card-advertisement-running-heading')
       expect(heading.textContent).toBe('Běží v různá období')
-      expect(heading).toHaveClass('tm-text-emotion-success-emphasis', 'tm-font-medium')
+      expect(heading).toHaveClass('tm-text-secondary-default', 'tm-font-medium')
       expect(screen.queryByTestId('job-card-advertisement-ending-soon-heading')).not.toBeInTheDocument()
       expect(screen.queryByText('Končí brzy')).not.toBeInTheDocument()
 
@@ -130,52 +137,139 @@ describe('JobCardAdvertisement mixed periods', () => {
     }
   })
 
-  it('uses informative end-date badges when running portals have different later dates', () => {
-    renderAdvertisement({
-      id: 'ad-running-diff',
-      publications: [
-        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
-        { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
-      ],
-    })
+  it('renders mixed-period dates as secondary text when periodPresentation is text', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
 
-    expect(screen.getByTestId('job-card-advertisement-running-heading').textContent).toBe(
-      'Běží v různá období',
-    )
-    const badges = screen.getAllByTestId('job-card-publication-period-badge')
-    expect(badges[0]).toHaveTextContent('30. 9. 2026')
-    expect(badges[0]).toHaveClass('tm-bg-emotion-info-background')
-    expect(badges[1]).toHaveTextContent('20. 9. 2026')
-    expect(screen.queryByTestId('job-card-publication-dates')).not.toBeInTheDocument()
+    try {
+      render(
+        <JobCardAdvertisement
+          advertisement={{
+            id: 'ad-running-diff',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+              { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+            ],
+          }}
+          periodPresentation="text"
+        />,
+      )
+
+      const badges = screen.getAllByTestId('job-card-publication-period-badge')
+      expect(badges[0]).toHaveTextContent('20. 9. 2026')
+      expect(badges[0]).toHaveClass('tm-text-sm', 'tm-text-secondary-default')
+      expect(badges[0]).not.toHaveClass('tm-bg-emotion-info-background')
+      expect(badges[1]).toHaveTextContent('30. 9. 2026')
+      expect(badges[1]).not.toHaveClass('tm-bg-emotion-info-background')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('uses warning medium text for mixed-period ending-soon dates when periodPresentation is text', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 26))
+
+    try {
+      render(
+        <JobCardAdvertisement
+          advertisement={{
+            id: 'ad-ending-diff',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '31. 8. 2026' },
+              { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            ],
+          }}
+          periodPresentation="text"
+        />,
+      )
+
+      const heading = screen.getByTestId('job-card-advertisement-running-heading')
+      expect(heading.textContent).toBe('Běží v různá období')
+      expect(heading).toHaveClass('tm-text-sm', 'tm-font-medium', 'tm-text-secondary-default')
+
+      const publications = screen.getAllByTestId('job-card-publication')
+      const endingSoon = within(publications[0]).getByTestId('job-card-publication-period-badge')
+      expect(endingSoon).toHaveTextContent('zbývá 5 dní')
+      expect(endingSoon).toHaveClass(
+        'tm-text-sm',
+        'tm-font-medium',
+        'tm-text-emotion-warning-emphasis',
+      )
+      expect(endingSoon).not.toHaveClass('tm-bg-emotion-warning-background')
+
+      const later = within(publications[1]).getByTestId('job-card-publication-period-badge')
+      expect(later).toHaveTextContent('30. 9. 2026')
+      expect(later).toHaveClass('tm-text-sm', 'tm-text-secondary-default')
+      expect(later).not.toHaveClass('tm-text-emotion-warning-emphasis')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('uses informative end-date badges when running portals have different later dates', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      renderAdvertisement({
+        id: 'ad-running-diff',
+        publications: [
+          { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+          { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+        ],
+      })
+
+      expect(screen.getByTestId('job-card-advertisement-running-heading').textContent).toBe(
+        'Běží v různá období',
+      )
+      const badges = screen.getAllByTestId('job-card-publication-period-badge')
+      expect(badges[0]).toHaveTextContent('20. 9. 2026')
+      expect(badges[0]).toHaveClass('tm-bg-emotion-info-background')
+      expect(badges[1]).toHaveTextContent('30. 9. 2026')
+      expect(screen.queryByTestId('job-card-publication-dates')).not.toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('balances four mixed-period portals into two columns of two', () => {
-    renderAdvertisement({
-      id: 'ad-running-four',
-      publications: [
-        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
-        { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
-        { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
-        { id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '12. 10. 2026' },
-      ],
-    })
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 8, 25))
 
-    const list = screen.getByTestId('job-card-advertisement-active-publications')
-    expect(list).toHaveClass('tm-grid', 'tm-grid-cols-2')
+    try {
+      renderAdvertisement({
+        id: 'ad-running-four',
+        publications: [
+          { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+          { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+          { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+          { id: 'atmoskop', channel: 'Atmoskop', startDate: '12. 7. 2026', endDate: '12. 10. 2026' },
+        ],
+      })
 
-    const columns = screen.getAllByTestId('job-card-advertisement-period-column')
-    expect(columns).toHaveLength(2)
-    columns.forEach((column) => {
-      expect(column).toHaveClass('tm-grid', 'tm-grid-cols-[minmax(0,8rem)_auto]')
-      expect(within(column).getAllByTestId('job-card-publication')).toHaveLength(2)
-      expect(within(column).getAllByTestId('job-card-publication-period-badge')).toHaveLength(2)
-    })
-    expect(within(columns[0]).getAllByTestId('job-card-publication-channel')[0]).toHaveTextContent(
-      'Jobs.cz',
-    )
-    expect(within(columns[1]).getAllByTestId('job-card-publication-channel')[0]).toHaveTextContent(
-      'Kariérní stránky',
-    )
+      const list = screen.getByTestId('job-card-advertisement-active-publications')
+      expect(list).toHaveClass('tm-grid', 'tm-grid-cols-2')
+
+      const columns = screen.getAllByTestId('job-card-advertisement-period-column')
+      expect(columns).toHaveLength(2)
+      columns.forEach((column) => {
+        expect(column).toHaveClass('tm-grid', 'tm-grid-cols-[minmax(0,10rem)_auto]')
+        expect(within(column).getAllByTestId('job-card-publication')).toHaveLength(2)
+        expect(within(column).getAllByTestId('job-card-publication-period-badge')).toHaveLength(2)
+      })
+      expect(within(columns[0]).getAllByTestId('job-card-publication-channel')[0]).toHaveTextContent(
+        'Jobs.cz',
+      )
+      expect(within(columns[0]).getAllByTestId('job-card-publication-period-badge')[0]).toHaveTextContent(
+        'zbývá 5 dní',
+      )
+      expect(within(columns[1]).getAllByTestId('job-card-publication-channel')[0]).toHaveTextContent(
+        'Atmoskop',
+      )
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('puts the extra portal in the first column when the count is odd', () => {
@@ -277,9 +371,9 @@ describe('JobCardAdvertisement mixed periods', () => {
 
     const badges = screen.getAllByTestId('job-card-publication-period-badge')
     expect(badges).toHaveLength(4)
-    expect(badges[0]).toHaveTextContent('1. 9. 2026')
+    expect(badges[0]).toHaveTextContent('12. 8. 2026')
     expect(badges[0]).toHaveClass('tm-bg-emotion-info-background')
-    expect(badges[3]).toHaveTextContent('12. 8. 2026')
+    expect(badges[3]).toHaveTextContent('1. 9. 2026')
   })
 
   it('keeps a single ended row without badges when every expired portal shares a date', () => {

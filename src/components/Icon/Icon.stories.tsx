@@ -29,6 +29,13 @@ export const Large: Story = {
     title: 'Hotovo',
   },
 }
+export const Opal: Story = {
+  args: {
+    name: 'opal',
+    className: 'tm-text-4xl',
+    title: 'Opalcování',
+  },
+}
 export const Fallback: Story = {
   args: {
     name: 'unknown-teamio-glyph',

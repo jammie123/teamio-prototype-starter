@@ -15,6 +15,7 @@ const STAT_LABELS: Record<JobCandidateStat, string> = {
   opalcovani: 'Opalcovaný',
   invited: 'Pozvaný',
   hired: 'Přijatý',
+  total: 'Celkem',
 }
 
 const STAT_ORDER: JobCandidateStat[] = [
@@ -23,6 +24,7 @@ const STAT_ORDER: JobCandidateStat[] = [
   'opalcovani',
   'invited',
   'hired',
+  'total',
 ]
 
 export function JobCardStats({ candidates, onStatClick, className }: JobCardStatsProps) {
@@ -43,6 +45,12 @@ export function JobCardStats({ candidates, onStatClick, className }: JobCardStat
         const newCount =
           key === 'unassessed' && typeof candidates.new === 'number' && candidates.new > 0
             ? candidates.new
+            : undefined
+        const newOpalcovaniCount =
+          key === 'opalcovani' &&
+          typeof candidates.newOpalcovani === 'number' &&
+          candidates.newOpalcovani > 0
+            ? candidates.newOpalcovani
             : undefined
         const layout = cn(
           'tm-flex',
@@ -89,6 +97,16 @@ export function JobCardStats({ candidates, onStatClick, className }: JobCardStat
                   {formatCount(newCount)}
                 </Pill>
               ) : null}
+              {newOpalcovaniCount != null ? (
+                <Pill
+                  color="pink"
+                  data-testid="job-card-new-opalcovani"
+                  aria-label={`Nově opalcovaní: ${formatCount(newOpalcovaniCount)}`}
+                  className="tm-h-6 tm-min-w-6 tm-px-2 tm-text-sm tm-font-semibold"
+                >
+                  {formatCount(newOpalcovaniCount)}
+                </Pill>
+              ) : null}
             </span>
             <span
               className={cn(
@@ -118,7 +136,9 @@ export function JobCardStats({ candidates, onStatClick, className }: JobCardStat
             aria-label={
               newCount != null
                 ? `${label}: ${formatCount(count)}, Noví kandidáti: ${formatCount(newCount)}`
-                : `${label}: ${formatCount(count)}`
+                : newOpalcovaniCount != null
+                  ? `${label}: ${formatCount(count)}, Nově opalcovaní: ${formatCount(newOpalcovaniCount)}`
+                  : `${label}: ${formatCount(count)}`
             }
             onClick={() => onStatClick(key)}
             className={cn(

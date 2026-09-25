@@ -14,6 +14,7 @@ export interface JobCardPublicationPortalProps {
   expired: boolean
   withSeparator: boolean
   periodBadge?: PublicationPeriodBadge
+  periodPresentation?: 'tag' | 'text'
   /** `grid` fills two cells of the parent grid: portal name and badge column. */
   variant?: 'inline' | 'grid'
   onPreview?: (publication: JobPublication) => void
@@ -160,14 +161,28 @@ export function JobCardPublicationPortal({
   expired,
   withSeparator,
   periodBadge,
+  periodPresentation = 'tag',
   variant = 'inline',
   onPreview,
   onExtend,
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge ? (
-    <Tag color={periodBadge.color} isSubtle data-testid="job-card-publication-period-badge">
-      {periodBadge.label}
-    </Tag>
+    periodPresentation === 'text' ? (
+      <span
+        data-testid="job-card-publication-period-badge"
+        className={
+          periodBadge.color === 'warning'
+            ? 'tm-text-sm tm-font-medium tm-text-emotion-warning-emphasis'
+            : 'tm-text-sm tm-text-secondary-default'
+        }
+      >
+        {periodBadge.label}
+      </span>
+    ) : (
+      <Tag color={periodBadge.color} isSubtle data-testid="job-card-publication-period-badge">
+        {periodBadge.label}
+      </Tag>
+    )
   ) : null
 
   if (variant === 'grid') {

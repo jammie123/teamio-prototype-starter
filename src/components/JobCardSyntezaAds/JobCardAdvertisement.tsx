@@ -30,6 +30,7 @@ import {
   isDraftAdvertisement,
   MIXED_PERIOD_HEADING,
   publicationPeriodBadge,
+  sortPublicationsBySoonestEnd,
   splitIntoBalancedColumns,
   type PublicationPeriodBadge,
 } from './advertisementSummaryAds'
@@ -43,6 +44,7 @@ export interface JobCardAdvertisementProps extends StyleProps {
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
   showPreviewLink?: boolean
+  periodPresentation?: 'tag' | 'text'
 }
 
 function sharedFieldDateLabel(
@@ -288,19 +290,21 @@ function PeriodBadgeColumn({
   publications,
   expired,
   periodBadge,
+  periodPresentation,
   onPreview,
   onExtend,
 }: {
   publications: JobPublication[]
   expired: boolean
   periodBadge: (publication: JobPublication) => PublicationPeriodBadge | undefined
+  periodPresentation?: 'tag' | 'text'
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
 }) {
   return (
     <div
       data-testid="job-card-advertisement-period-column"
-      className="tm-grid tm-grid-cols-[minmax(0,8rem)_auto] tm-items-center tm-content-start tm-gap-x-2 tm-gap-y-1"
+      className="tm-grid tm-grid-cols-[minmax(0,10rem)_auto] tm-items-center tm-content-start tm-gap-x-2 tm-gap-y-1"
     >
       {publications.map((publication) => (
         <JobCardPublicationPortal
@@ -310,6 +314,7 @@ function PeriodBadgeColumn({
           withSeparator={false}
           variant="grid"
           periodBadge={periodBadge(publication)}
+          periodPresentation={periodPresentation}
           onPreview={onPreview}
           onExtend={onExtend}
         />
@@ -327,6 +332,7 @@ function PeriodBadgeGroup({
   listTestId,
   showLeadingDivider = false,
   periodBadge,
+  periodPresentation,
   onPreview,
   onExtend,
 }: {
@@ -338,6 +344,7 @@ function PeriodBadgeGroup({
   listTestId: string
   showLeadingDivider?: boolean
   periodBadge: (publication: JobPublication) => PublicationPeriodBadge | undefined
+  periodPresentation?: 'tag' | 'text'
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
 }) {
@@ -345,7 +352,7 @@ function PeriodBadgeGroup({
     return null
   }
 
-  const columns = splitIntoBalancedColumns(publications)
+  const columns = splitIntoBalancedColumns(sortPublicationsBySoonestEnd(publications))
 
   return (
     <div className={cn('tm-flex tm-flex-col tm-gap-0.5', showLeadingDivider && ' tm-pt-2')}>
@@ -369,6 +376,7 @@ function PeriodBadgeGroup({
             publications={column}
             expired={expired}
             periodBadge={periodBadge}
+            periodPresentation={periodPresentation}
             onPreview={onPreview}
             onExtend={onExtend}
           />
@@ -386,6 +394,7 @@ export function JobCardAdvertisement({
   onPreviewPublication,
   onExtendPublication,
   showPreviewLink = true,
+  periodPresentation = 'tag',
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -467,9 +476,10 @@ export function JobCardAdvertisement({
                 expired={false}
                 heading={MIXED_PERIOD_HEADING}
                 headingTestId="job-card-advertisement-running-heading"
-                headingClassName="tm-text-sm tm-font-medium tm-text-emotion-success-emphasis"
+                headingClassName="tm-text-sm tm-font-medium tm-text-secondary-default"
                 listTestId="job-card-advertisement-active-publications"
                 periodBadge={publicationPeriodBadge}
+                periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
               />
@@ -491,6 +501,7 @@ export function JobCardAdvertisement({
                 listTestId="job-card-advertisement-ended-publications"
                 showLeadingDivider={active.length > 0}
                 periodBadge={expiredPeriodBadge}
+                periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
               />

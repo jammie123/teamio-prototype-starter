@@ -95,6 +95,95 @@ describe('JobCardSyntezaPipeline', () => {
     )
   })
 
+  it('shows a pink newly-opalcovany pill on Opalcovaný matching the new-candidates pill', () => {
+    renderPipeline({
+      candidates: {
+        new: 5,
+        unassessed: 14,
+        preselected: 8,
+        opalcovani: 3,
+        newOpalcovani: 2,
+        invited: 5,
+        hired: 2,
+      },
+      onCandidatesClick: vi.fn(),
+    })
+
+    const newPill = screen.getByTestId('job-card-new-candidates')
+    expect(newPill).toHaveTextContent(formatCount(5))
+    expect(newPill.querySelector('[data-icon-name]')).not.toBeInTheDocument()
+
+    const pill = screen.getByTestId('job-card-new-opalcovani')
+    expect(pill).toHaveTextContent(formatCount(2))
+    expect(pill).toHaveAttribute('aria-label', `Nově opalcovaní: ${formatCount(2)}`)
+    expect(pill.querySelector('[data-icon-name]')).not.toBeInTheDocument()
+    expect(pill).toHaveClass(
+      'tm-bg-teamio-pink',
+      'tm-text-primary-inverted-default',
+      'tm-h-6',
+      'tm-min-w-6',
+      'tm-px-2',
+      'tm-text-sm',
+      'tm-font-semibold',
+    )
+
+    const opalcovani = screen.getByTestId('job-card-stat-opalcovani')
+    expect(opalcovani).toContainElement(pill)
+    expect(opalcovani).toHaveAttribute(
+      'aria-label',
+      `Opalcovaný: ${formatCount(3)}, Nově opalcovaní: ${formatCount(2)}`,
+    )
+  })
+
+  it('shows Celkem as the last pipeline column when total is provided', () => {
+    renderPipeline({
+      candidates: {
+        new: 5,
+        unassessed: 14,
+        preselected: 8,
+        opalcovani: 3,
+        invited: 5,
+        hired: 2,
+        total: 32,
+      },
+      onCandidatesClick: vi.fn(),
+    })
+
+    const total = screen.getByTestId('job-card-stat-total')
+    expect(total).toHaveTextContent(`${formatCount(32)}Celkem`)
+    expect(total).toHaveAttribute('aria-label', `Celkem: ${formatCount(32)}`)
+    expect(
+      screen.getByTestId('job-card-stat-hired').compareDocumentPosition(total) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('hides the newly-opalcovany pill when newOpalcovani is omitted or zero', () => {
+    const { unmount } = renderPipeline({
+      candidates: { new: 5, unassessed: 14, preselected: 8, opalcovani: 3, invited: 5, hired: 2 },
+    })
+    expect(screen.queryByTestId('job-card-new-opalcovani')).not.toBeInTheDocument()
+
+    unmount()
+    renderPipeline({
+      candidates: {
+        new: 5,
+        unassessed: 14,
+        preselected: 8,
+        opalcovani: 3,
+        newOpalcovani: 0,
+        invited: 5,
+        hired: 2,
+      },
+      onCandidatesClick: vi.fn(),
+    })
+    expect(screen.queryByTestId('job-card-new-opalcovani')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-stat-opalcovani')).toHaveAttribute(
+      'aria-label',
+      `Opalcovaný: ${formatCount(3)}`,
+    )
+  })
+
   it('makes the pipeline stats clickable without a separate new column', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 })
     const onCandidatesClick = vi.fn()

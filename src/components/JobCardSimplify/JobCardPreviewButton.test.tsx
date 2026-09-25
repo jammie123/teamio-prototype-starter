@@ -16,6 +16,17 @@ describe('JobCardPreviewButton', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent('Zobrazit náhled inzerátu')
   })
 
+  it('uses a custom label for the aria-label and tooltip', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    render(<JobCardPreviewButton label="Zobrazit náhled" onPreviewAdvertisement={vi.fn()} />)
+
+    const button = screen.getByTestId('job-card-preview-toggle')
+    expect(button).toHaveAttribute('aria-label', 'Zobrazit náhled')
+
+    await user.hover(button)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Zobrazit náhled')
+  })
+
   it('calls onPreviewAdvertisement when clicked', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 })
     const onPreviewAdvertisement = vi.fn()

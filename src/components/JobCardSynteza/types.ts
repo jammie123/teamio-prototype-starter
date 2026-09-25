@@ -45,11 +45,13 @@ export interface JobCardCandidates {
   unassessed?: number
   preselected?: number
   opalcovani?: number
+  newOpalcovani?: number
   invited?: number
   hired?: number
+  total?: number
 }
 
-export type JobCandidateStat = keyof JobCardCandidates
+export type JobCandidateStat = Exclude<keyof JobCardCandidates, 'newOpalcovani' | 'total'>
 
 export type JobCardActivityType = 'rating' | 'note'
 

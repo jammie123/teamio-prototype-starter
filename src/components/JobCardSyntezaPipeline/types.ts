@@ -11,4 +11,4 @@ export type {
 } from '../JobCardSynteza/types'
 import type { JobCardCandidates } from '../JobCardSynteza/types'
 
-export type JobCandidateStat = Exclude<keyof JobCardCandidates, 'new'>
+export type JobCandidateStat = Exclude<keyof JobCardCandidates, 'new' | 'newOpalcovani'>

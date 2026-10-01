@@ -8,6 +8,9 @@ import { formatConversionRate, formatPublicationRange } from '../JobCardSynteza/
 import type { JobPublication } from '../JobCardSynteza/types'
 import { Tag } from '../Tag'
 import type { PublicationPeriodBadge } from './advertisementSummaryAds'
+import { JobCardPlacesSummaryTable } from './JobCardPlacesSummaryTable'
+
+export type JobCardPublicationHover = 'portalDetail' | 'placesTable'
 
 export interface JobCardPublicationPortalProps {
   publication: JobPublication
@@ -17,8 +20,12 @@ export interface JobCardPublicationPortalProps {
   periodPresentation?: 'tag' | 'text'
   /** `grid` fills two cells of the parent grid: portal name and badge column. */
   variant?: 'inline' | 'grid'
+  hoverContent?: JobCardPublicationHover
+  publications?: JobPublication[]
+  showProlong?: boolean
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
+  onExtendAll?: () => void
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -29,16 +36,25 @@ const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
 function PublicationDropdown({
   publication,
   expired,
+  hoverContent = 'portalDetail',
+  publications,
+  showProlong = false,
   onPreview,
   onExtend,
+  onExtendAll,
 }: {
   publication: JobPublication
   expired: boolean
+  hoverContent?: JobCardPublicationHover
+  publications?: JobPublication[]
+  showProlong?: boolean
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
+  onExtendAll?: () => void
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
+  const tablePublications = publications && publications.length > 0 ? publications : [publication]
 
   return (
     <Dropdown
@@ -77,8 +93,20 @@ function PublicationDropdown({
           data-testid="job-card-publication-dropdown"
           overflow="visible"
           initialFocus={-1}
-          className="tm-p-3"
+          className={
+            hoverContent === 'placesTable'
+              ? 'tm-p-2 !tm-max-w-[min(36rem,calc(100vw-2rem))]'
+              : 'tm-p-3'
+          }
         >
+          {hoverContent === 'placesTable' ? (
+            <JobCardPlacesSummaryTable
+              publications={tablePublications}
+              showProlong={showProlong}
+              onExtend={onExtendAll}
+            />
+          ) : null}
+          {hoverContent === 'portalDetail' ? (
           <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">
             <div className="tm-flex tm-items-start tm-justify-between tm-gap-4">
               <div className="tm-flex tm-min-w-0 tm-flex-1 tm-items-start tm-gap-2">
@@ -151,6 +179,7 @@ function PublicationDropdown({
               </Button>
             ) : null}
           </div>
+          ) : null}
         </DropdownBody>
     </Dropdown>
   )
@@ -163,8 +192,12 @@ export function JobCardPublicationPortal({
   periodBadge,
   periodPresentation = 'tag',
   variant = 'inline',
+  hoverContent = 'portalDetail',
+  publications,
+  showProlong,
   onPreview,
   onExtend,
+  onExtendAll,
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge ? (
     periodPresentation === 'text' ? (
@@ -201,8 +234,12 @@ export function JobCardPublicationPortal({
           <PublicationDropdown
             publication={publication}
             expired={expired}
+            hoverContent={hoverContent}
+            publications={publications}
+            showProlong={showProlong}
             onPreview={onPreview}
             onExtend={onExtend}
+            onExtendAll={onExtendAll}
           />
         </span>
         <span className="tm-flex tm-items-center">{badge}</span>
@@ -234,8 +271,12 @@ export function JobCardPublicationPortal({
       <PublicationDropdown
         publication={publication}
         expired={expired}
+        hoverContent={hoverContent}
+        publications={publications}
+        showProlong={showProlong}
         onPreview={onPreview}
         onExtend={onExtend}
+        onExtendAll={onExtendAll}
       />
       {badge}
     </li>

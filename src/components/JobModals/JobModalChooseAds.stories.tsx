@@ -3,8 +3,26 @@ import { useState } from 'react'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { Button } from '../Button'
 import { JobModalChooseAds } from './JobModalChooseAds'
+import { JobModalProlong } from './JobModalProlong'
 import { JobModalUnpublish } from './JobModalUnpublish'
 import { placesByAdvertisementId, sampleAdvertisements } from './fixtures'
+import type { JobModalAdvertisementSection } from './types'
+
+function sectionsForAds(advertisementIds: string[]): JobModalAdvertisementSection[] {
+  return advertisementIds.flatMap((advertisementId) => {
+    const advertisement = sampleAdvertisements.find((item) => item.id === advertisementId)
+    if (!advertisement) {
+      return []
+    }
+
+    return [
+      {
+        advertisement,
+        places: placesByAdvertisementId[advertisementId] ?? [],
+      },
+    ]
+  })
+}
 
 const meta = {
   id: 'jobs-jobmodals-chooseads',
@@ -44,7 +62,7 @@ export const ThenUnpublish: Story = {
   render: function ChooseThenUnpublish() {
     const [chooseOpen, setChooseOpen] = useState(true)
     const [unpublishOpen, setUnpublishOpen] = useState(false)
-    const [selectedAdId, setSelectedAdId] = useState<string | null>(null)
+    const [selectedAdIds, setSelectedAdIds] = useState<string[]>([])
 
     return (
       <>
@@ -52,8 +70,8 @@ export const ThenUnpublish: Story = {
           open={chooseOpen}
           onOpenChange={setChooseOpen}
           advertisements={sampleAdvertisements}
-          onConfirm={(advertisementId) => {
-            setSelectedAdId(advertisementId)
+          onConfirm={(advertisementIds) => {
+            setSelectedAdIds(advertisementIds)
             setChooseOpen(false)
             setUnpublishOpen(true)
           }}
@@ -61,7 +79,35 @@ export const ThenUnpublish: Story = {
         <JobModalUnpublish
           open={unpublishOpen}
           onOpenChange={setUnpublishOpen}
-          places={selectedAdId ? (placesByAdvertisementId[selectedAdId] ?? []) : []}
+          advertisementSections={sectionsForAds(selectedAdIds)}
+        />
+      </>
+    )
+  },
+}
+
+export const ThenProlong: Story = {
+  render: function ChooseThenProlong() {
+    const [chooseOpen, setChooseOpen] = useState(true)
+    const [prolongOpen, setProlongOpen] = useState(false)
+    const [selectedAdIds, setSelectedAdIds] = useState<string[]>([])
+
+    return (
+      <>
+        <JobModalChooseAds
+          open={chooseOpen}
+          onOpenChange={setChooseOpen}
+          advertisements={sampleAdvertisements}
+          onConfirm={(advertisementIds) => {
+            setSelectedAdIds(advertisementIds)
+            setChooseOpen(false)
+            setProlongOpen(true)
+          }}
+        />
+        <JobModalProlong
+          open={prolongOpen}
+          onOpenChange={setProlongOpen}
+          advertisementSections={sectionsForAds(selectedAdIds)}
         />
       </>
     )

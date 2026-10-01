@@ -16,3 +16,9 @@ export interface JobModalAdvertisement {
   title: string
   createdAt: string
 }
+
+export interface JobModalAdvertisementSection {
+  advertisement: JobModalAdvertisement
+  places: JobModalPublicationPlace[]
+  additionalPlaces?: JobModalPublicationPlace[]
+}

@@ -1,6 +1,6 @@
 import type { StyleProps } from '../../lib/types'
 
-export type JobsFilterOption = { value: string; label: string }
+export type JobsFilterOption = { value: string; label: string; description?: string }
 
 export type JobsFilterEmploymentType = 'fullTime' | 'partTime'
 export type JobsFilterAdvertisementStatus = 'active' | 'ended'

@@ -1,19 +1,17 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
-import { Radio } from '../Radio'
+import { Checkbox } from '../Checkbox'
 import type { JobModalAdvertisement } from './types'
 
 export interface JobAdvertisementChoiceCardProps extends StyleProps {
   advertisement: JobModalAdvertisement
-  name: string
   checked: boolean
   onSelect: (advertisementId: string) => void
 }
 
 export function JobAdvertisementChoiceCard({
   advertisement,
-  name,
   checked,
   onSelect,
   className,
@@ -32,9 +30,7 @@ export function JobAdvertisementChoiceCard({
           </span>
           <span className="tm-text-13 tm-text-secondary-default">{advertisement.createdAt}</span>
         </span>
-        <Radio
-          name={name}
-          value={advertisement.id}
+        <Checkbox
           checked={checked}
           aria-label={advertisement.title}
           onChange={() => onSelect(advertisement.id)}

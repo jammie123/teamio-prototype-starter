@@ -82,6 +82,7 @@ function FilterDropdown({
             <Option
               key={option.value}
               isSelected={option.value === value}
+              description={option.description}
               onClick={() => onChange(option.value)}
             >
               {option.label}

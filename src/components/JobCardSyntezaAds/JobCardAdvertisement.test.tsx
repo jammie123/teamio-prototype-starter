@@ -564,3 +564,73 @@ describe('JobCardAdvertisement stats dropdown', () => {
     expect(screen.queryByTestId('job-card-advertisement-preview-separator')).not.toBeInTheDocument()
   })
 })
+
+describe('JobCardAdvertisement places table hover', () => {
+  it('opens the shared places table from stats and shows Prodloužit when a portal expired', async () => {
+    const onExtendPublications = vi.fn()
+
+    render(
+      <JobCardAdvertisement
+        publicationHover="placesTable"
+        showPreviewLink={false}
+        onExtendPublications={onExtendPublications}
+        advertisement={{
+          id: 'ad-1',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 9. 2026',
+              viewCount: 842,
+              reactionCount: 21,
+            },
+            {
+              id: 'prace',
+              channel: 'Prace.cz',
+              status: 'expired',
+              startDate: '12. 7. 2026',
+              endDate: '1. 9. 2026',
+              viewCount: 312,
+              reactionCount: 9,
+            },
+          ],
+        }}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('job-card-advertisement-stats-toggle'))
+    const panel = screen.getByTestId('job-card-advertisement-stats-dropdown')
+    expect(within(panel).getByTestId('job-card-places-summary-table')).toBeInTheDocument()
+    expect(within(panel).getByRole('columnheader', { name: 'Shlédnutí' })).toBeInTheDocument()
+    expect(within(panel).getAllByTestId('job-card-places-summary-row')).toHaveLength(2)
+
+    fireEvent.click(within(panel).getByTestId('job-card-places-summary-extend'))
+    expect(onExtendPublications).toHaveBeenCalledTimes(1)
+  })
+
+  it('hides Prodloužit when every publication is still running', () => {
+    render(
+      <JobCardAdvertisement
+        publicationHover="placesTable"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-running',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 12. 2026',
+              viewCount: 100,
+            },
+          ],
+        }}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('job-card-advertisement-stats-toggle'))
+    expect(screen.getByTestId('job-card-places-summary-table')).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-places-summary-extend')).not.toBeInTheDocument()
+  })
+})

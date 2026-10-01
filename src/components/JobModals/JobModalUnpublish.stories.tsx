@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { Button } from '../Button'
 import { JobModalUnpublish } from './JobModalUnpublish'
-import { samplePlaces } from './fixtures'
+import { placesByAdvertisementId, sampleAdvertisements, samplePlaces } from './fixtures'
 
 const meta = {
   id: 'jobs-jobmodals-unpublish',
@@ -42,5 +42,21 @@ export const NoSelection: Story = {
   args: {
     defaultOpen: true,
     selectedPlaceIds: [],
+  },
+}
+
+export const MultipleAdvertisements: Story = {
+  args: {
+    defaultOpen: true,
+    advertisementSections: [
+      {
+        advertisement: sampleAdvertisements[0],
+        places: placesByAdvertisementId['ad-1'],
+      },
+      {
+        advertisement: sampleAdvertisements[1],
+        places: placesByAdvertisementId['ad-2'],
+      },
+    ],
   },
 }

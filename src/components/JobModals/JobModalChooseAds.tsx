@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { StyleProps } from '../../lib/types'
 import type { ModalProps } from '../Modal'
 import { JobAdvertisementChoiceCard } from './JobAdvertisementChoiceCard'
@@ -15,9 +15,14 @@ export interface JobModalChooseAdsProps extends StyleProps {
   cancelLabel?: string
   trigger?: ReactNode
   advertisements: JobModalAdvertisement[]
-  selectedAdvertisementId?: string
-  onSelectedAdvertisementIdChange?: (advertisementId: string) => void
-  onConfirm?: (advertisementId: string) => void
+  selectedAdvertisementIds?: string[]
+  defaultSelectedAdvertisementIds?: string[]
+  onSelectedAdvertisementIdsChange?: (advertisementIds: string[]) => void
+  onConfirm?: (advertisementIds: string[]) => void
+}
+
+function toggleId(ids: string[], id: string) {
+  return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]
 }
 
 export function JobModalChooseAds({
@@ -29,21 +34,24 @@ export function JobModalChooseAds({
   cancelLabel,
   trigger,
   advertisements,
-  selectedAdvertisementId,
-  onSelectedAdvertisementIdChange,
+  selectedAdvertisementIds,
+  defaultSelectedAdvertisementIds,
+  onSelectedAdvertisementIdsChange,
   onConfirm,
   className,
 }: JobModalChooseAdsProps) {
-  const radioName = useId()
-  const isControlled = selectedAdvertisementId !== undefined
-  const [uncontrolledId, setUncontrolledId] = useState<string | undefined>(undefined)
-  const selectedId = isControlled ? selectedAdvertisementId : uncontrolledId
+  const isControlled = selectedAdvertisementIds !== undefined
+  const [uncontrolledIds, setUncontrolledIds] = useState<string[]>(
+    () => defaultSelectedAdvertisementIds ?? [],
+  )
+  const selectedIds = isControlled ? selectedAdvertisementIds : uncontrolledIds
 
-  function select(id: string) {
+  function toggle(id: string) {
+    const next = toggleId(selectedIds, id)
     if (!isControlled) {
-      setUncontrolledId(id)
+      setUncontrolledIds(next)
     }
-    onSelectedAdvertisementIdChange?.(id)
+    onSelectedAdvertisementIdsChange?.(next)
   }
 
   return (
@@ -55,10 +63,10 @@ export function JobModalChooseAds({
       confirmLabel={confirmLabel}
       cancelLabel={cancelLabel}
       trigger={trigger}
-      confirmDisabled={!selectedId}
+      confirmDisabled={selectedIds.length === 0}
       onConfirm={() => {
-        if (selectedId) {
-          onConfirm?.(selectedId)
+        if (selectedIds.length > 0) {
+          onConfirm?.(selectedIds)
         }
       }}
       className={className}
@@ -67,9 +75,8 @@ export function JobModalChooseAds({
         <JobAdvertisementChoiceCard
           key={advertisement.id}
           advertisement={advertisement}
-          name={radioName}
-          checked={selectedId === advertisement.id}
-          onSelect={select}
+          checked={selectedIds.includes(advertisement.id)}
+          onSelect={toggle}
         />
       ))}
     </JobModalFrame>

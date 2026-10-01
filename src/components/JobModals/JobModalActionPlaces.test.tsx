@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { JobModalActionPlaces } from './JobModalActionPlaces'
-import type { JobModalPublicationPlace } from './types'
+import type { JobModalAdvertisementSection, JobModalPublicationPlace } from './types'
 
 const places: JobModalPublicationPlace[] = [
   {
@@ -50,6 +50,11 @@ describe('JobModalActionPlaces', () => {
     )
 
     const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveClass('tm-max-w-[900px]')
+    expect(within(dialog).getByTestId('job-modal-places-table')).toHaveClass('tm-text-sm')
+    expect(within(dialog).getByRole('columnheader', { name: 'Název místa' })).toHaveClass(
+      'tm-text-13',
+    )
     expect(within(dialog).getByRole('checkbox', { name: 'Jobs.cz' })).toBeChecked()
     expect(within(dialog).getByRole('checkbox', { name: 'Prace.cz' })).toBeChecked()
 
@@ -137,6 +142,8 @@ describe('JobModalActionPlaces', () => {
     await user.click(reveal)
     const hide = within(dialog).getByRole('button', { name: 'Skrýt tyto portály' })
     expect(hide).toHaveAttribute('aria-expanded', 'true')
+    expect(within(dialog).getAllByTestId('job-modal-places-table')).toHaveLength(1)
+    expect(within(dialog).getAllByTestId('job-modal-place-row')).toHaveLength(3)
     expect(within(dialog).getByRole('checkbox', { name: 'Atmoskop' })).not.toBeChecked()
 
     await user.click(hide)
@@ -150,6 +157,43 @@ describe('JobModalActionPlaces', () => {
     await user.click(within(dialog).getByRole('checkbox', { name: 'Atmoskop' }))
     await user.click(within(dialog).getByRole('button', { name: 'Prodloužit' }))
     expect(onConfirm).toHaveBeenCalledWith(['jobs', 'prace', 'atmoskop'])
+  })
+
+  it('renders a titled table for each selected advertisement', async () => {
+    const sections: JobModalAdvertisementSection[] = [
+      {
+        advertisement: { id: 'ad-1', title: 'Hlavní inzerát', createdAt: '12. 3. 2026' },
+        places: places,
+      },
+      {
+        advertisement: { id: 'ad-2', title: 'Inzerát pro brigádníky', createdAt: '20. 4. 2026' },
+        places: [
+          {
+            id: 'ad-2-jobs',
+            name: 'Jobs.cz',
+            startDate: '20. 4. 2026',
+            endDate: '31. 10. 2026',
+          },
+        ],
+      },
+    ]
+
+    render(
+      <JobModalActionPlaces
+        defaultOpen
+        title="Ukončit vystavení"
+        confirmLabel="Ukončit vystavení"
+        advertisementSections={sections}
+      />,
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getAllByTestId('job-modal-advertisement-title').map((node) => node.textContent)).toEqual([
+      'Hlavní inzerát',
+      'Inzerát pro brigádníky',
+    ])
+    expect(within(dialog).getAllByTestId('job-modal-places-table')).toHaveLength(2)
+    expect(within(dialog).getAllByRole('checkbox', { name: 'Jobs.cz' })).toHaveLength(2)
   })
 
   it('does not render the additional-places section when the list is empty', async () => {

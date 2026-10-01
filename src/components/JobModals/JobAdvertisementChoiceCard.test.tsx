@@ -15,7 +15,6 @@ describe('JobAdvertisementChoiceCard', () => {
     render(
       <JobAdvertisementChoiceCard
         advertisement={advertisement}
-        name="choose-ads"
         checked={false}
         onSelect={() => undefined}
       />,
@@ -23,23 +22,22 @@ describe('JobAdvertisementChoiceCard', () => {
 
     expect(screen.getByText('Hlavní inzerát')).toBeInTheDocument()
     expect(screen.getByText('12. 3. 2026')).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: 'Hlavní inzerát' })).not.toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Hlavní inzerát' })).not.toBeChecked()
   })
 
-  it('selects from the radio and from a click on the card', async () => {
+  it('selects from the checkbox and from a click on the card', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
 
     render(
       <JobAdvertisementChoiceCard
         advertisement={advertisement}
-        name="choose-ads"
         checked={false}
         onSelect={onSelect}
       />,
     )
 
-    await user.click(screen.getByRole('radio', { name: 'Hlavní inzerát' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Hlavní inzerát' }))
     expect(onSelect).toHaveBeenCalledTimes(1)
     expect(onSelect).toHaveBeenCalledWith('ad-1')
 
@@ -49,16 +47,15 @@ describe('JobAdvertisementChoiceCard', () => {
     expect(onSelect).toHaveBeenCalledWith('ad-1')
   })
 
-  it('marks the radio as checked when selected', () => {
+  it('marks the checkbox as checked when selected', () => {
     render(
       <JobAdvertisementChoiceCard
         advertisement={advertisement}
-        name="choose-ads"
         checked
         onSelect={() => undefined}
       />,
     )
 
-    expect(screen.getByRole('radio', { name: 'Hlavní inzerát' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Hlavní inzerát' })).toBeChecked()
   })
 })

@@ -20,28 +20,35 @@ describe('JobModalChooseAds', () => {
 
     const dialog = await screen.findByRole('dialog')
     expect(dialog).toHaveAccessibleName('Vyberte inzerát')
-    expect(within(dialog).getByRole('radio', { name: 'Hlavní inzerát' })).not.toBeChecked()
-    expect(within(dialog).getByRole('radio', { name: 'Inzerát pro brigádníky' })).not.toBeChecked()
+    expect(within(dialog).getByRole('checkbox', { name: 'Hlavní inzerát' })).not.toBeChecked()
+    expect(within(dialog).getByRole('checkbox', { name: 'Inzerát pro brigádníky' })).not.toBeChecked()
 
     const confirm = within(dialog).getByRole('button', { name: 'Pokračovat' })
     expect(confirm).toBeDisabled()
 
-    await user.click(within(dialog).getByRole('radio', { name: 'Hlavní inzerát' }))
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Hlavní inzerát' }))
     expect(within(dialog).getByRole('button', { name: 'Pokračovat' })).toBeEnabled()
 
     await user.click(within(dialog).getByRole('button', { name: 'Pokračovat' }))
-    expect(onConfirm).toHaveBeenCalledWith('ad-1')
+    expect(onConfirm).toHaveBeenCalledWith(['ad-1'])
   })
 
-  it('selects a single advertisement from a card click', async () => {
+  it('toggles advertisements from a card click and confirms both ids', async () => {
     const user = userEvent.setup()
+    const onConfirm = vi.fn()
 
-    render(<JobModalChooseAds defaultOpen advertisements={advertisements} />)
+    render(
+      <JobModalChooseAds defaultOpen advertisements={advertisements} onConfirm={onConfirm} />,
+    )
 
     const dialog = await screen.findByRole('dialog')
+    await user.click(within(dialog).getByText('Hlavní inzerát'))
     await user.click(within(dialog).getByText('Inzerát pro brigádníky'))
 
-    expect(within(dialog).getByRole('radio', { name: 'Hlavní inzerát' })).not.toBeChecked()
-    expect(within(dialog).getByRole('radio', { name: 'Inzerát pro brigádníky' })).toBeChecked()
+    expect(within(dialog).getByRole('checkbox', { name: 'Hlavní inzerát' })).toBeChecked()
+    expect(within(dialog).getByRole('checkbox', { name: 'Inzerát pro brigádníky' })).toBeChecked()
+
+    await user.click(within(dialog).getByRole('button', { name: 'Pokračovat' }))
+    expect(onConfirm).toHaveBeenCalledWith(['ad-1', 'ad-2'])
   })
 })

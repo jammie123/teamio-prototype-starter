@@ -1,4 +1,8 @@
-export type { JobModalAdvertisement, JobModalPublicationPlace } from './types'
+export type {
+  JobModalAdvertisement,
+  JobModalAdvertisementSection,
+  JobModalPublicationPlace,
+} from './types'
 export { JobPublicationPlaceCard, type JobPublicationPlaceCardProps } from './JobPublicationPlaceCard'
 export {
   JobAdvertisementChoiceCard,

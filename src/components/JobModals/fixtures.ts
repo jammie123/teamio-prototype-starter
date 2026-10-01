@@ -132,6 +132,6 @@ export const sampleAdvertisements: JobModalAdvertisement[] = [
 
 export const placesByAdvertisementId: Record<string, JobModalPublicationPlace[]> = {
   'ad-1': samplePlaces,
-  'ad-2': singlePlace,
-  'ad-3': creditsOnlyPlaces,
+  'ad-2': singlePlace.map((place) => ({ ...place, id: `ad-2-${place.id}` })),
+  'ad-3': creditsOnlyPlaces.map((place) => ({ ...place, id: `ad-3-${place.id}` })),
 }

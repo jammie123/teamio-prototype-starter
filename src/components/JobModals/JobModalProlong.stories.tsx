@@ -2,7 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { Button } from '../Button'
 import { JobModalProlong } from './JobModalProlong'
-import { additionalPlaces, creditsOnlyPlaces, samplePlaces } from './fixtures'
+import {
+  additionalPlaces,
+  creditsOnlyPlaces,
+  placesByAdvertisementId,
+  sampleAdvertisements,
+  samplePlaces,
+} from './fixtures'
 
 const meta = {
   id: 'jobs-jobmodals-prolong',
@@ -47,6 +53,23 @@ export const CreditsOnly: Story = {
   },
 }
 
+export const MultipleAdvertisements: Story = {
+  args: {
+    defaultOpen: true,
+    advertisementSections: [
+      {
+        advertisement: sampleAdvertisements[0],
+        places: placesByAdvertisementId['ad-1'],
+        additionalPlaces,
+      },
+      {
+        advertisement: sampleAdvertisements[1],
+        places: placesByAdvertisementId['ad-2'],
+      },
+    ],
+  },
+}
+
 export const AdditionalPlacesOpen: Story = {
   args: {
     defaultOpen: true,
@@ -56,6 +79,7 @@ export const AdditionalPlacesOpen: Story = {
     const dialog = await within(document.body).findByRole('dialog')
     await userEvent.click(within(dialog).getByRole('button', { name: 'Zobrazit další portály' }))
     await expect(within(dialog).getByRole('button', { name: 'Skrýt tyto portály' })).toBeInTheDocument()
+    await expect(within(dialog).getAllByTestId('job-modal-places-table')).toHaveLength(1)
     await expect(within(dialog).getByRole('checkbox', { name: 'Atmoskop' })).toBeInTheDocument()
   },
 }

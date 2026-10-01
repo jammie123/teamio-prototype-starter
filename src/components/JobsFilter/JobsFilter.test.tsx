@@ -144,4 +144,29 @@ describe('JobsFilter', () => {
     await user.click(screen.getByRole('option', { name: 'Nejnovější nábor' }))
     expect(onSortChange).toHaveBeenCalledWith('newestJob')
   })
+
+  it('renders a subtitle under a sort option and lists the extra sort choices', async () => {
+    const user = userEvent.setup()
+    renderFilter({
+      sortValue: 'latestAd',
+      sortOptions: [
+        {
+          value: 'latestAd',
+          label: 'Nejnověji vystavený inzerát',
+          description: 'Zveřejnění, topování, zvýraznění',
+        },
+        { value: 'mostNewCandidates', label: 'Nejvíce nových kandidátů' },
+        { value: 'titleZa', label: 'Název Z–A' },
+      ],
+      onSortChange: vi.fn(),
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Řazení' }))
+
+    expect(screen.getByTestId('option-description')).toHaveTextContent(
+      'Zveřejnění, topování, zvýraznění',
+    )
+    expect(screen.getByRole('option', { name: /Nejvíce nových kandidátů/ })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Název Z–A/ })).toBeInTheDocument()
+  })
 })

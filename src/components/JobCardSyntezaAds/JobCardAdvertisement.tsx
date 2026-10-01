@@ -34,7 +34,11 @@ import {
   splitIntoBalancedColumns,
   type PublicationPeriodBadge,
 } from './advertisementSummaryAds'
-import { JobCardPublicationPortal } from './JobCardPublicationPortal'
+import { JobCardPlacesSummaryTable, shouldShowPlacesProlong } from './JobCardPlacesSummaryTable'
+import {
+  JobCardPublicationPortal,
+  type JobCardPublicationHover,
+} from './JobCardPublicationPortal'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
@@ -43,8 +47,10 @@ export interface JobCardAdvertisementProps extends StyleProps {
   onPreviewAdvertisement?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
+  onExtendPublications?: () => void
   showPreviewLink?: boolean
   periodPresentation?: 'tag' | 'text'
+  publicationHover?: JobCardPublicationHover
 }
 
 function sharedFieldDateLabel(
@@ -84,12 +90,18 @@ function AdvertisementMeta({
   onViewStatisticsClick,
   onPreviewAdvertisement,
   showPreviewLink = true,
+  publicationHover = 'portalDetail',
+  showProlong = false,
+  onExtendAll,
 }: {
   publications: JobPublication[]
   viewCount?: number
   onViewStatisticsClick?: () => void
   onPreviewAdvertisement?: () => void
   showPreviewLink?: boolean
+  publicationHover?: JobCardPublicationHover
+  showProlong?: boolean
+  onExtendAll?: () => void
 }) {
   const [open, setOpen] = useState(false)
 
@@ -97,11 +109,17 @@ function AdvertisementMeta({
     return null
   }
 
-  return (
-    <div
-      data-testid="job-card-advertisement-meta"
-      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-1.5 tm-gap-y-0.5 tm-text-13 tm-text-secondary-default"
+  const viewsLabel = (
+    <span
+      data-testid="job-card-advertisement-aggregate-views"
+      className="tm-border-0 tm-border-b tm-border-dotted tm-border-secondary"
     >
+      {formatViewCountLabel(viewCount)}
+    </span>
+  )
+
+  const statsPanel =
+    publicationHover === 'placesTable' ? (
       <div
         className="tm-relative tm-flex tm-items-center"
         onMouseEnter={() => setOpen(true)}
@@ -114,12 +132,35 @@ function AdvertisementMeta({
           className="tm-border-0 tm-bg-transparent tm-p-0 tm-font-inherit tm-text-13 tm-text-secondary-default tm-cursor-pointer"
           onClick={() => setOpen((current) => !current)}
         >
-          <span
-            data-testid="job-card-advertisement-aggregate-views"
-            className="tm-border-0 tm-border-b tm-border-dotted tm-border-secondary"
+          {viewsLabel}
+        </button>
+        {open ? (
+          <div
+            data-testid="job-card-advertisement-stats-dropdown"
+            className="tm-absolute tm-left-0 tm-top-full tm-z-50 tm-mt-2 tm-w-max tm-max-w-[min(36rem,calc(100vw-2rem))] tm-rounded tm-border tm-border-primary tm-bg-basic tm-p-2 tm-shadow"
           >
-            {formatViewCountLabel(viewCount)}
-          </span>
+            <JobCardPlacesSummaryTable
+              publications={publications}
+              showProlong={showProlong}
+              onExtend={onExtendAll}
+            />
+          </div>
+        ) : null}
+      </div>
+    ) : (
+      <div
+        className="tm-relative tm-flex tm-items-center"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        <button
+          type="button"
+          data-testid="job-card-advertisement-stats-toggle"
+          aria-expanded={open}
+          className="tm-border-0 tm-bg-transparent tm-p-0 tm-font-inherit tm-text-13 tm-text-secondary-default tm-cursor-pointer"
+          onClick={() => setOpen((current) => !current)}
+        >
+          {viewsLabel}
         </button>
         {open ? (
           <div
@@ -175,6 +216,14 @@ function AdvertisementMeta({
           </div>
         ) : null}
       </div>
+    )
+
+  return (
+    <div
+      data-testid="job-card-advertisement-meta"
+      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-1.5 tm-gap-y-0.5 tm-text-13 tm-text-secondary-default"
+    >
+      {statsPanel}
       {showPreviewLink ? (
         <>
           <span aria-hidden data-testid="job-card-advertisement-preview-separator">
@@ -201,19 +250,30 @@ function AdvertisementMeta({
 
 type PublicationGroupKind = 'running' | 'endingSoon' | 'expired'
 
+interface PublicationHoverPassThrough {
+  hoverContent?: JobCardPublicationHover
+  allPublications?: JobPublication[]
+  showProlong?: boolean
+  onExtendAll?: () => void
+}
+
 function PublicationGroup({
   publications,
   kind,
   showLeadingDivider = false,
   onPreview,
   onExtend,
+  hoverContent,
+  allPublications,
+  showProlong,
+  onExtendAll,
 }: {
   publications: JobPublication[]
   kind: PublicationGroupKind
   showLeadingDivider?: boolean
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
-}) {
+} & PublicationHoverPassThrough) {
   if (publications.length === 0) {
     return null
   }
@@ -277,8 +337,12 @@ function PublicationGroup({
             publication={publication}
             expired={expired}
             withSeparator={index > 0}
+            hoverContent={hoverContent}
+            publications={allPublications}
+            showProlong={showProlong}
             onPreview={onPreview}
             onExtend={onExtend}
+            onExtendAll={onExtendAll}
           />
         ))}
       </ul>
@@ -293,6 +357,10 @@ function PeriodBadgeColumn({
   periodPresentation,
   onPreview,
   onExtend,
+  hoverContent,
+  allPublications,
+  showProlong,
+  onExtendAll,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -300,7 +368,7 @@ function PeriodBadgeColumn({
   periodPresentation?: 'tag' | 'text'
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
-}) {
+} & PublicationHoverPassThrough) {
   return (
     <div
       data-testid="job-card-advertisement-period-column"
@@ -315,8 +383,12 @@ function PeriodBadgeColumn({
           variant="grid"
           periodBadge={periodBadge(publication)}
           periodPresentation={periodPresentation}
+          hoverContent={hoverContent}
+          publications={allPublications}
+          showProlong={showProlong}
           onPreview={onPreview}
           onExtend={onExtend}
+          onExtendAll={onExtendAll}
         />
       ))}
     </div>
@@ -335,6 +407,10 @@ function PeriodBadgeGroup({
   periodPresentation,
   onPreview,
   onExtend,
+  hoverContent,
+  allPublications,
+  showProlong,
+  onExtendAll,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -347,7 +423,7 @@ function PeriodBadgeGroup({
   periodPresentation?: 'tag' | 'text'
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
-}) {
+} & PublicationHoverPassThrough) {
   if (publications.length === 0) {
     return null
   }
@@ -377,8 +453,12 @@ function PeriodBadgeGroup({
             expired={expired}
             periodBadge={periodBadge}
             periodPresentation={periodPresentation}
+            hoverContent={hoverContent}
+            allPublications={allPublications}
+            showProlong={showProlong}
             onPreview={onPreview}
             onExtend={onExtend}
+            onExtendAll={onExtendAll}
           />
         ))}
       </div>
@@ -393,8 +473,10 @@ export function JobCardAdvertisement({
   onPreviewAdvertisement,
   onPreviewPublication,
   onExtendPublication,
+  onExtendPublications,
   showPreviewLink = true,
   periodPresentation = 'tag',
+  publicationHover = 'portalDetail',
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -446,7 +528,7 @@ export function JobCardAdvertisement({
   }
 
   const publications = advertisement.publications ?? []
-  const { active, expired } = partitionPublications(publications)
+  const { active, expired, endingSoon } = partitionPublications(publications)
   const summary = getAdvertisementSummary(advertisement)
   const mixedActivePeriods = active.length > 0 && !shareSameEndDate(active)
   const mixedExpiredPeriods = expired.length > 0 && !shareSameEndDate(expired)
@@ -454,6 +536,23 @@ export function JobCardAdvertisement({
     !mixedActivePeriods &&
     active.length > 0 &&
     active.every((publication) => isEndingSoonPublication(publication))
+  const showProlong = shouldShowPlacesProlong(publications)
+  const onExtendAll =
+    onExtendPublications ??
+    (onExtendPublication
+      ? () => {
+          const target = expired[0] ?? endingSoon[0] ?? publications[0]
+          if (target) {
+            onExtendPublication(target)
+          }
+        }
+      : undefined)
+  const hoverPassThrough: PublicationHoverPassThrough = {
+    hoverContent: publicationHover,
+    allPublications: publications,
+    showProlong,
+    onExtendAll,
+  }
 
   return (
     <div
@@ -482,6 +581,7 @@ export function JobCardAdvertisement({
                 periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
+                {...hoverPassThrough}
               />
             ) : (
               <PublicationGroup
@@ -489,6 +589,7 @@ export function JobCardAdvertisement({
                 publications={active}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
+                {...hoverPassThrough}
               />
             )}
             {mixedExpiredPeriods ? (
@@ -504,6 +605,7 @@ export function JobCardAdvertisement({
                 periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
+                {...hoverPassThrough}
               />
             ) : (
               <PublicationGroup
@@ -512,6 +614,7 @@ export function JobCardAdvertisement({
                 showLeadingDivider={active.length > 0}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
+                {...hoverPassThrough}
               />
             )}
           </div>
@@ -521,6 +624,9 @@ export function JobCardAdvertisement({
         publications={publications}
         viewCount={summary.viewCount}
         showPreviewLink={showPreviewLink}
+        publicationHover={publicationHover}
+        showProlong={showProlong}
+        onExtendAll={onExtendAll}
         onViewStatisticsClick={onViewStatisticsClick}
         onPreviewAdvertisement={
           onPreviewAdvertisement ??

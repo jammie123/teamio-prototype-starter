@@ -219,6 +219,10 @@ export {
   type JobsFilterValue,
 } from './JobsFilter'
 export {
+  JobsFilterV2,
+  type JobsFilterV2Props,
+} from './JobsFilterV2'
+export {
   Drawer,
   DrawerTrigger,
   DrawerPortal,

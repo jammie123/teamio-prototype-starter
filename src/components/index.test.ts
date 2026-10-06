@@ -107,6 +107,7 @@ describe('components barrel', () => {
     expect(components.JobModalTop).toBeTypeOf('function')
     expect(components.JOB_MODAL_COPY).toBeTypeOf('object')
     expect(components.JobsFilter).toBeTypeOf('function')
+    expect(components.JobsFilterV2).toBeTypeOf('function')
     expect(components.AdvertisementTimeline).toBeTypeOf('function')
     expect(components.formatAdvertisementTimelineTimestamp).toBeTypeOf('function')
     expect(components.ADVERTISEMENT_TIMELINE_EVENT_LABELS).toBeTypeOf('object')

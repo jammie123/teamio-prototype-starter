@@ -31,6 +31,24 @@ describe('JobModalFrame', () => {
     expect(within(dialog).getByRole('button', { name: 'Zavřít dialog' })).toBeInTheDocument()
   })
 
+  it('renders optional footerEnd on the right of the footer', async () => {
+    render(
+      <JobModalFrame
+        defaultOpen
+        title="Ukončit vystavení"
+        confirmLabel="Ukončit vystavení"
+        footerEnd={<span data-testid="job-modal-footer-end">vystavení 2 · celkem 1 290 Kč</span>}
+      >
+        Tělo
+      </JobModalFrame>,
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    const footerEnd = within(dialog).getByTestId('job-modal-footer-end')
+    expect(footerEnd).toHaveTextContent('vystavení 2 · celkem 1 290 Kč')
+    expect(footerEnd.parentElement).toHaveClass('tm-text-sm', 'tm-text-primary-default', 'tm-ml-auto')
+  })
+
   it('disables confirm and does not call onConfirm when disabled', async () => {
     const user = userEvent.setup()
     const onConfirm = vi.fn()

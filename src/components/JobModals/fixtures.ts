@@ -1,12 +1,18 @@
 import type { JobModalAdvertisement, JobModalPublicationPlace } from './types'
 
+function daysFromNow(days: number) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
+}
+
 export const samplePlaces: JobModalPublicationPlace[] = [
   {
     id: 'jobs',
     name: 'Jobs.cz',
     description: 'Inzerát na hlavní pracovní portál',
     startDate: '12. 7. 2026',
-    endDate: '30. 9. 2026',
+    endDate: daysFromNow(20),
     priceLabel: '1 290 Kč',
     credits: 12,
   },
@@ -15,7 +21,7 @@ export const samplePlaces: JobModalPublicationPlace[] = [
     name: 'Prace.cz',
     description: 'Doplňkové vystavení na Prace.cz',
     startDate: '12. 7. 2026',
-    endDate: '30. 9. 2026',
+    endDate: daysFromNow(4),
     credits: 8,
   },
   {
@@ -23,7 +29,7 @@ export const samplePlaces: JobModalPublicationPlace[] = [
     name: 'Kariérní stránky',
     description: 'Vlastní kariérní stránky společnosti',
     startDate: '12. 7. 2026',
-    endDate: '30. 9. 2026',
+    endDate: daysFromNow(-10),
     priceLabel: 'zdarma',
   },
 ]
@@ -63,24 +69,18 @@ export const additionalPlaces: JobModalPublicationPlace[] = [
     id: 'atmoskop',
     name: 'Atmoskop',
     description: 'Nové místo vystavení',
-    startDate: '12. 7. 2026',
-    endDate: '30. 9. 2026',
     credits: 3,
   },
   {
     id: 'profesia',
     name: 'Profesia',
     description: 'Nové místo vystavení',
-    startDate: '12. 7. 2026',
-    endDate: '30. 9. 2026',
     priceLabel: '890 Kč',
   },
   {
     id: 'nearby',
     name: 'Práce za rohem',
     description: 'Nové místo vystavení',
-    startDate: '12. 7. 2026',
-    endDate: '30. 9. 2026',
     credits: 2,
   },
 ]

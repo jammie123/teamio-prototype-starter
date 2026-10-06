@@ -34,7 +34,7 @@ describe('JobModal action wrappers', () => {
     expect(await screen.findByRole('button', { name: 'Ukončit vystavení' })).toBeInTheDocument()
 
     rerender(<JobModalProlong defaultOpen places={places} />)
-    expect(await screen.findByRole('button', { name: 'Prodloužit' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Znovuvystavit inzeráty' })).toBeInTheDocument()
 
     rerender(<JobModalPublish defaultOpen places={places} />)
     expect(await screen.findByRole('button', { name: 'Zveřejnit' })).toBeInTheDocument()
@@ -46,16 +46,25 @@ describe('JobModal action wrappers', () => {
     expect(await screen.findByRole('button', { name: 'Topovat' })).toBeInTheDocument()
   })
 
-  it('hides Cena only on Unpublish and keeps it on Prolong', async () => {
+  it('keeps Cena off Unpublish, shows it on Prolong, and uses Inzerováno', async () => {
     const { rerender } = render(<JobModalUnpublish defaultOpen places={places} />)
     const unpublish = await screen.findByRole('dialog')
     expect(within(unpublish).queryByRole('columnheader', { name: 'Cena' })).not.toBeInTheDocument()
     expect(within(unpublish).queryByText('1 290 Kč')).not.toBeInTheDocument()
+    expect(within(unpublish).getByRole('columnheader', { name: 'Inzerováno' })).toBeInTheDocument()
+    expect(within(unpublish).getByText('12. 7. – 30. 9. 2026')).toBeInTheDocument()
+    expect(within(unpublish).queryByRole('columnheader', { name: 'Vystavení' })).not.toBeInTheDocument()
+    expect(within(unpublish).queryByTestId('job-modal-places-summary')).not.toBeInTheDocument()
 
     rerender(<JobModalProlong defaultOpen places={places} />)
     const prolong = await screen.findByRole('dialog')
+    expect(within(prolong).getByTestId('job-modal-places-summary')).toBeInTheDocument()
     expect(within(prolong).getByRole('columnheader', { name: 'Cena' })).toBeInTheDocument()
     expect(within(prolong).getByText('1 290 Kč')).toBeInTheDocument()
+    expect(within(prolong).queryByRole('columnheader', { name: 'Stav' })).not.toBeInTheDocument()
+    expect(within(prolong).getByRole('columnheader', { name: 'Inzerováno' })).toBeInTheDocument()
+    expect(within(prolong).getByTestId('job-modal-place-status')).toBeInTheDocument()
+    expect(within(prolong).getByRole('columnheader', { name: 'Nové období' })).toBeInTheDocument()
   })
 
   it('lets Prolong reveal extra portals with the default label', async () => {

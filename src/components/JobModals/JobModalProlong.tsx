@@ -1,17 +1,27 @@
 import { JobModalActionPlaces, type JobModalActionPlacesProps } from './JobModalActionPlaces'
 import { JOB_MODAL_COPY } from './jobModalCopy'
 
-export type JobModalProlongProps = Omit<JobModalActionPlacesProps, 'title' | 'confirmLabel'> & {
+export type JobModalProlongProps = Omit<
+  JobModalActionPlacesProps,
+  'title' | 'confirmLabel' | 'placesTableVariant'
+> & {
   title?: string
   confirmLabel?: string
 }
 
 export function JobModalProlong({
   title = JOB_MODAL_COPY.prolong.title,
-  confirmLabel = JOB_MODAL_COPY.prolong.confirm,
+  confirmLabel,
   ...rest
 }: JobModalProlongProps) {
-  return <JobModalActionPlaces title={title} confirmLabel={confirmLabel} {...rest} />
+  return (
+    <JobModalActionPlaces
+      {...rest}
+      title={title}
+      confirmLabel={confirmLabel}
+      placesTableVariant="prolong"
+    />
+  )
 }
 
 JobModalProlong.displayName = 'JobModalProlong'

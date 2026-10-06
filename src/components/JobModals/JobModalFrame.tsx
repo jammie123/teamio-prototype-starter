@@ -28,6 +28,7 @@ export interface JobModalFrameProps extends StyleProps {
   cancelLabel?: string
   trigger?: ReactNode
   size?: ModalSize
+  footerEnd?: ReactNode
 }
 
 export function JobModalFrame({
@@ -42,6 +43,7 @@ export function JobModalFrame({
   cancelLabel = JOB_MODAL_CANCEL_LABEL,
   trigger,
   size = 'default',
+  footerEnd,
   className,
 }: JobModalFrameProps) {
   return (
@@ -53,13 +55,20 @@ export function JobModalFrame({
         <ModalBody className="tm-flex tm-min-h-0 tm-max-h-[calc(100vh-10rem)] tm-flex-col tm-gap-2 tm-overflow-y-auto tm-py-2">
           {children}
         </ModalBody>
-        <ModalFooter className="tm-shrink-0 tm-bg-basic">
-          <Button isDisabled={confirmDisabled} onClick={onConfirm}>
-            {confirmLabel}
-          </Button>
-          <ModalClose asChild aria-label={cancelLabel}>
-            <Button variant="secondary">{cancelLabel}</Button>
-          </ModalClose>
+        <ModalFooter className="tm-shrink-0 tm-items-center tm-bg-basic sm:tm-justify-between">
+          <span className="tm-flex tm-flex-wrap tm-items-center tm-gap-3 sm:tm-gap-x-4">
+            <Button isDisabled={confirmDisabled} onClick={onConfirm}>
+              {confirmLabel}
+            </Button>
+            <ModalClose asChild aria-label={cancelLabel}>
+              <Button variant="secondary">{cancelLabel}</Button>
+            </ModalClose>
+          </span>
+          {footerEnd ? (
+            <span className="tm-ml-auto tm-text-sm tm-whitespace-nowrap tm-text-primary-default">
+              {footerEnd}
+            </span>
+          ) : null}
         </ModalFooter>
       </ModalContent>
     </Modal>

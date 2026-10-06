@@ -1,11 +1,14 @@
 import type { JobPortalLogoType } from '../JobPortalLogo'
+import type { JobPublicationStatus } from '../JobCardSynteza/types'
 
 export interface JobModalPublicationPlace {
   id: string
   name: string
   description?: string
-  startDate: string
+  /** Missing or empty when the place was never advertised. */
+  startDate?: string
   endDate?: string
+  status?: JobPublicationStatus
   priceLabel?: string
   credits?: number
   logoType?: JobPortalLogoType

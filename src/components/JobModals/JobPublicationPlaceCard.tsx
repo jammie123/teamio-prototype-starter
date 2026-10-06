@@ -23,7 +23,9 @@ export function JobPublicationPlaceCard({
   className,
 }: JobPublicationPlaceCardProps) {
   const logoType = place.logoType ?? jobPortalLogoTypeFromChannel(place.name)
-  const period = formatPublicationRange(place.startDate, place.endDate)
+  const period = place.startDate
+    ? formatPublicationRange(place.startDate, place.endDate)
+    : undefined
   const hasPrice = Boolean(place.priceLabel)
   const hasCredits = place.credits != null
 
@@ -41,7 +43,9 @@ export function JobPublicationPlaceCard({
           {place.description ? (
             <span className="tm-text-sm tm-text-secondary-default">{place.description}</span>
           ) : null}
-          <span className="tm-text-13 tm-tabular-nums tm-text-secondary-default">{period}</span>
+          {period ? (
+            <span className="tm-text-13 tm-tabular-nums tm-text-secondary-default">{period}</span>
+          ) : null}
           {hasPrice || hasCredits ? (
             <span className="tm-flex tm-flex-wrap tm-gap-x-2 tm-text-sm tm-text-primary-default">
               {hasPrice ? <span>{place.priceLabel}</span> : null}

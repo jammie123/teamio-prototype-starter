@@ -186,6 +186,7 @@ export {
   type JobAdvertisementChoiceCardProps,
   type JobModalFrameProps,
   type JobModalActionPlacesProps,
+  type JobModalPlacesTableVariant,
   type JobModalChooseAdsProps,
   type JobModalUnpublishProps,
   type JobModalProlongProps,

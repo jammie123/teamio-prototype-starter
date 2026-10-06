@@ -29,6 +29,7 @@ export interface JobModalActionPlacesProps extends StyleProps {
   defaultSelectedPlaceIds?: string[]
   onSelectedPlaceIdsChange?: (ids: string[]) => void
   onConfirm?: (selectedPlaceIds: string[]) => void
+  hideCostColumn?: boolean
 }
 
 function toggleId(ids: string[], id: string) {
@@ -68,10 +69,12 @@ function PlaceRow({
   place,
   selectedIds,
   onToggle,
+  hideCostColumn = false,
 }: {
   place: JobModalPublicationPlace
   selectedIds: string[]
   onToggle: (id: string) => void
+  hideCostColumn?: boolean
 }) {
   const logoType = place.logoType ?? jobPortalLogoTypeFromChannel(place.name)
   const cost = formatPlaceCost(place)
@@ -109,9 +112,11 @@ function PlaceRow({
       <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-tabular-nums tm-whitespace-nowrap tm-text-secondary-default">
         {formatPublicationRange(place.startDate, place.endDate)}
       </TableCell>
-      <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-text-primary-default">
-        {cost || '–'}
-      </TableCell>
+      {hideCostColumn ? null : (
+        <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-text-primary-default">
+          {cost || '–'}
+        </TableCell>
+      )}
     </TableRow>
   )
 }
@@ -122,12 +127,14 @@ function PlacesTable({
   additionalOpen = false,
   selectedIds,
   onToggle,
+  hideCostColumn = false,
 }: {
   places: JobModalPublicationPlace[]
   additionalPlaces?: JobModalPublicationPlace[]
   additionalOpen?: boolean
   selectedIds: string[]
   onToggle: (id: string) => void
+  hideCostColumn?: boolean
 }) {
   return (
     <Table data-testid="job-modal-places-table" className="tm-text-sm">
@@ -142,18 +149,32 @@ function PlacesTable({
           <TableHeader className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium tm-whitespace-nowrap">
             Vystavení
           </TableHeader>
-          <TableHeader className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium">
-            Cena
-          </TableHeader>
+          {hideCostColumn ? null : (
+            <TableHeader className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium">
+              Cena
+            </TableHeader>
+          )}
         </TableRow>
       </TableHead>
       <TableBody>
         {places.map((place) => (
-          <PlaceRow key={place.id} place={place} selectedIds={selectedIds} onToggle={onToggle} />
+          <PlaceRow
+            key={place.id}
+            place={place}
+            selectedIds={selectedIds}
+            onToggle={onToggle}
+            hideCostColumn={hideCostColumn}
+          />
         ))}
         {additionalOpen
           ? additionalPlaces.map((place) => (
-              <PlaceRow key={place.id} place={place} selectedIds={selectedIds} onToggle={onToggle} />
+              <PlaceRow
+                key={place.id}
+                place={place}
+                selectedIds={selectedIds}
+                onToggle={onToggle}
+                hideCostColumn={hideCostColumn}
+              />
             ))
           : null}
       </TableBody>
@@ -178,6 +199,7 @@ export function JobModalActionPlaces({
   defaultSelectedPlaceIds,
   onSelectedPlaceIdsChange,
   onConfirm,
+  hideCostColumn = false,
   className,
 }: JobModalActionPlacesProps) {
   const sections = resolveSections(places, additionalPlaces, advertisementSections)
@@ -239,6 +261,7 @@ export function JobModalActionPlaces({
               additionalOpen={additionalOpen}
               selectedIds={selectedIds}
               onToggle={togglePlace}
+              hideCostColumn={hideCostColumn}
             />
             {hasAdditionalPlaces ? (
               <div

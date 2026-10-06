@@ -127,7 +127,7 @@ describe('JobsFilter', () => {
     const user = userEvent.setup()
     const onSortChange = vi.fn()
     const sortOptions = [
-      { value: 'latestAd', label: 'Nejnověji vystavený inzerát' },
+      { value: 'latestAd', label: 'Nejnovější inzeráty' },
       { value: 'newestJob', label: 'Nejnovější nábor' },
     ]
     renderFilter({
@@ -137,7 +137,7 @@ describe('JobsFilter', () => {
     })
 
     const sort = screen.getByRole('button', { name: 'Řazení' })
-    expect(sort).toHaveTextContent('Nejnověji vystavený inzerát')
+    expect(sort).toHaveTextContent('Nejnovější inzeráty')
 
     await user.click(sort)
     expect(screen.queryByRole('option', { name: 'Všichni' })).not.toBeInTheDocument()
@@ -152,11 +152,11 @@ describe('JobsFilter', () => {
       sortOptions: [
         {
           value: 'latestAd',
-          label: 'Nejnověji vystavený inzerát',
-          description: 'Zveřejnění, topování, zvýraznění',
+          label: 'Nejnovější inzeráty',
+          description: 'Vystavení inzerátu, topování a zvýraznění',
         },
-        { value: 'mostNewCandidates', label: 'Nejvíce nových kandidátů' },
-        { value: 'titleZa', label: 'Název Z–A' },
+        { value: 'mostNewCandidates', label: 'Nejvíce nových uchazečů' },
+        { value: 'titleAz', label: 'Název A–Z' },
       ],
       onSortChange: vi.fn(),
     })
@@ -164,9 +164,9 @@ describe('JobsFilter', () => {
     await user.click(screen.getByRole('button', { name: 'Řazení' }))
 
     expect(screen.getByTestId('option-description')).toHaveTextContent(
-      'Zveřejnění, topování, zvýraznění',
+      'Vystavení inzerátu, topování a zvýraznění',
     )
-    expect(screen.getByRole('option', { name: /Nejvíce nových kandidátů/ })).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: /Název Z–A/ })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Nejvíce nových uchazečů/ })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Název A–Z/ })).toBeInTheDocument()
   })
 })

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { JobModalBoost } from './JobModalBoost'
 import { JobModalProlong } from './JobModalProlong'
@@ -8,7 +8,13 @@ import { JobModalUnpublish } from './JobModalUnpublish'
 import type { JobModalPublicationPlace } from './types'
 
 const places: JobModalPublicationPlace[] = [
-  { id: 'jobs', name: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+  {
+    id: 'jobs',
+    name: 'Jobs.cz',
+    startDate: '12. 7. 2026',
+    endDate: '30. 9. 2026',
+    priceLabel: '1 290 Kč',
+  },
 ]
 
 describe('JobModal action wrappers', () => {
@@ -38,6 +44,18 @@ describe('JobModal action wrappers', () => {
 
     rerender(<JobModalTop defaultOpen places={places} />)
     expect(await screen.findByRole('button', { name: 'Topovat' })).toBeInTheDocument()
+  })
+
+  it('hides Cena only on Unpublish and keeps it on Prolong', async () => {
+    const { rerender } = render(<JobModalUnpublish defaultOpen places={places} />)
+    const unpublish = await screen.findByRole('dialog')
+    expect(within(unpublish).queryByRole('columnheader', { name: 'Cena' })).not.toBeInTheDocument()
+    expect(within(unpublish).queryByText('1 290 Kč')).not.toBeInTheDocument()
+
+    rerender(<JobModalProlong defaultOpen places={places} />)
+    const prolong = await screen.findByRole('dialog')
+    expect(within(prolong).getByRole('columnheader', { name: 'Cena' })).toBeInTheDocument()
+    expect(within(prolong).getByText('1 290 Kč')).toBeInTheDocument()
   })
 
   it('lets Prolong reveal extra portals with the default label', async () => {

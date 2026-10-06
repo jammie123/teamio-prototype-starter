@@ -1,7 +1,10 @@
 import { JobModalActionPlaces, type JobModalActionPlacesProps } from './JobModalActionPlaces'
 import { JOB_MODAL_COPY } from './jobModalCopy'
 
-export type JobModalUnpublishProps = Omit<JobModalActionPlacesProps, 'title' | 'confirmLabel'> & {
+export type JobModalUnpublishProps = Omit<
+  JobModalActionPlacesProps,
+  'title' | 'confirmLabel' | 'hideCostColumn'
+> & {
   title?: string
   confirmLabel?: string
 }
@@ -11,7 +14,7 @@ export function JobModalUnpublish({
   confirmLabel = JOB_MODAL_COPY.unpublish.confirm,
   ...rest
 }: JobModalUnpublishProps) {
-  return <JobModalActionPlaces title={title} confirmLabel={confirmLabel} {...rest} />
+  return <JobModalActionPlaces {...rest} title={title} confirmLabel={confirmLabel} hideCostColumn />
 }
 
 JobModalUnpublish.displayName = 'JobModalUnpublish'

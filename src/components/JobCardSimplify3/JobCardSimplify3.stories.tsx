@@ -49,8 +49,48 @@ const runningSameDate: JobAdvertisement = {
   id: 'ad-running-same',
   title: 'Hlavní inzerát',
   publications: [
-    withReactions({ id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: daysFromNow(5), viewCount: 1840 }, 56),
-    withReactions({ id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: daysFromNow(5), viewCount: 920 }, 28),
+    withReactions(
+      {
+        id: 'jobs',
+        channel: 'Jobs.cz',
+        startDate: '12. 7. 2026',
+        endDate: daysFromNow(5),
+        viewCount: 1840,
+        highlights: [
+          {
+            id: 'jobs-jobstip',
+            name: 'Jobstip',
+            kind: 'jobstip',
+            startDate: '12. 7. 2026',
+            endDate: daysFromNow(5),
+            viewCount: 699,
+            reactionCount: 13,
+          },
+        ],
+      },
+      56,
+    ),
+    withReactions(
+      {
+        id: 'prace',
+        channel: 'Prace.cz',
+        startDate: '12. 7. 2026',
+        endDate: daysFromNow(5),
+        viewCount: 920,
+        highlights: [
+          {
+            id: 'prace-supermax',
+            name: 'Supermax',
+            kind: 'supermax',
+            startDate: '12. 7. 2026',
+            endDate: daysFromNow(5),
+            viewCount: 265,
+            reactionCount: 4,
+          },
+        ],
+      },
+      28,
+    ),
     withReactions({ id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: daysFromNow(5), viewCount: 410 }, 9),
   ],
 }
@@ -195,6 +235,69 @@ const mixedDifferentDates: JobAdvertisement = {
   ],
 }
 
+/** Running paid highlights sit after their parent portal in Teamio pink. */
+const highlightedAdvertisement: JobAdvertisement = {
+  id: 'ad-highlights',
+  title: 'Hlavní inzerát',
+  publications: [
+    withReactions(
+      {
+        id: 'jobs',
+        channel: 'Jobs.cz',
+        startDate: '12. 7. 2026',
+        endDate: '30. 10. 2026',
+        viewCount: 1840,
+        highlights: [
+          {
+            id: 'jobs-jobstip',
+            name: 'Jobstip',
+            kind: 'jobstip',
+            startDate: '8. 6. 2026',
+            endDate: '30. 10. 2026',
+            viewCount: 699,
+            reactionCount: 13,
+          },
+          {
+            id: 'jobs-top',
+            name: 'Topováno na jobs.cz',
+            kind: 'top',
+            startDate: '22. 6. 2026',
+            endDate: '30. 10. 2026',
+            viewCount: 331,
+            reactionCount: 6,
+          },
+        ],
+      },
+      56,
+    ),
+    withReactions(
+      {
+        id: 'prace',
+        channel: 'Prace.cz',
+        startDate: '12. 7. 2026',
+        endDate: '30. 10. 2026',
+        viewCount: 920,
+        highlights: [
+          {
+            id: 'prace-supermax',
+            name: 'Supermax',
+            kind: 'supermax',
+            startDate: '8. 6. 2026',
+            endDate: '30. 10. 2026',
+            viewCount: 265,
+            reactionCount: 4,
+          },
+        ],
+      },
+      28,
+    ),
+    withReactions(
+      { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '30. 10. 2026', viewCount: 410 },
+      9,
+    ),
+  ],
+}
+
 /** Open recruitment, unfinished advertisement wizard — follow-up card instead of publications. */
 const draftAdvertisement: JobAdvertisement = {
   id: 'ad-draft',
@@ -295,6 +398,12 @@ export const EndedDifferentDates: Story = {
 export const MixedDifferentDates: Story = {
   args: {
     advertisements: [mixedDifferentDates],
+  },
+}
+
+export const HighlightedAdvertisement: Story = {
+  args: {
+    advertisements: [highlightedAdvertisement],
   },
 }
 

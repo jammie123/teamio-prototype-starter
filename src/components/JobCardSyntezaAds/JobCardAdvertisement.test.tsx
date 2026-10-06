@@ -565,6 +565,118 @@ describe('JobCardAdvertisement stats dropdown', () => {
   })
 })
 
+describe('JobCardAdvertisement highlights', () => {
+  it('renders running Jobstip, Supermax and Topováno chips after the parent portal', () => {
+    renderAdvertisement({
+      id: 'ad-highlights',
+      publications: [
+        {
+          id: 'jobs',
+          channel: 'Jobs.cz',
+          startDate: '12. 7. 2026',
+          endDate: '30. 10. 2026',
+          highlights: [
+            {
+              id: 'jobs-jobstip',
+              name: 'Jobstip',
+              startDate: '8. 6. 2026',
+              endDate: '30. 10. 2026',
+              viewCount: 699,
+              reactionCount: 13,
+            },
+            {
+              id: 'jobs-top',
+              name: 'Topováno na jobs.cz',
+              startDate: '22. 6. 2026',
+              endDate: '30. 10. 2026',
+              viewCount: 331,
+              reactionCount: 6,
+            },
+          ],
+        },
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          startDate: '12. 7. 2026',
+          endDate: '30. 10. 2026',
+          highlights: [
+            {
+              id: 'prace-supermax',
+              name: 'Supermax',
+              startDate: '8. 6. 2026',
+              endDate: '30. 10. 2026',
+              viewCount: 265,
+              reactionCount: 4,
+            },
+          ],
+        },
+      ],
+    })
+
+    const chips = screen.getAllByTestId('job-card-publication-highlight')
+    expect(chips.map((chip) => chip.textContent)).toEqual([
+      'Jobstip',
+      'Topováno na jobs.cz',
+      'Supermax',
+    ])
+    chips.forEach((chip) => {
+      expect(within(chip).queryByTestId('job-card-publication-highlight-dot')).not.toBeInTheDocument()
+      expect(within(chip).getByTestId('job-card-publication-highlight-name')).toHaveClass(
+        'tm-text-teamio-pink',
+      )
+    })
+  })
+
+  it('hides expired highlights and highlights on ended portals', () => {
+    renderAdvertisement({
+      id: 'ad-expired-highlights',
+      publications: [
+        {
+          id: 'jobs',
+          channel: 'Jobs.cz',
+          startDate: '12. 7. 2026',
+          endDate: '30. 10. 2026',
+          highlights: [
+            {
+              id: 'jobs-jobstip',
+              name: 'Jobstip',
+              startDate: '8. 6. 2026',
+              endDate: '30. 10. 2026',
+            },
+            {
+              id: 'jobs-top',
+              name: 'Topováno na jobs.cz',
+              status: 'expired',
+              startDate: '22. 6. 2026',
+              endDate: '6. 7. 2026',
+            },
+          ],
+        },
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          status: 'expired',
+          startDate: '12. 7. 2026',
+          endDate: '1. 9. 2026',
+          highlights: [
+            {
+              id: 'prace-supermax',
+              name: 'Supermax',
+              startDate: '8. 6. 2026',
+              endDate: '30. 10. 2026',
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(screen.getAllByTestId('job-card-publication-highlight')).toHaveLength(1)
+    expect(screen.getByTestId('job-card-publication-highlight')).toHaveTextContent('Jobstip')
+    expect(screen.queryByText('Topováno na jobs.cz')).not.toBeInTheDocument()
+    expect(screen.queryByText('Supermax')).not.toBeInTheDocument()
+  })
+})
+
 describe('JobCardAdvertisement places table hover', () => {
   it('opens the shared places table from stats and shows Prodloužit when a portal expired', async () => {
     const onExtendPublications = vi.fn()

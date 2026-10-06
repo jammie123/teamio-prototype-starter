@@ -7,6 +7,8 @@ export type {
   JobCardCandidates,
   JobCardNote,
   JobPublication,
+  JobPublicationHighlight,
+  JobPublicationHighlightKind,
   JobPublicationStatus,
 } from '../JobCardSynteza/types'
 import type { JobCardCandidates } from '../JobCardSynteza/types'

@@ -1,4 +1,4 @@
-import type { JobAdvertisement, JobPublication } from './types'
+import type { JobAdvertisement, JobPublication, JobPublicationHighlight } from './types'
 import { formatCount } from './formatCount'
 
 export interface JobAdvertisementSummary {
@@ -230,6 +230,14 @@ export function partitionPublications(publications: JobPublication[], now = new 
   const running = active.filter((publication) => !isEndingSoonPublication(publication, now))
 
   return { active, running, endingSoon, expired }
+}
+
+export function visibleHighlights(publication: JobPublication): JobPublicationHighlight[] {
+  if (publication.status === 'expired') {
+    return []
+  }
+
+  return (publication.highlights ?? []).filter((highlight) => highlight.status !== 'expired')
 }
 
 function pickDate(

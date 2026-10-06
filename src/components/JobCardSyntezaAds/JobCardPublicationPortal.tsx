@@ -4,11 +4,16 @@ import { Icon } from '../Icon'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { cn } from '../../lib/cn'
 import { formatCount } from '../JobCardSynteza/formatCount'
-import { formatConversionRate, formatPublicationRange } from '../JobCardSynteza/advertisementSummary'
+import {
+  formatConversionRate,
+  formatPublicationRange,
+  visibleHighlights,
+} from '../JobCardSynteza/advertisementSummary'
 import type { JobPublication } from '../JobCardSynteza/types'
 import { Tag } from '../Tag'
 import type { PublicationPeriodBadge } from './advertisementSummaryAds'
 import { JobCardPlacesSummaryTable } from './JobCardPlacesSummaryTable'
+import { JobCardPublicationHighlight } from './JobCardPublicationHighlight'
 
 export type JobCardPublicationHover = 'portalDetail' | 'placesTable'
 
@@ -217,6 +222,15 @@ export function JobCardPublicationPortal({
       </Tag>
     )
   ) : null
+  const highlights = visibleHighlights(publication)
+  const highlightChips = highlights.map((highlight) => (
+    <JobCardPublicationHighlight
+      key={highlight.id}
+      publication={publication}
+      highlight={highlight}
+      as={variant === 'grid' ? 'span' : 'li'}
+    />
+  ))
 
   if (variant === 'grid') {
     return (
@@ -225,7 +239,10 @@ export function JobCardPublicationPortal({
           className={cn(
             'tm-flex',
             'tm-min-w-0',
+            'tm-flex-wrap',
             'tm-items-center',
+            'tm-gap-x-1.5',
+            'tm-gap-y-1',
             'tm-font-normal',
             'tm-text-sm',
             expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
@@ -241,6 +258,7 @@ export function JobCardPublicationPortal({
             onExtend={onExtend}
             onExtendAll={onExtendAll}
           />
+          {highlightChips}
         </span>
         <span className="tm-flex tm-items-center">{badge}</span>
       </div>
@@ -248,38 +266,41 @@ export function JobCardPublicationPortal({
   }
 
   return (
-    <li
-      data-testid="job-card-publication"
-      className={cn(
-        'tm-flex',
-        'tm-items-center',
-        'tm-gap-1.5',
-        'tm-font-normal',
-        expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
-        'tm-text-sm',
-      )}
-    >
-      {withSeparator ? (
-        <span
-          aria-hidden
-          data-testid="job-card-publication-separator"
-          className="tm-text-secondary-default"
-        >
-          ·
-        </span>
-      ) : null}
-      <PublicationDropdown
-        publication={publication}
-        expired={expired}
-        hoverContent={hoverContent}
-        publications={publications}
-        showProlong={showProlong}
-        onPreview={onPreview}
-        onExtend={onExtend}
-        onExtendAll={onExtendAll}
-      />
-      {badge}
-    </li>
+    <>
+      <li
+        data-testid="job-card-publication"
+        className={cn(
+          'tm-flex',
+          'tm-items-center',
+          'tm-gap-1.5',
+          'tm-font-normal',
+          expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+          'tm-text-sm',
+        )}
+      >
+        {withSeparator ? (
+          <span
+            aria-hidden
+            data-testid="job-card-publication-separator"
+            className="tm-text-secondary-default"
+          >
+            ·
+          </span>
+        ) : null}
+        <PublicationDropdown
+          publication={publication}
+          expired={expired}
+          hoverContent={hoverContent}
+          publications={publications}
+          showProlong={showProlong}
+          onPreview={onPreview}
+          onExtend={onExtend}
+          onExtendAll={onExtendAll}
+        />
+        {badge}
+      </li>
+      {highlightChips}
+    </>
   )
 }
 

@@ -134,6 +134,66 @@ describe('JobCardSimplify3', () => {
     }
   })
 
+  it('renders Jobstip, Supermax and Topováno chips after the parent portal', () => {
+    renderSimplify3({
+      advertisements: [
+        {
+          id: 'ad-highlights',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 10. 2026',
+              viewCount: 842,
+              highlights: [
+                {
+                  id: 'jobs-jobstip',
+                  name: 'Jobstip',
+                  startDate: '8. 6. 2026',
+                  endDate: '30. 10. 2026',
+                },
+                {
+                  id: 'jobs-top',
+                  name: 'Topováno na jobs.cz',
+                  startDate: '22. 6. 2026',
+                  endDate: '30. 10. 2026',
+                },
+              ],
+            },
+            {
+              id: 'prace',
+              channel: 'Prace.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 10. 2026',
+              viewCount: 312,
+              highlights: [
+                {
+                  id: 'prace-supermax',
+                  name: 'Supermax',
+                  startDate: '8. 6. 2026',
+                  endDate: '30. 10. 2026',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+
+    const chips = screen.getAllByTestId('job-card-publication-highlight')
+    expect(chips.map((chip) => chip.textContent)).toEqual([
+      'Jobstip',
+      'Topováno na jobs.cz',
+      'Supermax',
+    ])
+    chips.forEach((chip) => {
+      expect(within(chip).getByTestId('job-card-publication-highlight-name')).toHaveClass(
+        'tm-text-teamio-pink',
+      )
+    })
+  })
+
   it('uses the Synteza Ads switcher for two advertisements', () => {
     renderSimplify3({ advertisements: [runningAdvertisement, secondRunning] })
 

@@ -550,7 +550,7 @@ describe('JobCard', () => {
     expect(active.children[2]).toBe(highlights[1])
     expect(active.children[3]).toContainElement(screen.getByText('Prace.cz'))
     highlights.forEach((chip) => {
-      expect(within(chip).getByTestId('job-card-publication-highlight-dot')).toHaveClass('tm-bg-teamio-pink')
+      expect(within(chip).queryByTestId('job-card-publication-highlight-dot')).not.toBeInTheDocument()
       expect(within(chip).getByTestId('job-card-publication-highlight-name')).toHaveClass(
         'tm-text-teamio-pink',
         'tm-font-medium',

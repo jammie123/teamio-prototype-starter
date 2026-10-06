@@ -21,6 +21,19 @@ export interface JobCardMenuSection {
   items: JobCardMenuItem[]
 }
 
+export type JobPublicationHighlightKind = 'jobstip' | 'supermax' | 'top' | 'pzr_highlight'
+
+export interface JobPublicationHighlight {
+  id: string
+  name: string
+  kind?: JobPublicationHighlightKind
+  status?: JobPublicationStatus
+  startDate: string
+  endDate?: string
+  viewCount?: number
+  reactionCount?: number
+}
+
 export interface JobPublication {
   id: string
   channel: string
@@ -29,6 +42,7 @@ export interface JobPublication {
   endDate?: string
   viewCount?: number
   reactionCount?: number
+  highlights?: JobPublicationHighlight[]
 }
 
 export type JobAdvertisementStatus = 'draft'

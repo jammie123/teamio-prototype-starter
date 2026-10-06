@@ -196,6 +196,24 @@ describe('JobModalActionPlaces', () => {
     expect(within(dialog).getAllByRole('checkbox', { name: 'Jobs.cz' })).toHaveLength(2)
   })
 
+  it('hides the Cena column when hideCostColumn is set', async () => {
+    render(
+      <JobModalActionPlaces
+        defaultOpen
+        title="Ukončit vystavení"
+        confirmLabel="Ukončit vystavení"
+        places={places}
+        hideCostColumn
+      />,
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).queryByRole('columnheader', { name: 'Cena' })).not.toBeInTheDocument()
+    expect(within(dialog).queryByText('1 290 Kč')).not.toBeInTheDocument()
+    expect(within(dialog).getByRole('columnheader', { name: 'Název místa' })).toBeInTheDocument()
+    expect(within(dialog).getByRole('columnheader', { name: 'Vystavení' })).toBeInTheDocument()
+  })
+
   it('does not render the additional-places section when the list is empty', async () => {
     render(
       <JobModalActionPlaces

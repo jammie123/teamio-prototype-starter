@@ -42,6 +42,60 @@ describe('JobCardPlacesSummaryTable', () => {
     expect(screen.queryByTestId('job-card-places-summary-extend')).not.toBeInTheDocument()
   })
 
+  it('inserts Jobstip and Supermax rows after the parent portal', () => {
+    render(
+      <JobCardPlacesSummaryTable
+        publications={[
+          {
+            id: 'jobs',
+            channel: 'Jobs.cz',
+            startDate: '12. 7. 2026',
+            endDate: '30. 10. 2026',
+            viewCount: 1840,
+            reactionCount: 56,
+            highlights: [
+              {
+                id: 'jobs-jobstip',
+                name: 'Jobstip',
+                kind: 'jobstip',
+                startDate: '8. 6. 2026',
+                endDate: '30. 10. 2026',
+                viewCount: 699,
+                reactionCount: 13,
+              },
+            ],
+          },
+          {
+            id: 'prace',
+            channel: 'Prace.cz',
+            startDate: '12. 7. 2026',
+            endDate: '30. 10. 2026',
+            viewCount: 920,
+            reactionCount: 28,
+            highlights: [
+              {
+                id: 'prace-supermax',
+                name: 'Supermax',
+                kind: 'supermax',
+                startDate: '8. 6. 2026',
+                endDate: '30. 10. 2026',
+                viewCount: 265,
+                reactionCount: 4,
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getAllByTestId('job-card-places-summary-row')).toHaveLength(2)
+    const highlightRows = screen.getAllByTestId('job-card-places-summary-highlight-row')
+    expect(highlightRows).toHaveLength(2)
+    expect(screen.getByText('Jobstip')).toHaveClass('tm-text-teamio-pink')
+    expect(screen.getByText('Supermax')).toHaveClass('tm-text-teamio-pink')
+    expect(screen.queryByTestId('job-card-places-summary-highlight-dot')).not.toBeInTheDocument()
+  })
+
   it('shows Prodloužit and calls onExtend when requested', async () => {
     const user = userEvent.setup()
     const onExtend = vi.fn()

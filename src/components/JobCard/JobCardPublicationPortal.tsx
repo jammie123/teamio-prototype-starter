@@ -192,10 +192,6 @@ export function JobCardPublicationHighlight({
         'tm-text-sm',
       )}
     >
-      <span
-        data-testid="job-card-publication-highlight-dot"
-        className="tm-h-1.5 tm-w-1.5 tm-shrink-0 tm-rounded-full tm-bg-teamio-pink"
-      />
       <HoverDropdown
         dropdownTestId="job-card-publication-highlight-dropdown"
         trigger={

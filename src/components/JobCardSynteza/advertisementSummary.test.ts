@@ -19,6 +19,7 @@ import {
   isEndingSoon,
   partitionPublications,
   shareSameEndDate,
+  visibleHighlights,
 } from './advertisementSummary'
 import type { JobAdvertisement } from './types'
 
@@ -521,6 +522,51 @@ describe('partitionPublications', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('visibleHighlights', () => {
+  const jobstip = {
+    id: 'jobstip',
+    name: 'Jobstip',
+    startDate: '8. 6.',
+    endDate: '30. 9. 2026',
+    viewCount: 699,
+  }
+  const expiredTop = {
+    id: 'top',
+    name: 'Topováno na jobs.cz',
+    status: 'expired' as const,
+    startDate: '22. 6.',
+    endDate: '6. 7. 2026',
+    viewCount: 331,
+  }
+
+  it('returns running highlights on a running portal', () => {
+    expect(
+      visibleHighlights({
+        id: 'jobs',
+        channel: 'Jobs.cz',
+        startDate: '1. 6.',
+        highlights: [jobstip, expiredTop],
+      }),
+    ).toEqual([jobstip])
+  })
+
+  it('hides every highlight when the portal has ended', () => {
+    expect(
+      visibleHighlights({
+        id: 'jobs',
+        channel: 'Jobs.cz',
+        status: 'expired',
+        startDate: '1. 6.',
+        highlights: [jobstip],
+      }),
+    ).toEqual([])
+  })
+
+  it('returns an empty list when the portal has no highlights', () => {
+    expect(visibleHighlights({ id: 'jobs', channel: 'Jobs.cz', startDate: '1. 6.' })).toEqual([])
   })
 })
 

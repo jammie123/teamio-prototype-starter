@@ -125,7 +125,7 @@ export function JobCardPeople({ people, onInviteMore, className }: JobCardPeople
               onInviteMore()
             }}
           >
-            Zapojit další
+            Upravit zapojení
           </Button>
         ) : null}
       </DropdownBody>

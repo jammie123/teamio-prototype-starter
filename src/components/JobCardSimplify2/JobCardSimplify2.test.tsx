@@ -95,13 +95,13 @@ describe('JobCardSimplify2', () => {
     expect(screen.getByTestId('job-card-stat-total')).toHaveTextContent(`${formatCount(32)}Celkem`)
   })
 
-  it('offers Zapojit další in the people dropdown and fires onInviteColleagues', async () => {
+  it('offers Upravit zapojení in the people dropdown and fires onInviteColleagues', async () => {
     const onInviteColleagues = vi.fn()
     renderSimplify2({ onInviteColleagues })
 
     fireEvent.click(screen.getByTestId('job-card-people'))
     const invite = await screen.findByTestId('job-card-people-invite')
-    expect(invite).toHaveTextContent('Zapojit další')
+    expect(invite).toHaveTextContent('Upravit zapojení')
 
     fireEvent.click(invite)
     expect(onInviteColleagues).toHaveBeenCalledTimes(1)

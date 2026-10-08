@@ -95,6 +95,7 @@ describe('components barrel', () => {
     expect(components.JobCardSimplify3).toBeTypeOf('object')
     expect(components.JobCardSyntezaMoreAds).toBeTypeOf('object')
     expect(components.JobMenu).toBeTypeOf('function')
+    expect(components.JobPageHeader).toBeTypeOf('object')
     expect(components.JobPublicationPlaceCard).toBeTypeOf('function')
     expect(components.JobAdvertisementChoiceCard).toBeTypeOf('function')
     expect(components.JobModalFrame).toBeTypeOf('function')

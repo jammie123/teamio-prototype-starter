@@ -3,23 +3,9 @@ import { fn } from 'storybook/test'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
-import type { LeftMenuItemData } from '../LeftMenu'
 import { Option, OptionList } from '../OptionList'
-import { PageTemplate } from '../PageTemplate'
-import { SplitButton } from '../SplitButton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs'
+import { Tabs, TabsList, TabsTrigger } from '../Tabs'
 import { PageHeader } from './PageHeader'
-
-const demoUser = {
-  name: 'Jan Fuxa',
-  company: 'LMCTEST_Teamio s.r.o.',
-}
-
-const leftMenuItems: LeftMenuItemData[] = [
-  { id: 'prehled', label: 'Přehled', icon: 'home', href: '#prehled' },
-  { id: 'nabory', label: 'Nábory', icon: 'file-text', href: '#nabory' },
-  { id: 'uchazeci', label: 'Uchazeči', icon: 'user', href: '#uchazeci' },
-]
 
 const naboryTabs = (
   <TabsList aria-label="Filtry náborů">
@@ -101,49 +87,5 @@ export const WithTabs: Story = {
   ),
   args: {
     title: 'Nábory',
-  },
-}
-
-export const JobsNabory: Story = {
-  render: (args) => (
-    <Tabs defaultValue="aktivni" className="tm-contents">
-      <PageTemplate
-        leftMenu={{
-          items: leftMenuItems,
-          activeItemId: 'nabory',
-        }}
-        headerTop={{
-          user: demoUser,
-          onMessagesClick: fn(),
-          onNotificationsClick: fn(),
-          onSearchChange: fn(),
-        }}
-        pageHeader={
-          <PageHeader
-            {...args}
-            tabs={naboryTabs}
-            actions={
-              <SplitButton
-                label="Přidat nábor"
-                onClick={fn()}
-                menuLabel="Další možnosti přidání"
-              >
-                <Option onClick={fn()}>Přidat brigádu</Option>
-              </SplitButton>
-            }
-          />
-        }
-      >
-        <TabsContent value="aktivni">Otevřené pozice.</TabsContent>
-        <TabsContent value="archiv">Uzavřené pozice.</TabsContent>
-        <TabsContent value="navrhy">Návrhy k publikaci.</TabsContent>
-      </PageTemplate>
-    </Tabs>
-  ),
-  args: {
-    title: 'Nábory',
-  },
-  parameters: {
-    layout: 'fullscreen',
   },
 }

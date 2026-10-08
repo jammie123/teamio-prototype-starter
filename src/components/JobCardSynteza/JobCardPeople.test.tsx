@@ -9,7 +9,7 @@ const people = [
 ]
 
 describe('JobCardPeople', () => {
-  it('does not show Zapojit další unless onInviteMore is provided', async () => {
+  it('does not show Upravit zapojení unless onInviteMore is provided', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 })
     render(<JobCardPeople people={people} />)
 
@@ -20,13 +20,13 @@ describe('JobCardPeople', () => {
     expect(screen.queryByTestId('job-card-people-invite')).not.toBeInTheDocument()
   })
 
-  it('shows a secondary Zapojit další button that calls onInviteMore', async () => {
+  it('shows a secondary Upravit zapojení button that calls onInviteMore', async () => {
     const onInviteMore = vi.fn()
     render(<JobCardPeople people={people} onInviteMore={onInviteMore} />)
 
     fireEvent.click(screen.getByTestId('job-card-people'))
     const invite = await screen.findByTestId('job-card-people-invite')
-    expect(invite).toHaveTextContent('Zapojit další')
+    expect(invite).toHaveTextContent('Upravit zapojení')
     expect(invite).toHaveClass('tm-w-full', 'tm-min-h-8')
     expect(invite).not.toHaveFocus()
 

@@ -211,6 +211,10 @@ export {
   type AdvertisementTimelineCycle,
 } from './AdvertisementTimeline'
 export {
+  JobPageHeader,
+  type JobPageHeaderProps,
+} from './JobPageHeader'
+export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,
   type JobsFilterEmploymentType,

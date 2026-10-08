@@ -94,7 +94,7 @@ function InteractiveJobsFilter({
 }
 
 const meta = {
-  title: 'Jobs/JobsFilter',
+  title: 'Jobs/JobsFilter/V1',
   component: JobsFilter,
   args: {
     value: emptyValue,

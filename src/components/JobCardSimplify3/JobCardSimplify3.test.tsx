@@ -78,9 +78,29 @@ describe('JobCardSimplify3', () => {
     renderSimplify3({ advertisements: [], onPreviewAdvertisement: vi.fn() })
 
     expect(screen.getByTestId('job-card-no-advertisement')).toHaveTextContent(
-      'Nábor nemá žádný inzerát.',
+      'Zatím nemáte vytvořený žádný inzerát.',
     )
     expect(screen.queryByTestId('job-card-preview-toggle')).not.toBeInTheDocument()
+  })
+
+  it('offers Vytvořit inzerát in the empty advertisement box and fires onCreateAdvertisement', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    const onCreateAdvertisement = vi.fn()
+    renderSimplify3({ advertisements: [], onCreateAdvertisement })
+
+    const create = screen.getByTestId('job-card-no-advertisement-create')
+    expect(create).toHaveTextContent('Vytvořit inzerát')
+    expect(screen.getByTestId('job-card-no-advertisement')).toContainElement(create)
+
+    await user.click(create)
+    expect(onCreateAdvertisement).toHaveBeenCalledTimes(1)
+  })
+
+  it('hides the create button when no onCreateAdvertisement handler is provided', () => {
+    renderSimplify3({ advertisements: [] })
+
+    expect(screen.getByTestId('job-card-no-advertisement')).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-no-advertisement-create')).not.toBeInTheDocument()
   })
 
   it('keeps the new-candidates pill and adds the same number-only pill on Opalcovaný', () => {

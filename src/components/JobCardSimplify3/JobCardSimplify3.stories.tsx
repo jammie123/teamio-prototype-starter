@@ -460,6 +460,7 @@ export const WithNote: Story = {
   },
 }
 
+/** Open recruitment, no advertisement created yet — empty box with a "Vytvořit inzerát" action. */
 export const NoAdvertisements: Story = {
   args: {
     advertisements: [],

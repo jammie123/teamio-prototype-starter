@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useState, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Button } from '../Button'
 import { Card } from '../Card'
 import { buildJobCardPeople, JobCardPeople } from '../JobCardSynteza/JobCardPeople'
 import type { JobCardMenuHandlers } from '../JobCardSynteza/jobCardMenu'
@@ -18,7 +19,6 @@ import type {
   JobCardNote,
   JobPublication,
 } from '../JobCardSyntezaPipeline/types'
-import { Link } from '../Link'
 import { Note } from '../Note'
 import { Typography } from '../Typography'
 import { JobCardBranchBadge, type JobCardBranch } from './JobCardBranchBadge'
@@ -194,13 +194,25 @@ export const JobCardSimplify3 = forwardRef<HTMLElement, JobCardSimplify3Props>(
             {advertisements.length === 0 ? (
               <div
                 data-testid="job-card-no-advertisement"
-                className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
+                className="tm-flex tm-flex-col tm-items-start tm-gap-3 tm-rounded tm-border tm-border-secondary tm-bg-cover-light tm-p-4"
               >
-                <span>Nábor nemá žádný inzerát.</span>
+                <p className="tm-mb-0 tm-text-sm tm-text-secondary-default">
+                  Zatím nemáte vytvořený žádný inzerát.
+                </p>
                 {onCreateAdvertisement ? (
-                  <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    className="!tm-min-h-7 !tm-px-3 !tm-py-1"
+                    data-testid="job-card-no-advertisement-create"
+                    onClick={(event) => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      onCreateAdvertisement()
+                    }}
+                  >
                     Vytvořit inzerát
-                  </Link>
+                  </Button>
                 ) : null}
               </div>
             ) : selectedAdvertisement ? (

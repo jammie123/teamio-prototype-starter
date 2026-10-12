@@ -7,6 +7,7 @@ import type { StyleProps } from '../../lib/types'
 import { Typography } from '../Typography'
 import {
   pageHeaderActionsClass,
+  pageHeaderBreadcrumbsClass,
   pageHeaderClass,
   pageHeaderRowClass,
   pageHeaderTabsClass,
@@ -19,11 +20,13 @@ export interface PageHeaderProps
   title: ReactNode
   actions?: ReactNode
   tabs?: ReactNode
+  /** Breadcrumb trail shown above the title, usually a `Breadcrumbs`. */
+  breadcrumbs?: ReactNode
 }
 
 export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
   function PageHeader(
-    { title, actions, tabs, className, 'aria-label': ariaLabel, ...rest },
+    { title, actions, tabs, breadcrumbs, className, 'aria-label': ariaLabel, ...rest },
     ref,
   ) {
     const resolvedAriaLabel =
@@ -37,6 +40,7 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
         className={pageHeaderClass(className)}
         {...rest}
       >
+        {breadcrumbs ? <div className={pageHeaderBreadcrumbsClass()}>{breadcrumbs}</div> : null}
         <div className={pageHeaderRowClass(Boolean(tabs))}>
           <Typography variant="h1" className={pageHeaderTitleClass()}>
             {title}

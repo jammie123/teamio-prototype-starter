@@ -9,6 +9,7 @@ describe('components barrel', () => {
     expect(components.SplitButton).toBeTypeOf('object')
     expect(components.ButtonLink).toBeTypeOf('object')
     expect(components.Link).toBeTypeOf('object')
+    expect(components.Breadcrumbs).toBeTypeOf('object')
     expect(components.Icon).toBeTypeOf('object')
     expect(components.Divider).toBeTypeOf('object')
     expect(components.Card).toBeTypeOf('object')

@@ -7,6 +7,7 @@ export {
 } from './SplitButton'
 export { ButtonLink, type ButtonLinkProps } from './ButtonLink'
 export { Link, type LinkProps } from './Link'
+export { Breadcrumbs, type BreadcrumbsProps, type BreadcrumbItem } from './Breadcrumbs'
 export { Icon, type IconProps, type IconName, type KnownIconName } from './Icon'
 export { Divider, type DividerProps } from './Divider'
 export { Card, type CardProps } from './Card'

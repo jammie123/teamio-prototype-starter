@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { Breadcrumbs } from '../Breadcrumbs'
 import { Button } from '../Button'
 import { Option } from '../OptionList'
 import { SplitButton } from '../SplitButton'
@@ -25,6 +26,21 @@ describe('PageHeader', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Uložit' })).toBeInTheDocument()
+  })
+
+  it('renders breadcrumbs above the title', () => {
+    render(
+      <PageHeader
+        title="Product Manager"
+        breadcrumbs={
+          <Breadcrumbs items={[{ label: 'Nábory', href: '/nabory' }, { label: 'Product Manager' }]} />
+        }
+      />,
+    )
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Drobečková navigace' })
+    const title = screen.getByRole('heading', { level: 1, name: 'Product Manager' })
+    expect(breadcrumbs.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('renders a tablist when tabs are provided', () => {

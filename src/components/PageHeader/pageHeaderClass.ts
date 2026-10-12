@@ -14,6 +14,10 @@ export function pageHeaderClass(className?: string) {
   )
 }
 
+export function pageHeaderBreadcrumbsClass() {
+  return cn('tm-pb-2')
+}
+
 // With tabs the row gives up its bottom padding, so the tabs reach the bottom edge.
 export function pageHeaderRowClass(hasTabs = false) {
   return cn(

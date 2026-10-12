@@ -1,5 +1,6 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
+import { Breadcrumbs } from '../Breadcrumbs'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -75,6 +76,14 @@ export const WithOverflow: Story = {
         </Dropdown>
       </>
     ),
+  },
+}
+
+export const WithBreadcrumbs: Story = {
+  decorators: [onPageBackground],
+  args: {
+    title: 'Product Manager',
+    breadcrumbs: <Breadcrumbs items={[{ label: 'Nábory', href: '#nabory' }, { label: 'Product Manager' }]} />,
   },
 }
 

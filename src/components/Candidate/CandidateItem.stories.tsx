@@ -11,8 +11,13 @@ const [minayeva, cerny, karl, sousek, prijmeni] = sampleCandidates
 
 function Frame({ children, className }: { children: ReactNode; className?: string }) {
   return (
+    // Rows are shown on their own here, so the sticky dividers and shadows that
+    // `CandidateTable` toggles on overflow and while scrolling are forced on to make them visible.
     <div
-      className={`tm-min-h-[320px] tm-overflow-hidden tm-rounded tm-border tm-border-secondary ${className ?? ''}`}
+      data-overflow="true"
+      data-shadow-start="true"
+      data-shadow-end="true"
+      className={`tm-group/candidate-table tm-min-h-[320px] tm-overflow-hidden tm-rounded tm-border tm-border-secondary ${className ?? ''}`}
     >
       <Table aria-label="Uchazeči" className="tm-min-w-[1250px]">
         <CandidateTableHead />

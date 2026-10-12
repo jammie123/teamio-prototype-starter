@@ -27,7 +27,32 @@ describe('CandidateTags', () => {
   it('uses medium font weight on the new tag button', () => {
     render(<CandidateTags tags={tags} onAdd={vi.fn()} />)
 
-    expect(screen.getByTestId('candidate-tags-add')).toHaveClass('!tm-font-medium')
+    expect(screen.getByTestId('candidate-tags-add')).toHaveClass(
+      '!tm-font-medium',
+      'tm-text-secondary-default',
+    )
+  })
+
+  it('is always visible unless asked to reveal on row hover', () => {
+    render(<CandidateTags tags={tags} onAdd={vi.fn()} />)
+
+    expect(screen.getByTestId('candidate-tags-add')).not.toHaveClass('tm-opacity-0')
+  })
+
+  it('hides the new tag button until row hover', () => {
+    render(<CandidateTags tags={tags} onAdd={vi.fn()} revealOnRowHover />)
+
+    expect(screen.getByTestId('candidate-tags-add')).toHaveClass(
+      'tm-opacity-0',
+      'group-hover/row:tm-opacity-100',
+      'group-focus-within/row:tm-opacity-100',
+    )
+  })
+
+  it('hides the new tag button on row hover even when there are no tags', () => {
+    render(<CandidateTags onAdd={vi.fn()} revealOnRowHover />)
+
+    expect(screen.getByTestId('candidate-tags-add')).toHaveClass('tm-opacity-0')
   })
 
   it('calls onAdd from the new tag button', async () => {

@@ -216,6 +216,7 @@ export {
 } from './JobPageHeader'
 export {
   CandidateItem,
+  CandidateTable,
   CandidateTableHead,
   CandidateStatus,
   CandidateTags,
@@ -223,6 +224,7 @@ export {
   CANDIDATE_COPY,
   CANDIDATE_DEFAULT_STATUSES,
   type CandidateItemProps,
+  type CandidateTableProps,
   type CandidateTableHeadProps,
   type CandidateStatusProps,
   type CandidateTagsProps,

@@ -22,6 +22,32 @@ describe('CandidateNote', () => {
     expect(onExpand).toHaveBeenCalledTimes(1)
   })
 
+  it('uses medium weight and muted colour on the add note button', () => {
+    render(<CandidateNote onAdd={vi.fn()} />)
+
+    expect(screen.getByTestId('candidate-note-add')).toHaveClass(
+      '!tm-font-medium',
+      'tm-text-secondary-default',
+    )
+  })
+
+  it('is always visible unless asked to reveal on row hover', () => {
+    render(<CandidateNote onAdd={vi.fn()} />)
+
+    expect(screen.getByTestId('candidate-note-add')).not.toHaveClass('tm-opacity-0')
+  })
+
+  it('hides the add button until the row is hovered or focused', () => {
+    render(<CandidateNote onAdd={vi.fn()} revealOnRowHover />)
+
+    expect(screen.getByTestId('candidate-note-add')).toHaveClass(
+      'tm-opacity-0',
+      'group-hover/row:tm-opacity-100',
+      'group-focus-within/row:tm-opacity-100',
+      'focus-visible:tm-opacity-100',
+    )
+  })
+
   it('renders an add button when there is no note', async () => {
     const user = userEvent.setup()
     const onAdd = vi.fn()

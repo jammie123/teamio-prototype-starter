@@ -3,6 +3,7 @@ import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import { Tag } from '../Tag'
+import { candidateAddButtonClass, candidateRevealOnRowHoverClass } from './candidateCellClass'
 import { CANDIDATE_COPY } from './candidateCopy'
 import type { CandidateTagData } from './types'
 
@@ -10,9 +11,17 @@ export interface CandidateTagsProps extends StyleProps {
   tags?: CandidateTagData[]
   onAdd?: () => void
   onRemove?: (tag: CandidateTagData) => void
+  /** Hide the "new tag" button until the surrounding `tm-group/row` is hovered or focused. */
+  revealOnRowHover?: boolean
 }
 
-export function CandidateTags({ tags = [], onAdd, onRemove, className }: CandidateTagsProps) {
+export function CandidateTags({
+  tags = [],
+  onAdd,
+  onRemove,
+  revealOnRowHover = false,
+  className,
+}: CandidateTagsProps) {
   return (
     <div
       data-testid="candidate-tags"
@@ -35,7 +44,7 @@ export function CandidateTags({ tags = [], onAdd, onRemove, className }: Candida
           size="small"
           data-testid="candidate-tags-add"
           onClick={onAdd}
-          className="!tm-font-medium tm-text-secondary-default"
+          className={cn(candidateAddButtonClass, revealOnRowHover && candidateRevealOnRowHoverClass)}
         >
           <Icon name={tags.length === 0 ? 'tag' : 'plus'} className="tm-text-base" />
           {CANDIDATE_COPY.addTag}

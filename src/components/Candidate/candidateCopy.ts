@@ -12,6 +12,8 @@ export const CANDIDATE_COPY = {
     tags: 'Štítky',
     note: 'Poznámka',
   },
+  tableLabel: 'Uchazeči',
+  emptyTable: 'Žádní uchazeči',
   addPhone: 'Přidat telefon',
   notContacted: 'Nekontaktován/a',
   emptyValue: '–',

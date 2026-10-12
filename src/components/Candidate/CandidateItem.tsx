@@ -213,6 +213,7 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
         <TableCell data-testid="candidate-cell-tags" className={cn(cellClass, 'tm-min-w-[14rem]')}>
           <CandidateTags
             tags={candidate.tags}
+            revealOnRowHover
             onAdd={onTagAdd ? () => onTagAdd(candidate) : undefined}
             onRemove={onTagRemove ? (tag) => onTagRemove(candidate, tag) : undefined}
           />
@@ -224,6 +225,7 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
         >
           <CandidateNote
             note={candidate.note}
+            revealOnRowHover
             onAdd={() => onNoteAdd?.(candidate)}
             onExpand={() => onNoteExpand?.(candidate)}
           />

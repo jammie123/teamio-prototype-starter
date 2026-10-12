@@ -86,6 +86,7 @@ describe('components barrel', () => {
 
   it('exports candidate components', () => {
     expect(components.CandidateItem).toBeTypeOf('object')
+    expect(components.CandidateTable).toBeTypeOf('object')
     expect(components.CandidateTableHead).toBeTypeOf('function')
     expect(components.CandidateStatus).toBeTypeOf('function')
     expect(components.CandidateTags).toBeTypeOf('function')

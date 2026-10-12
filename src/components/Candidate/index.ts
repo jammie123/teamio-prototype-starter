@@ -1,4 +1,5 @@
 export { CandidateItem, type CandidateItemProps } from './CandidateItem'
+export { CandidateTable, type CandidateTableProps } from './CandidateTable'
 export { CandidateTableHead, type CandidateTableHeadProps } from './CandidateTableHead'
 export { CandidateStatus, type CandidateStatusProps } from './CandidateStatus'
 export { CandidateTags, type CandidateTagsProps } from './CandidateTags'

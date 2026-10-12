@@ -109,6 +109,19 @@ describe('CandidateItem', () => {
     expect(row).not.toHaveClass('tm-group')
   })
 
+  it('reveals the add note and new tag buttons only on row hover', () => {
+    renderItem({ candidate: { ...candidate, note: undefined }, onNoteAdd: vi.fn(), onTagAdd: vi.fn() })
+
+    expect(screen.getByTestId('candidate-note-add')).toHaveClass('tm-opacity-0', 'group-hover/row:tm-opacity-100')
+    expect(screen.getByTestId('candidate-tags-add')).toHaveClass('tm-opacity-0', 'group-hover/row:tm-opacity-100')
+  })
+
+  it('hides the new tag button on row hover for a candidate without tags too', () => {
+    renderItem({ candidate: { ...candidate, tags: [] }, onTagAdd: vi.fn() })
+
+    expect(screen.getByTestId('candidate-tags-add')).toHaveClass('tm-opacity-0', 'group-hover/row:tm-opacity-100')
+  })
+
   it('calls the row callbacks with the candidate', async () => {
     const user = userEvent.setup()
     const onNameClick = vi.fn()

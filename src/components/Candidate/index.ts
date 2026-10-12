@@ -1,10 +1,16 @@
 export { CandidateItem, type CandidateItemProps } from './CandidateItem'
 export { CandidateTable, type CandidateTableProps } from './CandidateTable'
 export { CandidateTableHead, type CandidateTableHeadProps } from './CandidateTableHead'
+export { JobsPipeline, type JobsPipelineProps } from './JobsPipeline'
 export { CandidateStatus, type CandidateStatusProps } from './CandidateStatus'
 export { CandidateTags, type CandidateTagsProps } from './CandidateTags'
 export { CandidateNote, type CandidateNoteProps } from './CandidateNote'
-export { CANDIDATE_COPY, CANDIDATE_DEFAULT_STATUSES } from './candidateCopy'
+export {
+  CANDIDATE_COPY,
+  CANDIDATE_DEFAULT_STATUSES,
+  CANDIDATE_PIPELINE_ALL_STATUS_ID,
+  CANDIDATE_PIPELINE_STATUSES,
+} from './candidateCopy'
 export type {
   CandidateItemData,
   CandidateNoteData,

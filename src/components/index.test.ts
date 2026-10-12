@@ -91,7 +91,9 @@ describe('components barrel', () => {
     expect(components.CandidateStatus).toBeTypeOf('function')
     expect(components.CandidateTags).toBeTypeOf('function')
     expect(components.CandidateNote).toBeTypeOf('function')
+    expect(components.JobsPipeline).toBeTypeOf('object')
     expect(components.CANDIDATE_COPY).toBeTypeOf('object')
+    expect(components.CANDIDATE_PIPELINE_STATUSES).toBeInstanceOf(Array)
     expect(components.CANDIDATE_DEFAULT_STATUSES).toBeInstanceOf(Array)
   })
 

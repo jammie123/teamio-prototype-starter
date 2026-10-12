@@ -55,6 +55,19 @@ export interface CandidateColumnState {
   visible: boolean
 }
 
+/** Actions offered by the row menu (`CandidateActionsMenu`). `move` carries the target status id. */
+export type CandidateActionId =
+  | 'reject'
+  | 'move'
+  | 'ai-evaluate'
+  | 'record-contact'
+  | 'send-message'
+  | 'forward'
+  | 'assign-to-position'
+  | 'edit'
+  | 'request-consent'
+  | 'add-tag'
+
 export interface CandidateItemData {
   id: string
   name: string

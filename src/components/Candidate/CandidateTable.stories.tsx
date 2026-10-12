@@ -91,3 +91,24 @@ function InteractiveTable(args: CandidateTableProps) {
 export const Interactive: Story = {
   render: (args) => <InteractiveTable {...args} />,
 }
+
+function SelectableTable(args: CandidateTableProps) {
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+
+  return (
+    <div className="tm-min-h-[520px]">
+      <CandidateTable
+        {...args}
+        className="tm-max-w-[900px]"
+        selectedIds={selectedIds}
+        onSelectionChange={setSelectedIds}
+        onAction={fn()}
+      />
+    </div>
+  )
+}
+
+/** Select column with a checkbox and the actions menu; the header checkbox selects all rows. */
+export const WithSelection: Story = {
+  render: (args) => <SelectableTable {...args} />,
+}

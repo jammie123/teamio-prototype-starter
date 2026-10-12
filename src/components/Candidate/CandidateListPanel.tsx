@@ -4,6 +4,7 @@ import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
 import { Input } from '../Input'
+import { BulkAction, type BulkActionProps } from './BulkAction'
 import { CANDIDATE_COPY } from './candidateCopy'
 import { JobsPipelineV2, type JobsPipelineV2Props } from './JobsPipelineV2'
 
@@ -27,6 +28,10 @@ export interface CandidateListPanelProps
   activeFiltersCount?: number
   /** Called when the "Přizpůsobit sloupce" button is clicked. The button is shown only when set. */
   onColumnsClick?: () => void
+  /** Number of selected candidates; while greater than 0 the `BulkAction` bar is shown above the toolbar. */
+  selectedCount?: number
+  /** Handlers and options of the `BulkAction` bar (everything except `count`). */
+  bulkActions?: Omit<BulkActionProps, 'count'>
   /** Content below the toolbar, usually a `CandidateTable`. Its own border is removed. */
   children?: ReactNode
 }
@@ -50,6 +55,8 @@ export const CandidateListPanel = forwardRef<HTMLDivElement, CandidateListPanelP
       onFiltersClick,
       activeFiltersCount = 0,
       onColumnsClick,
+      selectedCount = 0,
+      bulkActions,
       children,
       className,
       ...rest
@@ -83,6 +90,13 @@ export const CandidateListPanel = forwardRef<HTMLDivElement, CandidateListPanelP
             onChange={onStatusChange}
           />
         </div>
+        {selectedCount > 0 ? (
+          <BulkAction
+            {...bulkActions}
+            count={selectedCount}
+            className="tm-border-0 tm-border-b tm-border-solid tm-border-secondary"
+          />
+        ) : null}
         <div
           data-testid="candidate-list-panel-toolbar"
           className="tm-flex tm-items-center tm-gap-3 tm-px-4 tm-py-4"

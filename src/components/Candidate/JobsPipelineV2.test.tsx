@@ -261,4 +261,15 @@ describe('JobsPipelineV2', () => {
 
     expect(screen.getByRole('tablist')).toHaveClass('!tm-items-stretch')
   })
+
+  it('gives tabs without an icon the same count row height and font sizes', () => {
+    render(<JobsPipelineV2 {...baseProps} />)
+
+    const row = screen.getByTestId('jobs-pipeline-status-total-count').parentElement
+    expect(row).toHaveClass('tm-min-h-6')
+    for (const id of ['total', 'hired']) {
+      expect(screen.getByTestId(`jobs-pipeline-status-${id}-count`)).toHaveClass('tm-text-lg')
+      expect(screen.getByTestId(`jobs-pipeline-status-${id}-label`)).toHaveClass('tm-text-sm')
+    }
+  })
 })

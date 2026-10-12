@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, type ReactNode } from 'react'
+import { forwardRef, useCallback, useMemo, type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Table, TableBody, TableCell, TableRow } from '../Table'
@@ -20,6 +20,8 @@ type RowCallbacks = Pick<
   | 'onTagRemove'
   | 'onNoteAdd'
   | 'onNoteExpand'
+  | 'onAction'
+  | 'moveToOptions'
 >
 
 export interface CandidateTableProps extends StyleProps, RowCallbacks {
@@ -28,6 +30,13 @@ export interface CandidateTableProps extends StyleProps, RowCallbacks {
   columns?: CandidateColumnState[]
   /** Content shown when `candidates` is empty. */
   emptyMessage?: ReactNode
+  /** Ids of the selected candidates (controlled). */
+  selectedIds?: string[]
+  /**
+   * Called with the new selection. Setting it adds the select column with a checkbox per row and
+   * the select-all checkbox in the header.
+   */
+  onSelectionChange?: (selectedIds: string[]) => void
   'aria-label'?: string
 }
 
@@ -44,6 +53,8 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
       columns,
       statusOptions = CANDIDATE_DEFAULT_STATUSES,
       emptyMessage = CANDIDATE_COPY.emptyTable,
+      selectedIds,
+      onSelectionChange,
       className,
       'aria-label': ariaLabel = CANDIDATE_COPY.tableLabel,
       ...rowCallbacks
@@ -51,7 +62,21 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
     ref,
   ) {
     const { ref: scrollRef, state: scroll } = useScrollEdges<HTMLTableElement>()
-    const columnCount = getVisibleColumnIds(columns).length
+    const selectable = Boolean(onSelectionChange)
+    const hasSelectColumn = selectable || Boolean(rowCallbacks.onAction)
+    const columnCount = getVisibleColumnIds(columns).length + (hasSelectColumn ? 1 : 0)
+    const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
+    const selectedCount = candidates.filter((candidate) => selectedSet.has(candidate.id)).length
+
+    const handleSelectAll = (checked: boolean) =>
+      onSelectionChange?.(checked ? candidates.map((candidate) => candidate.id) : [])
+
+    const handleSelectRow = (candidate: CandidateItemData, checked: boolean) => {
+      const next = new Set(selectedSet)
+      if (checked) next.add(candidate.id)
+      else next.delete(candidate.id)
+      onSelectionChange?.(candidates.filter((item) => next.has(item.id)).map((item) => item.id))
+    }
     const setRef = useCallback(
       (node: HTMLTableElement | null) => {
         scrollRef(node)
@@ -76,8 +101,14 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
           className,
         )}
       >
-        <Table ref={setRef} aria-label={ariaLabel} className="tm-min-w-[1250px]">
-          <CandidateTableHead columns={columns} />
+        <Table ref={setRef} aria-label={ariaLabel} className={hasSelectColumn ? 'tm-min-w-[1346px]' : 'tm-min-w-[1250px]'}>
+          <CandidateTableHead
+            columns={columns}
+            showSelectColumn={hasSelectColumn}
+            selectedCount={selectedCount}
+            totalCount={candidates.length}
+            onSelectAllChange={selectable ? handleSelectAll : undefined}
+          />
           <TableBody>
             {candidates.length === 0 ? (
               <TableRow data-testid="candidate-table-empty">
@@ -95,6 +126,8 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
                   candidate={candidate}
                   columns={columns}
                   statusOptions={statusOptions}
+                  isSelected={selectedSet.has(candidate.id)}
+                  onSelectChange={selectable ? handleSelectRow : undefined}
                   {...rowCallbacks}
                 />
               ))

@@ -92,7 +92,8 @@ export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
                   ACTIVE_INDICATOR_CLASS,
                 )}
               >
-                <span className="tm-inline-flex tm-items-center tm-gap-2">
+                {/* min-h keeps the count row as tall as the icon row, so tabs without an icon line up. */}
+                <span className="tm-inline-flex tm-min-h-6 tm-items-center tm-gap-2">
                   {option.icon ? (
                     <Icon
                       name={option.icon}

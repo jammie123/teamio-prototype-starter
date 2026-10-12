@@ -2,6 +2,7 @@ import { forwardRef, Fragment, type HTMLAttributes, type ReactNode } from 'react
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
+import { Checkbox } from '../Checkbox'
 import { Icon } from '../Icon'
 import { TableCell, TableRow } from '../Table'
 import {
@@ -9,15 +10,20 @@ import {
   candidateEmptyTextClass,
   candidateMetaTextClass,
   candidateNameColumnClass,
+  candidateNameColumnWithSelectClass,
   candidateNoteColumnClass,
+  candidateSelectCellPaddingClass,
+  candidateSelectColumnClass,
   candidateValueTextClass,
 } from './candidateCellClass'
 import { getVisibleColumnIds } from './candidateColumns'
 import { CANDIDATE_COPY, CANDIDATE_DEFAULT_STATUSES } from './candidateCopy'
+import { CandidateActionsMenu } from './CandidateActionsMenu'
 import { CandidateNote } from './CandidateNote'
 import { CandidateStatus } from './CandidateStatus'
 import { CandidateTags } from './CandidateTags'
 import type {
+  CandidateActionId,
   CandidateColumnId,
   CandidateColumnState,
   CandidateItemData,
@@ -39,6 +45,14 @@ export interface CandidateItemProps
   onTagRemove?: (candidate: CandidateItemData, tag: CandidateTagData) => void
   onNoteAdd?: (candidate: CandidateItemData) => void
   onNoteExpand?: (candidate: CandidateItemData) => void
+  /** Whether the row is selected; highlights the row and checks its checkbox. */
+  isSelected?: boolean
+  /** Shows the leading checkbox. Together with `onAction` it adds the sticky select column. */
+  onSelectChange?: (candidate: CandidateItemData, checked: boolean) => void
+  /** Shows the "three dots" menu in the select column; `statusId` is set for `move`. */
+  onAction?: (candidate: CandidateItemData, actionId: CandidateActionId, statusId?: string) => void
+  /** Targets of "Posunout do" in the row menu. */
+  moveToOptions?: CandidateStatusOption[]
 }
 
 const STAR_COUNT = 5
@@ -51,6 +65,7 @@ const cellClass = cn(
   'tm-align-middle',
   candidateCellPaddingClass,
   'group-hover/row:tm-bg-cover-light',
+  'group-data-[selected=true]/row:tm-bg-cover-light',
 )
 
 function Stars({ value, count }: { value: number; count?: number }) {
@@ -97,6 +112,10 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
       onTagRemove,
       onNoteAdd,
       onNoteExpand,
+      isSelected = false,
+      onSelectChange,
+      onAction,
+      moveToOptions,
       className,
       ...rest
     },
@@ -104,12 +123,17 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
   ) {
     const { name, phone, rating, attachmentsCount, aiScore, source } = candidate
     const hasAiScore = aiScore !== undefined && aiScore !== null && aiScore !== ''
+    const hasSelectColumn = Boolean(onSelectChange || onAction)
 
     const cells: Record<CandidateColumnId, ReactNode> = {
       name: (
         <TableCell
           data-testid="candidate-cell-name"
-          className={cn(cellClass, candidateNameColumnClass, 'tm-z-10')}
+          className={cn(
+            cellClass,
+            hasSelectColumn ? candidateNameColumnWithSelectClass : candidateNameColumnClass,
+            'tm-z-10',
+          )}
         >
           {onNameClick ? (
             <button
@@ -136,7 +160,7 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
               'tm-items-center',
               'tm-gap-1',
               'tm-text-sm',
-              phone ? 'tm-text-action-link-default' : 'tm-text-light-default',
+              phone ? 'tm-text-secondary-default' : 'tm-text-light-default',
             )}
           >
             <Icon name="phone" className="tm-text-base" />
@@ -258,9 +282,44 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
       <TableRow
         ref={ref}
         data-testid="candidate-item"
+        data-selected={isSelected}
         className={cn('tm-group/row', 'tm-h-16', className)}
         {...rest}
       >
+        {hasSelectColumn ? (
+          <TableCell
+            data-testid="candidate-cell-select"
+            className={cn(
+              'tm-bg-basic',
+              'tm-align-middle',
+              'tm-z-10',
+              // The open menu is part of this cell; lift it above the sticky cells of the rows below.
+              'focus-within:tm-z-30',
+              'group-hover/row:tm-bg-cover-light',
+              'group-data-[selected=true]/row:tm-bg-cover-light',
+              candidateSelectCellPaddingClass,
+              candidateSelectColumnClass,
+            )}
+          >
+            <div className="tm-flex tm-items-center tm-gap-1">
+              {onSelectChange ? (
+                <Checkbox
+                  data-testid="candidate-select"
+                  aria-label={CANDIDATE_COPY.selection.selectCandidate(name)}
+                  checked={isSelected}
+                  onChange={(event) => onSelectChange(candidate, event.target.checked)}
+                />
+              ) : null}
+              {onAction ? (
+                <CandidateActionsMenu
+                  label={CANDIDATE_COPY.actions.menuLabel(name)}
+                  moveToOptions={moveToOptions}
+                  onAction={(actionId, statusId) => onAction(candidate, actionId, statusId)}
+                />
+              ) : null}
+            </div>
+          </TableCell>
+        ) : null}
         {getVisibleColumnIds(columns).map((id) => (
           <Fragment key={id}>{cells[id]}</Fragment>
         ))}

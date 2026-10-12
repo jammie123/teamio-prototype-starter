@@ -9,7 +9,16 @@ import type { CandidateItemData } from './types'
 
 const [minayeva, cerny, karl, sousek, prijmeni] = sampleCandidates
 
-function Frame({ children, className }: { children: ReactNode; className?: string }) {
+function Frame({
+  children,
+  className,
+  selectable = false,
+}: {
+  children: ReactNode
+  className?: string
+  /** Adds the leading select column to the header, matching rows with `onSelectChange` / `onAction`. */
+  selectable?: boolean
+}) {
   return (
     // Rows are shown on their own here, so the sticky dividers and shadows that
     // `CandidateTable` toggles on overflow and while scrolling are forced on to make them visible.
@@ -20,7 +29,7 @@ function Frame({ children, className }: { children: ReactNode; className?: strin
       className={`tm-group/candidate-table tm-min-h-[320px] tm-overflow-hidden tm-rounded tm-border tm-border-secondary ${className ?? ''}`}
     >
       <Table aria-label="Uchazeči" className="tm-min-w-[1250px]">
-        <CandidateTableHead />
+        <CandidateTableHead showSelectColumn={selectable} />
         <TableBody>{children}</TableBody>
       </Table>
     </div>
@@ -77,6 +86,21 @@ export const StickyColumns: Story = {
       ))}
     </Frame>
   ),
+}
+
+/** Checkbox plus the "three dots" menu in the sticky column left of the name. */
+export const WithSelectionAndActions: Story = {
+  args: { isSelected: false, onSelectChange: fn(), onAction: fn() },
+  render: (args) => (
+    <Frame selectable className="tm-min-h-[520px]">
+      <CandidateItem {...args} />
+    </Frame>
+  ),
+}
+
+export const Selected: Story = {
+  args: { isSelected: true, onSelectChange: fn(), onAction: fn() },
+  render: WithSelectionAndActions.render,
 }
 
 function InteractiveRows() {

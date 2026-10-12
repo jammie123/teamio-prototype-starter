@@ -42,6 +42,12 @@ export const WithColumnsButton: Story = {
   render: Default.render,
 }
 
+/** While candidates are selected, the `BulkAction` bar appears above the search and filter toolbar. */
+export const WithSelection: Story = {
+  args: { selectedCount: 2, bulkActions: { onClear: fn(), onReject: fn(), onInvite: fn() } },
+  render: Default.render,
+}
+
 export const WithoutTable: Story = {}
 
 /** Pipeline, search and table share one container and filter the same rows. */

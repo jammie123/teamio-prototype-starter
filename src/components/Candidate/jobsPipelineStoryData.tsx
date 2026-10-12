@@ -59,6 +59,7 @@ export function PanelWithTable() {
   const [search, setSearch] = useState('')
   const [columns, setColumns] = useState(CANDIDATE_DEFAULT_COLUMNS)
   const [columnsOpen, setColumnsOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const counts = useStoryCounts()
 
   const query = search.trim().toLowerCase()
@@ -77,10 +78,15 @@ export function PanelWithTable() {
         searchValue={search}
         onSearchChange={setSearch}
         onColumnsClick={() => setColumnsOpen(true)}
+        selectedCount={selectedIds.length}
+        bulkActions={{ onClear: () => setSelectedIds([]) }}
       >
         <CandidateTable
           candidates={visible}
           columns={columns}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
+          onAction={() => undefined}
           emptyMessage="Filtru neodpovídá žádný uchazeč"
         />
       </CandidateListPanel>

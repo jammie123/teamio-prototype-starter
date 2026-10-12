@@ -39,6 +39,8 @@ describe('CandidateItem', () => {
     expect(within(row).getAllByRole('cell')).toHaveLength(9)
     expect(screen.getByTestId('candidate-name')).toHaveTextContent('Karl Jakub')
     expect(screen.getByTestId('candidate-phone')).toHaveTextContent('776802520')
+    expect(screen.getByTestId('candidate-phone')).toHaveClass('tm-text-secondary-default')
+    expect(screen.getByTestId('candidate-phone')).not.toHaveClass('tm-text-action-link-default')
     expect(screen.getByTestId('candidate-rating')).toHaveAttribute('data-rating', '3')
     expect(screen.getByTestId('candidate-rating')).toHaveTextContent('(2)')
     expect(screen.getByTestId('candidate-attachments')).toHaveTextContent('4')
@@ -98,7 +100,7 @@ describe('CandidateItem', () => {
   it('gives body cells roomier horizontal padding', () => {
     renderItem()
 
-    expect(screen.getByTestId('candidate-cell-source')).toHaveClass('!tm-px-4')
+    expect(screen.getByTestId('candidate-cell-source')).toHaveClass('!tm-px-6', '!tm-py-5')
   })
 
   it('uses a named hover group so Note hover state is not triggered by the row', () => {
@@ -186,7 +188,7 @@ describe('CandidateTableHead', () => {
     expect(headers[8]).toHaveTextContent('Poznámka')
     expect(headers[8]).toHaveClass('tm-sticky', 'tm-right-0')
     for (const header of headers) {
-      expect(header).toHaveClass('!tm-px-4', '!tm-py-4', 'tm-text-sm', 'tm-text-secondary-default')
+      expect(header).toHaveClass('!tm-px-6', '!tm-py-4', 'tm-text-sm', 'tm-text-secondary-default')
     }
   })
 })

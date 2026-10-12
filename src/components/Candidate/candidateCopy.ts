@@ -36,6 +36,35 @@ export const CANDIDATE_COPY = {
     filtersWithCount: (count: number) => `Filtry (${count})`,
     columns: 'Přizpůsobit sloupce',
   },
+  selection: {
+    selectAll: 'Vybrat všechny uchazeče',
+    selectCandidate: (name: string) => `Vybrat uchazeče ${name}`,
+  },
+  actions: {
+    menuLabel: (name: string) => `Akce uchazeče ${name}`,
+    reject: 'Zamítnout',
+    moveTo: 'Posunout do',
+    aiEvaluate: 'Zanalyzovat pomocí AI',
+    recordContact: 'Zaznamenat kontakt',
+    sendMessage: 'Napsat uchazeči',
+    forward: 'Přeposlat',
+    assignToPosition: 'Přiřadit k náboru',
+    edit: 'Upravit údaje',
+    requestConsent: 'Požádat o souhlas',
+    addTag: 'Přidat štítek',
+  },
+  bulk: {
+    label: 'Hromadné akce',
+    selected: (count: number) => {
+      const noun = count === 1 ? 'uchazeč' : count >= 2 && count <= 4 ? 'uchazeči' : 'uchazečů'
+      return `Vybráno: ${count} ${noun}`
+    },
+    moveTo: 'Posunout do',
+    reject: 'Zamítnout',
+    invite: 'Pozvat',
+    sendMessage: 'Napsat zprávu',
+    clear: 'Zrušit výběr',
+  },
   columnsDrawer: {
     title: 'Přizpůsobit sloupce',
     description: 'Vyberte, které sloupce se zobrazí, a přetažením změňte jejich pořadí.',
@@ -76,6 +105,10 @@ export const CANDIDATE_DEFAULT_STATUSES: CandidateStatusOption[] = [
   { id: 'hired', label: 'Nástup', color: 'success' },
   { id: 'rejected', label: 'Zamítnut', color: 'danger' },
 ]
+
+/** Targets of "Posunout do" in the row menu and the bulk bar; rejecting is a separate action. */
+export const CANDIDATE_DEFAULT_MOVE_TO_OPTIONS: CandidateStatusOption[] =
+  CANDIDATE_DEFAULT_STATUSES.filter((status) => status.id !== 'rejected')
 
 /** Id of the pipeline cell that clears the status filter (the "Celkem" cell). */
 export const CANDIDATE_PIPELINE_ALL_STATUS_ID = 'total'

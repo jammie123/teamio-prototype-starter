@@ -46,7 +46,7 @@ import {
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { OpalIcon } from './customIcons'
+import { CandidateMoveIcon, OpalIcon, SingleManTimeIcon } from './customIcons'
 
 const iconMap = {
   plus: Plus,
@@ -94,6 +94,8 @@ const iconMap = {
 
 const customIconMap = {
   opal: OpalIcon,
+  'single-man-time': SingleManTimeIcon,
+  'candidate-move': CandidateMoveIcon,
 } as const satisfies Record<string, LucideIcon>
 
 export type KnownIconName = keyof typeof iconMap | keyof typeof customIconMap

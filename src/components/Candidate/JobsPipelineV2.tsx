@@ -27,6 +27,15 @@ const ACTIVE_INDICATOR_CLASS = [
   'data-[state=active]:after:!tm-h-[3px]',
 ]
 
+/**
+ * Outline icons that fill the whole 24px box and look bigger than the lighter custom icons next to
+ * them; they are drawn slightly smaller so every tab icon has a similar optical size.
+ */
+const OPTICALLY_LARGE_ICONS = new Set(['ban', 'circle-check', 'message-square'])
+
+/** Stroke weight of the outline icons, closer to the thin lines of the custom icons. */
+const ICON_STROKE_WIDTH = 1.75
+
 export type JobsPipelineV2Props = Pick<
   JobsPipelineProps,
   'statusCounts' | 'newCounts' | 'statusOptions' | 'value' | 'onChange' | 'className' | 'aria-label'
@@ -62,7 +71,7 @@ export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
         }
         className={cn('tm-w-full', className)}
       >
-        <TabsList aria-label={ariaLabel} className="!tm-gap-0 !tm-mx-0">
+        <TabsList aria-label={ariaLabel} className="!tm-gap-0 !tm-mx-0 !tm-items-stretch">
           {statusOptions.map((option) => {
             const newCount = newCounts?.[option.id]
             const hasNew = typeof newCount === 'number' && newCount > 0
@@ -75,7 +84,7 @@ export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
                 data-testid={testId}
                 // There is no tab panel; the tabs filter a table elsewhere on the page.
                 aria-controls={undefined}
-                // Horizontal padding is at least the icon width (1em of tm-text-lg = 1.125rem).
+                // Horizontal padding is at least the icon width (1em of tm-text-2xl = 1.5rem).
                 className={cn(
                   '!tm-items-start !tm-gap-1 !tm-px-8 !tm-py-5 tm-flex-col',
                   '!tm-bg-cover-light data-[state=active]:!tm-bg-basic',
@@ -88,7 +97,12 @@ export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
                     <Icon
                       name={option.icon}
                       data-testid={`${testId}-icon`}
-                      className={cn('tm-text-lg', ICON_COLOR_CLASS[option.iconColor ?? 'neutral'])}
+                      strokeWidth={ICON_STROKE_WIDTH}
+                        className={cn(
+                          'tm-text-2xl',
+                          ICON_COLOR_CLASS[option.iconColor ?? 'neutral'],
+                          OPTICALLY_LARGE_ICONS.has(option.icon) && 'tm-scale-90',
+                        )}
                     />
                   ) : null}
                   <span

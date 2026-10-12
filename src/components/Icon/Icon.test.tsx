@@ -50,6 +50,14 @@ describe('Icon', () => {
     expect(screen.getByRole('img', { name: 'Opalcování' })).toBeInTheDocument()
   })
 
+  it.each(['single-man-time', 'candidate-move'])('renders the custom filled %s icon', (name) => {
+    render(<Icon name={name} title={name} />)
+    const wrapper = screen.getByTestId('icon')
+    expect(wrapper).toHaveAttribute('data-icon-name', name)
+    expect(wrapper).not.toHaveAttribute('data-icon-fallback')
+    expect(wrapper.querySelector('svg')).toHaveClass('tm-fill-current')
+  })
+
   it.each(['ban', 'circle-check', 'message-square', 'sliders-horizontal'])(
     'resolves %s as a known lucide icon',
     (name) => {

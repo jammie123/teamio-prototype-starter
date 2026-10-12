@@ -55,7 +55,7 @@ describe('JobsPipelineV2', () => {
   it('pads the tab at least as wide as the icon', () => {
     render(<JobsPipelineV2 {...baseProps} />)
 
-    expect(screen.getByTestId('jobs-pipeline-status-hired-icon')).toHaveClass('tm-text-lg')
+    expect(screen.getByTestId('jobs-pipeline-status-hired-icon')).toHaveClass('tm-text-2xl')
     expect(screen.getByTestId('jobs-pipeline-status-hired')).toHaveClass(
       '!tm-px-8',
       '!tm-py-5',
@@ -85,6 +85,14 @@ describe('JobsPipelineV2', () => {
     expect(screen.getByTestId('jobs-pipeline-status-hired-icon')).toHaveAttribute(
       'data-icon-name',
       'circle-check',
+    )
+    expect(screen.getByTestId('jobs-pipeline-status-unassessed-icon')).toHaveAttribute(
+      'data-icon-name',
+      'single-man-time',
+    )
+    expect(screen.getByTestId('jobs-pipeline-status-preselected-icon')).toHaveAttribute(
+      'data-icon-name',
+      'candidate-move',
     )
     expect(screen.queryByTestId('jobs-pipeline-status-total-icon')).not.toBeInTheDocument()
     for (const icon of screen.getAllByTestId(/-icon$/)) {
@@ -235,5 +243,22 @@ describe('JobsPipelineV2', () => {
     for (const tab of screen.getAllByRole('tab')) {
       expect(tab.className).not.toMatch(/(^|\s)tm-border-[bt]\b/)
     }
+  })
+
+  it('draws the oversized outline icons slightly smaller', () => {
+    render(<JobsPipelineV2 {...baseProps} />)
+
+    for (const id of ['rejected', 'hired', 'invited']) {
+      expect(screen.getByTestId(`jobs-pipeline-status-${id}-icon`)).toHaveClass('tm-scale-90')
+    }
+    for (const id of ['unassessed', 'preselected', 'opalcovani']) {
+      expect(screen.getByTestId(`jobs-pipeline-status-${id}-icon`)).not.toHaveClass('tm-scale-90')
+    }
+  })
+
+  it('stretches every tab to the full height of the strip', () => {
+    render(<JobsPipelineV2 {...baseProps} newCounts={{ unassessed: 14 }} />)
+
+    expect(screen.getByRole('tablist')).toHaveClass('!tm-items-stretch')
   })
 })

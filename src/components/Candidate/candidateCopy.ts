@@ -63,8 +63,8 @@ export const CANDIDATE_PIPELINE_STATUSES: CandidateStatusOption[] = [
  * "Zamítnutý" and "Celkem" at the end. "Celkem" clears the status filter.
  */
 export const CANDIDATE_PIPELINE_V2_STATUSES: CandidateStatusOption[] = [
-  { id: 'unassessed', label: 'Neposouzení', icon: 'eye' },
-  { id: 'preselected', label: 'Předvybraný', icon: 'star', iconColor: 'info' },
+  { id: 'unassessed', label: 'Neposouzení', icon: 'single-man-time' },
+  { id: 'preselected', label: 'Předvybraný', icon: 'candidate-move', iconColor: 'info' },
   { id: 'opalcovani', label: 'Opalcovaný', icon: 'opal', iconColor: 'info' },
   { id: 'invited', label: 'Pozvaný', icon: 'message-square', iconColor: 'success' },
   { id: 'hired', label: 'Přijatý', icon: 'circle-check', iconColor: 'success' },

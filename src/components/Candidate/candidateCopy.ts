@@ -29,6 +29,12 @@ export const CANDIDATE_COPY = {
     label: 'Filtr uchazečů',
     newBadgeLabel: (count: string) => `Noví uchazeči: ${count}`,
   },
+  panel: {
+    searchPlaceholder: 'Hledat uchazeče…',
+    searchLabel: 'Hledat uchazeče',
+    filters: 'Filtry',
+    filtersWithCount: (count: number) => `Filtry (${count})`,
+  },
 } as const
 
 export const CANDIDATE_DEFAULT_STATUSES: CandidateStatusOption[] = [
@@ -49,5 +55,19 @@ export const CANDIDATE_PIPELINE_STATUSES: CandidateStatusOption[] = [
   { id: 'opalcovani', label: 'Opalcovaný' },
   { id: 'invited', label: 'Pozvaný' },
   { id: 'hired', label: 'Přijatý' },
+  { id: CANDIDATE_PIPELINE_ALL_STATUS_ID, label: 'Celkem' },
+]
+
+/**
+ * Cells of the tab-style pipeline (`JobsPipelineV2`): the hiring stages with an icon each, then
+ * "Zamítnutý" and "Celkem" at the end. "Celkem" clears the status filter.
+ */
+export const CANDIDATE_PIPELINE_V2_STATUSES: CandidateStatusOption[] = [
+  { id: 'unassessed', label: 'Neposouzení', icon: 'eye' },
+  { id: 'preselected', label: 'Předvybraný', icon: 'star', iconColor: 'info' },
+  { id: 'opalcovani', label: 'Opalcovaný', icon: 'opal', iconColor: 'info' },
+  { id: 'invited', label: 'Pozvaný', icon: 'message-square', iconColor: 'success' },
+  { id: 'hired', label: 'Přijatý', icon: 'circle-check', iconColor: 'success' },
+  { id: 'rejected', label: 'Zamítnutý', icon: 'ban', iconColor: 'danger' },
   { id: CANDIDATE_PIPELINE_ALL_STATUS_ID, label: 'Celkem' },
 ]

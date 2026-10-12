@@ -50,6 +50,16 @@ describe('Icon', () => {
     expect(screen.getByRole('img', { name: 'Opalcování' })).toBeInTheDocument()
   })
 
+  it.each(['ban', 'circle-check', 'message-square', 'sliders-horizontal'])(
+    'resolves %s as a known lucide icon',
+    (name) => {
+      render(<Icon name={name} />)
+      const wrapper = screen.getByTestId('icon')
+      expect(wrapper).toHaveAttribute('data-icon-name', name)
+      expect(wrapper).not.toHaveAttribute('data-icon-fallback')
+    },
+  )
+
   it('resolves maximize as a known lucide icon', () => {
     render(<Icon name="maximize" title="Na celou obrazovku" />)
     const wrapper = screen.getByTestId('icon')

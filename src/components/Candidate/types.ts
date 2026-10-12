@@ -1,9 +1,18 @@
+import type { IconName } from '../Icon'
+
 export type CandidateStatusColor = 'neutral' | 'informative' | 'success' | 'warning' | 'danger'
+
+/** Icon tint of a `JobsPipelineV2` tab. */
+export type CandidatePipelineIconColor = 'neutral' | 'info' | 'success' | 'danger'
 
 export interface CandidateStatusOption {
   id: string
   label: string
   color?: CandidateStatusColor
+  /** Icon shown next to the count in `JobsPipelineV2`. */
+  icon?: IconName
+  /** Tint of `icon` in `JobsPipelineV2`; defaults to neutral grey. */
+  iconColor?: CandidatePipelineIconColor
 }
 
 export interface CandidateTagData {

@@ -2,6 +2,8 @@ export { CandidateItem, type CandidateItemProps } from './CandidateItem'
 export { CandidateTable, type CandidateTableProps } from './CandidateTable'
 export { CandidateTableHead, type CandidateTableHeadProps } from './CandidateTableHead'
 export { JobsPipeline, type JobsPipelineProps } from './JobsPipeline'
+export { JobsPipelineV2, type JobsPipelineV2Props } from './JobsPipelineV2'
+export { CandidateListPanel, type CandidateListPanelProps } from './CandidateListPanel'
 export { CandidateStatus, type CandidateStatusProps } from './CandidateStatus'
 export { CandidateTags, type CandidateTagsProps } from './CandidateTags'
 export { CandidateNote, type CandidateNoteProps } from './CandidateNote'
@@ -10,10 +12,12 @@ export {
   CANDIDATE_DEFAULT_STATUSES,
   CANDIDATE_PIPELINE_ALL_STATUS_ID,
   CANDIDATE_PIPELINE_STATUSES,
+  CANDIDATE_PIPELINE_V2_STATUSES,
 } from './candidateCopy'
 export type {
   CandidateItemData,
   CandidateNoteData,
+  CandidatePipelineIconColor,
   CandidateRating,
   CandidateSource,
   CandidateStatusColor,

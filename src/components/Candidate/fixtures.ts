@@ -58,4 +58,24 @@ export const sampleCandidates: CandidateItemData[] = [
     source: { name: 'Databáze uchazečů', date: '1. 8. 2024' },
     tags: [{ id: 'inbox', label: 'inbox' }],
   },
+  {
+    id: 'zamitnuty',
+    name: 'Zamítnutý Petr',
+    rating: { value: 2 },
+    attachmentsCount: 1,
+    statusId: 'rejected',
+    lastContact: '14. 3. 2024',
+    source: { name: 'LinkedIn', date: '2. 3. 2024' },
+  },
 ]
+
+/** Shared by the JobsPipeline V1 and V2 stories. */
+export const pipelineStatusCounts = {
+  unassessed: 128,
+  preselected: 24,
+  opalcovani: 16,
+  invited: 9,
+  hired: 5,
+  rejected: 12,
+  total: 182,
+}

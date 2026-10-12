@@ -84,6 +84,16 @@ describe('components barrel', () => {
     expect(components.Option).toBeTypeOf('function')
   })
 
+  it('exports candidate components', () => {
+    expect(components.CandidateItem).toBeTypeOf('object')
+    expect(components.CandidateTableHead).toBeTypeOf('function')
+    expect(components.CandidateStatus).toBeTypeOf('function')
+    expect(components.CandidateTags).toBeTypeOf('function')
+    expect(components.CandidateNote).toBeTypeOf('function')
+    expect(components.CANDIDATE_COPY).toBeTypeOf('object')
+    expect(components.CANDIDATE_DEFAULT_STATUSES).toBeInstanceOf(Array)
+  })
+
   it('exports job components', () => {
     expect(components.JobCard).toBeTypeOf('object')
     expect(components.JobCardOld).toBeTypeOf('object')

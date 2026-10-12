@@ -26,9 +26,14 @@ import {
   Mail,
   Maximize2,
   Menu,
+  Paperclip,
   Pencil,
+  Phone,
   Plus,
   Search,
+  Sparkles,
+  Star,
+  Tag,
   Trash2,
   User,
   X,
@@ -72,6 +77,11 @@ const iconMap = {
   mail: Mail,
   notification: Bell,
   maximize: Maximize2,
+  paperclip: Paperclip,
+  star: Star,
+  sparkles: Sparkles,
+  tag: Tag,
+  phone: Phone,
 } as const satisfies Record<string, LucideIcon>
 
 const customIconMap = {

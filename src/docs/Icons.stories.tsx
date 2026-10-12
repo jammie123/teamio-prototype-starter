@@ -34,6 +34,11 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   mail: 'Zprávy',
   notification: 'Notifikace',
   maximize: 'Na celou obrazovku',
+  paperclip: 'Příloha',
+  star: 'Hvězdička',
+  sparkles: 'AI',
+  tag: 'Štítek',
+  phone: 'Telefon',
 }
 
 const KNOWN_ICONS = Object.keys(ICON_LABELS) as KnownIconName[]

@@ -215,6 +215,27 @@ export {
   type JobPageHeaderProps,
 } from './JobPageHeader'
 export {
+  CandidateItem,
+  CandidateTableHead,
+  CandidateStatus,
+  CandidateTags,
+  CandidateNote,
+  CANDIDATE_COPY,
+  CANDIDATE_DEFAULT_STATUSES,
+  type CandidateItemProps,
+  type CandidateTableHeadProps,
+  type CandidateStatusProps,
+  type CandidateTagsProps,
+  type CandidateNoteProps,
+  type CandidateItemData,
+  type CandidateNoteData,
+  type CandidateRating,
+  type CandidateSource,
+  type CandidateStatusColor,
+  type CandidateStatusOption,
+  type CandidateTagData,
+} from './Candidate'
+export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,
   type JobsFilterEmploymentType,

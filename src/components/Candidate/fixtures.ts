@@ -30,6 +30,7 @@ export const sampleCandidates: CandidateItemData[] = [
     attachmentsCount: 1,
     aiScore: 82,
     statusId: 'interview',
+    isNewlyOpalcovani: true,
     lastContact: '5. 12. 2023',
     source: { name: 'LinkedIn', date: '1. 12. 2023' },
     tags: [{ id: 'senior', label: 'senior' }],
@@ -45,6 +46,7 @@ export const sampleCandidates: CandidateItemData[] = [
     rating: { value: 1 },
     attachmentsCount: 1,
     statusId: 'unassessed',
+    isNew: true,
     source: { name: 'Jobote', date: '20. 12. 2024' },
   },
   {

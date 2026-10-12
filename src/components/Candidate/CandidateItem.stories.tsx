@@ -65,6 +65,16 @@ export const WithoutPhoneAndNote: Story = {
   args: { candidate: minayeva },
 }
 
+/** Pink dot next to the name: the candidate is new. */
+export const New: Story = {
+  args: { candidate: { ...sousek, isNew: true } },
+}
+
+/** Pink dot next to the name: the line manager has just rated the candidate. */
+export const NewlyOpalcovani: Story = {
+  args: { candidate: { ...karl, isNewlyOpalcovani: true } },
+}
+
 export const WithTags: Story = {
   args: { candidate: prijmeni },
 }

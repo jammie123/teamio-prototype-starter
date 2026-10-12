@@ -33,6 +33,15 @@ const ACTIVE_INDICATOR_CLASS = [
  */
 const OPTICALLY_LARGE_ICONS = new Set(['ban', 'circle-check', 'message-square'])
 
+/**
+ * Only these tabs can show the pink "new" pill, like the Job Card stats strip: new candidates on
+ * "Neposouzení" and newly opalcovaní on "Opalcovaný". Values for other tabs are ignored.
+ */
+const NEW_PILL_LABELS: Partial<Record<string, (count: string) => string>> = {
+  unassessed: CANDIDATE_COPY.pipeline.newCandidatesBadgeLabel,
+  opalcovani: CANDIDATE_COPY.pipeline.newOpalcovaniBadgeLabel,
+}
+
 /** Stroke weight of the outline icons, closer to the thin lines of the custom icons. */
 const ICON_STROKE_WIDTH = 1.75
 
@@ -47,6 +56,8 @@ export type JobsPipelineV2Props = Pick<
  * underline, and takes the same data props as `JobsPipeline`. "Celkem" is the tab that is active
  * while no status filter is set. `statusOptions` defaults to `CANDIDATE_PIPELINE_V2_STATUSES`
  * (the hiring stages, then "Zamítnutý" and "Celkem"); an option's `icon` (tinted by `iconColor`) is rendered before its count.
+ * `newCounts` adds a pink pill next to the count, but only on the "Neposouzení" (`unassessed`) and
+ * "Opalcovaný" (`opalcovani`) tabs.
  */
 export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
   function JobsPipelineV2(
@@ -74,7 +85,8 @@ export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
         <TabsList aria-label={ariaLabel} className="!tm-gap-0 !tm-mx-0 !tm-items-stretch">
           {statusOptions.map((option) => {
             const newCount = newCounts?.[option.id]
-            const hasNew = typeof newCount === 'number' && newCount > 0
+            const newBadgeLabel = NEW_PILL_LABELS[option.id]
+            const hasNew = newBadgeLabel !== undefined && typeof newCount === 'number' && newCount > 0
             const testId = `jobs-pipeline-status-${option.id}`
 
             return (
@@ -116,7 +128,7 @@ export const JobsPipelineV2 = forwardRef<HTMLDivElement, JobsPipelineV2Props>(
                     <Pill
                       color="pink"
                       data-testid={`${testId}-new`}
-                      aria-label={CANDIDATE_COPY.pipeline.newBadgeLabel(formatCount(newCount))}
+                      aria-label={newBadgeLabel(formatCount(newCount))}
                       className="tm-h-5 tm-min-w-5 tm-px-1.5 tm-text-xs tm-font-semibold"
                     >
                       {formatCount(newCount)}

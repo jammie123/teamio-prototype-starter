@@ -77,6 +77,10 @@ export interface CandidateItemData {
   /** AI score; undefined renders an empty value. */
   aiScore?: string | number
   statusId: string
+  /** New candidate; shows a pink dot next to the name. */
+  isNew?: boolean
+  /** The line manager has just rated the candidate ("nově opalcovaný"); shows the same pink dot. */
+  isNewlyOpalcovani?: boolean
   /** Last contact date; undefined means the candidate has not been contacted yet. */
   lastContact?: string
   source?: CandidateSource

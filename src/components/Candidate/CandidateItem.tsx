@@ -124,6 +124,11 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
     const { name, phone, rating, attachmentsCount, aiScore, source } = candidate
     const hasAiScore = aiScore !== undefined && aiScore !== null && aiScore !== ''
     const hasSelectColumn = Boolean(onSelectChange || onAction)
+    const newIndicatorLabel = candidate.isNew
+      ? CANDIDATE_COPY.newCandidateLabel
+      : candidate.isNewlyOpalcovani
+        ? CANDIDATE_COPY.newlyOpalcovaniLabel
+        : undefined
 
     const cells: Record<CandidateColumnId, ReactNode> = {
       name: (
@@ -135,23 +140,33 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             'tm-z-10',
           )}
         >
-          {onNameClick ? (
-            <button
-              type="button"
-              data-testid="candidate-name"
-              onClick={() => onNameClick(candidate)}
-              className="tm-cursor-pointer tm-border-0 tm-bg-transparent tm-p-0 tm-text-left tm-font-poppins tm-text-base tm-font-semibold tm-text-action-link-default hover:tm-text-action-link-hover focus-visible:tm-ring focus-visible:tm-outline-none"
-            >
-              {name}
-            </button>
-          ) : (
-            <span
-              data-testid="candidate-name"
-              className="tm-text-base tm-font-semibold tm-text-action-link-default"
-            >
-              {name}
-            </span>
-          )}
+          <div className="tm-flex tm-items-center tm-gap-1.5">
+            {onNameClick ? (
+              <button
+                type="button"
+                data-testid="candidate-name"
+                onClick={() => onNameClick(candidate)}
+                className="tm-cursor-pointer tm-border-0 tm-bg-transparent tm-p-0 tm-text-left tm-font-poppins tm-text-base tm-font-semibold tm-text-action-link-default hover:tm-text-action-link-hover focus-visible:tm-ring focus-visible:tm-outline-none"
+              >
+                {name}
+              </button>
+            ) : (
+              <span
+                data-testid="candidate-name"
+                className="tm-text-base tm-font-semibold tm-text-action-link-default"
+              >
+                {name}
+              </span>
+            )}
+            {newIndicatorLabel ? (
+              <span
+                role="img"
+                data-testid="candidate-new-indicator"
+                aria-label={newIndicatorLabel}
+                className="tm-size-2 tm-shrink-0 tm-rounded-full tm-bg-teamio-pink"
+              />
+            ) : null}
+          </div>
           <div
             data-testid="candidate-phone"
             className={cn(

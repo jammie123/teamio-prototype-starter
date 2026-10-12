@@ -53,6 +53,43 @@ describe('CandidateItem', () => {
     expect(screen.getByTestId('note-text')).toHaveTextContent('Dlouhá poznámka')
   })
 
+  it('shows no new indicator by default', () => {
+    renderItem()
+
+    expect(screen.queryByTestId('candidate-new-indicator')).not.toBeInTheDocument()
+  })
+
+  it('shows a pink dot next to the name of a new candidate', () => {
+    renderItem({ candidate: { ...candidate, isNew: true } })
+
+    const dot = screen.getByTestId('candidate-new-indicator')
+    expect(dot).toHaveAccessibleName('Nový uchazeč')
+    expect(dot).toHaveClass('tm-rounded-full', 'tm-bg-teamio-pink')
+    expect(screen.getByTestId('candidate-name').parentElement).toContainElement(dot)
+  })
+
+  it('shows the pink dot for a newly opalcovaný candidate', () => {
+    renderItem({ candidate: { ...candidate, isNewlyOpalcovani: true } })
+
+    expect(screen.getByTestId('candidate-new-indicator')).toHaveAccessibleName('Nově opalcovaný')
+  })
+
+  it('prefers the new label when both flags are set and renders a single dot', () => {
+    renderItem({ candidate: { ...candidate, isNew: true, isNewlyOpalcovani: true } })
+
+    expect(screen.getAllByTestId('candidate-new-indicator')).toHaveLength(1)
+    expect(screen.getByTestId('candidate-new-indicator')).toHaveAccessibleName('Nový uchazeč')
+  })
+
+  it('keeps the name clickable next to the dot', async () => {
+    const onNameClick = vi.fn()
+    renderItem({ candidate: { ...candidate, isNew: true }, onNameClick })
+
+    await userEvent.click(screen.getByTestId('candidate-name'))
+
+    expect(onNameClick).toHaveBeenCalledWith(expect.objectContaining({ id: 'karl' }))
+  })
+
   it('fills the number of stars equal to the rating', () => {
     renderItem()
 

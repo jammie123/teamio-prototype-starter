@@ -119,9 +119,33 @@ describe('JobsPipelineV2', () => {
 
     expect(screen.getByTestId('jobs-pipeline-status-unassessed-new')).toHaveTextContent('14')
     expect(screen.getByTestId('jobs-pipeline-status-unassessed-new')).toHaveAccessibleName(
-      'Noví uchazeči: 14',
+      'Noví kandidáti: 14',
     )
     expect(screen.queryByTestId('jobs-pipeline-status-preselected-new')).not.toBeInTheDocument()
+  })
+
+  it('shows the newly opalcovaní pill on the Opalcovaný tab', () => {
+    render(<JobsPipelineV2 {...baseProps} newCounts={{ opalcovani: 3 }} />)
+
+    expect(screen.getByTestId('jobs-pipeline-status-opalcovani-new')).toHaveTextContent('3')
+    expect(screen.getByTestId('jobs-pipeline-status-opalcovani-new')).toHaveAccessibleName(
+      'Nově opalcovaní: 3',
+    )
+  })
+
+  it('shows the pill only on the Neposouzení and Opalcovaný tabs', () => {
+    render(
+      <JobsPipelineV2
+        {...baseProps}
+        newCounts={{ unassessed: 1, preselected: 5, opalcovani: 2, invited: 4, hired: 3, rejected: 6 }}
+      />,
+    )
+
+    expect(screen.getByTestId('jobs-pipeline-status-unassessed-new')).toBeInTheDocument()
+    expect(screen.getByTestId('jobs-pipeline-status-opalcovani-new')).toBeInTheDocument()
+    for (const id of ['preselected', 'invited', 'hired', 'rejected', 'total']) {
+      expect(screen.queryByTestId(`jobs-pipeline-status-${id}-new`)).not.toBeInTheDocument()
+    }
   })
 
   it('selects Celkem while no status is set and the status tab otherwise', () => {

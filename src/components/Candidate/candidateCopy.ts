@@ -25,9 +25,13 @@ export const CANDIDATE_COPY = {
   removeTag: (label: string) => `Odebrat štítek ${label}`,
   addNote: 'Přidat poznámku',
   expandNote: 'Zobrazit celou poznámku',
+  newCandidateLabel: 'Nový uchazeč',
+  newlyOpalcovaniLabel: 'Nově opalcovaný',
   pipeline: {
     label: 'Filtr uchazečů',
     newBadgeLabel: (count: string) => `Noví uchazeči: ${count}`,
+    newCandidatesBadgeLabel: (count: string) => `Noví kandidáti: ${count}`,
+    newOpalcovaniBadgeLabel: (count: string) => `Nově opalcovaní: ${count}`,
   },
   panel: {
     searchPlaceholder: 'Hledat uchazeče…',

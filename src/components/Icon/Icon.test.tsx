@@ -58,7 +58,14 @@ describe('Icon', () => {
     expect(wrapper.querySelector('svg')).toHaveClass('tm-fill-current')
   })
 
-  it.each(['ban', 'circle-check', 'message-square', 'sliders-horizontal'])(
+  it.each([
+    'ban',
+    'circle-check',
+    'message-square',
+    'sliders-horizontal',
+    'columns-3',
+    'grip-vertical',
+  ])(
     'resolves %s as a known lucide icon',
     (name) => {
       render(<Icon name={name} />)

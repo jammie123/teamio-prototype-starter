@@ -43,6 +43,8 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   'circle-check': 'Přijato',
   'message-square': 'Zpráva',
   'sliders-horizontal': 'Filtry',
+  'columns-3': 'Sloupce',
+  'grip-vertical': 'Přetažení',
   opal: 'Opalcování',
   'single-man-time': 'Neposouzený uchazeč',
   'candidate-move': 'Předvybraný uchazeč',

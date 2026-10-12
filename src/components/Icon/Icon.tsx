@@ -17,12 +17,14 @@ import {
   CircleCheck,
   CircleHelp,
   CirclePlus,
+  Columns3,
   Database,
   Download,
   EllipsisVertical,
   ExternalLink,
   Eye,
   FileText,
+  GripVertical,
   Home,
   Info,
   Mail,
@@ -90,6 +92,8 @@ const iconMap = {
   'circle-check': CircleCheck,
   'message-square': MessageSquare,
   'sliders-horizontal': SlidersHorizontal,
+  'columns-3': Columns3,
+  'grip-vertical': GripVertical,
 } as const satisfies Record<string, LucideIcon>
 
 const customIconMap = {

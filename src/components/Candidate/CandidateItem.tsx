@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, Fragment, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
@@ -12,17 +12,26 @@ import {
   candidateNoteColumnClass,
   candidateValueTextClass,
 } from './candidateCellClass'
+import { getVisibleColumnIds } from './candidateColumns'
 import { CANDIDATE_COPY, CANDIDATE_DEFAULT_STATUSES } from './candidateCopy'
 import { CandidateNote } from './CandidateNote'
 import { CandidateStatus } from './CandidateStatus'
 import { CandidateTags } from './CandidateTags'
-import type { CandidateItemData, CandidateStatusOption, CandidateTagData } from './types'
+import type {
+  CandidateColumnId,
+  CandidateColumnState,
+  CandidateItemData,
+  CandidateStatusOption,
+  CandidateTagData,
+} from './types'
 
 export interface CandidateItemProps
   extends StyleProps,
     Omit<HTMLAttributes<HTMLTableRowElement>, 'color' | 'children'> {
   candidate: CandidateItemData
   statusOptions?: CandidateStatusOption[]
+  /** Column order and visibility; defaults to every column in the standard order. */
+  columns?: CandidateColumnState[]
   onNameClick?: (candidate: CandidateItemData) => void
   onAttachmentsClick?: (candidate: CandidateItemData) => void
   onStatusChange?: (candidate: CandidateItemData, statusId: string) => void
@@ -80,6 +89,7 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
     {
       candidate,
       statusOptions = CANDIDATE_DEFAULT_STATUSES,
+      columns,
       onNameClick,
       onAttachmentsClick,
       onStatusChange,
@@ -95,13 +105,8 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
     const { name, phone, rating, attachmentsCount, aiScore, source } = candidate
     const hasAiScore = aiScore !== undefined && aiScore !== null && aiScore !== ''
 
-    return (
-      <TableRow
-        ref={ref}
-        data-testid="candidate-item"
-        className={cn('tm-group/row', 'tm-h-16', className)}
-        {...rest}
-      >
+    const cells: Record<CandidateColumnId, ReactNode> = {
+      name: (
         <TableCell
           data-testid="candidate-cell-name"
           className={cn(cellClass, candidateNameColumnClass, 'tm-z-10')}
@@ -138,11 +143,15 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             {phone ?? CANDIDATE_COPY.addPhone}
           </div>
         </TableCell>
+      ),
 
+      rating: (
         <TableCell data-testid="candidate-cell-rating" className={cn(cellClass, 'tm-whitespace-nowrap')}>
           <Stars value={rating?.value ?? 0} count={rating?.count} />
         </TableCell>
+      ),
 
+      attachments: (
         <TableCell data-testid="candidate-cell-attachments" className={cellClass}>
           <Button
             variant="tertiary"
@@ -156,7 +165,9 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             {attachmentsCount ?? 0}
           </Button>
         </TableCell>
+      ),
 
+      ai: (
         <TableCell data-testid="candidate-cell-ai" className={cellClass}>
           {hasAiScore ? (
             <span
@@ -173,7 +184,9 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             </span>
           )}
         </TableCell>
+      ),
 
+      status: (
         <TableCell data-testid="candidate-cell-status" className={cellClass}>
           <CandidateStatus
             value={candidate.statusId}
@@ -181,7 +194,9 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             onChange={(statusId) => onStatusChange?.(candidate, statusId)}
           />
         </TableCell>
+      ),
 
+      lastContact: (
         <TableCell
           data-testid="candidate-cell-last-contact"
           className={cn(cellClass, 'tm-whitespace-nowrap')}
@@ -194,7 +209,9 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             <span className={candidateEmptyTextClass}>{CANDIDATE_COPY.notContacted}</span>
           )}
         </TableCell>
+      ),
 
+      source: (
         <TableCell data-testid="candidate-cell-source" className={cellClass}>
           {source ? (
             <>
@@ -209,7 +226,9 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             <span className={candidateEmptyTextClass}>{CANDIDATE_COPY.emptyValue}</span>
           )}
         </TableCell>
+      ),
 
+      tags: (
         <TableCell data-testid="candidate-cell-tags" className={cn(cellClass, 'tm-min-w-[14rem]')}>
           <CandidateTags
             tags={candidate.tags}
@@ -218,7 +237,9 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             onRemove={onTagRemove ? (tag) => onTagRemove(candidate, tag) : undefined}
           />
         </TableCell>
+      ),
 
+      note: (
         <TableCell
           data-testid="candidate-cell-note"
           className={cn(cellClass, candidateNoteColumnClass, 'tm-z-10')}
@@ -230,6 +251,19 @@ export const CandidateItem = forwardRef<HTMLTableRowElement, CandidateItemProps>
             onExpand={() => onNoteExpand?.(candidate)}
           />
         </TableCell>
+      ),
+    }
+
+    return (
+      <TableRow
+        ref={ref}
+        data-testid="candidate-item"
+        className={cn('tm-group/row', 'tm-h-16', className)}
+        {...rest}
+      >
+        {getVisibleColumnIds(columns).map((id) => (
+          <Fragment key={id}>{cells[id]}</Fragment>
+        ))}
       </TableRow>
     )
   },

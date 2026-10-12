@@ -1,4 +1,6 @@
 import { useMemo, useState, type ComponentType } from 'react'
+import { CandidateColumnsDrawer } from './CandidateColumnsDrawer'
+import { CANDIDATE_DEFAULT_COLUMNS } from './candidateCopy'
 import { CandidateListPanel } from './CandidateListPanel'
 import { CandidateTable } from './CandidateTable'
 import { sampleCandidates } from './fixtures'
@@ -55,6 +57,8 @@ export function PipelineWithTable({ Pipeline }: { Pipeline: ComponentType<JobsPi
 export function PanelWithTable() {
   const [status, setStatus] = useState<string | undefined>()
   const [search, setSearch] = useState('')
+  const [columns, setColumns] = useState(CANDIDATE_DEFAULT_COLUMNS)
+  const [columnsOpen, setColumnsOpen] = useState(false)
   const counts = useStoryCounts()
 
   const query = search.trim().toLowerCase()
@@ -64,15 +68,28 @@ export function PanelWithTable() {
   )
 
   return (
-    <CandidateListPanel
-      statusCounts={counts}
-      newCounts={{ unassessed: 1 }}
-      statusValue={status}
-      onStatusChange={setStatus}
-      searchValue={search}
-      onSearchChange={setSearch}
-    >
-      <CandidateTable candidates={visible} emptyMessage="Filtru neodpovídá žádný uchazeč" />
-    </CandidateListPanel>
+    <>
+      <CandidateListPanel
+        statusCounts={counts}
+        newCounts={{ unassessed: 1 }}
+        statusValue={status}
+        onStatusChange={setStatus}
+        searchValue={search}
+        onSearchChange={setSearch}
+        onColumnsClick={() => setColumnsOpen(true)}
+      >
+        <CandidateTable
+          candidates={visible}
+          columns={columns}
+          emptyMessage="Filtru neodpovídá žádný uchazeč"
+        />
+      </CandidateListPanel>
+      <CandidateColumnsDrawer
+        open={columnsOpen}
+        onOpenChange={setColumnsOpen}
+        columns={columns}
+        onApply={setColumns}
+      />
+    </>
   )
 }

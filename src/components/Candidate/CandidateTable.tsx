@@ -3,13 +3,12 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Table, TableBody, TableCell, TableRow } from '../Table'
 import { candidateEmptyTextClass } from './candidateCellClass'
+import { getVisibleColumnIds } from './candidateColumns'
 import { CANDIDATE_COPY, CANDIDATE_DEFAULT_STATUSES } from './candidateCopy'
 import { CandidateItem, type CandidateItemProps } from './CandidateItem'
 import { CandidateTableHead } from './CandidateTableHead'
-import type { CandidateItemData } from './types'
+import type { CandidateColumnState, CandidateItemData } from './types'
 import { useScrollEdges } from './useScrollEdges'
-
-const COLUMN_COUNT = Object.keys(CANDIDATE_COPY.columns).length
 
 type RowCallbacks = Pick<
   CandidateItemProps,
@@ -25,6 +24,8 @@ type RowCallbacks = Pick<
 
 export interface CandidateTableProps extends StyleProps, RowCallbacks {
   candidates: CandidateItemData[]
+  /** Column order and visibility; defaults to every column in the standard order. */
+  columns?: CandidateColumnState[]
   /** Content shown when `candidates` is empty. */
   emptyMessage?: ReactNode
   'aria-label'?: string
@@ -40,6 +41,7 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
   function CandidateTable(
     {
       candidates,
+      columns,
       statusOptions = CANDIDATE_DEFAULT_STATUSES,
       emptyMessage = CANDIDATE_COPY.emptyTable,
       className,
@@ -49,6 +51,7 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
     ref,
   ) {
     const { ref: scrollRef, state: scroll } = useScrollEdges<HTMLTableElement>()
+    const columnCount = getVisibleColumnIds(columns).length
     const setRef = useCallback(
       (node: HTMLTableElement | null) => {
         scrollRef(node)
@@ -74,12 +77,12 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
         )}
       >
         <Table ref={setRef} aria-label={ariaLabel} className="tm-min-w-[1250px]">
-          <CandidateTableHead />
+          <CandidateTableHead columns={columns} />
           <TableBody>
             {candidates.length === 0 ? (
               <TableRow data-testid="candidate-table-empty">
                 <TableCell
-                  colSpan={COLUMN_COUNT}
+                  colSpan={columnCount}
                   className={cn('!tm-py-10', 'tm-text-center', candidateEmptyTextClass)}
                 >
                   {emptyMessage}
@@ -90,6 +93,7 @@ export const CandidateTable = forwardRef<HTMLTableElement, CandidateTableProps>(
                 <CandidateItem
                   key={candidate.id}
                   candidate={candidate}
+                  columns={columns}
                   statusOptions={statusOptions}
                   {...rowCallbacks}
                 />

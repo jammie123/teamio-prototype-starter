@@ -38,6 +38,23 @@ export interface CandidateRating {
   count?: number
 }
 
+export type CandidateColumnId =
+  | 'name'
+  | 'rating'
+  | 'attachments'
+  | 'ai'
+  | 'status'
+  | 'lastContact'
+  | 'source'
+  | 'tags'
+  | 'note'
+
+/** One entry of the table column configuration; the array order is the display order. */
+export interface CandidateColumnState {
+  id: CandidateColumnId
+  visible: boolean
+}
+
 export interface CandidateItemData {
   id: string
   name: string

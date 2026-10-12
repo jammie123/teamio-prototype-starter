@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { CandidateTable } from './CandidateTable'
 import { sampleCandidates } from './fixtures'
+import type { CandidateColumnState } from './types'
 
 describe('CandidateTable', () => {
   it('renders the header and one row per candidate', () => {
@@ -31,6 +32,62 @@ describe('CandidateTable', () => {
     const empty = screen.getByTestId('candidate-table-empty')
     expect(within(empty).getByRole('cell')).toHaveAttribute('colspan', '9')
     expect(empty).toHaveTextContent('Žádní uchazeči')
+  })
+
+  describe('columns', () => {
+    const columns: CandidateColumnState[] = [
+      { id: 'name', visible: true },
+      { id: 'status', visible: true },
+      { id: 'source', visible: true },
+      { id: 'rating', visible: false },
+      { id: 'attachments', visible: false },
+      { id: 'ai', visible: false },
+      { id: 'lastContact', visible: false },
+      { id: 'tags', visible: false },
+      { id: 'note', visible: true },
+    ]
+
+    it('renders only visible columns in the configured order', () => {
+      render(<CandidateTable candidates={sampleCandidates.slice(0, 1)} columns={columns} />)
+
+      expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+        'Uchazeč',
+        'Stav',
+        'Zdroj',
+        'Poznámka',
+      ])
+      expect(screen.queryByTestId('candidate-cell-rating')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('candidate-cell-tags')).not.toBeInTheDocument()
+      expect(within(screen.getByTestId('candidate-item')).getAllByRole('cell')).toHaveLength(4)
+    })
+
+    it('keeps the name column first and the note column last', () => {
+      render(
+        <CandidateTable
+          candidates={sampleCandidates.slice(0, 1)}
+          columns={[
+            { id: 'note', visible: false },
+            { id: 'tags', visible: true },
+            { id: 'name', visible: false },
+          ]}
+        />,
+      )
+
+      expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+        'Uchazeč',
+        'Štítky',
+        'Poznámka',
+      ])
+    })
+
+    it('spans the empty state over the visible columns', () => {
+      render(<CandidateTable candidates={[]} columns={columns} />)
+
+      expect(within(screen.getByTestId('candidate-table-empty')).getByRole('cell')).toHaveAttribute(
+        'colspan',
+        '4',
+      )
+    })
   })
 
   it('renders a custom empty message and aria-label', () => {

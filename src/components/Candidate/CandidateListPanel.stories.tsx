@@ -36,6 +36,12 @@ export const WithNewBadgeAndActiveFilters: Story = {
   render: Default.render,
 }
 
+/** The secondary "Přizpůsobit sloupce" button next to "Filtry"; shown only when `onColumnsClick` is set. */
+export const WithColumnsButton: Story = {
+  args: { onColumnsClick: fn() },
+  render: Default.render,
+}
+
 export const WithoutTable: Story = {}
 
 /** Pipeline, search and table share one container and filter the same rows. */

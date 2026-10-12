@@ -25,6 +25,8 @@ export interface CandidateListPanelProps
   onFiltersClick?: () => void
   /** Number of active filters, shown in the "Filtry" button label when greater than 0. */
   activeFiltersCount?: number
+  /** Called when the "Přizpůsobit sloupce" button is clicked. The button is shown only when set. */
+  onColumnsClick?: () => void
   /** Content below the toolbar, usually a `CandidateTable`. Its own border is removed. */
   children?: ReactNode
 }
@@ -47,6 +49,7 @@ export const CandidateListPanel = forwardRef<HTMLDivElement, CandidateListPanelP
       searchPlaceholder = CANDIDATE_COPY.panel.searchPlaceholder,
       onFiltersClick,
       activeFiltersCount = 0,
+      onColumnsClick,
       children,
       className,
       ...rest
@@ -114,6 +117,16 @@ export const CandidateListPanel = forwardRef<HTMLDivElement, CandidateListPanelP
               ? CANDIDATE_COPY.panel.filtersWithCount(activeFiltersCount)
               : CANDIDATE_COPY.panel.filters}
           </Button>
+          {onColumnsClick ? (
+            <Button
+              variant="secondary"
+              data-testid="candidate-list-panel-columns"
+              onClick={onColumnsClick}
+            >
+              <Icon name="columns-3" />
+              {CANDIDATE_COPY.panel.columns}
+            </Button>
+          ) : null}
         </div>
         {children ? (
           <div

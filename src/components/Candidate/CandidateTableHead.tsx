@@ -7,32 +7,36 @@ import {
   candidateNameColumnClass,
   candidateNoteColumnClass,
 } from './candidateCellClass'
+import { getVisibleColumnIds } from './candidateColumns'
 import { CANDIDATE_COPY } from './candidateCopy'
+import type { CandidateColumnState } from './types'
 
-export type CandidateTableHeadProps = StyleProps
+export interface CandidateTableHeadProps extends StyleProps {
+  /** Column order and visibility; defaults to every column in the standard order. */
+  columns?: CandidateColumnState[]
+}
 
 /** Header row matching the columns of `CandidateItem`, with the same sticky name and note columns. */
-export function CandidateTableHead({ className }: CandidateTableHeadProps) {
-  const { columns } = CANDIDATE_COPY
+export function CandidateTableHead({ columns, className }: CandidateTableHeadProps) {
+  const labels = CANDIDATE_COPY.columns
   const stickyHeader = 'tm-bg-cover-light tm-z-20'
   const headerClass = cn(candidateHeaderPaddingClass, candidateHeaderTextClass)
 
   return (
     <TableHead className={className}>
       <TableRow>
-        <TableHeader className={cn(headerClass, candidateNameColumnClass, stickyHeader)}>
-          {columns.name}
-        </TableHeader>
-        <TableHeader className={headerClass}>{columns.rating}</TableHeader>
-        <TableHeader className={headerClass}>{columns.attachments}</TableHeader>
-        <TableHeader className={headerClass}>{columns.ai}</TableHeader>
-        <TableHeader className={headerClass}>{columns.status}</TableHeader>
-        <TableHeader className={headerClass}>{columns.lastContact}</TableHeader>
-        <TableHeader className={headerClass}>{columns.source}</TableHeader>
-        <TableHeader className={headerClass}>{columns.tags}</TableHeader>
-        <TableHeader className={cn(headerClass, candidateNoteColumnClass, stickyHeader)}>
-          {columns.note}
-        </TableHeader>
+        {getVisibleColumnIds(columns).map((id) => (
+          <TableHeader
+            key={id}
+            className={cn(
+              headerClass,
+              id === 'name' && [candidateNameColumnClass, stickyHeader],
+              id === 'note' && [candidateNoteColumnClass, stickyHeader],
+            )}
+          >
+            {labels[id]}
+          </TableHeader>
+        ))}
       </TableRow>
     </TableHead>
   )

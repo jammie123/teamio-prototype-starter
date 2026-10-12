@@ -1,4 +1,4 @@
-import type { CandidateStatusOption } from './types'
+import type { CandidateColumnId, CandidateColumnState, CandidateStatusOption } from './types'
 
 export const CANDIDATE_COPY = {
   columns: {
@@ -34,8 +34,40 @@ export const CANDIDATE_COPY = {
     searchLabel: 'Hledat uchazeče',
     filters: 'Filtry',
     filtersWithCount: (count: number) => `Filtry (${count})`,
+    columns: 'Přizpůsobit sloupce',
+  },
+  columnsDrawer: {
+    title: 'Přizpůsobit sloupce',
+    description: 'Vyberte, které sloupce se zobrazí, a přetažením změňte jejich pořadí.',
+    listLabel: 'Sloupce tabulky',
+    close: 'Zavřít panel',
+    save: 'Uložit',
+    cancel: 'Zrušit',
+    reset: 'Obnovit výchozí',
+    lockedHint: 'Tento sloupec nelze skrýt',
+    dragHandle: (label: string) => `Přesunout sloupec ${label}`,
+    moveUp: (label: string) => `Posunout sloupec ${label} nahoru`,
+    moveDown: (label: string) => `Posunout sloupec ${label} dolů`,
+    moved: (label: string, position: number, total: number) =>
+      `Sloupec ${label} je na pozici ${position} z ${total}`,
   },
 } as const
+
+/** Columns that cannot be hidden or moved: the name sticks to the left, the note to the right. */
+export const CANDIDATE_LOCKED_COLUMNS: readonly CandidateColumnId[] = ['name', 'note']
+
+/** Current column order with every column visible. */
+export const CANDIDATE_DEFAULT_COLUMNS: CandidateColumnState[] = [
+  { id: 'name', visible: true },
+  { id: 'rating', visible: true },
+  { id: 'attachments', visible: true },
+  { id: 'ai', visible: true },
+  { id: 'status', visible: true },
+  { id: 'lastContact', visible: true },
+  { id: 'source', visible: true },
+  { id: 'tags', visible: true },
+  { id: 'note', visible: true },
+]
 
 export const CANDIDATE_DEFAULT_STATUSES: CandidateStatusOption[] = [
   { id: 'unassessed', label: 'Neposouzeni', color: 'neutral' },

@@ -30,6 +30,23 @@ export const StickyColumns: Story = {
   render: (args) => <CandidateTable {...args} className="tm-max-w-[900px]" />,
 }
 
+/** Hidden and reordered columns; the name and note columns stay pinned at the edges. */
+export const CustomColumns: Story = {
+  args: {
+    columns: [
+      { id: 'name', visible: true },
+      { id: 'status', visible: true },
+      { id: 'source', visible: true },
+      { id: 'rating', visible: true },
+      { id: 'attachments', visible: false },
+      { id: 'ai', visible: false },
+      { id: 'lastContact', visible: false },
+      { id: 'tags', visible: false },
+      { id: 'note', visible: true },
+    ],
+  },
+}
+
 export const Empty: Story = {
   args: { candidates: [] },
 }

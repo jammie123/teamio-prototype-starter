@@ -82,6 +82,21 @@ describe('CandidateListPanel', () => {
     expect(onFiltersClick).toHaveBeenCalledTimes(1)
   })
 
+  it('shows the columns button next to Filtry only when onColumnsClick is set', async () => {
+    const user = userEvent.setup()
+    const onColumnsClick = vi.fn()
+    const { rerender } = render(<CandidateListPanel {...baseProps} />)
+    expect(screen.queryByTestId('candidate-list-panel-columns')).not.toBeInTheDocument()
+
+    rerender(<CandidateListPanel {...baseProps} onColumnsClick={onColumnsClick} />)
+    const filters = screen.getByTestId('candidate-list-panel-filters')
+    const columns = screen.getByRole('button', { name: 'Přizpůsobit sloupce' })
+    expect(filters.nextElementSibling).toBe(columns)
+
+    await user.click(columns)
+    expect(onColumnsClick).toHaveBeenCalledTimes(1)
+  })
+
   it('shows the number of active filters in the button', () => {
     render(<CandidateListPanel {...baseProps} activeFiltersCount={2} />)
 

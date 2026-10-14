@@ -261,6 +261,11 @@ export {
   type CandidateTagData,
 } from './Candidate'
 export {
+  JobResponseRateBadge,
+  type JobResponseRateBadgeProps,
+  type JobResponseRateStatus,
+} from './JobResponseRateBadge'
+export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,
   type JobsFilterEmploymentType,

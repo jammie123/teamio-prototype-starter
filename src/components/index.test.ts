@@ -117,6 +117,7 @@ describe('components barrel', () => {
     expect(components.JobMenu).toBeTypeOf('function')
     expect(components.JobPageHeader).toBeTypeOf('object')
     expect(components.JobResponseRateBadge).toBeTypeOf('function')
+    expect(components.JobResponseRateBadgeV2).toBeTypeOf('function')
     expect(components.JobPublicationPlaceCard).toBeTypeOf('function')
     expect(components.JobAdvertisementChoiceCard).toBeTypeOf('function')
     expect(components.JobModalFrame).toBeTypeOf('function')

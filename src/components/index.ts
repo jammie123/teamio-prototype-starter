@@ -265,6 +265,7 @@ export {
   type JobResponseRateBadgeProps,
   type JobResponseRateStatus,
 } from './JobResponseRateBadge'
+export { JobResponseRateBadgeV2, type JobResponseRateBadgeV2Props } from './JobResponseRateBadgeV2'
 export {
   JobsFilter,
   type JobsFilterAdvertisementStatus,

@@ -4,8 +4,8 @@ import { JobResponseRateBadge } from './JobResponseRateBadge'
 import type { JobResponseRateStatus } from './jobResponseRateCopy'
 
 const meta = {
-  id: 'jobs-jobresponseratebadge',
-  title: 'Jobs/JobResponseRateBadge',
+  id: 'jobs-jobresponseratebadge-v1',
+  title: 'Jobs/JobResponseRateBadge/V1',
   component: JobResponseRateBadge,
   args: {
     status: 'expected',

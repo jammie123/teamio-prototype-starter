@@ -198,3 +198,61 @@ export function getJobResponseRateCopy(
       }
   }
 }
+
+export type JobResponseRateBandId = 'below' | 'expected' | 'above'
+
+export interface JobResponseRateBand {
+  id: JobResponseRateBandId
+  /** Band name, matches the badge label of the same status. */
+  label: string
+  /** Range covered by the band, e.g. "do 2,5 %", "2,5–4,6 %", "od 4,6 %". */
+  rangeLabel: string
+}
+
+/** Smallest and largest share of a band width where the marker may sit, so the callout stays inside. */
+export const BAND_MARKER_MIN = 0.08
+export const BAND_MARKER_MAX = 0.92
+
+/** The three comparison bands, ordered from the lowest to the highest response rate. */
+export function getJobResponseRateBands(typicalMin: number, typicalMax: number): JobResponseRateBand[] {
+  const minLabel = formatPercent(typicalMin)
+  const maxLabel = formatPercent(typicalMax)
+
+  return [
+    { id: 'below', label: 'Pod očekáváním', rangeLabel: `do ${minLabel}` },
+    {
+      id: 'expected',
+      label: 'Podle očekávání',
+      rangeLabel: `${minLabel.replace('\u00a0%', '')}–${maxLabel}`,
+    },
+    { id: 'above', label: 'Nad očekáváním', rangeLabel: `od ${maxLabel}` },
+  ]
+}
+
+/**
+ * Where the marker sits inside its band, as a share of the band width (0–1, clamped).
+ * The open-ended bands reuse the width of the usual range, e.g. "above" ends at max + (max - min).
+ */
+export function getBandMarkerPosition(
+  band: JobResponseRateBandId,
+  rate: number,
+  typicalMin: number,
+  typicalMax: number,
+): number {
+  const span = typicalMax - typicalMin
+  let share: number
+
+  switch (band) {
+    case 'below':
+      share = typicalMin > 0 ? rate / typicalMin : 0.5
+      break
+    case 'expected':
+      share = span > 0 ? (rate - typicalMin) / span : 0.5
+      break
+    case 'above':
+      share = span > 0 ? (rate - typicalMax) / span : 0.5
+      break
+  }
+
+  return Math.min(BAND_MARKER_MAX, Math.max(BAND_MARKER_MIN, share))
+}

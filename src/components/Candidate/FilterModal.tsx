@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, type RefObject } from 'react'
 import { cn } from '../../lib/cn'
 import { validationBorderClass } from '../../lib/validation'
 import { Button } from '../Button'
@@ -62,18 +62,20 @@ function FilterDropdown({
   value,
   options,
   onChange,
+  portalContainerRef,
 }: {
   label: string
   emptyLabel: string
   value: string
   options: CandidateFilterModalOption[]
   onChange: (next: string) => void
+  portalContainerRef: RefObject<HTMLElement | null>
 }) {
   const selectedLabel = value ? findFilterModalOptionLabel(options, value) : undefined
   const selectedOption = options.find((option) => option.value === value)
 
   return (
-    <Dropdown className="tm-block tm-w-full tm-min-w-0">
+    <Dropdown strategy="fixed" className="tm-block tm-w-full tm-min-w-0">
       <DropdownToggle
         variant="custom"
         showIndicator
@@ -106,7 +108,11 @@ function FilterDropdown({
           )}
         </span>
       </DropdownToggle>
-      <DropdownBody className="tm-w-full tm-min-w-full tm-max-w-none">
+      <DropdownBody
+        portalContainerRef={portalContainerRef}
+        overflow="scrollY"
+        className="tm-w-full tm-min-w-full tm-max-w-none"
+      >
         <OptionList aria-label={label}>
           <Option isSelected={!value} onClick={() => onChange('')}>
             {emptyLabel}
@@ -131,9 +137,10 @@ interface FilterModalFormProps {
   value: CandidateFilterModalValue
   onApply: (value: CandidateFilterModalValue) => void
   onOpenChange: (open: boolean) => void
+  portalContainerRef: RefObject<HTMLElement | null>
 }
 
-function FilterModalForm({ value, onApply, onOpenChange }: FilterModalFormProps) {
+function FilterModalForm({ value, onApply, onOpenChange, portalContainerRef }: FilterModalFormProps) {
   const copy = CANDIDATE_COPY.filterModal
   const [draft, setDraft] = useState<CandidateFilterModalValue>(() => ({ ...value }))
 
@@ -144,7 +151,7 @@ function FilterModalForm({ value, onApply, onOpenChange }: FilterModalFormProps)
   return (
     <>
       <ModalBody
-        className="tm-grid tm-grid-cols-[auto_minmax(0,1fr)] tm-items-center tm-gap-x-8 tm-gap-y-4 tm-pb-6"
+        className="!tm-overflow-visible tm-grid tm-grid-cols-[auto_minmax(0,1fr)] tm-items-center tm-gap-x-8 tm-gap-y-4 tm-pb-6"
         data-testid="candidate-filter-modal-body"
       >
         {CANDIDATE_FILTER_MODAL_FIELDS.map((field) => (
@@ -156,6 +163,7 @@ function FilterModalForm({ value, onApply, onOpenChange }: FilterModalFormProps)
               value={draft[field.key]}
               options={field.options}
               onChange={(next) => patch(field.key, next)}
+              portalContainerRef={portalContainerRef}
             />
           </div>
         ))}
@@ -188,18 +196,25 @@ function FilterModalForm({ value, onApply, onOpenChange }: FilterModalFormProps)
 
 export function FilterModal({ open, onOpenChange, value, onApply }: FilterModalProps) {
   const copy = CANDIDATE_COPY.filterModal
+  const contentRef = useRef<HTMLDivElement>(null)
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent
+        ref={contentRef}
         data-testid="candidate-filter-modal"
-        className="tm-max-w-[480px]"
+        className="!tm-overflow-visible tm-max-w-[480px]"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
         <ModalTitle>{copy.title}</ModalTitle>
         <ModalClose aria-label={copy.close} />
         {open ? (
-          <FilterModalForm value={value} onApply={onApply} onOpenChange={onOpenChange} />
+          <FilterModalForm
+            value={value}
+            onApply={onApply}
+            onOpenChange={onOpenChange}
+            portalContainerRef={contentRef}
+          />
         ) : null}
       </ModalContent>
     </Modal>

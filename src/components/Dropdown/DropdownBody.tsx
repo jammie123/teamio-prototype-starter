@@ -1,5 +1,6 @@
 import { FloatingFocusManager, FloatingList } from '@floating-ui/react'
-import { useContext, type HTMLAttributes } from 'react'
+import { useContext, type HTMLAttributes, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '../../lib/cn'
 import type { ChildrenProps, StyleProps } from '../../lib/types'
 import { DropdownContext } from './DropdownContext'
@@ -9,12 +10,15 @@ export interface DropdownBodyProps
     ChildrenProps,
     Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   overflow?: 'scrollY' | 'visible'
+  /** Render the panel into this element (e.g. modal content) to escape `overflow: hidden` without leaving the dialog focus/pointer stack. */
+  portalContainerRef?: RefObject<HTMLElement | null>
   /** Skip moving focus into the panel. Use for hover cards so inner tooltips do not open. */
   initialFocus?: -1 | 0
 }
 
 export function DropdownBody({
   overflow,
+  portalContainerRef,
   initialFocus,
   children,
   className,
@@ -27,7 +31,7 @@ export function DropdownBody({
     return null
   }
 
-  return (
+  const panel = (
     <FloatingFocusManager
       context={context}
       modal={false}
@@ -40,7 +44,7 @@ export function DropdownBody({
         className={cn(
           'tm-absolute',
           'tm-top-full',
-          'tm-z-50',
+          portalContainerRef ? 'tm-z-[60]' : 'tm-z-50',
           'tm-w-max',
           'tm-min-w-[5rem]',
           'tm-max-w-[20rem]',
@@ -78,6 +82,9 @@ export function DropdownBody({
       </div>
     </FloatingFocusManager>
   )
+
+  const portalContainer = portalContainerRef?.current
+  return portalContainer ? createPortal(panel, portalContainer) : panel
 }
 
 DropdownBody.displayName = 'DropdownBody'

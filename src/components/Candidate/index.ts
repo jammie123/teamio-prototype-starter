@@ -7,6 +7,14 @@ export { JobsPipeline, type JobsPipelineProps } from './JobsPipeline'
 export { JobsPipelineV2, type JobsPipelineV2Props } from './JobsPipelineV2'
 export { CandidateListPanel, type CandidateListPanelProps } from './CandidateListPanel'
 export { CandidateColumnsDrawer, type CandidateColumnsDrawerProps } from './CandidateColumnsDrawer'
+export {
+  FilterModal,
+  EMPTY_CANDIDATE_FILTER_VALUE,
+  countActiveCandidateFilters,
+  CANDIDATE_FILTER_MODAL_FIELDS,
+  type FilterModalProps,
+  type CandidateFilterModalValue,
+} from './FilterModal'
 export { CandidateStatus, type CandidateStatusProps } from './CandidateStatus'
 export { CandidateTags, type CandidateTagsProps } from './CandidateTags'
 export { CandidateNote, type CandidateNoteProps } from './CandidateNote'

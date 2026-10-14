@@ -25,6 +25,7 @@ import {
   Eye,
   FileText,
   GripVertical,
+  Hourglass,
   Home,
   Info,
   Mail,
@@ -48,7 +49,14 @@ import {
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { CandidateMoveIcon, OpalIcon, SingleManTimeIcon } from './customIcons'
+import {
+  CandidateMoveIcon,
+  OpalIcon,
+  SingleManTimeIcon,
+  StopReasonIcon,
+  ThumbDownIcon,
+  ThumbUpIcon,
+} from './customIcons'
 
 const iconMap = {
   plus: Plus,
@@ -94,12 +102,16 @@ const iconMap = {
   'sliders-horizontal': SlidersHorizontal,
   'columns-3': Columns3,
   'grip-vertical': GripVertical,
+  hourglass: Hourglass,
 } as const satisfies Record<string, LucideIcon>
 
 const customIconMap = {
   opal: OpalIcon,
   'single-man-time': SingleManTimeIcon,
   'candidate-move': CandidateMoveIcon,
+  'thumb-up': ThumbUpIcon,
+  'thumb-down': ThumbDownIcon,
+  'stop-reason': StopReasonIcon,
 } as const satisfies Record<string, LucideIcon>
 
 export type KnownIconName = keyof typeof iconMap | keyof typeof customIconMap

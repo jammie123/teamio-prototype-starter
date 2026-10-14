@@ -69,6 +69,13 @@ export const CANDIDATE_COPY = {
     sendMessage: 'Napsat zprávu',
     clear: 'Zrušit výběr',
   },
+  filterModal: {
+    title: 'Filtry uchazečů',
+    close: 'Zavřít dialog',
+    apply: 'Potvrdit',
+    cancel: 'Zrušit',
+    reset: 'Obnovit výchozí',
+  },
   columnsDrawer: {
     title: 'Přizpůsobit sloupce',
     description: 'Vyberte, které sloupce se zobrazí, a přetažením změňte jejich pořadí.',

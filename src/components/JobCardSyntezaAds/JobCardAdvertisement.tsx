@@ -35,8 +35,10 @@ import {
   type PublicationPeriodBadge,
 } from './advertisementSummaryAds'
 import { JobCardPlacesSummaryTable, shouldShowPlacesProlong } from './JobCardPlacesSummaryTable'
+import type { Placement } from '@floating-ui/react'
 import {
   JobCardPublicationPortal,
+  type JobCardPublicationChannelDecoration,
   type JobCardPublicationHover,
 } from './JobCardPublicationPortal'
 
@@ -51,6 +53,8 @@ export interface JobCardAdvertisementProps extends StyleProps {
   showPreviewLink?: boolean
   periodPresentation?: 'tag' | 'text'
   publicationHover?: JobCardPublicationHover
+  publicationChannelDecoration?: JobCardPublicationChannelDecoration
+  publicationDropdownPlacement?: Placement
 }
 
 function sharedFieldDateLabel(
@@ -93,6 +97,7 @@ function AdvertisementMeta({
   publicationHover = 'portalDetail',
   showProlong = false,
   onExtendAll,
+  linkDecoration = 'dotted-underline',
 }: {
   publications: JobPublication[]
   viewCount?: number
@@ -102,6 +107,7 @@ function AdvertisementMeta({
   publicationHover?: JobCardPublicationHover
   showProlong?: boolean
   onExtendAll?: () => void
+  linkDecoration?: JobCardPublicationChannelDecoration
 }) {
   const [open, setOpen] = useState(false)
 
@@ -112,7 +118,11 @@ function AdvertisementMeta({
   const viewsLabel = (
     <span
       data-testid="job-card-advertisement-aggregate-views"
-      className="tm-border-0 tm-border-b tm-border-dotted tm-border-secondary"
+      className={cn(
+        'tm-border-0',
+        linkDecoration === 'dotted-underline' &&
+          'tm-border-b tm-border-dotted tm-border-secondary',
+      )}
     >
       {formatViewCountLabel(viewCount)}
     </span>
@@ -255,6 +265,8 @@ interface PublicationHoverPassThrough {
   allPublications?: JobPublication[]
   showProlong?: boolean
   onExtendAll?: () => void
+  channelDecoration?: JobCardPublicationChannelDecoration
+  dropdownPlacement?: Placement
 }
 
 function PublicationGroup({
@@ -267,6 +279,8 @@ function PublicationGroup({
   allPublications,
   showProlong,
   onExtendAll,
+  channelDecoration,
+  dropdownPlacement,
 }: {
   publications: JobPublication[]
   kind: PublicationGroupKind
@@ -343,6 +357,8 @@ function PublicationGroup({
             onPreview={onPreview}
             onExtend={onExtend}
             onExtendAll={onExtendAll}
+            channelDecoration={channelDecoration}
+            dropdownPlacement={dropdownPlacement}
           />
         ))}
       </ul>
@@ -361,6 +377,8 @@ function PeriodBadgeColumn({
   allPublications,
   showProlong,
   onExtendAll,
+  channelDecoration,
+  dropdownPlacement,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -389,6 +407,8 @@ function PeriodBadgeColumn({
           onPreview={onPreview}
           onExtend={onExtend}
           onExtendAll={onExtendAll}
+          channelDecoration={channelDecoration}
+          dropdownPlacement={dropdownPlacement}
         />
       ))}
     </div>
@@ -411,6 +431,8 @@ function PeriodBadgeGroup({
   allPublications,
   showProlong,
   onExtendAll,
+  channelDecoration,
+  dropdownPlacement,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -459,6 +481,8 @@ function PeriodBadgeGroup({
             onPreview={onPreview}
             onExtend={onExtend}
             onExtendAll={onExtendAll}
+            channelDecoration={channelDecoration}
+            dropdownPlacement={dropdownPlacement}
           />
         ))}
       </div>
@@ -477,6 +501,8 @@ export function JobCardAdvertisement({
   showPreviewLink = true,
   periodPresentation = 'tag',
   publicationHover = 'portalDetail',
+  publicationChannelDecoration,
+  publicationDropdownPlacement,
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -552,6 +578,8 @@ export function JobCardAdvertisement({
     allPublications: publications,
     showProlong,
     onExtendAll,
+    channelDecoration: publicationChannelDecoration,
+    dropdownPlacement: publicationDropdownPlacement,
   }
 
   return (
@@ -627,6 +655,7 @@ export function JobCardAdvertisement({
         publicationHover={publicationHover}
         showProlong={showProlong}
         onExtendAll={onExtendAll}
+        linkDecoration={publicationChannelDecoration}
         onViewStatisticsClick={onViewStatisticsClick}
         onPreviewAdvertisement={
           onPreviewAdvertisement ??

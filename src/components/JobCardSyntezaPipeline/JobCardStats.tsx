@@ -14,6 +14,7 @@ const STAT_LABELS: Record<JobCandidateStat, string> = {
   preselected: 'Předvýbraný',
   opalcovani: 'Opalcovaný',
   invited: 'Pozvaný',
+  nabidka: 'Nabídka',
   hired: 'Přijatý',
   total: 'Celkem',
 }

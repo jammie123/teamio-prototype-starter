@@ -164,6 +164,12 @@ export {
   type JobCardSimplify3Props,
   type JobCardBranch,
 } from './JobCardSimplify3'
+export {
+  JobCardSimplify4,
+  JOB_CARD_SIMPLIFY_4_PREVIEW_LABEL,
+  type JobCardSimplify4Props,
+  type JobCardBranch as JobCardSimplify4Branch,
+} from './JobCardSimplify4'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
 export { JobCardSyntezaMoreAds, type JobCardSyntezaMoreAdsProps } from './JobCardSyntezaMoreAds'
 export {

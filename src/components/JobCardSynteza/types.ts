@@ -61,6 +61,7 @@ export interface JobCardCandidates {
   opalcovani?: number
   newOpalcovani?: number
   invited?: number
+  nabidka?: number
   hired?: number
   total?: number
 }

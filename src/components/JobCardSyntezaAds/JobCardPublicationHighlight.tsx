@@ -3,11 +3,13 @@ import { cn } from '../../lib/cn'
 import { formatCount } from '../JobCardSynteza/formatCount'
 import { formatPublicationRange } from '../JobCardSynteza/advertisementSummary'
 import type { JobPublication, JobPublicationHighlight as Highlight } from '../JobCardSynteza/types'
+import type { JobCardPublicationChannelDecoration } from './JobCardPublicationPortal'
 
 export interface JobCardPublicationHighlightProps {
   publication: JobPublication
   highlight: Highlight
   as?: 'li' | 'span'
+  nameDecoration?: JobCardPublicationChannelDecoration
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -19,6 +21,7 @@ export function JobCardPublicationHighlight({
   publication,
   highlight,
   as = 'li',
+  nameDecoration = 'dotted-underline',
 }: JobCardPublicationHighlightProps) {
   const Tag = as
 
@@ -40,11 +43,10 @@ export function JobCardPublicationHighlight({
             data-testid="job-card-publication-highlight-name"
             className={cn(
               'tm-border-0',
-              'tm-border-b',
-              'tm-border-dotted',
-              'tm-border-secondary',
               'tm-font-medium',
               'tm-text-teamio-pink',
+              nameDecoration === 'dotted-underline' &&
+                'tm-border-b tm-border-dotted tm-border-secondary',
             )}
           >
             {highlight.name}

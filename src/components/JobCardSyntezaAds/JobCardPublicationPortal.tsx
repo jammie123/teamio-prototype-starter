@@ -1,3 +1,4 @@
+import type { Placement } from '@floating-ui/react'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -17,6 +18,8 @@ import { JobCardPublicationHighlight } from './JobCardPublicationHighlight'
 
 export type JobCardPublicationHover = 'portalDetail' | 'placesTable'
 
+export type JobCardPublicationChannelDecoration = 'dotted-underline' | 'plain'
+
 export interface JobCardPublicationPortalProps {
   publication: JobPublication
   expired: boolean
@@ -31,6 +34,8 @@ export interface JobCardPublicationPortalProps {
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
   onExtendAll?: () => void
+  channelDecoration?: JobCardPublicationChannelDecoration
+  dropdownPlacement?: Placement
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -47,6 +52,8 @@ function PublicationDropdown({
   onPreview,
   onExtend,
   onExtendAll,
+  channelDecoration = 'dotted-underline',
+  dropdownPlacement = 'bottom-start',
 }: {
   publication: JobPublication
   expired: boolean
@@ -56,6 +63,8 @@ function PublicationDropdown({
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
   onExtendAll?: () => void
+  channelDecoration?: JobCardPublicationChannelDecoration
+  dropdownPlacement?: Placement
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
@@ -66,7 +75,7 @@ function PublicationDropdown({
       openOnHover
       hoverDelay={150}
       autoClose={false}
-      placement="bottom-start"
+      placement={dropdownPlacement}
       strategy="fixed"
       className="tm-group tm-inline-flex"
     >
@@ -82,10 +91,9 @@ function PublicationDropdown({
               data-testid="job-card-publication-channel"
               className={cn(
                 'tm-border-0',
-                'tm-border-b',
-                'tm-border-dotted',
-                'tm-border-secondary',
                 'tm-font-normal',
+                channelDecoration === 'dotted-underline' &&
+                  'tm-border-b tm-border-dotted tm-border-secondary',
                 expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
                 expired && 'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
               )}
@@ -203,6 +211,8 @@ export function JobCardPublicationPortal({
   onPreview,
   onExtend,
   onExtendAll,
+  channelDecoration = 'dotted-underline',
+  dropdownPlacement = 'bottom-start',
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge ? (
     periodPresentation === 'text' ? (
@@ -229,6 +239,7 @@ export function JobCardPublicationPortal({
       publication={publication}
       highlight={highlight}
       as={variant === 'grid' ? 'span' : 'li'}
+      nameDecoration={channelDecoration}
     />
   ))
 
@@ -257,6 +268,8 @@ export function JobCardPublicationPortal({
             onPreview={onPreview}
             onExtend={onExtend}
             onExtendAll={onExtendAll}
+            channelDecoration={channelDecoration}
+            dropdownPlacement={dropdownPlacement}
           />
           {highlightChips}
         </span>
@@ -296,6 +309,8 @@ export function JobCardPublicationPortal({
           onPreview={onPreview}
           onExtend={onExtend}
           onExtendAll={onExtendAll}
+          channelDecoration={channelDecoration}
+          dropdownPlacement={dropdownPlacement}
         />
         {badge}
       </li>

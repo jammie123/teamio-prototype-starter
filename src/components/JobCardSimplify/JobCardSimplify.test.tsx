@@ -63,7 +63,7 @@ describe('JobCardSimplify', () => {
 
     const preview = screen.getByTestId('job-card-preview-toggle')
     expect(preview).toHaveAttribute('aria-label', 'Zobrazit náhled inzerátu')
-    expect(preview.querySelector('[data-icon-name="search"]')).toBeInTheDocument()
+    expect(preview.querySelector('[data-icon-name="advertisement-preview"]')).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-preview')).not.toBeInTheDocument()
 
     const icons = screen.getByTestId('job-card-icon-buttons')

@@ -28,7 +28,7 @@ export function JobCardPreviewButton({
               data-testid="job-card-preview-toggle"
               onClick={onPreviewAdvertisement}
             >
-              <Icon name="search" strokeWidth={2.5} />
+              <Icon name="advertisement-preview" className="tm-text-[1.25rem]" />
             </Button>
           </span>
         </TooltipTrigger>

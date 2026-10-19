@@ -4,13 +4,13 @@ import { describe, expect, it, vi } from 'vitest'
 import { JobCardPreviewButton } from './JobCardPreviewButton'
 
 describe('JobCardPreviewButton', () => {
-  it('shows a search icon button with a preview tooltip', async () => {
+  it('shows an advertisement preview icon button with a preview tooltip', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 })
     render(<JobCardPreviewButton onPreviewAdvertisement={vi.fn()} />)
 
     const button = screen.getByTestId('job-card-preview-toggle')
     expect(button).toHaveAttribute('aria-label', 'Zobrazit náhled inzerátu')
-    expect(button.querySelector('[data-icon-name="search"]')).toBeInTheDocument()
+    expect(button.querySelector('[data-icon-name="advertisement-preview"]')).toBeInTheDocument()
 
     await user.hover(button)
     expect(await screen.findByRole('tooltip')).toHaveTextContent('Zobrazit náhled inzerátu')

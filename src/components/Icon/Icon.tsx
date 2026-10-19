@@ -50,6 +50,7 @@ import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import {
+  AdvertisementPreviewIcon,
   CandidateMoveIcon,
   OpalIcon,
   SingleManTimeIcon,
@@ -106,6 +107,7 @@ const iconMap = {
 } as const satisfies Record<string, LucideIcon>
 
 const customIconMap = {
+  'advertisement-preview': AdvertisementPreviewIcon,
   opal: OpalIcon,
   'single-man-time': SingleManTimeIcon,
   'candidate-move': CandidateMoveIcon,

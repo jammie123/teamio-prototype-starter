@@ -41,6 +41,13 @@ import {
   type JobCardPublicationChannelDecoration,
   type JobCardPublicationHover,
 } from './JobCardPublicationPortal'
+import { JobCardPublicationHighlight } from './JobCardPublicationHighlight'
+import {
+  collectProductHighlights,
+  JOB_CARD_PRODUCT_HIGHLIGHTS_HEADING,
+} from './advertisementProductHighlights'
+
+export type JobCardAdvertisementPublicationPresentation = 'default' | 'simplify5'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
@@ -55,6 +62,7 @@ export interface JobCardAdvertisementProps extends StyleProps {
   publicationHover?: JobCardPublicationHover
   publicationChannelDecoration?: JobCardPublicationChannelDecoration
   publicationDropdownPlacement?: Placement
+  publicationPresentation?: JobCardAdvertisementPublicationPresentation
 }
 
 function sharedFieldDateLabel(
@@ -267,6 +275,84 @@ interface PublicationHoverPassThrough {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
+  channelLogoSize?: 18 | 24 | 30
+  showChannelLabel?: boolean
+  inlineHighlights?: 'all' | 'none'
+  minimalPresentation?: boolean
+  showProductHighlights?: boolean
+}
+
+function publicationStatusHeadingClass(
+  kind: PublicationGroupKind,
+  minimalPresentation: boolean | undefined,
+  sameDate: boolean,
+) {
+  if (minimalPresentation) {
+    return 'tm-text-13 tm-font-normal tm-text-secondary-default'
+  }
+
+  return cn(
+    'tm-text-sm',
+    kind === 'expired' && 'tm-font-normal tm-text-secondary-default',
+    kind === 'endingSoon' &&
+      (sameDate
+        ? 'tm-font-semibold tm-text-emotion-warning-emphasis'
+        : 'tm-font-medium tm-text-emotion-warning-emphasis'),
+    kind === 'running' && 'tm-font-medium tm-text-emotion-success-emphasis',
+  )
+}
+
+function ProductHighlightsSection({
+  publications,
+  channelDecoration,
+  minimalPresentation,
+}: {
+  publications: JobPublication[]
+  channelDecoration?: JobCardPublicationChannelDecoration
+  minimalPresentation?: boolean
+}) {
+  const entries = collectProductHighlights(publications)
+
+  if (entries.length === 0) {
+    return null
+  }
+
+  return (
+    <div
+      data-testid="job-card-advertisement-product-highlights"
+      className={cn(
+        'tm-flex tm-flex-col',
+        minimalPresentation ? 'tm-mt-1 tm-gap-2 tm-border-t tm-border-secondary tm-pt-3' : 'tm-gap-0.5 tm-pt-2',
+      )}
+    >
+      <div
+        data-testid="job-card-advertisement-product-highlights-heading"
+        className={
+          minimalPresentation
+            ? 'tm-text-13 tm-font-normal tm-text-secondary-default'
+            : 'tm-text-sm tm-font-medium tm-text-secondary-default'
+        }
+      >
+        {JOB_CARD_PRODUCT_HIGHLIGHTS_HEADING}
+      </div>
+      <ul
+        className={cn(
+          'tm-m-0 tm-flex tm-list-none tm-flex-row tm-flex-wrap tm-p-0',
+          minimalPresentation ? 'tm-gap-x-3 tm-gap-y-2' : 'tm-gap-x-2 tm-gap-y-1.5',
+        )}
+      >
+        {entries.map(({ publication, highlight }) => (
+          <JobCardPublicationHighlight
+            key={highlight.id}
+            publication={publication}
+            highlight={highlight}
+            nameDecoration={channelDecoration}
+            variant={minimalPresentation ? 'subtle' : 'default'}
+          />
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 function PublicationGroup({
@@ -281,6 +367,10 @@ function PublicationGroup({
   onExtendAll,
   channelDecoration,
   dropdownPlacement,
+  channelLogoSize,
+  showChannelLabel,
+  inlineHighlights,
+  minimalPresentation,
 }: {
   publications: JobPublication[]
   kind: PublicationGroupKind
@@ -319,14 +409,36 @@ function PublicationGroup({
       : kind === 'endingSoon'
         ? 'job-card-advertisement-ending-soon-publications'
         : 'job-card-advertisement-active-publications'
-  const headingClassName = cn(
-    'tm-text-sm',
-    kind === 'expired' && 'tm-font-normal tm-text-secondary-default',
-    kind === 'endingSoon' &&
-      (sameDate
-        ? 'tm-font-semibold tm-text-emotion-warning-emphasis'
-        : 'tm-font-medium tm-text-emotion-warning-emphasis'),
-    kind === 'running' && 'tm-font-medium tm-text-emotion-success-emphasis',
+  const headingClassName = publicationStatusHeadingClass(kind, minimalPresentation, sameDate)
+
+  const portalList = (
+    <ul
+      data-testid={listTestId}
+      className={cn(
+        'tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-list-none tm-p-0',
+        minimalPresentation ? 'tm-gap-x-3 tm-gap-y-2' : 'tm-gap-x-2 tm-gap-y-1.5',
+      )}
+    >
+      {publications.map((publication, index) => (
+        <JobCardPublicationPortal
+          key={publication.id}
+          publication={publication}
+          expired={expired}
+          withSeparator={!minimalPresentation && index > 0}
+          hoverContent={hoverContent}
+          publications={allPublications}
+          showProlong={showProlong}
+          onPreview={onPreview}
+          onExtend={onExtend}
+          onExtendAll={onExtendAll}
+          channelDecoration={channelDecoration}
+          dropdownPlacement={dropdownPlacement}
+          channelLogoSize={channelLogoSize}
+          showChannelLabel={showChannelLabel}
+          inlineHighlights={inlineHighlights}
+        />
+      ))}
+    </ul>
   )
 
   return (
@@ -334,34 +446,28 @@ function PublicationGroup({
       className={cn(
         'tm-flex',
         'tm-flex-col',
-        'tm-gap-0.5',
-        showLeadingDivider && ' tm-pt-2',
+        minimalPresentation ? 'tm-gap-1.5' : 'tm-gap-0.5',
+        showLeadingDivider && (minimalPresentation ? 'tm-border-t tm-border-secondary tm-pt-3' : ' tm-pt-2'),
       )}
     >
-      <div data-testid={headingTestId} className={headingClassName}>
-        {heading}
-      </div>
-      <ul
-        data-testid={listTestId}
-        className="tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-gap-x-2 tm-gap-y-1.5 tm-list-none tm-p-0"
-      >
-        {publications.map((publication, index) => (
-          <JobCardPublicationPortal
-            key={publication.id}
-            publication={publication}
-            expired={expired}
-            withSeparator={index > 0}
-            hoverContent={hoverContent}
-            publications={allPublications}
-            showProlong={showProlong}
-            onPreview={onPreview}
-            onExtend={onExtend}
-            onExtendAll={onExtendAll}
-            channelDecoration={channelDecoration}
-            dropdownPlacement={dropdownPlacement}
-          />
-        ))}
-      </ul>
+      {minimalPresentation ? (
+        <div
+          data-testid="job-card-advertisement-status-row"
+          className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-3 tm-gap-y-2"
+        >
+          <div data-testid={headingTestId} className={headingClassName}>
+            {heading}
+          </div>
+          {portalList}
+        </div>
+      ) : (
+        <>
+          <div data-testid={headingTestId} className={headingClassName}>
+            {heading}
+          </div>
+          {portalList}
+        </>
+      )}
     </div>
   )
 }
@@ -379,6 +485,9 @@ function PeriodBadgeColumn({
   onExtendAll,
   channelDecoration,
   dropdownPlacement,
+  channelLogoSize,
+  showChannelLabel,
+  inlineHighlights,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -409,6 +518,9 @@ function PeriodBadgeColumn({
           onExtendAll={onExtendAll}
           channelDecoration={channelDecoration}
           dropdownPlacement={dropdownPlacement}
+          channelLogoSize={channelLogoSize}
+          showChannelLabel={showChannelLabel}
+          inlineHighlights={inlineHighlights}
         />
       ))}
     </div>
@@ -433,6 +545,10 @@ function PeriodBadgeGroup({
   onExtendAll,
   channelDecoration,
   dropdownPlacement,
+  channelLogoSize,
+  showChannelLabel,
+  inlineHighlights,
+  minimalPresentation,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -451,9 +567,89 @@ function PeriodBadgeGroup({
   }
 
   const columns = splitIntoBalancedColumns(sortPublicationsBySoonestEnd(publications))
+  const minimalHeadingClass = 'tm-text-13 tm-font-normal tm-text-secondary-default'
+
+  if (minimalPresentation) {
+    return (
+      <div
+        className={cn(
+          'tm-flex tm-flex-col tm-gap-1.5',
+          showLeadingDivider && 'tm-border-t tm-border-secondary tm-pt-3',
+        )}
+      >
+        <div
+          data-testid="job-card-advertisement-status-row"
+          className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-3 tm-gap-y-2"
+        >
+          <div data-testid={headingTestId} className={minimalHeadingClass}>
+            {heading}
+          </div>
+          <ul
+            data-testid={listTestId}
+            className="tm-m-0 tm-flex tm-list-none tm-flex-row tm-flex-wrap tm-gap-x-3 tm-gap-y-2 tm-p-0"
+          >
+            {publications.map((publication) => (
+              <JobCardPublicationPortal
+                key={publication.id}
+                publication={publication}
+                expired={expired}
+                withSeparator={false}
+                hoverContent={hoverContent}
+                publications={allPublications}
+                showProlong={showProlong}
+                onPreview={onPreview}
+                onExtend={onExtend}
+                onExtendAll={onExtendAll}
+                channelDecoration={channelDecoration}
+                dropdownPlacement={dropdownPlacement}
+                channelLogoSize={channelLogoSize}
+                showChannelLabel={showChannelLabel}
+                inlineHighlights={inlineHighlights}
+              />
+            ))}
+          </ul>
+        </div>
+        <div
+          data-testid="job-card-advertisement-period-badges"
+          className="tm-flex tm-flex-wrap tm-gap-x-3 tm-gap-y-1"
+        >
+          {publications.map((publication) => {
+            const badge = periodBadge(publication)
+            if (!badge) {
+              return null
+            }
+
+            return periodPresentation === 'text' ? (
+              <span
+                key={publication.id}
+                data-testid="job-card-publication-period-badge"
+                className={
+                  badge.color === 'warning'
+                    ? 'tm-text-sm tm-font-medium tm-text-emotion-warning-emphasis'
+                    : 'tm-text-sm tm-text-secondary-default'
+                }
+              >
+                {badge.label}
+              </span>
+            ) : (
+              <Tag key={publication.id} color={badge.color} isSubtle data-testid="job-card-publication-period-badge">
+                {badge.label}
+              </Tag>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className={cn('tm-flex tm-flex-col tm-gap-0.5', showLeadingDivider && ' tm-pt-2')}>
+    <div
+      className={cn(
+        'tm-flex tm-flex-col',
+        'tm-gap-0.5',
+        showLeadingDivider && ' tm-pt-2',
+      )}
+    >
       <div data-testid={headingTestId} className={headingClassName}>
         {heading}
       </div>
@@ -483,6 +679,9 @@ function PeriodBadgeGroup({
             onExtendAll={onExtendAll}
             channelDecoration={channelDecoration}
             dropdownPlacement={dropdownPlacement}
+            channelLogoSize={channelLogoSize}
+            showChannelLabel={showChannelLabel}
+            inlineHighlights={inlineHighlights}
           />
         ))}
       </div>
@@ -503,6 +702,7 @@ export function JobCardAdvertisement({
   publicationHover = 'portalDetail',
   publicationChannelDecoration,
   publicationDropdownPlacement,
+  publicationPresentation = 'default',
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -573,6 +773,7 @@ export function JobCardAdvertisement({
           }
         }
       : undefined)
+  const simplify5Presentation = publicationPresentation === 'simplify5'
   const hoverPassThrough: PublicationHoverPassThrough = {
     hoverContent: publicationHover,
     allPublications: publications,
@@ -580,12 +781,21 @@ export function JobCardAdvertisement({
     onExtendAll,
     channelDecoration: publicationChannelDecoration,
     dropdownPlacement: publicationDropdownPlacement,
+    ...(simplify5Presentation
+      ? {
+          channelLogoSize: 30 as const,
+          showChannelLabel: false,
+          inlineHighlights: 'none' as const,
+          minimalPresentation: true,
+          showProductHighlights: false,
+        }
+      : {}),
   }
 
   return (
     <div
       data-testid="job-card-advertisement"
-      className={cn('tm-flex', 'tm-flex-col', 'tm-gap-4', className)}
+      className={cn('tm-flex', 'tm-flex-col', simplify5Presentation ? 'tm-gap-3' : 'tm-gap-4', className)}
     >
       <div data-testid="job-card-advertisement-publications" className="tm-min-w-0">
         {publications.length === 0 ? (
@@ -595,7 +805,10 @@ export function JobCardAdvertisement({
         ) : (
           <div
             data-testid="job-card-publication-groups"
-            className="tm-flex tm-flex-col tm-gap-2"
+            className={cn(
+              'tm-flex tm-flex-col',
+              simplify5Presentation ? 'tm-gap-3' : 'tm-gap-2',
+            )}
           >
             {mixedActivePeriods ? (
               <PeriodBadgeGroup
@@ -620,6 +833,15 @@ export function JobCardAdvertisement({
                 {...hoverPassThrough}
               />
             )}
+            {simplify5Presentation &&
+            hoverPassThrough.showProductHighlights !== false &&
+            active.length > 0 ? (
+              <ProductHighlightsSection
+                publications={active}
+                channelDecoration={publicationChannelDecoration}
+                minimalPresentation
+              />
+            ) : null}
             {mixedExpiredPeriods ? (
               <PeriodBadgeGroup
                 publications={expired}

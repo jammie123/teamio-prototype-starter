@@ -677,6 +677,71 @@ describe('JobCardAdvertisement highlights', () => {
   })
 })
 
+describe('JobCardAdvertisement publicationPresentation simplify5', () => {
+  it('puts 30px portal logos on the status row and hides product highlights', () => {
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify5"
+        publicationChannelDecoration="plain"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-highlights',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 10. 2026',
+              highlights: [
+                {
+                  id: 'jobs-jobstip',
+                  name: 'Jobstip',
+                  kind: 'jobstip',
+                  startDate: '8. 6. 2026',
+                  endDate: '30. 10. 2026',
+                },
+                {
+                  id: 'jobs-top',
+                  name: 'Topováno na jobs.cz',
+                  kind: 'top',
+                  startDate: '22. 6. 2026',
+                  endDate: '30. 10. 2026',
+                },
+              ],
+            },
+            {
+              id: 'prace',
+              channel: 'Prace.cz',
+              startDate: '12. 7. 2026',
+              endDate: '30. 10. 2026',
+              highlights: [
+                {
+                  id: 'prace-supermax',
+                  name: 'Supermax',
+                  kind: 'supermax',
+                  startDate: '8. 6. 2026',
+                  endDate: '30. 10. 2026',
+                },
+              ],
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-publication-channel')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-product-highlights')).not.toBeInTheDocument()
+    expect(screen.queryByText('Jobstip')).not.toBeInTheDocument()
+    expect(screen.queryByText('Topováno na jobs.cz')).not.toBeInTheDocument()
+
+    const statusRow = screen.getByTestId('job-card-advertisement-status-row')
+    expect(within(statusRow).getByTestId('job-card-advertisement-running-heading')).toHaveClass(
+      'tm-text-secondary-default',
+    )
+    expect(screen.getAllByTestId('job-card-publication-channel-logo')[0]).toHaveClass('tm-size-[30px]')
+  })
+})
+
 describe('JobCardAdvertisement places table hover', () => {
   it('opens the shared places table from stats and shows Prodloužit when a portal expired', async () => {
     const onExtendPublications = vi.fn()

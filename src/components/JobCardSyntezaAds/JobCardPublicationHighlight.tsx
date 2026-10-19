@@ -10,6 +10,8 @@ export interface JobCardPublicationHighlightProps {
   highlight: Highlight
   as?: 'li' | 'span'
   nameDecoration?: JobCardPublicationChannelDecoration
+  /** `subtle` uses secondary body text instead of pink emphasis (Simplify 5). */
+  variant?: 'default' | 'subtle'
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -22,6 +24,7 @@ export function JobCardPublicationHighlight({
   highlight,
   as = 'li',
   nameDecoration = 'dotted-underline',
+  variant = 'default',
 }: JobCardPublicationHighlightProps) {
   const Tag = as
 
@@ -43,8 +46,9 @@ export function JobCardPublicationHighlight({
             data-testid="job-card-publication-highlight-name"
             className={cn(
               'tm-border-0',
-              'tm-font-medium',
-              'tm-text-teamio-pink',
+              variant === 'subtle'
+                ? 'tm-font-normal tm-text-secondary-default'
+                : 'tm-font-medium tm-text-teamio-pink',
               nameDecoration === 'dotted-underline' &&
                 'tm-border-b tm-border-dotted tm-border-secondary',
             )}

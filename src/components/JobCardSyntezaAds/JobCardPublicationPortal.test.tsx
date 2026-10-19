@@ -49,4 +49,24 @@ describe('JobCardPublicationPortal', () => {
     expect(screen.getByTestId('job-card-publication-channel-logo')).toHaveClass('tm-size-[18px]')
     expect(screen.getByTestId('job-card-publication-channel-logo')).toHaveAttribute('data-logo-type', 'pages')
   })
+
+  it('can render a 24px logo without a channel label and exposes aria-label', () => {
+    render(
+      <JobCardPublicationPortal
+        publication={publication('Jobs.cz')}
+        expired={false}
+        withSeparator={false}
+        channelLogoSize={24}
+        showChannelLabel={false}
+        inlineHighlights="none"
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-publication-channel')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-publication-channel-logo')).toHaveClass('tm-size-[24px]')
+    expect(screen.getByTestId('job-card-publication-channel-logo').closest('[role="button"]')).toHaveAttribute(
+      'aria-label',
+      'Jobs.cz',
+    )
+  })
 })

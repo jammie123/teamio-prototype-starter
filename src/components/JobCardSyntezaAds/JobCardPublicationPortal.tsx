@@ -36,6 +36,21 @@ export interface JobCardPublicationPortalProps {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
+  channelLogoSize?: 18 | 24 | 30
+  showChannelLabel?: boolean
+  inlineHighlights?: 'all' | 'none'
+}
+
+export function channelLogoSizeClass(size: 18 | 24 | 30 = 18) {
+  if (size === 30) {
+    return 'tm-size-[30px]'
+  }
+
+  if (size === 24) {
+    return 'tm-size-[24px]'
+  }
+
+  return 'tm-size-[18px]'
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -54,6 +69,8 @@ function PublicationDropdown({
   onExtendAll,
   channelDecoration = 'dotted-underline',
   dropdownPlacement = 'bottom-start',
+  channelLogoSize = 18,
+  showChannelLabel = true,
 }: {
   publication: JobPublication
   expired: boolean
@@ -65,6 +82,8 @@ function PublicationDropdown({
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
+  channelLogoSize?: 18 | 24 | 30
+  showChannelLabel?: boolean
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
@@ -79,27 +98,33 @@ function PublicationDropdown({
       strategy="fixed"
       className="tm-group tm-inline-flex"
     >
-        <DropdownToggle variant="custom" className="tm-rounded-none tm-bg-transparent">
+        <DropdownToggle
+          variant="custom"
+          className="tm-rounded-none tm-bg-transparent"
+          aria-label={showChannelLabel ? undefined : publication.channel}
+        >
           <span className="tm-inline-flex tm-items-center tm-gap-1">
             <JobPortalLogo
               type={jobPortalLogoTypeFromChannel(publication.channel)}
               title=""
               data-testid="job-card-publication-channel-logo"
-              className="tm-size-[18px]"
+              className={channelLogoSizeClass(channelLogoSize)}
             />
-            <span
-              data-testid="job-card-publication-channel"
-              className={cn(
-                'tm-border-0',
-                'tm-font-normal',
-                channelDecoration === 'dotted-underline' &&
-                  'tm-border-b tm-border-dotted tm-border-secondary',
-                expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
-                expired && 'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
-              )}
-            >
-              {publication.channel}
-            </span>
+            {showChannelLabel ? (
+              <span
+                data-testid="job-card-publication-channel"
+                className={cn(
+                  'tm-border-0',
+                  'tm-font-normal',
+                  channelDecoration === 'dotted-underline' &&
+                    'tm-border-b tm-border-dotted tm-border-secondary',
+                  expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+                  expired && 'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
+                )}
+              >
+                {publication.channel}
+              </span>
+            ) : null}
           </span>
         </DropdownToggle>
         <DropdownBody
@@ -213,6 +238,9 @@ export function JobCardPublicationPortal({
   onExtendAll,
   channelDecoration = 'dotted-underline',
   dropdownPlacement = 'bottom-start',
+  channelLogoSize = 18,
+  showChannelLabel = true,
+  inlineHighlights = 'all',
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge ? (
     periodPresentation === 'text' ? (
@@ -232,7 +260,7 @@ export function JobCardPublicationPortal({
       </Tag>
     )
   ) : null
-  const highlights = visibleHighlights(publication)
+  const highlights = inlineHighlights === 'none' ? [] : visibleHighlights(publication)
   const highlightChips = highlights.map((highlight) => (
     <JobCardPublicationHighlight
       key={highlight.id}
@@ -270,6 +298,8 @@ export function JobCardPublicationPortal({
             onExtendAll={onExtendAll}
             channelDecoration={channelDecoration}
             dropdownPlacement={dropdownPlacement}
+            channelLogoSize={channelLogoSize}
+            showChannelLabel={showChannelLabel}
           />
           {highlightChips}
         </span>
@@ -311,6 +341,8 @@ export function JobCardPublicationPortal({
           onExtendAll={onExtendAll}
           channelDecoration={channelDecoration}
           dropdownPlacement={dropdownPlacement}
+          channelLogoSize={channelLogoSize}
+          showChannelLabel={showChannelLabel}
         />
         {badge}
       </li>

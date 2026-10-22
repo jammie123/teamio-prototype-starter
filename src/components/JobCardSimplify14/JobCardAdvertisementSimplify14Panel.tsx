@@ -15,7 +15,6 @@ import { JobCardAdvertisement } from '../JobCardSyntezaAds/JobCardAdvertisement'
 import { JobCardAdvertisementSimplify10Panel } from '../JobCardSimplify10/JobCardAdvertisementSimplify10Panel'
 import { JobCardSimplify14ChannelStrip } from './JobCardSimplify14ChannelStrip'
 import {
-  buildSimplify14PanelSubline,
   formatMixedPeriodsHeading,
   getSimplify11PanelCta,
   resolveJobCardSimplify14PanelMode,
@@ -37,11 +36,16 @@ export interface JobCardAdvertisementSimplify14PanelProps extends StyleProps {
 }
 
 const SIMPLIFY_14_STATUS_ICON_CLASS = 'tm-shrink-0 tm-text-2xl tm-leading-none'
+const SIMPLIFY_14_CHECK_ICON_CLASS = 'tm-shrink-0 tm-text-xl tm-leading-none'
 const SIMPLIFY_14_STATUS_ICON_STROKE = 2
-const SIMPLIFY_14_RUNNING_CHECK_STROKE = 1.75
+const SIMPLIFY_14_CHECK_ICON_STROKE = 1.5
 
 function statusIconStroke(icon: 'circle-check' | 'alert-triangle-outline' | 'warning' | 'view-off') {
-  return icon === 'circle-check' ? SIMPLIFY_14_RUNNING_CHECK_STROKE : SIMPLIFY_14_STATUS_ICON_STROKE
+  return icon === 'circle-check' ? SIMPLIFY_14_CHECK_ICON_STROKE : SIMPLIFY_14_STATUS_ICON_STROKE
+}
+
+function statusIconClass(icon: 'circle-check' | 'alert-triangle-outline' | 'warning' | 'view-off') {
+  return icon === 'circle-check' ? SIMPLIFY_14_CHECK_ICON_CLASS : SIMPLIFY_14_STATUS_ICON_CLASS
 }
 
 function StatusHeading({
@@ -66,7 +70,7 @@ function StatusHeading({
       <Icon
         name={icon}
         strokeWidth={statusIconStroke(icon)}
-        className={SIMPLIFY_14_STATUS_ICON_CLASS}
+        className={statusIconClass(icon)}
       />
       <span>{children}</span>
     </p>
@@ -81,7 +85,7 @@ function AggregateViews({
   onViewStatisticsClick?: () => void
 }) {
   const label = formatViewCountLabel(viewCount)
-  const className = 'tm-shrink-0 tm-text-xs tm-text-secondary-default'
+  const className = 'tm-shrink-0 tm-text-sm tm-text-secondary-default'
 
   if (onViewStatisticsClick) {
     return (
@@ -110,13 +114,7 @@ function AggregateViews({
   )
 }
 
-function headingForMode(
-  mode: JobCardSimplify14PanelMode,
-  advertisement: JobAdvertisement,
-  now: Date,
-) {
-  const subline = buildSimplify14PanelSubline(advertisement, mode, now)
-
+function headingForMode(mode: JobCardSimplify14PanelMode) {
   switch (mode) {
     case 'partial':
       return {
@@ -124,7 +122,6 @@ function headingForMode(
         className: 'tm-text-emotion-warning-emphasis',
         testId: 'job-card-simplify14-partial-heading',
         label: formatPartialRunningHeading(),
-        subline,
       }
     case 'running':
       return {
@@ -132,7 +129,6 @@ function headingForMode(
         className: 'tm-text-emotion-success-emphasis',
         testId: 'job-card-simplify14-running-heading',
         label: formatRunningSimpleHeading(),
-        subline,
       }
     case 'ended':
       return {
@@ -140,7 +136,6 @@ function headingForMode(
         className: 'tm-text-emotion-danger-emphasis',
         testId: 'job-card-simplify14-ended-heading',
         label: formatAdvertisementEndedHeading(),
-        subline,
       }
     case 'allDisabled':
       return {
@@ -148,7 +143,6 @@ function headingForMode(
         className: 'tm-text-secondary-default',
         testId: 'job-card-simplify14-all-disabled-heading',
         label: 'Neinzeruje se',
-        subline: undefined,
       }
     case 'mixedPeriods':
       return {
@@ -156,7 +150,6 @@ function headingForMode(
         className: 'tm-text-emotion-success-emphasis',
         testId: 'job-card-simplify14-mixed-periods-heading',
         label: formatMixedPeriodsHeading(),
-        subline,
       }
     default:
       return null
@@ -185,7 +178,7 @@ function Simplify14MixedChannelPanel({
 }) {
   const publications = advertisement.publications ?? []
   const summary = getAdvertisementSummary(advertisement)
-  const heading = headingForMode(mode, advertisement, now)
+  const heading = headingForMode(mode)
   const showDateLabels = shouldShowPerChannelDateLabels(mode, publications, now)
   const cta =
     mode === 'running' || mode === 'allDisabled' || mode === 'mixedPeriods'
@@ -235,14 +228,6 @@ function Simplify14MixedChannelPanel({
             />
           ) : null}
         </div>
-        {heading.subline ? (
-          <p
-            data-testid="job-card-simplify14-subline"
-            className="tm-m-0 tm-text-xs tm-text-secondary-default"
-          >
-            {heading.subline}
-          </p>
-        ) : null}
       </div>
       <JobCardSimplify14ChannelStrip
         publications={publications}
@@ -357,7 +342,6 @@ export function JobCardAdvertisementSimplify14Panel({
       expiredLogosMuted={false}
       actionButtonVariant="secondary"
       actionButtonSize="medium"
-      headingSublineDisabledOnly
       hideNotAdvertisingMeta
       notAdvertisingHeadingBorder
       className={className}

@@ -1,11 +1,9 @@
 import {
-  formatDisabledChannelsSuffix,
   isUnlimitedPublication,
   partitionPublicationChannels,
   shareSameEndDate,
   stripYear,
 } from '../JobCardSynteza/advertisementSummary'
-import type { JobAdvertisement } from '../JobCardSynteza/types'
 import type { JobPublication } from '../JobCardSynteza/types'
 import {
   buildSimplify11PanelSubline,
@@ -119,24 +117,3 @@ export function simplify14ChannelDateLabelClassName(
 }
 
 export type { Simplify11ChannelVisualState as Simplify14ChannelVisualState }
-
-/** Simplify 14 — no date/perex under heading; optional disabled-channel hint only. */
-export function buildSimplify14PanelSubline(
-  advertisement: JobAdvertisement,
-  mode: JobCardSimplify11PanelMode,
-  now = new Date(),
-) {
-  const publications = advertisement.publications ?? []
-  const { disabled } = partitionPublicationChannels(publications, now)
-  const disabledSuffix = formatDisabledChannelsSuffix(disabled.length)
-
-  if (mode === 'allDisabled' || mode === 'partial') {
-    return undefined
-  }
-
-  if (mode === 'running' || mode === 'ended' || mode === 'mixedPeriods' || mode === 'endingSoon') {
-    return disabledSuffix
-  }
-
-  return undefined
-}

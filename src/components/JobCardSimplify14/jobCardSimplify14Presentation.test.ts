@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
 import {
-  buildSimplify14PanelSubline,
   formatSimplify14ChannelDateLabel,
   resolveSimplify14ChannelDateLabelTone,
   shouldShowPerChannelDateLabels,
@@ -64,49 +63,6 @@ describe('shouldShowPerChannelDateLabels', () => {
     expect(
       shouldShowPerChannelDateLabels('ended', combinationD.publications ?? [], now),
     ).toBe(false)
-  })
-})
-
-describe('buildSimplify14PanelSubline', () => {
-  it('returns no subline for partial', () => {
-    expect(buildSimplify14PanelSubline(combinationD, 'partial', now)).toBeUndefined()
-  })
-
-  it('returns only disabled suffix for running with a disabled channel', () => {
-    const publications = [
-      { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '14. 11. 2026' },
-      { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '14. 11. 2026' },
-      {
-        id: 'career',
-        channel: 'Kariérní stránky',
-        status: 'disabled',
-        startDate: '12. 7. 2026',
-      },
-    ]
-
-    expect(buildSimplify14PanelSubline({ id: 'ad-e', publications }, 'running', now)).toBe(
-      '· 1 vypnutý',
-    )
-  })
-
-  it('returns no subline for allDisabled', () => {
-    expect(
-      buildSimplify14PanelSubline(
-        {
-          id: 'ad-off',
-          publications: [
-            {
-              id: 'career',
-              channel: 'Kariérní stránky',
-              status: 'disabled',
-              startDate: '12. 7. 2026',
-            },
-          ],
-        },
-        'allDisabled',
-        now,
-      ),
-    ).toBeUndefined()
   })
 })
 

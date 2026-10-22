@@ -38,6 +38,7 @@ import {
 import { JobCardPlacesSummaryTable, shouldShowPlacesProlong } from './JobCardPlacesSummaryTable'
 import type { Placement } from '@floating-ui/react'
 import {
+  JobCardExpiredPublicationMiniLogoRow,
   JobCardPublicationPortal,
   JobCardPublicationPortalDateChipGroup,
   type JobCardPublicationChannelDecoration,
@@ -48,12 +49,15 @@ import {
   collectProductHighlights,
   JOB_CARD_PRODUCT_HIGHLIGHTS_HEADING,
 } from './advertisementProductHighlights'
+import { JobCardExpiredPublicationsSimplify9Row } from './JobCardExpiredPublicationsSimplify9Row'
 
 export type JobCardAdvertisementPublicationPresentation =
   | 'default'
   | 'simplify5'
   | 'simplify6'
   | 'simplify7'
+  | 'simplify8'
+  | 'simplify9'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
@@ -297,7 +301,22 @@ function simplify6PortalListGapClass() {
 function isSimplify6FamilyPresentation(
   publicationPresentation?: JobCardAdvertisementPublicationPresentation,
 ) {
-  return publicationPresentation === 'simplify6' || publicationPresentation === 'simplify7'
+  return (
+    publicationPresentation === 'simplify6' ||
+    publicationPresentation === 'simplify7' ||
+    publicationPresentation === 'simplify8' ||
+    publicationPresentation === 'simplify9'
+  )
+}
+
+function isSimplify7MixedDatesPresentation(
+  publicationPresentation?: JobCardAdvertisementPublicationPresentation,
+) {
+  return (
+    publicationPresentation === 'simplify7' ||
+    publicationPresentation === 'simplify8' ||
+    publicationPresentation === 'simplify9'
+  )
 }
 
 function publicationStatusHeadingClass(
@@ -456,39 +475,81 @@ function PublicationGroup({
     publicationPresentation,
   )
 
-  const portalList = (
-    <ul
-      data-testid={listTestId}
-      className={cn(
-        'tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-list-none tm-p-0',
-        isSimplify6Family
-          ? simplify6PortalListGapClass()
-          : minimalPresentation
-            ? 'tm-gap-x-3 tm-gap-y-2'
-            : 'tm-gap-x-2 tm-gap-y-1.5',
-      )}
-    >
-      {publications.map((publication, index) => (
-        <JobCardPublicationPortal
-          key={publication.id}
-          publication={publication}
-          expired={expired}
-          withSeparator={!minimalPresentation && index > 0}
+  if (
+    expired &&
+    publicationPresentation === 'simplify9' &&
+    minimalPresentation &&
+    isSimplify6Family
+  ) {
+    const sortedPublications = sortPublicationsBySoonestEnd(publications)
+    return (
+      <JobCardExpiredPublicationsSimplify9Row onExtendAll={onExtendAll}>
+        <div data-testid={headingTestId} className={headingClassName}>
+          {heading}
+        </div>
+        <JobCardExpiredPublicationMiniLogoRow
+          publications={sortedPublications}
+          listTestId={listTestId}
           hoverContent={hoverContent}
-          publications={allPublications}
+          allPublications={allPublications}
           showProlong={showProlong}
           onPreview={onPreview}
           onExtend={onExtend}
           onExtendAll={onExtendAll}
           channelDecoration={channelDecoration}
           dropdownPlacement={dropdownPlacement}
-          channelLogoSize={channelLogoSize}
-          showChannelLabel={showChannelLabel}
-          inlineHighlights={inlineHighlights}
         />
-      ))}
-    </ul>
-  )
+      </JobCardExpiredPublicationsSimplify9Row>
+    )
+  }
+
+  const portalList =
+    expired && publicationPresentation === 'simplify8' ? (
+      <JobCardExpiredPublicationMiniLogoRow
+        publications={publications}
+        listTestId={listTestId}
+        hoverContent={hoverContent}
+        allPublications={allPublications}
+        showProlong={showProlong}
+        onPreview={onPreview}
+        onExtend={onExtend}
+        onExtendAll={onExtendAll}
+        channelDecoration={channelDecoration}
+        dropdownPlacement={dropdownPlacement}
+      />
+    ) : (
+      <ul
+        data-testid={listTestId}
+        className={cn(
+          'tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-list-none tm-p-0',
+          isSimplify6Family
+            ? simplify6PortalListGapClass()
+            : minimalPresentation
+              ? 'tm-gap-x-3 tm-gap-y-2'
+              : 'tm-gap-x-2 tm-gap-y-1.5',
+        )}
+      >
+        {publications.map((publication, index) => (
+          <JobCardPublicationPortal
+            key={publication.id}
+            publication={publication}
+            expired={expired}
+            withSeparator={!minimalPresentation && index > 0}
+            hoverContent={hoverContent}
+            publications={allPublications}
+            showProlong={showProlong}
+            onPreview={onPreview}
+            onExtend={onExtend}
+            onExtendAll={onExtendAll}
+            channelDecoration={channelDecoration}
+            dropdownPlacement={dropdownPlacement}
+            channelLogoSize={channelLogoSize}
+            showChannelLabel={showChannelLabel}
+            inlineHighlights={inlineHighlights}
+          />
+        ))}
+      </ul>
+    )
 
   return (
     <div
@@ -618,7 +679,7 @@ function PeriodBadgeGroup({
   }
 
   const isSimplify6Family = isSimplify6FamilyPresentation(publicationPresentation)
-  const isSimplify7 = publicationPresentation === 'simplify7'
+  const isSimplify7MixedDates = isSimplify7MixedDatesPresentation(publicationPresentation)
   const isSimplify5Inline = minimalPresentation && publicationPresentation === 'simplify5'
   const columns = splitIntoBalancedColumns(sortPublicationsBySoonestEnd(publications))
   const minimalHeadingClass = 'tm-text-13 tm-font-normal tm-text-secondary-default'
@@ -626,6 +687,33 @@ function PeriodBadgeGroup({
   const dateGroups = groupPublicationsByEndDate(publications)
 
   if (minimalPresentation && isSimplify6Family) {
+    if (expired && publicationPresentation === 'simplify8') {
+      return (
+        <div
+          className={cn(
+            'tm-flex tm-flex-col tm-gap-1.5',
+            showLeadingDivider && 'tm-border-t tm-border-secondary tm-pt-3',
+          )}
+        >
+          <div data-testid={headingTestId} className={headingClassName}>
+            {heading}
+          </div>
+          <JobCardExpiredPublicationMiniLogoRow
+            publications={sortedPublications}
+            listTestId={listTestId}
+            hoverContent={hoverContent}
+            allPublications={allPublications}
+            showProlong={showProlong}
+            onPreview={onPreview}
+            onExtend={onExtend}
+            onExtendAll={onExtendAll}
+            channelDecoration={channelDecoration}
+            dropdownPlacement={dropdownPlacement}
+          />
+        </div>
+      )
+    }
+
     const mixedRunningLogoSize = !expired ? (20 as const) : channelLogoSize
     const mixedRunningBlock = (
       <>
@@ -663,13 +751,21 @@ function PeriodBadgeGroup({
                 dropdownPlacement={dropdownPlacement}
                 channelLogoSize={mixedRunningLogoSize}
                 showChannelLabel={showChannelLabel}
-                dateChipPresentation={isSimplify7 ? 'simplify7MixedDates' : 'default'}
+                dateChipPresentation={isSimplify7MixedDates ? 'simplify7MixedDates' : 'default'}
               />
             )
           })}
         </ul>
       </>
     )
+
+    if (expired && publicationPresentation === 'simplify9') {
+      return (
+        <JobCardExpiredPublicationsSimplify9Row onExtendAll={onExtendAll}>
+          {mixedRunningBlock}
+        </JobCardExpiredPublicationsSimplify9Row>
+      )
+    }
 
     return (
       <div
@@ -678,7 +774,7 @@ function PeriodBadgeGroup({
           showLeadingDivider && 'tm-border-t tm-border-secondary tm-pt-3',
         )}
       >
-        {!expired ? (
+        {!expired && !isSimplify7MixedDatesPresentation(publicationPresentation) ? (
           <div
             data-testid="job-card-advertisement-mixed-running-cover"
             className="tm-flex tm-flex-col tm-gap-1.5 tm-rounded tm-bg-cover-default tm-p-3"
@@ -873,9 +969,14 @@ export function JobCardAdvertisement({
   const simplifyMinimalPresentation =
     publicationPresentation === 'simplify5' ||
     publicationPresentation === 'simplify6' ||
-    publicationPresentation === 'simplify7'
+    publicationPresentation === 'simplify7' ||
+    publicationPresentation === 'simplify8' ||
+    publicationPresentation === 'simplify9'
   const simplifyChannelLogoSize =
-    publicationPresentation === 'simplify6' || publicationPresentation === 'simplify7'
+    publicationPresentation === 'simplify6' ||
+    publicationPresentation === 'simplify7' ||
+    publicationPresentation === 'simplify8' ||
+    publicationPresentation === 'simplify9'
       ? (35 as const)
       : publicationPresentation === 'simplify5'
         ? (30 as const)

@@ -31,3 +31,21 @@ export interface FilterModalProps {
   value: CandidateFilterModalValue
   onApply: (value: CandidateFilterModalValue) => void
 }
+
+export type CandidateFilterV2Value = Omit<CandidateFilterModalValue, 'candidateTag'> & {
+  candidateTag: string[]
+}
+
+export type CandidateFilterV2FlatControl = 'radio' | 'checkbox'
+
+export interface CandidateFilterV2FieldMeta {
+  flatControl?: CandidateFilterV2FlatControl
+  multi?: boolean
+}
+
+export interface FilterModalV2Props {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  value: CandidateFilterV2Value
+  onApply: (value: CandidateFilterV2Value) => void
+}

@@ -75,6 +75,8 @@ export const CANDIDATE_COPY = {
     apply: 'Potvrdit',
     cancel: 'Zrušit',
     reset: 'Obnovit výchozí',
+    expandCategory: (label: string) => `Rozbalit ${label}`,
+    collapseCategory: (label: string) => `Sbalit ${label}`,
   },
   columnsDrawer: {
     title: 'Přizpůsobit sloupce',

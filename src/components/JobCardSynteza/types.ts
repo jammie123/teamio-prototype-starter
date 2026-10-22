@@ -60,6 +60,8 @@ export interface JobCardCandidates {
   preselected?: number
   opalcovani?: number
   newOpalcovani?: number
+  /** Nově ohodnocení manažerem (Simplify 8 badge u Předvybraný). */
+  newOhodnoceni?: number
   invited?: number
   nabidka?: number
   hired?: number

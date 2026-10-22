@@ -43,12 +43,17 @@ export interface JobCardPublicationPortalProps {
   portalChip?: boolean
 }
 
-function portalChipSubtleClasses(color: PublicationPeriodBadge['color']) {
+function portalChipSubtleClasses(
+  color: PublicationPeriodBadge['color'],
+  mixedDates = false,
+) {
   switch (color) {
     case 'warning':
       return 'tm-text-emotion-warning-emphasis tm-bg-emotion-warning-background'
     case 'informative':
-      return 'tm-text-emotion-info-emphasis tm-bg-emotion-info-background'
+      return mixedDates
+        ? 'tm-text-emotion-info-emphasis tm-bg-cover-light'
+        : 'tm-text-emotion-info-emphasis tm-bg-emotion-info-background'
   }
 }
 
@@ -343,8 +348,8 @@ export function JobCardPublicationPortalDateChipGroup({
         className={cn(
           'tm-inline-flex tm-items-center tm-gap-2 tm-border-0 tm-rounded-full',
           'tm-font-poppins tm-text-sm tm-font-normal',
-          simplify7MixedDates ? 'tm-py-1.5 tm-pl-1.5 tm-pr-3.5' : 'tm-py-1 tm-pl-1 tm-pr-2.5',
-          portalChipSubtleClasses(periodBadge.color),
+          simplify7MixedDates ? 'tm-py-1 tm-px-3' : 'tm-py-1 tm-pl-1 tm-pr-2.5',
+          portalChipSubtleClasses(periodBadge.color, simplify7MixedDates),
         )}
       >
         <span className={cn('tm-inline-flex tm-items-center', logoRowGapClass)}>
@@ -373,6 +378,65 @@ export function JobCardPublicationPortalDateChipGroup({
 }
 
 JobCardPublicationPortalDateChipGroup.displayName = 'JobCardPublicationPortalDateChipGroup'
+
+export interface JobCardExpiredPublicationMiniLogoRowProps {
+  publications: JobPublication[]
+  listTestId: string
+  hoverContent?: JobCardPublicationHover
+  allPublications?: JobPublication[]
+  showProlong?: boolean
+  onPreview?: (publication: JobPublication) => void
+  onExtend?: (publication: JobPublication) => void
+  onExtendAll?: () => void
+  channelDecoration?: JobCardPublicationChannelDecoration
+  dropdownPlacement?: Placement
+}
+
+/** Gray miniature portal logos in one row (Simplify 8 ended advertisements). */
+export function JobCardExpiredPublicationMiniLogoRow({
+  publications,
+  listTestId,
+  hoverContent = 'portalDetail',
+  allPublications,
+  showProlong = false,
+  onPreview,
+  onExtend,
+  onExtendAll,
+  channelDecoration = 'plain',
+  dropdownPlacement = 'bottom-start',
+}: JobCardExpiredPublicationMiniLogoRowProps) {
+  if (publications.length === 0) {
+    return null
+  }
+
+  return (
+    <ul
+      data-testid={listTestId}
+      className="tm-m-0 tm-flex tm-list-none tm-flex-row tm-flex-wrap tm-items-center tm-gap-1 tm-p-0 tm-opacity-60 tm-grayscale"
+    >
+      {publications.map((publication) => (
+        <li key={publication.id} data-testid="job-card-publication">
+          <PublicationDropdown
+            publication={publication}
+            expired
+            hoverContent={hoverContent}
+            publications={allPublications}
+            showProlong={showProlong}
+            onPreview={onPreview}
+            onExtend={onExtend}
+            onExtendAll={onExtendAll}
+            channelDecoration={channelDecoration}
+            dropdownPlacement={dropdownPlacement}
+            channelLogoSize={20}
+            showChannelLabel={false}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+JobCardExpiredPublicationMiniLogoRow.displayName = 'JobCardExpiredPublicationMiniLogoRow'
 
 export function JobCardPublicationPortal({
   publication,

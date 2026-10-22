@@ -8,9 +8,14 @@ import {
   EMPTY_CANDIDATE_FILTER_VALUE,
   FilterModal,
 } from './FilterModal'
+import {
+  countActiveCandidateFiltersV2,
+  EMPTY_CANDIDATE_FILTER_V2_VALUE,
+  FilterModalV2,
+} from '../CandidateFilterV2'
 import { pipelineStatusCounts, sampleCandidates } from './fixtures'
 import { PanelWithTable } from './jobsPipelineStoryData'
-import type { CandidateFilterModalValue } from './filterModalTypes'
+import type { CandidateFilterModalValue, CandidateFilterV2Value } from './filterModalTypes'
 
 const meta = {
   title: 'Candidate/CandidateListPanel',
@@ -97,4 +102,37 @@ function PanelWithFiltersModal() {
 /** Opens `FilterModal` when the panel "Filtry" button is clicked. */
 export const WithFiltersModal: Story = {
   render: () => <PanelWithFiltersModal />,
+}
+
+function PanelWithFiltersModalV2() {
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filterValue, setFilterValue] = useState<CandidateFilterV2Value>(EMPTY_CANDIDATE_FILTER_V2_VALUE)
+  const activeFiltersCount = countActiveCandidateFiltersV2(filterValue)
+
+  return (
+    <>
+      <div className="tm-max-w-[1100px]">
+        <CandidateListPanel
+          statusCounts={pipelineStatusCounts}
+          searchValue=""
+          onSearchChange={fn()}
+          activeFiltersCount={activeFiltersCount}
+          onFiltersClick={() => setFiltersOpen(true)}
+        >
+          <CandidateTable candidates={sampleCandidates} />
+        </CandidateListPanel>
+      </div>
+      <FilterModalV2
+        open={filtersOpen}
+        onOpenChange={setFiltersOpen}
+        value={filterValue}
+        onApply={setFilterValue}
+      />
+    </>
+  )
+}
+
+/** Opens `FilterModalV2` when the panel "Filtry" button is clicked. */
+export const WithFiltersModalV2: Story = {
+  render: () => <PanelWithFiltersModalV2 />,
 }

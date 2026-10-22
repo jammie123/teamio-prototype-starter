@@ -15,6 +15,14 @@ export {
   type FilterModalProps,
   type CandidateFilterModalValue,
 } from './FilterModal'
+export {
+  FilterModalV2,
+  EMPTY_CANDIDATE_FILTER_V2_VALUE,
+  countActiveCandidateFiltersV2,
+  CANDIDATE_FILTER_V2_FIELD_META,
+  type FilterModalV2Props,
+  type CandidateFilterV2Value,
+} from '../CandidateFilterV2'
 export { CandidateStatus, type CandidateStatusProps } from './CandidateStatus'
 export { CandidateTags, type CandidateTagsProps } from './CandidateTags'
 export { CandidateNote, type CandidateNoteProps } from './CandidateNote'

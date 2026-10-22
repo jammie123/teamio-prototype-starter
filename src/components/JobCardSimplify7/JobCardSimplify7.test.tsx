@@ -81,6 +81,7 @@ describe('JobCardSimplify7', () => {
     )
     expect(badge).toHaveClass('tm-font-normal')
     expect(badge).not.toHaveClass('tm-font-medium')
-    expect(screen.getAllByTestId('job-card-publication-chip')[0]).toHaveClass('tm-pr-3.5')
+    expect(screen.getAllByTestId('job-card-publication-chip')[0]).toHaveClass('tm-px-3', 'tm-py-1')
+    expect(screen.queryByTestId('job-card-advertisement-mixed-running-cover')).not.toBeInTheDocument()
   })
 })

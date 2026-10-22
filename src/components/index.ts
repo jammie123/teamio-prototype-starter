@@ -188,6 +188,18 @@ export {
   type JobCardSimplify7Props,
   type JobCardBranch as JobCardSimplify7Branch,
 } from './JobCardSimplify7'
+export {
+  JobCardSimplify8,
+  JOB_CARD_SIMPLIFY_8_PREVIEW_LABEL,
+  type JobCardSimplify8Props,
+  type JobCardBranch as JobCardSimplify8Branch,
+} from './JobCardSimplify8'
+export {
+  JobCardSimplify9,
+  JOB_CARD_SIMPLIFY_9_PREVIEW_LABEL,
+  type JobCardSimplify9Props,
+  type JobCardBranch as JobCardSimplify9Branch,
+} from './JobCardSimplify9'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
 export { JobCardSyntezaMoreAds, type JobCardSyntezaMoreAdsProps } from './JobCardSyntezaMoreAds'
 export {
@@ -253,9 +265,13 @@ export {
   CandidateListPanel,
   CandidateColumnsDrawer,
   FilterModal,
+  FilterModalV2,
   EMPTY_CANDIDATE_FILTER_VALUE,
+  EMPTY_CANDIDATE_FILTER_V2_VALUE,
   countActiveCandidateFilters,
+  countActiveCandidateFiltersV2,
   CANDIDATE_FILTER_MODAL_FIELDS,
+  CANDIDATE_FILTER_V2_FIELD_META,
   CANDIDATE_COPY,
   CANDIDATE_DEFAULT_COLUMNS,
   CANDIDATE_DEFAULT_MOVE_TO_OPTIONS,
@@ -278,7 +294,9 @@ export {
   type CandidateListPanelProps,
   type CandidateColumnsDrawerProps,
   type FilterModalProps,
+  type FilterModalV2Props,
   type CandidateFilterModalValue,
+  type CandidateFilterV2Value,
   type CandidateColumnId,
   type CandidateColumnState,
   type CandidateItemData,

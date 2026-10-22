@@ -1,7 +1,10 @@
 import type {
   CandidateFilterModalFieldConfig,
+  CandidateFilterModalFieldKey,
   CandidateFilterModalOption,
   CandidateFilterModalValue,
+  CandidateFilterV2FieldMeta,
+  CandidateFilterV2Value,
 } from './filterModalTypes'
 
 export const EMPTY_CANDIDATE_FILTER_VALUE: CandidateFilterModalValue = {
@@ -10,6 +13,14 @@ export const EMPTY_CANDIDATE_FILTER_VALUE: CandidateFilterModalValue = {
   source: '',
   rating: '',
   candidateTag: '',
+}
+
+export const EMPTY_CANDIDATE_FILTER_V2_VALUE: CandidateFilterV2Value = {
+  status: '',
+  opinion: '',
+  source: '',
+  rating: '',
+  candidateTag: [],
 }
 
 const STATUS_OPTIONS: CandidateFilterModalOption[] = [
@@ -68,6 +79,21 @@ export const CANDIDATE_FILTER_MODAL_FIELDS: CandidateFilterModalFieldConfig[] = 
   { key: 'candidateTag', label: 'Štítky', emptyLabel: 'Všechny', options: CANDIDATE_TAG_OPTIONS },
 ]
 
+export const CANDIDATE_FILTER_V2_FIELD_META: Record<
+  CandidateFilterModalFieldKey,
+  CandidateFilterV2FieldMeta
+> = {
+  status: {},
+  opinion: {},
+  source: { flatControl: 'radio' },
+  rating: { flatControl: 'radio' },
+  candidateTag: { flatControl: 'checkbox', multi: true },
+}
+
+export function optionsHaveHierarchy(options: CandidateFilterModalOption[]): boolean {
+  return options.some((option) => (option.depth ?? 0) > 0)
+}
+
 export function findFilterModalOptionLabel(
   options: CandidateFilterModalOption[],
   value: string,
@@ -79,4 +105,14 @@ export function countActiveCandidateFilters(value: CandidateFilterModalValue): n
   return (Object.keys(EMPTY_CANDIDATE_FILTER_VALUE) as (keyof CandidateFilterModalValue)[]).filter(
     (key) => Boolean(value[key]),
   ).length
+}
+
+export function countActiveCandidateFiltersV2(value: CandidateFilterV2Value): number {
+  let count = 0
+  if (value.status) count += 1
+  if (value.opinion) count += 1
+  if (value.source) count += 1
+  if (value.rating) count += 1
+  if (value.candidateTag.length > 0) count += 1
+  return count
 }

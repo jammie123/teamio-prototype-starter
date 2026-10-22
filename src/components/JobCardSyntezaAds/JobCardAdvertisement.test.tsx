@@ -825,7 +825,8 @@ describe('JobCardAdvertisement publicationPresentation simplify7', () => {
     )
 
     const chip = screen.getAllByTestId('job-card-publication-chip')[0]
-    expect(chip).toHaveClass('tm-pr-3.5', 'tm-py-1.5')
+    expect(chip).toHaveClass('tm-px-3', 'tm-py-1')
+    expect(chip).toHaveClass('tm-bg-cover-light')
 
     const badge = within(chip).getByTestId('job-card-publication-period-badge')
     expect(badge).toHaveTextContent('20. 9. 2026')
@@ -978,5 +979,73 @@ describe('JobCardAdvertisement places table hover', () => {
     fireEvent.click(screen.getByTestId('job-card-advertisement-stats-toggle'))
     expect(screen.getByTestId('job-card-places-summary-table')).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-places-summary-extend')).not.toBeInTheDocument()
+  })
+})
+
+describe('JobCardAdvertisement publicationPresentation simplify9', () => {
+  it('wraps same-date ended publications in a bordered row with Prodloužit', () => {
+    const onExtendPublications = vi.fn()
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify9"
+        periodPresentation="text"
+        publicationChannelDecoration="plain"
+        showPreviewLink={false}
+        onExtendPublications={onExtendPublications}
+        advertisement={{
+          id: 'ad-ended',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '1. 9. 2026',
+              viewCount: 100,
+            },
+            {
+              id: 'prace',
+              channel: 'Prace.cz',
+              status: 'expired',
+              startDate: '12. 6.',
+              endDate: '1. 9. 2026',
+              viewCount: 50,
+            },
+          ],
+        }}
+      />,
+    )
+
+    const row = screen.getByTestId('job-card-advertisement-ended-row')
+    expect(row).toHaveClass('tm-border-secondary')
+    expect(within(row).getByTestId('job-card-publication-ended-heading')).toHaveTextContent(
+      'Ukončeno 1. 9.',
+    )
+
+    fireEvent.click(screen.getByTestId('job-card-advertisement-ended-extend'))
+    expect(onExtendPublications).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not show ended row when publications are still running', () => {
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify9"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-running',
+          publications: [
+            {
+              id: 'jobs',
+              channel: 'Jobs.cz',
+              startDate: '12. 7.',
+              endDate: '30. 9. 2026',
+              viewCount: 100,
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-advertisement-ended-row')).not.toBeInTheDocument()
   })
 })

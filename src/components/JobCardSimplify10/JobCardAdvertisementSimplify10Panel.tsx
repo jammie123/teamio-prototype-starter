@@ -37,6 +37,11 @@ export interface JobCardAdvertisementSimplify10PanelProps extends StyleProps {
   onDeclineAdvertising?: () => void
   onRepublishAdvertisement?: () => void
   publicationHover?: JobCardPublicationHover
+  channelLogoSize?: 35 | 40
+  showPortalPeriodBadges?: boolean
+  expiredLogosMuted?: boolean
+  actionButtonVariant?: 'primary' | 'secondary'
+  actionButtonSize?: 'small' | 'medium'
 }
 
 function sharedFullEndDate(publications: JobPublication[]) {
@@ -97,6 +102,8 @@ function ActivePortalLogos({
   onExtend,
   onExtendAll,
   publicationHover,
+  channelLogoSize = 35,
+  showPortalPeriodBadges = true,
 }: {
   publications: JobPublication[]
   allPublications: JobPublication[]
@@ -105,6 +112,8 @@ function ActivePortalLogos({
   onExtend?: (publication: JobPublication) => void
   onExtendAll?: () => void
   publicationHover: JobCardPublicationHover
+  channelLogoSize?: 35 | 40
+  showPortalPeriodBadges?: boolean
 }) {
   return (
     <ul
@@ -117,7 +126,7 @@ function ActivePortalLogos({
           publication={publication}
           expired={false}
           withSeparator={false}
-          periodBadge={publicationPeriodBadge(publication)}
+          periodBadge={showPortalPeriodBadges ? publicationPeriodBadge(publication) : undefined}
           periodPresentation="text"
           hoverContent={publicationHover}
           publications={allPublications}
@@ -126,7 +135,7 @@ function ActivePortalLogos({
           onExtend={onExtend}
           onExtendAll={onExtendAll}
           channelDecoration="plain"
-          channelLogoSize={35}
+          channelLogoSize={channelLogoSize}
           showChannelLabel={false}
           inlineHighlights="none"
           portalChip
@@ -142,12 +151,20 @@ function Simplify10EndingSoonPanel({
   onPreviewPublication,
   onExtendPublication,
   publicationHover,
+  channelLogoSize = 35,
+  showPortalPeriodBadges = true,
+  actionButtonVariant = 'primary',
+  actionButtonSize = 'small',
 }: {
   advertisement: JobAdvertisement
   onExtendAll?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
   publicationHover: JobCardPublicationHover
+  channelLogoSize?: 35 | 40
+  showPortalPeriodBadges?: boolean
+  actionButtonVariant?: 'primary' | 'secondary'
+  actionButtonSize?: 'small' | 'medium'
 }) {
   const publications = advertisement.publications ?? []
   const summary = getAdvertisementSummary(advertisement)
@@ -180,6 +197,8 @@ function Simplify10EndingSoonPanel({
         onExtend={onExtendPublication}
         onExtendAll={onExtendAll}
         publicationHover={publicationHover}
+        channelLogoSize={channelLogoSize}
+        showPortalPeriodBadges={showPortalPeriodBadges}
       />
       {summary.viewCount !== undefined ? (
         <p
@@ -191,10 +210,10 @@ function Simplify10EndingSoonPanel({
       ) : null}
       {onExtendAll ? (
         <Button
-          variant="primary"
-          size="small"
+          variant={actionButtonVariant}
+          size={actionButtonSize}
           isBlock
-          className="!tm-min-h-8"
+          className={actionButtonSize === 'small' ? '!tm-min-h-8' : undefined}
           data-testid="job-card-simplify10-extend-advertising"
           onClick={(event) => {
             event.preventDefault()
@@ -216,6 +235,10 @@ function Simplify10ExpiredPanel({
   onPreviewPublication,
   onExtendPublication,
   publicationHover,
+  channelLogoSize = 35,
+  expiredLogosMuted = true,
+  actionButtonVariant = 'primary',
+  actionButtonSize = 'small',
 }: {
   advertisement: JobAdvertisement
   onExtendAll?: () => void
@@ -223,6 +246,10 @@ function Simplify10ExpiredPanel({
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
   publicationHover: JobCardPublicationHover
+  channelLogoSize?: 35 | 40
+  expiredLogosMuted?: boolean
+  actionButtonVariant?: 'primary' | 'secondary'
+  actionButtonSize?: 'small' | 'medium'
 }) {
   const publications = advertisement.publications ?? []
   const endDate = sharedFullEndDate(publications)
@@ -248,16 +275,18 @@ function Simplify10ExpiredPanel({
         onExtend={onExtendPublication}
         onExtendAll={onExtendAll}
         channelDecoration="plain"
+        channelLogoSize={channelLogoSize}
+        muted={expiredLogosMuted}
       />
       <p className="tm-m-0 tm-text-xs tm-text-secondary-default">
         Nábor běží, ale pozice už není vidět. Noví kandidáti nepřijdou.
       </p>
       {onExtendAll ? (
         <Button
-          variant="primary"
-          size="small"
+          variant={actionButtonVariant}
+          size={actionButtonSize}
           isBlock
-          className="!tm-min-h-8"
+          className={actionButtonSize === 'small' ? '!tm-min-h-8' : undefined}
           data-testid="job-card-simplify10-restore-advertising"
           onClick={(event) => {
             event.preventDefault()
@@ -346,6 +375,14 @@ function renderSimplify10Panel(
     props
   const onRepublish = onRepublishAdvertisement ?? onExtendAll
 
+  const {
+    channelLogoSize = 35,
+    showPortalPeriodBadges = true,
+    expiredLogosMuted = true,
+    actionButtonVariant = 'primary',
+    actionButtonSize = 'small',
+  } = props
+
   switch (mode) {
     case 'endingSoon':
       return (
@@ -355,6 +392,10 @@ function renderSimplify10Panel(
           onPreviewPublication={onPreviewPublication}
           onExtendPublication={onExtendPublication}
           publicationHover={publicationHover}
+          channelLogoSize={channelLogoSize}
+          showPortalPeriodBadges={showPortalPeriodBadges}
+          actionButtonVariant={actionButtonVariant}
+          actionButtonSize={actionButtonSize}
         />
       )
     case 'expiredUnexpected':
@@ -366,6 +407,10 @@ function renderSimplify10Panel(
           onPreviewPublication={onPreviewPublication}
           onExtendPublication={onExtendPublication}
           publicationHover={publicationHover}
+          channelLogoSize={channelLogoSize}
+          expiredLogosMuted={expiredLogosMuted}
+          actionButtonVariant={actionButtonVariant}
+          actionButtonSize={actionButtonSize}
         />
       )
     case 'notAdvertising':
@@ -388,6 +433,11 @@ export function JobCardAdvertisementSimplify10Panel({
   onDeclineAdvertising,
   onRepublishAdvertisement,
   publicationHover = 'placesTable',
+  channelLogoSize = 35,
+  showPortalPeriodBadges = true,
+  expiredLogosMuted = true,
+  actionButtonVariant = 'primary',
+  actionButtonSize = 'small',
   className,
 }: JobCardAdvertisementSimplify10PanelProps) {
   const publications = advertisement.publications ?? []
@@ -428,14 +478,24 @@ export function JobCardAdvertisementSimplify10Panel({
   }
 
   const mode = resolveJobCardSimplify10PanelMode(advertisement)
-  const panel = renderSimplify10Panel(mode, {
-    advertisement,
-    onPreviewPublication,
-    onExtendPublication,
-    onDeclineAdvertising,
-    onRepublishAdvertisement,
+  const panel = renderSimplify10Panel(
+    mode,
+    {
+      advertisement,
+      onPreviewPublication,
+      onExtendPublication,
+      onDeclineAdvertising,
+      onRepublishAdvertisement,
+      publicationHover,
+      channelLogoSize,
+      showPortalPeriodBadges,
+      expiredLogosMuted,
+      actionButtonVariant,
+      actionButtonSize,
+    },
+    onExtendAll,
     publicationHover,
-  }, onExtendAll, publicationHover)
+  )
 
   if (panel) {
     return (

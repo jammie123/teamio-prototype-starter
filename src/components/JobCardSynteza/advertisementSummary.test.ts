@@ -2,11 +2,13 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   formatAdvertisementExpiredHeading,
   formatCompactDateRange,
+  formatDisabledChannelsSuffix,
   formatEndedHeading,
   formatEndingSoonHeading,
   formatEndingSoonLabel,
   formatEndingSoonWithDate,
   formatExpiredPortalsLabel,
+  formatPartialExpiredSubline,
   formatPublicationDateLabel,
   formatRemainingDaysLabel,
   formatRunningHeading,
@@ -18,7 +20,10 @@ import {
   groupPublicationsByDate,
   isAdvertisementFullyExpired,
   isEndingSoon,
+  joinSublineParts,
   partitionPublications,
+  resolveSimplify11PanelCta,
+  resolveSimplify11SummaryMode,
   shareSameEndDate,
   visibleHighlights,
 } from './advertisementSummary'
@@ -503,6 +508,7 @@ describe('partitionPublications', () => {
             endDate: '12. 8.',
           },
         ],
+        disabled: [],
       })
     } finally {
       vi.useRealTimers()
@@ -529,6 +535,7 @@ describe('partitionPublications', () => {
         running: [prace],
         endingSoon: [jobs],
         expired: [career],
+        disabled: [],
       })
     } finally {
       vi.useRealTimers()
@@ -578,6 +585,153 @@ describe('visibleHighlights', () => {
 
   it('returns an empty list when the portal has no highlights', () => {
     expect(visibleHighlights({ id: 'jobs', channel: 'Jobs.cz', startDate: '1. 6.' })).toEqual([])
+  })
+})
+
+describe('Simplify 11 channel states', () => {
+  const now = new Date('2026-10-22T12:00:00')
+
+  it('excludes disabled publications from active and expired partitions', () => {
+    const { active, expired, disabled } = partitionPublications(
+      [
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 6.', endDate: '14. 11. 2026' },
+        {
+          id: 'prace',
+          channel: 'Prace.cz',
+          status: 'expired',
+          startDate: '1. 6.',
+          endDate: '20. 10. 2026',
+        },
+        {
+          id: 'career',
+          channel: 'Kariérní stránky',
+          status: 'disabled',
+          startDate: '1. 6.',
+        },
+      ],
+      now,
+    )
+
+    expect(active.map((p) => p.id)).toEqual(['jobs'])
+    expect(expired.map((p) => p.id)).toEqual(['prace'])
+    expect(disabled.map((p) => p.id)).toEqual(['career'])
+  })
+
+  it('resolves summary modes D, E, and F from non-disabled channels only', () => {
+    const mix = [
+      { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 6.', endDate: '14. 11. 2026' },
+      {
+        id: 'prace',
+        channel: 'Prace.cz',
+        status: 'expired' as const,
+        startDate: '1. 6.',
+        endDate: '20. 10. 2026',
+      },
+      {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        status: 'disabled' as const,
+        startDate: '1. 6.',
+      },
+    ]
+
+    expect(resolveSimplify11SummaryMode(mix, now)).toBe('partial')
+
+    expect(
+      resolveSimplify11SummaryMode(
+        [
+          { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 6.', endDate: '14. 11. 2026' },
+          { id: 'prace', channel: 'Prace.cz', startDate: '1. 6.', endDate: '14. 11. 2026' },
+          {
+            id: 'career',
+            channel: 'Kariérní stránky',
+            status: 'disabled' as const,
+            startDate: '1. 6.',
+          },
+        ],
+        now,
+      ),
+    ).toBe('running')
+
+    expect(
+      resolveSimplify11SummaryMode(
+        [
+          {
+            id: 'jobs',
+            channel: 'Jobs.cz',
+            status: 'expired' as const,
+            startDate: '1. 6.',
+            endDate: '20. 10. 2026',
+          },
+          {
+            id: 'prace',
+            channel: 'Prace.cz',
+            status: 'expired' as const,
+            startDate: '1. 6.',
+            endDate: '20. 10. 2026',
+          },
+          {
+            id: 'career',
+            channel: 'Kariérní stránky',
+            status: 'disabled' as const,
+            startDate: '1. 6.',
+          },
+        ],
+        now,
+      ),
+    ).toBe('ended')
+  })
+
+  it('formats disabled suffix and partial subline', () => {
+    expect(formatDisabledChannelsSuffix(1)).toBe('· 1 vypnutý')
+    expect(formatDisabledChannelsSuffix(3)).toBe('· 3 vypnuté')
+    expect(
+      joinSublineParts(
+        formatPartialExpiredSubline([
+          { id: 'prace', channel: 'Prace.cz', status: 'expired', startDate: '1. 6.', endDate: '20. 10.' },
+        ]),
+        formatDisabledChannelsSuffix(1),
+      ),
+    ).toBe('Prace.cz skončila · 1 vypnutý')
+  })
+
+  it('targets only expired publications in panel CTA', () => {
+    const publications = [
+      { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 6.', endDate: '14. 11. 2026' },
+      {
+        id: 'prace',
+        channel: 'Prace.cz',
+        status: 'expired' as const,
+        startDate: '1. 6.',
+        endDate: '20. 10. 2026',
+      },
+      {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        status: 'disabled' as const,
+        startDate: '1. 6.',
+      },
+    ]
+
+    const cta = resolveSimplify11PanelCta(publications, now)
+    expect(cta?.label).toBe('Obnovit Prace.cz')
+    expect(cta?.targetPublications.map((p) => p.id)).toEqual(['prace'])
+  })
+
+  it('ignores disabled channels in advertisement summary active names', () => {
+    const summary = getAdvertisementSummary(
+      advertisement([
+        { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7.', endDate: '15. 9. 2026' },
+        {
+          id: 'career',
+          channel: 'Kariérní stránky',
+          status: 'disabled',
+          startDate: '12. 7.',
+        },
+      ]),
+    )
+
+    expect(summary.activePortalNames).toEqual(['Jobs.cz'])
   })
 })
 

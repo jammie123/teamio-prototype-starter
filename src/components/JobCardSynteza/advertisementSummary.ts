@@ -9,8 +9,12 @@ export interface JobAdvertisementSummary {
   viewCount?: number
 }
 
+export function isDisabledPublication(publication: JobPublication) {
+  return publication.status === 'disabled'
+}
+
 function isActive(publication: JobPublication) {
-  return publication.status !== 'expired'
+  return publication.status !== 'expired' && publication.status !== 'disabled'
 }
 
 function isExpired(publication: JobPublication) {
@@ -224,12 +228,137 @@ export function isEndingSoonPublication(publication: JobPublication, now = new D
 }
 
 export function partitionPublications(publications: JobPublication[], now = new Date()) {
-  const expired = publications.filter(isExpired)
-  const active = publications.filter((publication) => !isExpired(publication))
+  const disabled = publications.filter(isDisabledPublication)
+  const nonDisabled = publications.filter((publication) => !isDisabledPublication(publication))
+  const expired = nonDisabled.filter(isExpired)
+  const active = nonDisabled.filter((publication) => !isExpired(publication))
   const endingSoon = active.filter((publication) => isEndingSoonPublication(publication, now))
   const running = active.filter((publication) => !isEndingSoonPublication(publication, now))
 
-  return { active, running, endingSoon, expired }
+  return { active, running, endingSoon, expired, disabled }
+}
+
+export function partitionPublicationChannels(publications: JobPublication[], now = new Date()) {
+  return partitionPublications(publications, now)
+}
+
+export type Simplify11SummaryMode = 'partial' | 'running' | 'ended' | 'allDisabled' | 'empty'
+
+export function resolveSimplify11SummaryMode(
+  publications: JobPublication[],
+  now = new Date(),
+): Simplify11SummaryMode {
+  const { active, expired, disabled } = partitionPublicationChannels(publications, now)
+
+  if (publications.length === 0) {
+    return 'empty'
+  }
+
+  if (active.length === 0 && expired.length === 0 && disabled.length > 0) {
+    return 'allDisabled'
+  }
+
+  if (active.length > 0 && expired.length > 0) {
+    return 'partial'
+  }
+
+  if (active.length > 0 && expired.length === 0) {
+    return 'running'
+  }
+
+  if (active.length === 0 && expired.length > 0) {
+    return 'ended'
+  }
+
+  return 'empty'
+}
+
+export function formatDisabledChannelsSuffix(count: number) {
+  if (count <= 0) {
+    return undefined
+  }
+
+  if (count === 1) {
+    return '· 1 vypnutý'
+  }
+
+  if (count >= 2 && count <= 4) {
+    return `· ${count} vypnuté`
+  }
+
+  return `· ${count} vypnutých`
+}
+
+export function joinSublineParts(...parts: (string | undefined)[]) {
+  return parts.filter(Boolean).join(' ')
+}
+
+export function formatPartialExpiredSubline(expiredPublications: JobPublication[]) {
+  if (expiredPublications.length === 0) {
+    return undefined
+  }
+
+  const publication = expiredPublications[0]
+  return `${publication.channel} skončila`
+}
+
+export function formatChannelEndedSubline(publication: JobPublication) {
+  const endDate = publication.endDate
+  if (!endDate) {
+    return `${publication.channel} skončila`
+  }
+
+  return `${publication.channel} skončila ${endDate}`
+}
+
+export interface Simplify11PanelCta {
+  label: string
+  targetPublications: JobPublication[]
+}
+
+export function resolveSimplify11PanelCta(
+  publications: JobPublication[],
+  now = new Date(),
+): Simplify11PanelCta | undefined {
+  const mode = resolveSimplify11SummaryMode(publications, now)
+  const { expired } = partitionPublicationChannels(publications, now)
+
+  if (expired.length === 0) {
+    return undefined
+  }
+
+  if (mode === 'partial' && expired.length === 1) {
+    return {
+      label: `Obnovit ${expired[0].channel}`,
+      targetPublications: expired,
+    }
+  }
+
+  if (mode === 'partial' || mode === 'ended') {
+    return {
+      label: 'Obnovit inzerci',
+      targetPublications: expired,
+    }
+  }
+
+  return undefined
+}
+
+/** Simplify 11 — all channels ended (mix may include disabled). */
+export function formatAdvertisementEndedHeading(date?: string) {
+  if (!date) {
+    return 'Skončila'
+  }
+
+  return `Skončila ${date}`
+}
+
+export function formatPartialRunningHeading() {
+  return 'Běží částečně'
+}
+
+export function formatRunningSimpleHeading() {
+  return 'Běží'
 }
 
 export function visibleHighlights(publication: JobPublication): JobPublicationHighlight[] {

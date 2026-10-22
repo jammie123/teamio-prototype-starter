@@ -36,7 +36,7 @@ export interface JobCardPublicationPortalProps {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
-  channelLogoSize?: 18 | 20 | 24 | 30 | 35
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
   inlineHighlights?: 'all' | 'none'
   /** Pill wrapper (logo + period) for Simplify 5 mixed periods. */
@@ -57,7 +57,11 @@ function portalChipSubtleClasses(
   }
 }
 
-export function channelLogoSizeClass(size: 18 | 20 | 24 | 30 | 35 = 18) {
+export function channelLogoSizeClass(size: 18 | 20 | 24 | 30 | 35 | 40 = 18) {
+  if (size === 40) {
+    return 'tm-size-[40px]'
+  }
+
   if (size === 35) {
     return 'tm-size-[35px]'
   }
@@ -77,7 +81,7 @@ export function channelLogoSizeClass(size: 18 | 20 | 24 | 30 | 35 = 18) {
   return 'tm-size-[18px]'
 }
 
-export function channelLogoPresentationClass(size: 18 | 20 | 24 | 30 | 35 = 18) {
+export function channelLogoPresentationClass(size: 18 | 20 | 24 | 30 | 35 | 40 = 18) {
   return cn(channelLogoSizeClass(size), 'tm-overflow-hidden', 'tm-rounded-full')
 }
 
@@ -110,7 +114,7 @@ function PublicationDropdown({
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
-  channelLogoSize?: 18 | 20 | 24 | 30 | 35
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
@@ -306,7 +310,7 @@ export interface JobCardPublicationPortalDateChipGroupProps {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
-  channelLogoSize?: 18 | 20 | 24 | 30 | 35
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
   /** Gap between logos inside the chip (Simplify6 uses a tighter row). */
   logoRowGapClass?: string
@@ -390,6 +394,9 @@ export interface JobCardExpiredPublicationMiniLogoRowProps {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
+  /** When false, expired logos keep full color (Simplify 11). */
+  muted?: boolean
 }
 
 /** Gray miniature portal logos in one row (Simplify 8 ended advertisements). */
@@ -404,6 +411,8 @@ export function JobCardExpiredPublicationMiniLogoRow({
   onExtendAll,
   channelDecoration = 'plain',
   dropdownPlacement = 'bottom-start',
+  channelLogoSize = 20,
+  muted = true,
 }: JobCardExpiredPublicationMiniLogoRowProps) {
   if (publications.length === 0) {
     return null
@@ -412,7 +421,10 @@ export function JobCardExpiredPublicationMiniLogoRow({
   return (
     <ul
       data-testid={listTestId}
-      className="tm-m-0 tm-flex tm-list-none tm-flex-row tm-flex-wrap tm-items-center tm-gap-1 tm-p-0 tm-opacity-60 tm-grayscale"
+      className={cn(
+        'tm-m-0 tm-flex tm-list-none tm-flex-row tm-flex-wrap tm-items-center tm-gap-1 tm-p-0',
+        muted && 'tm-opacity-60 tm-grayscale',
+      )}
     >
       {publications.map((publication) => (
         <li key={publication.id} data-testid="job-card-publication">
@@ -427,7 +439,7 @@ export function JobCardExpiredPublicationMiniLogoRow({
             onExtendAll={onExtendAll}
             channelDecoration={channelDecoration}
             dropdownPlacement={dropdownPlacement}
-            channelLogoSize={20}
+            channelLogoSize={channelLogoSize}
             showChannelLabel={false}
           />
         </li>

@@ -1,6 +1,6 @@
 import type { OptionColor } from '../OptionList'
 
-export type JobPublicationStatus = 'active' | 'endingSoon' | 'expired'
+export type JobPublicationStatus = 'active' | 'endingSoon' | 'expired' | 'disabled'
 
 export interface JobCardAction {
   id: string

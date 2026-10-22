@@ -58,6 +58,7 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify7'
   | 'simplify8'
   | 'simplify9'
+  | 'simplify11'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
@@ -305,7 +306,8 @@ function isSimplify6FamilyPresentation(
     publicationPresentation === 'simplify6' ||
     publicationPresentation === 'simplify7' ||
     publicationPresentation === 'simplify8' ||
-    publicationPresentation === 'simplify9'
+    publicationPresentation === 'simplify9' ||
+    publicationPresentation === 'simplify11'
   )
 }
 
@@ -315,7 +317,8 @@ function isSimplify7MixedDatesPresentation(
   return (
     publicationPresentation === 'simplify7' ||
     publicationPresentation === 'simplify8' ||
-    publicationPresentation === 'simplify9'
+    publicationPresentation === 'simplify9' ||
+    publicationPresentation === 'simplify11'
   )
 }
 
@@ -971,16 +974,33 @@ export function JobCardAdvertisement({
     publicationPresentation === 'simplify6' ||
     publicationPresentation === 'simplify7' ||
     publicationPresentation === 'simplify8' ||
-    publicationPresentation === 'simplify9'
+    publicationPresentation === 'simplify9' ||
+    publicationPresentation === 'simplify11'
   const simplifyChannelLogoSize =
-    publicationPresentation === 'simplify6' ||
-    publicationPresentation === 'simplify7' ||
-    publicationPresentation === 'simplify8' ||
-    publicationPresentation === 'simplify9'
-      ? (35 as const)
-      : publicationPresentation === 'simplify5'
-        ? (30 as const)
-        : undefined
+    publicationPresentation === 'simplify11'
+      ? (40 as const)
+      : publicationPresentation === 'simplify6' ||
+          publicationPresentation === 'simplify7' ||
+          publicationPresentation === 'simplify8' ||
+          publicationPresentation === 'simplify9'
+        ? (35 as const)
+        : publicationPresentation === 'simplify5'
+          ? (30 as const)
+          : undefined
+  const simplifyPeriodBadge = (publication: JobPublication) => {
+    if (publicationPresentation === 'simplify11') {
+      return undefined
+    }
+
+    return publicationPeriodBadge(publication)
+  }
+  const simplifyExpiredPeriodBadge = (publication: JobPublication) => {
+    if (publicationPresentation === 'simplify11') {
+      return undefined
+    }
+
+    return expiredPeriodBadge(publication)
+  }
   const hoverPassThrough: PublicationHoverPassThrough = {
     hoverContent: publicationHover,
     allPublications: publications,
@@ -1027,7 +1047,7 @@ export function JobCardAdvertisement({
                 headingTestId="job-card-advertisement-running-heading"
                 headingClassName="tm-text-sm tm-font-medium tm-text-secondary-default"
                 listTestId="job-card-advertisement-active-publications"
-                periodBadge={publicationPeriodBadge}
+                periodBadge={simplifyPeriodBadge}
                 periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
@@ -1060,7 +1080,7 @@ export function JobCardAdvertisement({
                 headingClassName="tm-text-sm tm-font-normal tm-text-secondary-default"
                 listTestId="job-card-advertisement-ended-publications"
                 showLeadingDivider={active.length > 0}
-                periodBadge={expiredPeriodBadge}
+                periodBadge={simplifyExpiredPeriodBadge}
                 periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}

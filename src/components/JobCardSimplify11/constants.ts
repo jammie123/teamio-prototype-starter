@@ -1,0 +1,1 @@
+export const JOB_CARD_SIMPLIFY_11_CHANNEL_LOGO_SIZE = 40 as const

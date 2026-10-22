@@ -9,6 +9,7 @@ import {
   earliestStartDateLabel,
   formatEndedHeading,
   formatEndingSoonHeading,
+  formatPartialRunningHeading,
   formatRunningHeading,
   formatViewCountLabel,
   getAdvertisementSummary,
@@ -59,6 +60,7 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify8'
   | 'simplify9'
   | 'simplify11'
+  | 'simplify13'
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
@@ -74,6 +76,10 @@ export interface JobCardAdvertisementProps extends StyleProps {
   publicationChannelDecoration?: JobCardPublicationChannelDecoration
   publicationDropdownPlacement?: Placement
   publicationPresentation?: JobCardAdvertisementPublicationPresentation
+  /** Overrides default portal logo size (18px) when using default publication presentation. */
+  publicationChannelLogoSize?: 18 | 20 | 24 | 30 | 35
+  /** Hides Běží / Ukončeno group headings when a parent panel renders Simplify 11-style status. */
+  suppressPublicationGroupHeadings?: boolean
 }
 
 function sharedFieldDateLabel(
@@ -279,6 +285,103 @@ function AdvertisementMeta({
 
 type PublicationGroupKind = 'running' | 'endingSoon' | 'expired'
 
+type PublicationStatusHeadingKind =
+  | PublicationGroupKind
+  | 'mixedActive'
+  | 'mixedExpired'
+  | 'partial'
+
+function publicationStatusIcon(
+  kind: PublicationStatusHeadingKind,
+): 'circle-check' | 'alert-triangle-outline' | 'clock' | 'warning' {
+  if (kind === 'partial') {
+    return 'alert-triangle-outline'
+  }
+
+  if (kind === 'expired' || kind === 'mixedExpired') {
+    return 'warning'
+  }
+
+  if (kind === 'endingSoon') {
+    return 'clock'
+  }
+
+  return 'circle-check'
+}
+
+const SIMPLIFY_13_STATUS_HEADING_ICON_SIZE = 24
+
+function PublicationStatusHeading({
+  kind,
+  testId,
+  className,
+  iconSize = 20,
+  children,
+}: {
+  kind: PublicationStatusHeadingKind
+  testId: string
+  className?: string
+  iconSize?: number
+  children: string
+}) {
+  return (
+    <p
+      data-testid={testId}
+      className={cn(
+        'tm-m-0 tm-flex tm-items-center tm-gap-2 tm-text-sm tm-font-medium',
+        className,
+      )}
+    >
+      <Icon name={publicationStatusIcon(kind)} size={iconSize} className="tm-shrink-0" />
+      <span>{children}</span>
+    </p>
+  )
+}
+
+function renderPublicationGroupHeading({
+  presentation,
+  kind,
+  heading,
+  headingTestId,
+  headingClassName,
+  suppressPublicationGroupHeadings,
+}: {
+  presentation?: JobCardAdvertisementPublicationPresentation
+  kind: PublicationStatusHeadingKind
+  heading: string
+  headingTestId: string
+  headingClassName: string
+  suppressPublicationGroupHeadings?: boolean
+}) {
+  if (suppressPublicationGroupHeadings) {
+    return null
+  }
+
+  if (presentation === 'simplify13') {
+    return (
+      <div
+        data-testid={`${headingTestId}-wrap`}
+        className="tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-1.5 tm-mb-2"
+      >
+        <PublicationStatusHeading
+          kind={kind}
+          testId={headingTestId}
+          className={headingClassName}
+          iconSize={SIMPLIFY_13_STATUS_HEADING_ICON_SIZE}
+        >
+          {heading}
+        </PublicationStatusHeading>
+      </div>
+    )
+  }
+
+  return (
+    <div data-testid={headingTestId} className={headingClassName}>
+      {heading}
+    </div>
+  )
+}
+
 interface PublicationHoverPassThrough {
   hoverContent?: JobCardPublicationHover
   allPublications?: JobPublication[]
@@ -293,6 +396,7 @@ interface PublicationHoverPassThrough {
   showProductHighlights?: boolean
   portalChip?: boolean
   publicationPresentation?: JobCardAdvertisementPublicationPresentation
+  suppressPublicationGroupHeadings?: boolean
 }
 
 function simplify6PortalListGapClass() {
@@ -348,6 +452,14 @@ function publicationStatusHeadingClass(
     }
 
     return 'tm-text-13 tm-font-normal tm-text-secondary-default'
+  }
+
+  if (publicationPresentation === 'simplify13') {
+    return cn(
+      kind === 'expired' && 'tm-text-emotion-danger-emphasis',
+      kind === 'endingSoon' && 'tm-text-emotion-warning-emphasis',
+      kind === 'running' && 'tm-text-emotion-success-emphasis',
+    )
   }
 
   return cn(
@@ -431,6 +543,7 @@ function PublicationGroup({
   inlineHighlights,
   minimalPresentation,
   publicationPresentation,
+  suppressPublicationGroupHeadings,
 }: {
   publications: JobPublication[]
   kind: PublicationGroupKind
@@ -448,7 +561,7 @@ function PublicationGroup({
   const sameDate = shareSameEndDate(publications)
   const date = sharedEndDateLabel(publications)
   const remainingDays = !expired && date ? getRemainingCalendarDays(date) : undefined
-  const heading =
+  let heading =
     kind === 'expired'
       ? formatEndedHeading({ sameDate, date: date ? stripYear(date) : undefined })
       : kind === 'endingSoon'
@@ -459,6 +572,21 @@ function PublicationGroup({
             endDate: date,
             remainingDays,
           })
+
+  if (publicationPresentation === 'simplify13') {
+    if (kind === 'running' && sameDate && date) {
+      heading = `Běží do ${stripYear(date)}`
+    }
+
+    if (kind === 'endingSoon') {
+      heading = formatEndingSoonHeading({
+        sameDate,
+        endDate: date ? stripYear(date) : undefined,
+        remainingDays,
+      })
+    }
+  }
+
   const headingTestId =
     kind === 'expired'
       ? 'job-card-publication-ended-heading'
@@ -554,12 +682,19 @@ function PublicationGroup({
       </ul>
     )
 
+  const contentGap =
+    publicationPresentation === 'simplify13'
+      ? 'tm-gap-0'
+      : minimalPresentation
+        ? 'tm-gap-1.5'
+        : 'tm-gap-0.5'
+
   return (
     <div
       className={cn(
         'tm-flex',
         'tm-flex-col',
-        minimalPresentation ? 'tm-gap-1.5' : 'tm-gap-0.5',
+        contentGap,
         showLeadingDivider && (minimalPresentation ? 'tm-border-t tm-border-secondary tm-pt-3' : ' tm-pt-2'),
       )}
     >
@@ -568,16 +703,26 @@ function PublicationGroup({
           data-testid="job-card-advertisement-status-row"
           className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-3 tm-gap-y-2"
         >
-          <div data-testid={headingTestId} className={headingClassName}>
-            {heading}
-          </div>
+          {renderPublicationGroupHeading({
+            presentation: publicationPresentation,
+            kind,
+            heading,
+            headingTestId,
+            headingClassName,
+            suppressPublicationGroupHeadings,
+          })}
           {portalList}
         </div>
       ) : (
         <>
-          <div data-testid={headingTestId} className={headingClassName}>
-            {heading}
-          </div>
+          {renderPublicationGroupHeading({
+            presentation: publicationPresentation,
+            kind,
+            heading,
+            headingTestId,
+            headingClassName,
+            suppressPublicationGroupHeadings,
+          })}
           {portalList}
         </>
       )}
@@ -588,6 +733,7 @@ function PublicationGroup({
 function PeriodBadgeColumn({
   publications,
   expired,
+  perPublicationExpired = false,
   periodBadge,
   periodPresentation,
   onPreview,
@@ -604,6 +750,7 @@ function PeriodBadgeColumn({
 }: {
   publications: JobPublication[]
   expired: boolean
+  perPublicationExpired?: boolean
   periodBadge: (publication: JobPublication) => PublicationPeriodBadge | undefined
   periodPresentation?: 'tag' | 'text'
   onPreview?: (publication: JobPublication) => void
@@ -618,7 +765,7 @@ function PeriodBadgeColumn({
         <JobCardPublicationPortal
           key={publication.id}
           publication={publication}
-          expired={expired}
+          expired={perPublicationExpired ? publication.status === 'expired' : expired}
           withSeparator={false}
           variant="grid"
           periodBadge={periodBadge(publication)}
@@ -664,6 +811,9 @@ function PeriodBadgeGroup({
   minimalPresentation,
   portalChip,
   publicationPresentation,
+  suppressPublicationGroupHeadings,
+  statusHeadingKind,
+  perPublicationExpired = false,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -674,6 +824,8 @@ function PeriodBadgeGroup({
   showLeadingDivider?: boolean
   periodBadge: (publication: JobPublication) => PublicationPeriodBadge | undefined
   periodPresentation?: 'tag' | 'text'
+  statusHeadingKind?: PublicationStatusHeadingKind
+  perPublicationExpired?: boolean
   onPreview?: (publication: JobPublication) => void
   onExtend?: (publication: JobPublication) => void
 } & PublicationHoverPassThrough) {
@@ -803,9 +955,14 @@ function PeriodBadgeGroup({
           data-testid="job-card-advertisement-status-row"
           className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-3 tm-gap-y-2"
         >
-          <div data-testid={headingTestId} className={minimalHeadingClass}>
-            {heading}
-          </div>
+          {renderPublicationGroupHeading({
+            presentation: publicationPresentation,
+            kind: statusHeadingKind ?? (expired ? 'mixedExpired' : 'mixedActive'),
+            heading,
+            headingTestId,
+            headingClassName: publicationPresentation === 'simplify13' ? headingClassName : minimalHeadingClass,
+            suppressPublicationGroupHeadings,
+          })}
           <ul
             data-testid={listTestId}
             className="tm-m-0 tm-flex tm-list-none tm-flex-row tm-flex-wrap tm-gap-x-3 tm-gap-y-2 tm-p-0"
@@ -838,17 +995,31 @@ function PeriodBadgeGroup({
     )
   }
 
+  const badgeGroupHeadingKind =
+    statusHeadingKind ?? (expired ? 'mixedExpired' : 'mixedActive')
+  const badgeGroupHeadingClassName =
+    publicationPresentation === 'simplify13'
+      ? expired
+        ? 'tm-text-emotion-danger-emphasis'
+        : badgeGroupHeadingKind === 'partial' || badgeGroupHeadingKind === 'endingSoon'
+          ? 'tm-text-emotion-warning-emphasis'
+          : 'tm-text-emotion-success-emphasis'
+      : headingClassName
+
+  const badgeGroupContentGap = publicationPresentation === 'simplify13' ? 'tm-gap-0' : 'tm-gap-0.5'
+
   return (
     <div
-      className={cn(
-        'tm-flex tm-flex-col',
-        'tm-gap-0.5',
-        showLeadingDivider && ' tm-pt-2',
-      )}
+      className={cn('tm-flex tm-flex-col', badgeGroupContentGap, showLeadingDivider && ' tm-pt-2')}
     >
-      <div data-testid={headingTestId} className={headingClassName}>
-        {heading}
-      </div>
+      {renderPublicationGroupHeading({
+        presentation: publicationPresentation,
+        kind: badgeGroupHeadingKind,
+        heading,
+        headingTestId,
+        headingClassName: badgeGroupHeadingClassName,
+        suppressPublicationGroupHeadings,
+      })}
       <div
         data-testid={listTestId}
         className={cn(
@@ -865,6 +1036,7 @@ function PeriodBadgeGroup({
             key={column.map((publication) => publication.id).join('|')}
             publications={column}
             expired={expired}
+            perPublicationExpired={perPublicationExpired}
             periodBadge={periodBadge}
             periodPresentation={periodPresentation}
             hoverContent={hoverContent}
@@ -899,6 +1071,8 @@ export function JobCardAdvertisement({
   publicationChannelDecoration,
   publicationDropdownPlacement,
   publicationPresentation = 'default',
+  publicationChannelLogoSize,
+  suppressPublicationGroupHeadings = false,
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -1001,6 +1175,50 @@ export function JobCardAdvertisement({
 
     return expiredPeriodBadge(publication)
   }
+  const simplify13PartialActiveAndExpired =
+    publicationPresentation === 'simplify13' && active.length > 0 && expired.length > 0
+  const simplify13PartialPublications = simplify13PartialActiveAndExpired
+    ? sortPublicationsBySoonestEnd([...active, ...expired])
+    : []
+  const simplify13PartialPeriodBadge = (publication: JobPublication) =>
+    publication.status === 'expired'
+      ? simplifyExpiredPeriodBadge(publication)
+      : simplifyPeriodBadge(publication)
+  const mixedActiveGroupHeading = (() => {
+    if (publicationPresentation !== 'simplify13') {
+      return {
+        heading: MIXED_PERIOD_HEADING,
+        headingClassName: 'tm-text-sm tm-font-medium tm-text-secondary-default',
+        statusHeadingKind: 'mixedActive' as const,
+      }
+    }
+
+    const endingSoonActive = active.filter((publication) =>
+      isEndingSoonPublication(publication),
+    )
+
+    if (endingSoonActive.length > 0) {
+      const sameDate = shareSameEndDate(endingSoonActive)
+      const date = sharedEndDateLabel(endingSoonActive)
+      const remainingDays = date ? getRemainingCalendarDays(date) : undefined
+
+      return {
+        heading: formatEndingSoonHeading({
+          sameDate,
+          endDate: date ? stripYear(date) : undefined,
+          remainingDays,
+        }),
+        headingClassName: 'tm-text-emotion-warning-emphasis',
+        statusHeadingKind: 'endingSoon' as const,
+      }
+    }
+
+    return {
+      heading: MIXED_PERIOD_HEADING,
+      headingClassName: 'tm-text-emotion-success-emphasis',
+      statusHeadingKind: 'mixedActive' as const,
+    }
+  })()
   const hoverPassThrough: PublicationHoverPassThrough = {
     hoverContent: publicationHover,
     allPublications: publications,
@@ -1009,6 +1227,7 @@ export function JobCardAdvertisement({
     channelDecoration: publicationChannelDecoration,
     dropdownPlacement: publicationDropdownPlacement,
     publicationPresentation,
+    suppressPublicationGroupHeadings,
     ...(simplifyMinimalPresentation && simplifyChannelLogoSize
       ? {
           channelLogoSize: simplifyChannelLogoSize,
@@ -1018,7 +1237,9 @@ export function JobCardAdvertisement({
           showProductHighlights: false,
           portalChip: true,
         }
-      : {}),
+      : publicationChannelLogoSize
+        ? { channelLogoSize: publicationChannelLogoSize }
+        : {}),
   }
 
   return (
@@ -1036,79 +1257,119 @@ export function JobCardAdvertisement({
             data-testid="job-card-publication-groups"
             className={cn(
               'tm-flex tm-flex-col',
-              simplifyMinimalPresentation ? 'tm-gap-3' : 'tm-gap-2',
+              publicationPresentation === 'simplify13'
+                ? 'tm-gap-3'
+                : simplifyMinimalPresentation
+                  ? 'tm-gap-3'
+                  : 'tm-gap-2',
             )}
           >
-            {mixedActivePeriods ? (
+            {simplify13PartialActiveAndExpired ? (
               <PeriodBadgeGroup
-                publications={active}
+                publications={simplify13PartialPublications}
                 expired={false}
-                heading={MIXED_PERIOD_HEADING}
-                headingTestId="job-card-advertisement-running-heading"
-                headingClassName="tm-text-sm tm-font-medium tm-text-secondary-default"
-                listTestId="job-card-advertisement-active-publications"
-                periodBadge={simplifyPeriodBadge}
+                perPublicationExpired
+                heading={formatPartialRunningHeading()}
+                headingTestId="job-card-simplify13-partial-heading"
+                headingClassName="tm-text-emotion-warning-emphasis"
+                statusHeadingKind="partial"
+                listTestId="job-card-simplify13-partial-publications"
+                periodBadge={simplify13PartialPeriodBadge}
                 periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
                 {...hoverPassThrough}
               />
             ) : (
-              <PublicationGroup
-                kind={endingSoonSameDate ? 'endingSoon' : 'running'}
-                publications={active}
-                onPreview={onPreviewPublication}
-                onExtend={onExtendPublication}
-                {...hoverPassThrough}
-              />
+              <>
+                {mixedActivePeriods ? (
+                  <PeriodBadgeGroup
+                    publications={active}
+                    expired={false}
+                    heading={mixedActiveGroupHeading.heading}
+                    headingTestId="job-card-advertisement-running-heading"
+                    headingClassName={mixedActiveGroupHeading.headingClassName}
+                    statusHeadingKind={mixedActiveGroupHeading.statusHeadingKind}
+                    listTestId="job-card-advertisement-active-publications"
+                    periodBadge={simplifyPeriodBadge}
+                    periodPresentation={periodPresentation}
+                    onPreview={onPreviewPublication}
+                    onExtend={onExtendPublication}
+                    {...hoverPassThrough}
+                  />
+                ) : (
+                  <PublicationGroup
+                    kind={endingSoonSameDate ? 'endingSoon' : 'running'}
+                    publications={active}
+                    onPreview={onPreviewPublication}
+                    onExtend={onExtendPublication}
+                    {...hoverPassThrough}
+                  />
+                )}
+                {simplifyMinimalPresentation &&
+                hoverPassThrough.showProductHighlights !== false &&
+                active.length > 0 ? (
+                  <ProductHighlightsSection
+                    publications={active}
+                    channelDecoration={publicationChannelDecoration}
+                    minimalPresentation
+                  />
+                ) : null}
+                {mixedExpiredPeriods ? (
+                  <PeriodBadgeGroup
+                    publications={expired}
+                    expired
+                    heading="Ukončeno"
+                    headingTestId="job-card-publication-ended-heading"
+                    headingClassName={
+                      publicationPresentation === 'simplify13'
+                        ? 'tm-text-emotion-danger-emphasis'
+                        : 'tm-text-sm tm-font-normal tm-text-secondary-default'
+                    }
+                    statusHeadingKind="mixedExpired"
+                    listTestId="job-card-advertisement-ended-publications"
+                    showLeadingDivider={active.length > 0}
+                    periodBadge={simplifyExpiredPeriodBadge}
+                    periodPresentation={periodPresentation}
+                    onPreview={onPreviewPublication}
+                    onExtend={onExtendPublication}
+                    {...hoverPassThrough}
+                  />
+                ) : (
+                  <PublicationGroup
+                    kind="expired"
+                    publications={expired}
+                    showLeadingDivider={active.length > 0}
+                    onPreview={onPreviewPublication}
+                    onExtend={onExtendPublication}
+                    {...hoverPassThrough}
+                  />
+                )}
+              </>
             )}
-            {simplifyMinimalPresentation &&
-            hoverPassThrough.showProductHighlights !== false &&
-            active.length > 0 ? (
+            {simplify13PartialActiveAndExpired &&
+            simplifyMinimalPresentation &&
+            hoverPassThrough.showProductHighlights !== false ? (
               <ProductHighlightsSection
                 publications={active}
                 channelDecoration={publicationChannelDecoration}
                 minimalPresentation
               />
             ) : null}
-            {mixedExpiredPeriods ? (
-              <PeriodBadgeGroup
-                publications={expired}
-                expired
-                heading="Ukončeno"
-                headingTestId="job-card-publication-ended-heading"
-                headingClassName="tm-text-sm tm-font-normal tm-text-secondary-default"
-                listTestId="job-card-advertisement-ended-publications"
-                showLeadingDivider={active.length > 0}
-                periodBadge={simplifyExpiredPeriodBadge}
-                periodPresentation={periodPresentation}
-                onPreview={onPreviewPublication}
-                onExtend={onExtendPublication}
-                {...hoverPassThrough}
-              />
-            ) : (
-              <PublicationGroup
-                kind="expired"
-                publications={expired}
-                showLeadingDivider={active.length > 0}
-                onPreview={onPreviewPublication}
-                onExtend={onExtendPublication}
-                {...hoverPassThrough}
-              />
-            )}
           </div>
         )}
       </div>
-      <AdvertisementMeta
-        publications={publications}
-        viewCount={summary.viewCount}
-        showPreviewLink={showPreviewLink}
-        publicationHover={publicationHover}
-        showProlong={showProlong}
-        onExtendAll={onExtendAll}
-        linkDecoration={publicationChannelDecoration}
-        onViewStatisticsClick={onViewStatisticsClick}
-        onPreviewAdvertisement={
+      <div className={cn(publicationPresentation === 'simplify13' && 'tm-mt-3')}>
+        <AdvertisementMeta
+          publications={publications}
+          viewCount={summary.viewCount}
+          showPreviewLink={showPreviewLink}
+          publicationHover={publicationHover}
+          showProlong={showProlong}
+          onExtendAll={onExtendAll}
+          linkDecoration={publicationChannelDecoration}
+          onViewStatisticsClick={onViewStatisticsClick}
+          onPreviewAdvertisement={
           onPreviewAdvertisement ??
           (onPreviewPublication
             ? () => {
@@ -1120,7 +1381,8 @@ export function JobCardAdvertisement({
               }
             : undefined)
         }
-      />
+        />
+      </div>
     </div>
   )
 }

@@ -51,6 +51,7 @@ const CHANNEL_LOGO_TYPES: Record<string, KnownJobPortalLogoType> = {
   'prace.cz': 'prace-cz',
   'jobs.cz + prace.cz': 'jobs-cz-prace-cz',
   'kariérní stránky': 'pages',
+  'kariérní web': 'pages',
   atmoskop: 'atmoskop',
   profesia: 'profesia',
   'profesia.sk': 'profesia',

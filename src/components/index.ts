@@ -212,6 +212,27 @@ export {
   type JobCardSimplify11Props,
   type JobCardBranch as JobCardSimplify11Branch,
 } from './JobCardSimplify11'
+export {
+  JobCardSimplify12,
+  JOB_CARD_SIMPLIFY_12_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_12_SECTION_PADDING,
+  type JobCardSimplify12Props,
+  type JobCardBranch as JobCardSimplify12Branch,
+} from './JobCardSimplify12'
+export {
+  JobCardSimplify13,
+  JOB_CARD_SIMPLIFY_13_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_13_SECTION_PADDING,
+  type JobCardSimplify13Props,
+  type JobCardBranch as JobCardSimplify13Branch,
+} from './JobCardSimplify13'
+export {
+  JobCardSimplify14,
+  JOB_CARD_SIMPLIFY_14_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_14_SECTION_PADDING,
+  type JobCardSimplify14Props,
+  type JobCardBranch as JobCardSimplify14Branch,
+} from './JobCardSimplify14'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
 export { JobCardSyntezaMoreAds, type JobCardSyntezaMoreAdsProps } from './JobCardSyntezaMoreAds'
 export {

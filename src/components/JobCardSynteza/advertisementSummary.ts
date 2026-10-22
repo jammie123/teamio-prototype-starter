@@ -1,3 +1,4 @@
+import { jobPortalLogoTypeFromChannel } from '../JobPortalLogo/JobPortalLogo'
 import type { JobAdvertisement, JobPublication, JobPublicationHighlight } from './types'
 import { formatCount } from './formatCount'
 
@@ -11,6 +12,32 @@ export interface JobAdvertisementSummary {
 
 export function isDisabledPublication(publication: JobPublication) {
   return publication.status === 'disabled'
+}
+
+/** Career web and export placements have no paid expiry in the product UI. */
+export function isUnlimitedPublication(channel: string) {
+  const type = jobPortalLogoTypeFromChannel(channel)
+  return type === 'pages' || type === 'export'
+}
+
+export function formatUnlimitedEndLabel() {
+  return 'bez omezení'
+}
+
+export function formatRunningUntilHeading(endDate: string) {
+  return `Běží do ${endDate}`
+}
+
+export function formatPartialChannelCountHeading(runningCount: number, totalCount: number) {
+  return `Běží na ${runningCount} ze ${totalCount} kanálů`
+}
+
+export function formatNearestEndHeading(remainingDays: number, endDate: string) {
+  if (remainingDays === 0) {
+    return `Nejdřív končí dnes · ${endDate}`
+  }
+
+  return `Nejdřív končí za ${formatRemainingDaysLabel(remainingDays)} · ${endDate}`
 }
 
 function isActive(publication: JobPublication) {
@@ -220,7 +247,7 @@ export function groupPublicationsByDate(publications: JobPublication[]) {
 }
 
 export function isEndingSoonPublication(publication: JobPublication, now = new Date()) {
-  if (isExpired(publication) || !publication.endDate) {
+  if (isExpired(publication) || !publication.endDate || isUnlimitedPublication(publication.channel)) {
     return false
   }
 
@@ -407,6 +434,12 @@ function pickEndDate(publications: JobPublication[], pick: 'earliest' | 'latest'
 
 export function earliestStartDateLabel(publications: JobPublication[]) {
   return pickDate(publications, 'startDate', 'earliest')?.label
+}
+
+export function earliestEndDateLabel(publications: JobPublication[]) {
+  const withEnd = publications.filter((publication) => publication.endDate)
+  const picked = pickEndDate(withEnd, 'earliest')
+  return picked ? stripYear(picked.label) : undefined
 }
 
 export function isAdvertisementFullyExpired(advertisement: JobAdvertisement) {

@@ -15,7 +15,9 @@ import {
   formatUntilDate,
   formatViewCountLabel,
   formatConversionRate,
+  formatUnlimitedEndLabel,
   getAdvertisementSummary,
+  isUnlimitedPublication,
   getRemainingCalendarDays,
   groupPublicationsByDate,
   isAdvertisementFullyExpired,
@@ -732,6 +734,20 @@ describe('Simplify 11 channel states', () => {
     )
 
     expect(summary.activePortalNames).toEqual(['Jobs.cz'])
+  })
+})
+
+describe('isUnlimitedPublication', () => {
+  it('treats career web and export as unlimited', () => {
+    expect(isUnlimitedPublication('Kariérní stránky')).toBe(true)
+    expect(isUnlimitedPublication('Kariérní web')).toBe(true)
+    expect(isUnlimitedPublication('Export')).toBe(true)
+    expect(isUnlimitedPublication('Jobs.cz')).toBe(false)
+    expect(isUnlimitedPublication('Prace.cz')).toBe(false)
+  })
+
+  it('formats unlimited end copy', () => {
+    expect(formatUnlimitedEndLabel()).toBe('bez omezení')
   })
 })
 

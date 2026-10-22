@@ -4,14 +4,17 @@ import { Button } from '../Button'
 import { Icon } from '../Icon'
 import {
   formatAdvertisementExpiredHeading,
+  formatDisabledChannelsSuffix,
   formatEndingSoonHeading,
   formatViewCountLabel,
   getAdvertisementSummary,
   getRemainingCalendarDays,
+  partitionPublicationChannels,
   richestDateLabel,
   shareSameEndDate,
 } from '../JobCardSynteza/advertisementSummary'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
+import type { ReactNode } from 'react'
 import { Link } from '../Link'
 import { JobCardAdvertisement } from '../JobCardSyntezaAds/JobCardAdvertisement'
 import { isDraftAdvertisement, publicationPeriodBadge } from '../JobCardSyntezaAds/advertisementSummaryAds'
@@ -37,11 +40,49 @@ export interface JobCardAdvertisementSimplify10PanelProps extends StyleProps {
   onDeclineAdvertising?: () => void
   onRepublishAdvertisement?: () => void
   publicationHover?: JobCardPublicationHover
-  channelLogoSize?: 35 | 40
+  channelLogoSize?: 24 | 35 | 40
   showPortalPeriodBadges?: boolean
   expiredLogosMuted?: boolean
   actionButtonVariant?: 'primary' | 'secondary'
   actionButtonSize?: 'small' | 'medium'
+  notAdvertisingMetaClassName?: string
+  notAdvertisingHeadingIconSize?: number
+  notAdvertisingHeadingBorder?: boolean
+  hideNotAdvertisingMeta?: boolean
+  /** Under heading: only “· N vypnutý”, no date/perex (Simplify 14). */
+  headingSublineDisabledOnly?: boolean
+}
+
+function disabledChannelsSubline(advertisement: JobAdvertisement) {
+  const { disabled } = partitionPublicationChannels(advertisement.publications ?? [])
+  return formatDisabledChannelsSuffix(disabled.length)
+}
+
+function AdvertisementHeadingBlock({
+  subline,
+  sublineTestId = 'job-card-advertisement-heading-subline',
+  children,
+}: {
+  subline?: string
+  sublineTestId?: string
+  children: ReactNode
+}) {
+  return (
+    <div
+      data-testid="job-card-advertisement-heading-block"
+      className="tm-flex tm-flex-col tm-gap-1 tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-2"
+    >
+      {children}
+      {subline ? (
+        <p
+          data-testid={sublineTestId}
+          className="tm-m-0 tm-text-xs tm-text-secondary-default"
+        >
+          {subline}
+        </p>
+      ) : null}
+    </div>
+  )
 }
 
 function sharedFullEndDate(publications: JobPublication[]) {
@@ -73,22 +114,24 @@ function StatusHeading({
   icon,
   className,
   testId,
+  iconSize = 20,
   children,
 }: {
   icon: 'clock' | 'alert-triangle-outline' | 'view-off'
   className: string
   testId: string
+  iconSize?: number
   children: string
 }) {
   return (
     <p
       data-testid={testId}
       className={cn(
-        'tm-m-0 tm-flex tm-items-center tm-gap-1.5 tm-text-sm tm-font-medium',
+        'tm-m-0 tm-flex tm-items-center tm-gap-2 tm-text-sm tm-font-medium',
         className,
       )}
     >
-      <Icon name={icon} size={20} className="tm-shrink-0" />
+      <Icon name={icon} size={iconSize} className="tm-shrink-0" />
       <span>{children}</span>
     </p>
   )
@@ -112,7 +155,7 @@ function ActivePortalLogos({
   onExtend?: (publication: JobPublication) => void
   onExtendAll?: () => void
   publicationHover: JobCardPublicationHover
-  channelLogoSize?: 35 | 40
+  channelLogoSize?: 24 | 35 | 40
   showPortalPeriodBadges?: boolean
 }) {
   return (
@@ -155,16 +198,18 @@ function Simplify10EndingSoonPanel({
   showPortalPeriodBadges = true,
   actionButtonVariant = 'primary',
   actionButtonSize = 'small',
+  headingSublineDisabledOnly = false,
 }: {
   advertisement: JobAdvertisement
   onExtendAll?: () => void
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
   publicationHover: JobCardPublicationHover
-  channelLogoSize?: 35 | 40
+  channelLogoSize?: 24 | 35 | 40
   showPortalPeriodBadges?: boolean
   actionButtonVariant?: 'primary' | 'secondary'
   actionButtonSize?: 'small' | 'medium'
+  headingSublineDisabledOnly?: boolean
 }) {
   const publications = advertisement.publications ?? []
   const summary = getAdvertisementSummary(advertisement)
@@ -176,19 +221,31 @@ function Simplify10EndingSoonPanel({
     remainingDays,
   })
   const showProlong = shouldShowPlacesProlong(publications)
+  const headingNode = (
+    <StatusHeading
+      icon="clock"
+      className="tm-text-emotion-warning-emphasis"
+      testId="job-card-advertisement-ending-soon-heading"
+    >
+      {heading}
+    </StatusHeading>
+  )
 
   return (
     <div
       data-testid="job-card-simplify10-ending-soon"
       className="tm-flex tm-flex-col tm-gap-2"
     >
-      <StatusHeading
-        icon="clock"
-        className="tm-text-emotion-warning-emphasis"
-        testId="job-card-advertisement-ending-soon-heading"
-      >
-        {heading}
-      </StatusHeading>
+      {headingSublineDisabledOnly ? (
+        <AdvertisementHeadingBlock
+          subline={disabledChannelsSubline(advertisement)}
+          sublineTestId="job-card-simplify14-subline"
+        >
+          {headingNode}
+        </AdvertisementHeadingBlock>
+      ) : (
+        headingNode
+      )}
       <ActivePortalLogos
         publications={publications}
         allPublications={publications}
@@ -239,6 +296,7 @@ function Simplify10ExpiredPanel({
   expiredLogosMuted = true,
   actionButtonVariant = 'primary',
   actionButtonSize = 'small',
+  headingSublineDisabledOnly = false,
 }: {
   advertisement: JobAdvertisement
   onExtendAll?: () => void
@@ -246,25 +304,38 @@ function Simplify10ExpiredPanel({
   onPreviewPublication?: (publication: JobPublication) => void
   onExtendPublication?: (publication: JobPublication) => void
   publicationHover: JobCardPublicationHover
-  channelLogoSize?: 35 | 40
+  channelLogoSize?: 24 | 35 | 40
   expiredLogosMuted?: boolean
   actionButtonVariant?: 'primary' | 'secondary'
   actionButtonSize?: 'small' | 'medium'
+  headingSublineDisabledOnly?: boolean
 }) {
   const publications = advertisement.publications ?? []
   const endDate = sharedFullEndDate(publications)
   const heading = formatAdvertisementExpiredHeading(endDate)
   const showProlong = shouldShowPlacesProlong(publications)
+  const headingNode = (
+    <StatusHeading
+      icon="alert-triangle-outline"
+      className="tm-text-emotion-danger-emphasis"
+      testId="job-card-publication-ended-heading"
+    >
+      {heading}
+    </StatusHeading>
+  )
 
   return (
     <div data-testid="job-card-simplify10-expired" className="tm-flex tm-flex-col tm-gap-2">
-      <StatusHeading
-        icon="alert-triangle-outline"
-        className="tm-text-emotion-danger-emphasis"
-        testId="job-card-publication-ended-heading"
-      >
-        {heading}
-      </StatusHeading>
+      {headingSublineDisabledOnly ? (
+        <AdvertisementHeadingBlock
+          subline={disabledChannelsSubline(advertisement)}
+          sublineTestId="job-card-simplify14-subline"
+        >
+          {headingNode}
+        </AdvertisementHeadingBlock>
+      ) : (
+        headingNode
+      )}
       <JobCardExpiredPublicationMiniLogoRow
         publications={publications}
         listTestId="job-card-advertisement-ended-publications"
@@ -319,9 +390,17 @@ function Simplify10ExpiredPanel({
 function Simplify10NotAdvertisingPanel({
   advertisement,
   onRepublish,
+  metaClassName = 'tm-text-xs tm-text-secondary-default',
+  headingIconSize = 20,
+  headingBorder = false,
+  hideMeta = false,
 }: {
   advertisement: JobAdvertisement
   onRepublish?: () => void
+  metaClassName?: string
+  headingIconSize?: number
+  headingBorder?: boolean
+  hideMeta?: boolean
 }) {
   const summary = getAdvertisementSummary(advertisement)
   const declinedDate = declinedAdvertisingDate(advertisement)
@@ -335,15 +414,34 @@ function Simplify10NotAdvertisingPanel({
       data-testid="job-card-simplify10-not-advertising"
       className="tm-flex tm-flex-col tm-gap-2"
     >
-      <StatusHeading
-        icon="view-off"
-        className="tm-text-secondary-default"
-        testId="job-card-simplify10-not-advertising-heading"
-      >
-        Neinzeruje se
-      </StatusHeading>
-      {metaParts.length > 0 ? (
-        <p className="tm-m-0 tm-text-xs tm-text-secondary-default">{metaParts.join(' · ')}</p>
+      {headingBorder ? (
+        <div
+          data-testid="job-card-simplify10-not-advertising-heading-wrap"
+          className="tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-1.5 tm-mb-2"
+        >
+          <StatusHeading
+            icon="view-off"
+            className="tm-text-secondary-default"
+            testId="job-card-simplify10-not-advertising-heading"
+            iconSize={headingIconSize}
+          >
+            Neinzeruje se
+          </StatusHeading>
+        </div>
+      ) : (
+        <StatusHeading
+          icon="view-off"
+          className="tm-text-secondary-default"
+          testId="job-card-simplify10-not-advertising-heading"
+          iconSize={headingIconSize}
+        >
+          Neinzeruje se
+        </StatusHeading>
+      )}
+      {!hideMeta && metaParts.length > 0 ? (
+        <p data-testid="job-card-not-advertising-meta" className={cn('tm-m-0', metaClassName)}>
+          {metaParts.join(' · ')}
+        </p>
       ) : null}
       {onRepublish ? (
         <Link
@@ -396,6 +494,7 @@ function renderSimplify10Panel(
           showPortalPeriodBadges={showPortalPeriodBadges}
           actionButtonVariant={actionButtonVariant}
           actionButtonSize={actionButtonSize}
+          headingSublineDisabledOnly={props.headingSublineDisabledOnly}
         />
       )
     case 'expiredUnexpected':
@@ -411,11 +510,19 @@ function renderSimplify10Panel(
           expiredLogosMuted={expiredLogosMuted}
           actionButtonVariant={actionButtonVariant}
           actionButtonSize={actionButtonSize}
+          headingSublineDisabledOnly={props.headingSublineDisabledOnly}
         />
       )
     case 'notAdvertising':
       return (
-        <Simplify10NotAdvertisingPanel advertisement={advertisement} onRepublish={onRepublish} />
+        <Simplify10NotAdvertisingPanel
+          advertisement={advertisement}
+          onRepublish={onRepublish}
+          metaClassName={props.notAdvertisingMetaClassName}
+          headingIconSize={props.notAdvertisingHeadingIconSize}
+          headingBorder={props.notAdvertisingHeadingBorder}
+          hideMeta={props.hideNotAdvertisingMeta}
+        />
       )
     default:
       return null
@@ -438,6 +545,11 @@ export function JobCardAdvertisementSimplify10Panel({
   expiredLogosMuted = true,
   actionButtonVariant = 'primary',
   actionButtonSize = 'small',
+  notAdvertisingMetaClassName,
+  notAdvertisingHeadingIconSize,
+  notAdvertisingHeadingBorder,
+  hideNotAdvertisingMeta,
+  headingSublineDisabledOnly,
   className,
 }: JobCardAdvertisementSimplify10PanelProps) {
   const publications = advertisement.publications ?? []
@@ -492,6 +604,11 @@ export function JobCardAdvertisementSimplify10Panel({
       expiredLogosMuted,
       actionButtonVariant,
       actionButtonSize,
+      notAdvertisingMetaClassName,
+      notAdvertisingHeadingIconSize,
+      notAdvertisingHeadingBorder,
+      hideNotAdvertisingMeta,
+      headingSublineDisabledOnly,
     },
     onExtendAll,
     publicationHover,

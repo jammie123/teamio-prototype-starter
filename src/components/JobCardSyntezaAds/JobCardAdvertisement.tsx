@@ -389,7 +389,7 @@ interface PublicationHoverPassThrough {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
-  channelLogoSize?: 18 | 20 | 24 | 30 | 35
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
   inlineHighlights?: 'all' | 'none'
   minimalPresentation?: boolean
@@ -960,7 +960,7 @@ function PeriodBadgeGroup({
             kind: statusHeadingKind ?? (expired ? 'mixedExpired' : 'mixedActive'),
             heading,
             headingTestId,
-            headingClassName: publicationPresentation === 'simplify13' ? headingClassName : minimalHeadingClass,
+            headingClassName: minimalHeadingClass,
             suppressPublicationGroupHeadings,
           })}
           <ul

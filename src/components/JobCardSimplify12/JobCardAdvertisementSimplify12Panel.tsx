@@ -254,7 +254,7 @@ export function JobCardAdvertisementSimplify12Panel({
   onExtendPublications,
   onDeclineAdvertising,
   onRepublishAdvertisement,
-  onEnablePublication,
+  onEnablePublication: _onEnablePublication,
   className,
 }: JobCardAdvertisementSimplify12PanelProps) {
   const publications = advertisement.publications ?? []

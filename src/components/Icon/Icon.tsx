@@ -129,6 +129,8 @@ export interface IconProps extends StyleProps, Omit<HTMLAttributes<HTMLSpanEleme
   name: IconName
   title?: string
   strokeWidth?: number
+  /** Pixel size; when omitted, icon scales with `1em` via className. */
+  size?: number
 }
 
 const FALLBACK_ICON = CircleHelp
@@ -152,7 +154,7 @@ function resolveIcon(name: IconName): {
 }
 
 export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
-  { name, className, title, strokeWidth, ...rest },
+  { name, className, title, strokeWidth, size, ...rest },
   ref,
 ) {
   const { Icon: SvgIcon, isFallback, variant } = resolveIcon(name)
@@ -174,10 +176,10 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
         aria-hidden="true"
         className={cn(
           'tm-inline-block',
-          'tm-h-[1em]',
-          'tm-w-[1em]',
+          size === undefined && 'tm-h-[1em] tm-w-[1em]',
           variant === 'fill' ? 'tm-fill-current' : 'tm-stroke-current',
         )}
+        style={size !== undefined ? { width: size, height: size } : undefined}
         focusable="false"
         strokeWidth={variant === 'fill' ? undefined : strokeWidth}
       />

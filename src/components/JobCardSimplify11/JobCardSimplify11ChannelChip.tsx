@@ -14,7 +14,7 @@ import {
   type Simplify11ChannelVisualState,
 } from './jobCardSimplify11Presentation'
 
-function chipShellClass(visual: Simplify11ChannelVisualState) {
+function chipShellClass(_visual: Simplify11ChannelVisualState) {
   return cn(
     'tm-relative tm-inline-flex tm-shrink-0 tm-items-center tm-justify-center tm-overflow-visible',
     'tm-size-[40px]',

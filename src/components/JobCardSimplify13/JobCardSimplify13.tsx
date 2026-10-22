@@ -25,6 +25,7 @@ import {
   JOB_CARD_SIMPLIFY_8_PREVIEW_LABEL,
   JOB_CARD_SIMPLIFY_8_SECTION_PADDING,
 } from '../JobCardSimplify8/JobCardSimplify8'
+import { JOB_CARD_SIMPLIFY_13_ADVERTISEMENT_HEADING_OFFSET } from './constants'
 import { JobCardStatsSimplify8 } from '../JobCardSimplify8/JobCardStatsSimplify8'
 export const JOB_CARD_SIMPLIFY_13_PREVIEW_LABEL = JOB_CARD_SIMPLIFY_8_PREVIEW_LABEL
 export const JOB_CARD_SIMPLIFY_13_SECTION_PADDING = JOB_CARD_SIMPLIFY_8_SECTION_PADDING
@@ -239,7 +240,12 @@ export const JobCardSimplify13 = forwardRef<HTMLElement, JobCardSimplify13Props>
                 ) : null}
               </div>
             ) : selectedAdvertisement ? (
-              <div className="tm-flex tm-flex-col tm-gap-2">
+              <div
+                className={cn(
+                  'tm-flex tm-flex-col tm-gap-2',
+                  JOB_CARD_SIMPLIFY_13_ADVERTISEMENT_HEADING_OFFSET,
+                )}
+              >
                 {hasSwitcher ? (
                   <JobCardAdvertisementSwitcher
                     title={advertisementSwitcherTitle(selectedAdvertisement, selectedAdIndex)}

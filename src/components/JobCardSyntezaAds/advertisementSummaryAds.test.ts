@@ -8,6 +8,7 @@ import {
   isDraftAdvertisement,
   MIXED_PERIOD_HEADING,
   publicationPeriodBadge,
+  groupPublicationsByEndDate,
   sortPublicationsBySoonestEnd,
   splitIntoBalancedColumns,
 } from './advertisementSummaryAds'
@@ -166,6 +167,24 @@ describe('sortPublicationsBySoonestEnd', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('groupPublicationsByEndDate', () => {
+  it('merges publications that share an end date while preserving soonest-first order', () => {
+    const career = {
+      id: 'career',
+      channel: 'Kariérní stránky',
+      startDate: '12. 7. 2026',
+      endDate: '20. 9. 2026',
+    }
+    const jobs = { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' }
+    const prace = { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' }
+
+    expect(groupPublicationsByEndDate([jobs, career, prace]).map((group) => group.map((p) => p.id))).toEqual([
+      ['career'],
+      ['jobs', 'prace'],
+    ])
   })
 })
 

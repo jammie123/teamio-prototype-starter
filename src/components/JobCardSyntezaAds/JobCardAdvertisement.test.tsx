@@ -740,6 +740,175 @@ describe('JobCardAdvertisement publicationPresentation simplify5', () => {
     )
     expect(screen.getAllByTestId('job-card-publication-channel-logo')[0]).toHaveClass('tm-size-[30px]')
   })
+
+  it('uses text-sm for the ending-soon heading in minimal presentation', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      render(
+        <JobCardAdvertisement
+          publicationPresentation="simplify5"
+          showPreviewLink={false}
+          advertisement={{
+            id: 'ad-ending-same',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 8. 2026' },
+              { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 8. 2026' },
+            ],
+          }}
+        />,
+      )
+
+      const heading = screen.getByTestId('job-card-advertisement-ending-soon-heading')
+      expect(heading).toHaveClass('tm-text-sm', 'tm-text-secondary-default')
+      expect(heading).not.toHaveClass('tm-text-13')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('pairs each portal logo with its date in a chip when end dates differ', () => {
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify5"
+        periodPresentation="text"
+        publicationChannelDecoration="plain"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-running-diff',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            {
+              id: 'career',
+              channel: 'Kariérní stránky',
+              startDate: '12. 7. 2026',
+              endDate: '20. 9. 2026',
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-advertisement-period-badges')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-advertisement-running-heading')).toHaveTextContent(
+      'Běží v různá období',
+    )
+
+    const chips = screen.getAllByTestId('job-card-publication-chip')
+    expect(chips).toHaveLength(2)
+    expect(within(chips[0]).getByTestId('job-card-publication-period-badge')).toHaveTextContent(
+      '20. 9. 2026',
+    )
+    expect(within(chips[1]).getByTestId('job-card-publication-period-badge')).toHaveTextContent(
+      '30. 9. 2026',
+    )
+  })
+})
+
+describe('JobCardAdvertisement publicationPresentation simplify7', () => {
+  it('uses regular-weight date badges and roomier chips for mixed end dates', () => {
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify7"
+        periodPresentation="text"
+        publicationChannelDecoration="plain"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-running-diff',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+          ],
+        }}
+      />,
+    )
+
+    const chip = screen.getAllByTestId('job-card-publication-chip')[0]
+    expect(chip).toHaveClass('tm-pr-3.5', 'tm-py-1.5')
+
+    const badge = within(chip).getByTestId('job-card-publication-period-badge')
+    expect(badge).toHaveTextContent('20. 9. 2026')
+    expect(badge).toHaveClass('tm-font-normal')
+    expect(badge).not.toHaveClass('tm-font-medium')
+  })
+})
+
+describe('JobCardAdvertisement publicationPresentation simplify6', () => {
+  it('puts logos under the heading with text-sm and groups chips by end date', () => {
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify6"
+        periodPresentation="text"
+        publicationChannelDecoration="plain"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-running-diff',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            {
+              id: 'career',
+              channel: 'Kariérní stránky',
+              startDate: '12. 7. 2026',
+              endDate: '20. 9. 2026',
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-advertisement-status-row')).not.toBeInTheDocument()
+
+    const heading = screen.getByTestId('job-card-advertisement-running-heading')
+    expect(heading).toHaveTextContent('Běží v různá období')
+    expect(heading).toHaveClass('tm-text-sm')
+
+    const list = screen.getByTestId('job-card-advertisement-active-publications')
+    expect(list).toHaveClass('tm-gap-x-1.5', 'tm-gap-y-1')
+    expect(heading.nextElementSibling).toBe(list)
+
+    const chips = screen.getAllByTestId('job-card-publication-chip')
+    expect(chips).toHaveLength(2)
+    expect(within(chips[0]).getAllByTestId('job-card-publication-channel-logo')).toHaveLength(1)
+    expect(within(chips[0]).getByTestId('job-card-publication-period-badge')).toHaveTextContent(
+      '20. 9. 2026',
+    )
+    expect(within(chips[1]).getAllByTestId('job-card-publication-channel-logo')).toHaveLength(2)
+    expect(within(chips[1]).getByTestId('job-card-publication-period-badge')).toHaveTextContent(
+      '30. 9. 2026',
+    )
+
+    expect(screen.getByTestId('job-card-advertisement-mixed-running-cover')).toHaveClass(
+      'tm-bg-cover-default',
+    )
+    expect(screen.getAllByTestId('job-card-publication-channel-logo')[0]).toHaveClass('tm-size-[20px]')
+  })
+
+  it('uses stacked logos under a shared running heading when end dates match', () => {
+    render(
+      <JobCardAdvertisement
+        publicationPresentation="simplify6"
+        showPreviewLink={false}
+        advertisement={{
+          id: 'ad-running-same',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+            { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-advertisement-status-row')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-publication-chip')).not.toBeInTheDocument()
+
+    const heading = screen.getByTestId('job-card-advertisement-running-heading')
+    const list = screen.getByTestId('job-card-advertisement-active-publications')
+    expect(heading.nextElementSibling).toBe(list)
+    expect(list).toHaveClass('tm-gap-x-1.5')
+    expect(screen.getAllByTestId('job-card-publication-channel-logo')).toHaveLength(2)
+  })
 })
 
 describe('JobCardAdvertisement places table hover', () => {

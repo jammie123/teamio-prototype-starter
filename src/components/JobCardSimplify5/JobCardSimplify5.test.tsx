@@ -100,7 +100,7 @@ describe('JobCardSimplify5', () => {
     expect(within(statusRow).getByTestId('job-card-advertisement-active-publications')).toBeInTheDocument()
 
     const logos = screen.getAllByTestId('job-card-publication-channel-logo')
-    expect(logos[0]).toHaveClass('tm-size-[30px]')
+    expect(logos[0]).toHaveClass('tm-size-[30px]', 'tm-rounded-full')
     expect(logos[0].closest('[role="button"]')).toHaveAttribute('aria-label', 'Jobs.cz')
   })
 
@@ -160,13 +160,39 @@ describe('JobCardSimplify5', () => {
     expect(screen.queryByText('Topováno na jobs.cz')).not.toBeInTheDocument()
   })
 
-  it('opens advertisement preview from the title-row search icon', async () => {
+  it('places people, preview and menu in the ad toolbar above the advertisement panel', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 })
     const onPreviewAdvertisement = vi.fn()
     renderSimplify5({ onPreviewAdvertisement, onEditJob: vi.fn() })
 
+    const titleRow = screen.getByTestId('job-card-title-row')
+    const adColumn = screen.getByTestId('job-card-advertisements')
+    const toolbar = screen.getByTestId('job-card-ad-toolbar')
+
+    expect(adColumn).toContainElement(toolbar)
+    expect(titleRow).not.toContainElement(screen.getByTestId('job-card-icon-buttons'))
+    expect(toolbar).toContainElement(screen.getByTestId('job-card-icon-buttons'))
+    expect(toolbar).toHaveClass('tm-justify-end')
+
     await user.click(screen.getByTestId('job-card-preview-toggle'))
     expect(onPreviewAdvertisement).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders portal logo and date in a subtle pill chip when periods differ', () => {
+    renderSimplify5()
+
+    expect(screen.queryByTestId('job-card-advertisement-period-badges')).not.toBeInTheDocument()
+
+    const chips = screen.getAllByTestId('job-card-publication-chip')
+    expect(chips).toHaveLength(2)
+    chips.forEach((chip) => {
+      expect(chip).toHaveClass('tm-rounded-full', 'tm-bg-emotion-info-background')
+      expect(within(chip).getByTestId('job-card-publication-channel-logo')).toBeInTheDocument()
+      expect(within(chip).getByTestId('job-card-publication-period-badge')).toBeInTheDocument()
+    })
+
+    const publication = screen.getAllByTestId('job-card-publication')[0]
+    expect(publication).toContainElement(chips[0])
   })
 
   it('uses regular job title typography', () => {

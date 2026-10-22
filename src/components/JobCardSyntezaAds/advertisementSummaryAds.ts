@@ -48,6 +48,27 @@ function remainingDaysRank(publication: JobPublication) {
 }
 
 /** Still-running soonest first (left column); already-ended dates after; missing dates last. */
+/** Groups sorted publications that share the same end date (missing dates share one bucket). */
+export function groupPublicationsByEndDate(publications: JobPublication[]): JobPublication[][] {
+  const sorted = sortPublicationsBySoonestEnd(publications)
+  const groups: JobPublication[][] = []
+  const groupIndexByEndDate = new Map<string, number>()
+
+  for (const publication of sorted) {
+    const key = publication.endDate ?? ''
+    const existingIndex = groupIndexByEndDate.get(key)
+
+    if (existingIndex !== undefined) {
+      groups[existingIndex].push(publication)
+    } else {
+      groupIndexByEndDate.set(key, groups.length)
+      groups.push([publication])
+    }
+  }
+
+  return groups
+}
+
 export function sortPublicationsBySoonestEnd(publications: JobPublication[]): JobPublication[] {
   return publications
     .map((publication, index) => ({ publication, index }))

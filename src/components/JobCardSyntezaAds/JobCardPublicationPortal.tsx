@@ -36,12 +36,27 @@ export interface JobCardPublicationPortalProps {
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
-  channelLogoSize?: 18 | 24 | 30
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35
   showChannelLabel?: boolean
   inlineHighlights?: 'all' | 'none'
+  /** Pill wrapper (logo + period) for Simplify 5 mixed periods. */
+  portalChip?: boolean
 }
 
-export function channelLogoSizeClass(size: 18 | 24 | 30 = 18) {
+function portalChipSubtleClasses(color: PublicationPeriodBadge['color']) {
+  switch (color) {
+    case 'warning':
+      return 'tm-text-emotion-warning-emphasis tm-bg-emotion-warning-background'
+    case 'informative':
+      return 'tm-text-emotion-info-emphasis tm-bg-emotion-info-background'
+  }
+}
+
+export function channelLogoSizeClass(size: 18 | 20 | 24 | 30 | 35 = 18) {
+  if (size === 35) {
+    return 'tm-size-[35px]'
+  }
+
   if (size === 30) {
     return 'tm-size-[30px]'
   }
@@ -50,7 +65,15 @@ export function channelLogoSizeClass(size: 18 | 24 | 30 = 18) {
     return 'tm-size-[24px]'
   }
 
+  if (size === 20) {
+    return 'tm-size-[20px]'
+  }
+
   return 'tm-size-[18px]'
+}
+
+export function channelLogoPresentationClass(size: 18 | 20 | 24 | 30 | 35 = 18) {
+  return cn(channelLogoSizeClass(size), 'tm-overflow-hidden', 'tm-rounded-full')
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -82,7 +105,7 @@ function PublicationDropdown({
   onExtendAll?: () => void
   channelDecoration?: JobCardPublicationChannelDecoration
   dropdownPlacement?: Placement
-  channelLogoSize?: 18 | 24 | 30
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35
   showChannelLabel?: boolean
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
@@ -108,7 +131,7 @@ function PublicationDropdown({
               type={jobPortalLogoTypeFromChannel(publication.channel)}
               title=""
               data-testid="job-card-publication-channel-logo"
-              className={channelLogoSizeClass(channelLogoSize)}
+              className={channelLogoPresentationClass(channelLogoSize)}
             />
             {showChannelLabel ? (
               <span
@@ -223,6 +246,134 @@ function PublicationDropdown({
   )
 }
 
+function periodBadgeElement(
+  periodBadge: PublicationPeriodBadge,
+  periodPresentation: 'tag' | 'text',
+  portalChip: boolean,
+  dateChipPresentation: 'default' | 'simplify7MixedDates' = 'default',
+) {
+  if (periodPresentation === 'text') {
+    const mixedSimplify7 =
+      portalChip && dateChipPresentation === 'simplify7MixedDates'
+
+    return (
+      <span
+        data-testid="job-card-publication-period-badge"
+        className={
+          mixedSimplify7
+            ? cn(
+                'tm-text-sm tm-font-normal tm-tabular-nums',
+                periodBadge.color === 'warning' && 'tm-text-emotion-warning-emphasis',
+                periodBadge.color !== 'warning' && 'tm-text-secondary-default',
+              )
+            : portalChip
+              ? cn(
+                  'tm-text-sm tm-tabular-nums',
+                  periodBadge.color === 'warning' && 'tm-font-medium',
+                )
+              : periodBadge.color === 'warning'
+                ? 'tm-text-sm tm-font-medium tm-text-emotion-warning-emphasis'
+                : 'tm-text-sm tm-text-secondary-default'
+        }
+      >
+        {periodBadge.label}
+      </span>
+    )
+  }
+
+  return (
+    <Tag color={periodBadge.color} isSubtle data-testid="job-card-publication-period-badge">
+      {periodBadge.label}
+    </Tag>
+  )
+}
+
+export interface JobCardPublicationPortalDateChipGroupProps {
+  publications: JobPublication[]
+  expired: boolean
+  periodBadge: PublicationPeriodBadge
+  periodPresentation?: 'tag' | 'text'
+  hoverContent?: JobCardPublicationHover
+  allPublications?: JobPublication[]
+  showProlong?: boolean
+  onPreview?: (publication: JobPublication) => void
+  onExtend?: (publication: JobPublication) => void
+  onExtendAll?: () => void
+  channelDecoration?: JobCardPublicationChannelDecoration
+  dropdownPlacement?: Placement
+  channelLogoSize?: 18 | 20 | 24 | 30 | 35
+  showChannelLabel?: boolean
+  /** Gap between logos inside the chip (Simplify6 uses a tighter row). */
+  logoRowGapClass?: string
+  /** Larger chip padding and regular-weight date text (Simplify7 mixed periods). */
+  dateChipPresentation?: 'default' | 'simplify7MixedDates'
+}
+
+export function JobCardPublicationPortalDateChipGroup({
+  publications: chipPublications,
+  expired,
+  periodBadge,
+  periodPresentation = 'text',
+  hoverContent = 'portalDetail',
+  allPublications,
+  showProlong,
+  onPreview,
+  onExtend,
+  onExtendAll,
+  channelDecoration = 'dotted-underline',
+  dropdownPlacement = 'bottom-start',
+  channelLogoSize = 18,
+  showChannelLabel = true,
+  logoRowGapClass = 'tm-gap-1',
+  dateChipPresentation = 'default',
+}: JobCardPublicationPortalDateChipGroupProps) {
+  const badge = periodBadgeElement(periodBadge, periodPresentation, true, dateChipPresentation)
+  const simplify7MixedDates = dateChipPresentation === 'simplify7MixedDates'
+
+  return (
+    <li
+      data-testid="job-card-publication"
+      className={cn(
+        'tm-flex tm-items-center tm-font-normal tm-text-sm',
+        expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+      )}
+    >
+      <span
+        data-testid="job-card-publication-chip"
+        className={cn(
+          'tm-inline-flex tm-items-center tm-gap-2 tm-border-0 tm-rounded-full',
+          'tm-font-poppins tm-text-sm tm-font-normal',
+          simplify7MixedDates ? 'tm-py-1.5 tm-pl-1.5 tm-pr-3.5' : 'tm-py-1 tm-pl-1 tm-pr-2.5',
+          portalChipSubtleClasses(periodBadge.color),
+        )}
+      >
+        <span className={cn('tm-inline-flex tm-items-center', logoRowGapClass)}>
+          {chipPublications.map((publication) => (
+            <PublicationDropdown
+              key={publication.id}
+              publication={publication}
+              expired={expired}
+              hoverContent={hoverContent}
+              publications={allPublications}
+              showProlong={showProlong}
+              onPreview={onPreview}
+              onExtend={onExtend}
+              onExtendAll={onExtendAll}
+              channelDecoration={channelDecoration}
+              dropdownPlacement={dropdownPlacement}
+              channelLogoSize={channelLogoSize}
+              showChannelLabel={showChannelLabel}
+            />
+          ))}
+        </span>
+        {badge}
+      </span>
+    </li>
+  )
+}
+
+JobCardPublicationPortalDateChipGroup.displayName = 'JobCardPublicationPortalDateChipGroup'
+
 export function JobCardPublicationPortal({
   publication,
   expired,
@@ -241,25 +392,11 @@ export function JobCardPublicationPortal({
   channelLogoSize = 18,
   showChannelLabel = true,
   inlineHighlights = 'all',
+  portalChip = false,
 }: JobCardPublicationPortalProps) {
-  const badge = periodBadge ? (
-    periodPresentation === 'text' ? (
-      <span
-        data-testid="job-card-publication-period-badge"
-        className={
-          periodBadge.color === 'warning'
-            ? 'tm-text-sm tm-font-medium tm-text-emotion-warning-emphasis'
-            : 'tm-text-sm tm-text-secondary-default'
-        }
-      >
-        {periodBadge.label}
-      </span>
-    ) : (
-      <Tag color={periodBadge.color} isSubtle data-testid="job-card-publication-period-badge">
-        {periodBadge.label}
-      </Tag>
-    )
-  ) : null
+  const badge = periodBadge
+    ? periodBadgeElement(periodBadge, periodPresentation, portalChip)
+    : null
   const highlights = inlineHighlights === 'none' ? [] : visibleHighlights(publication)
   const highlightChips = highlights.map((highlight) => (
     <JobCardPublicationHighlight
@@ -330,21 +467,59 @@ export function JobCardPublicationPortal({
             ·
           </span>
         ) : null}
-        <PublicationDropdown
-          publication={publication}
-          expired={expired}
-          hoverContent={hoverContent}
-          publications={publications}
-          showProlong={showProlong}
-          onPreview={onPreview}
-          onExtend={onExtend}
-          onExtendAll={onExtendAll}
-          channelDecoration={channelDecoration}
-          dropdownPlacement={dropdownPlacement}
-          channelLogoSize={channelLogoSize}
-          showChannelLabel={showChannelLabel}
-        />
-        {badge}
+        {portalChip && periodBadge ? (
+          <span
+            data-testid="job-card-publication-chip"
+            className={cn(
+              'tm-inline-flex',
+              'tm-items-center',
+              'tm-gap-2',
+              'tm-py-1',
+              'tm-pl-1',
+              'tm-pr-2.5',
+              'tm-font-poppins',
+              'tm-text-sm',
+              'tm-font-normal',
+              'tm-border-0',
+              'tm-rounded-full',
+              portalChipSubtleClasses(periodBadge.color),
+            )}
+          >
+            <PublicationDropdown
+              publication={publication}
+              expired={expired}
+              hoverContent={hoverContent}
+              publications={publications}
+              showProlong={showProlong}
+              onPreview={onPreview}
+              onExtend={onExtend}
+              onExtendAll={onExtendAll}
+              channelDecoration={channelDecoration}
+              dropdownPlacement={dropdownPlacement}
+              channelLogoSize={channelLogoSize}
+              showChannelLabel={showChannelLabel}
+            />
+            {badge}
+          </span>
+        ) : (
+          <>
+            <PublicationDropdown
+              publication={publication}
+              expired={expired}
+              hoverContent={hoverContent}
+              publications={publications}
+              showProlong={showProlong}
+              onPreview={onPreview}
+              onExtend={onExtend}
+              onExtendAll={onExtendAll}
+              channelDecoration={channelDecoration}
+              dropdownPlacement={dropdownPlacement}
+              channelLogoSize={channelLogoSize}
+              showChannelLabel={showChannelLabel}
+            />
+            {badge}
+          </>
+        )}
       </li>
       {highlightChips}
     </>

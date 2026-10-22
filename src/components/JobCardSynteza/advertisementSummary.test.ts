@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  formatAdvertisementExpiredHeading,
   formatCompactDateRange,
   formatEndedHeading,
   formatEndingSoonHeading,
@@ -268,6 +269,16 @@ describe('formatEndingSoonHeading', () => {
         remainingDays: 5,
       }),
     ).toBe('Končí brzy')
+  })
+})
+
+describe('formatAdvertisementExpiredHeading', () => {
+  it('includes the end date when provided', () => {
+    expect(formatAdvertisementExpiredHeading('20. 10. 2026')).toBe('Inzerce skončila 20. 10. 2026')
+  })
+
+  it('omits the date when missing', () => {
+    expect(formatAdvertisementExpiredHeading()).toBe('Inzerce skončila')
   })
 })
 

@@ -353,6 +353,15 @@ export function formatEndedHeading({
   return `Ukončeno ${date}`
 }
 
+/** Simplify 10 — unexpected expiry (all portals ended). */
+export function formatAdvertisementExpiredHeading(date?: string) {
+  if (!date) {
+    return 'Inzerce skončila'
+  }
+
+  return `Inzerce skončila ${date}`
+}
+
 export function formatViewCountLabel(count: number) {
   const formatted = formatCount(count)
 

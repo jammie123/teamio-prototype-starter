@@ -51,12 +51,15 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import {
   AdvertisementPreviewIcon,
+  AlertTriangleOutlineIcon,
   CandidateMoveIcon,
+  ClockIcon,
   OpalIcon,
   SingleManTimeIcon,
   StopReasonIcon,
   ThumbDownIcon,
   ThumbUpIcon,
+  ViewOffIcon,
 } from './customIcons'
 
 const iconMap = {
@@ -108,12 +111,15 @@ const iconMap = {
 
 const customIconMap = {
   'advertisement-preview': AdvertisementPreviewIcon,
+  'alert-triangle-outline': AlertTriangleOutlineIcon,
+  clock: ClockIcon,
   opal: OpalIcon,
   'single-man-time': SingleManTimeIcon,
   'candidate-move': CandidateMoveIcon,
   'thumb-up': ThumbUpIcon,
   'thumb-down': ThumbDownIcon,
   'stop-reason': StopReasonIcon,
+  'view-off': ViewOffIcon,
 } as const satisfies Record<string, LucideIcon>
 
 export type KnownIconName = keyof typeof iconMap | keyof typeof customIconMap

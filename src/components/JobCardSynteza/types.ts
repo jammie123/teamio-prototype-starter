@@ -45,12 +45,14 @@ export interface JobPublication {
   highlights?: JobPublicationHighlight[]
 }
 
-export type JobAdvertisementStatus = 'draft'
+export type JobAdvertisementStatus = 'draft' | 'notAdvertising'
 
 export interface JobAdvertisement {
   id: string
   title?: string
   status?: JobAdvertisementStatus
+  /** When status is notAdvertising — shown in meta; falls back to latest publication end date. */
+  advertisingDeclinedAt?: string
   publications?: JobPublication[]
 }
 

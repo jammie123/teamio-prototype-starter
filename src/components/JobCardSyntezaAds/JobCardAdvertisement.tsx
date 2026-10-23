@@ -92,6 +92,10 @@ export interface JobCardAdvertisementProps extends StyleProps {
   publicationChannelLogoSize?: 18 | 20 | 24 | 30 | 35
   /** Hides Běží / Ukončeno group headings when a parent panel renders Simplify 11-style status. */
   suppressPublicationGroupHeadings?: boolean
+  /** Hides aggregate views / preview meta row (e.g. Simplify 18 renders stats in the panel header). */
+  suppressAdvertisementMeta?: boolean
+  /** Hides per-publication highlight chips that surface view/reaction stats under portals. */
+  publicationInlineHighlights?: 'all' | 'none'
 }
 
 function sharedFieldDateLabel(
@@ -1101,6 +1105,8 @@ export function JobCardAdvertisement({
   publicationPresentation = 'default',
   publicationChannelLogoSize,
   suppressPublicationGroupHeadings = false,
+  suppressAdvertisementMeta = false,
+  publicationInlineHighlights,
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -1259,6 +1265,7 @@ export function JobCardAdvertisement({
     dropdownPlacement: publicationDropdownPlacement,
     publicationPresentation,
     suppressPublicationGroupHeadings,
+    ...(publicationInlineHighlights ? { inlineHighlights: publicationInlineHighlights } : {}),
     ...(simplifyMinimalPresentation && simplifyChannelLogoSize
       ? {
           channelLogoSize: simplifyChannelLogoSize,
@@ -1390,30 +1397,32 @@ export function JobCardAdvertisement({
           </div>
         )}
       </div>
-      <div className={cn(isSimplify13StylePresentation(publicationPresentation) && 'tm-mt-3')}>
-        <AdvertisementMeta
-          publications={publications}
-          viewCount={summary.viewCount}
-          showPreviewLink={showPreviewLink}
-          publicationHover={publicationHover}
-          showProlong={showProlong}
-          onExtendAll={onExtendAll}
-          linkDecoration={publicationChannelDecoration}
-          onViewStatisticsClick={onViewStatisticsClick}
-          onPreviewAdvertisement={
-          onPreviewAdvertisement ??
-          (onPreviewPublication
-            ? () => {
-                const publication =
-                  publications.find((item) => item.status !== 'expired') ?? publications[0]
-                if (publication) {
-                  onPreviewPublication(publication)
-                }
-              }
-            : undefined)
-        }
-        />
-      </div>
+      {!suppressAdvertisementMeta ? (
+        <div className={cn(isSimplify13StylePresentation(publicationPresentation) && 'tm-mt-3')}>
+          <AdvertisementMeta
+            publications={publications}
+            viewCount={summary.viewCount}
+            showPreviewLink={showPreviewLink}
+            publicationHover={publicationHover}
+            showProlong={showProlong}
+            onExtendAll={onExtendAll}
+            linkDecoration={publicationChannelDecoration}
+            onViewStatisticsClick={onViewStatisticsClick}
+            onPreviewAdvertisement={
+              onPreviewAdvertisement ??
+              (onPreviewPublication
+                ? () => {
+                    const publication =
+                      publications.find((item) => item.status !== 'expired') ?? publications[0]
+                    if (publication) {
+                      onPreviewPublication(publication)
+                    }
+                  }
+                : undefined)
+            }
+          />
+        </div>
+      ) : null}
     </div>
   )
 }

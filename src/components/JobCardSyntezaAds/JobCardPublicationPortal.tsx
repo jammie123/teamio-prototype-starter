@@ -1,4 +1,5 @@
 import type { Placement } from '@floating-ui/react'
+import type { ReactNode } from 'react'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -15,6 +16,10 @@ import { Tag } from '../Tag'
 import type { PublicationPeriodBadge } from './advertisementSummaryAds'
 import { JobCardPlacesSummaryTable } from './JobCardPlacesSummaryTable'
 import { JobCardPublicationHighlight } from './JobCardPublicationHighlight'
+import {
+  JobCardSimplify19ChannelStatusDot,
+  type JobCardSimplify19ChannelStatusTone,
+} from '../JobCardSimplify19/JobCardSimplify19ChannelStatusDot'
 
 export type JobCardPublicationHover = 'portalDetail' | 'placesTable'
 
@@ -27,7 +32,7 @@ export interface JobCardPublicationPortalProps {
   periodBadge?: PublicationPeriodBadge
   periodPresentation?: 'tag' | 'text'
   /** `grid` fills two cells of the parent grid: portal name and badge column. */
-  variant?: 'inline' | 'grid'
+  variant?: 'inline' | 'grid' | 'stacked'
   hoverContent?: JobCardPublicationHover
   publications?: JobPublication[]
   showProlong?: boolean
@@ -41,6 +46,8 @@ export interface JobCardPublicationPortalProps {
   inlineHighlights?: 'all' | 'none'
   /** Pill wrapper (logo + period) for Simplify 5 mixed periods. */
   portalChip?: boolean
+  /** Simplify 19 status dot on the portal logo. */
+  channelLogoStatus?: JobCardSimplify19ChannelStatusTone
 }
 
 function portalChipSubtleClasses(
@@ -103,6 +110,8 @@ function PublicationDropdown({
   dropdownPlacement = 'bottom-start',
   channelLogoSize = 18,
   showChannelLabel = true,
+  channelLabelFooter,
+  channelLogoStatus,
 }: {
   publication: JobPublication
   expired: boolean
@@ -116,10 +125,14 @@ function PublicationDropdown({
   dropdownPlacement?: Placement
   channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
+  /** Second line under channel name (Simplify 19 stacked portals). */
+  channelLabelFooter?: ReactNode
+  channelLogoStatus?: JobCardSimplify19ChannelStatusTone
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
   const tablePublications = publications && publications.length > 0 ? publications : [publication]
+  const simplify19ChannelLabel = Boolean(channelLogoStatus)
 
   return (
     <Dropdown
@@ -135,27 +148,62 @@ function PublicationDropdown({
           className="tm-rounded-none tm-bg-transparent"
           aria-label={showChannelLabel ? undefined : publication.channel}
         >
-          <span className="tm-inline-flex tm-items-center tm-gap-1">
-            <JobPortalLogo
-              type={jobPortalLogoTypeFromChannel(publication.channel)}
-              title=""
-              data-testid="job-card-publication-channel-logo"
-              className={channelLogoPresentationClass(channelLogoSize)}
-            />
+          <span
+            className={cn(
+              'tm-inline-flex tm-gap-1.5',
+              channelLabelFooter ? 'tm-items-start' : 'tm-items-center tm-gap-1',
+            )}
+          >
+            <span className="tm-relative tm-inline-flex tm-shrink-0">
+              <JobPortalLogo
+                type={jobPortalLogoTypeFromChannel(publication.channel)}
+                title=""
+                data-testid="job-card-publication-channel-logo"
+                className={channelLogoPresentationClass(channelLogoSize)}
+              />
+              {channelLogoStatus ? (
+                <JobCardSimplify19ChannelStatusDot tone={channelLogoStatus} />
+              ) : null}
+            </span>
             {showChannelLabel ? (
-              <span
-                data-testid="job-card-publication-channel"
-                className={cn(
-                  'tm-border-0',
-                  'tm-font-normal',
-                  channelDecoration === 'dotted-underline' &&
-                    'tm-border-b tm-border-dotted tm-border-secondary',
-                  expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
-                  expired && 'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
-                )}
-              >
-                {publication.channel}
-              </span>
+              channelLabelFooter ? (
+                <span className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0 tm-leading-snug">
+                  <span
+                    data-testid="job-card-publication-channel"
+                    className={cn(
+                      'tm-border-0',
+                      'tm-font-normal',
+                      !simplify19ChannelLabel &&
+                        channelDecoration === 'dotted-underline' &&
+                        'tm-border-b tm-border-dotted tm-border-secondary',
+                      expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+                      expired &&
+                        !simplify19ChannelLabel &&
+                        'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
+                    )}
+                  >
+                    {publication.channel}
+                  </span>
+                  {channelLabelFooter}
+                </span>
+              ) : (
+                <span
+                  data-testid="job-card-publication-channel"
+                  className={cn(
+                    'tm-border-0',
+                    'tm-font-normal',
+                    !simplify19ChannelLabel &&
+                      channelDecoration === 'dotted-underline' &&
+                      'tm-border-b tm-border-dotted tm-border-secondary',
+                    expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+                    expired &&
+                      !simplify19ChannelLabel &&
+                      'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
+                  )}
+                >
+                  {publication.channel}
+                </span>
+              )
             ) : null}
           </span>
         </DropdownToggle>
@@ -260,10 +308,27 @@ function periodBadgeElement(
   periodPresentation: 'tag' | 'text',
   portalChip: boolean,
   dateChipPresentation: 'default' | 'simplify7MixedDates' = 'default',
+  stackedUnderPortal = false,
 ) {
   if (periodPresentation === 'text') {
     const mixedSimplify7 =
       portalChip && dateChipPresentation === 'simplify7MixedDates'
+
+    if (stackedUnderPortal) {
+      return (
+        <span
+          data-testid="job-card-publication-period-badge"
+          className={cn(
+            'tm-text-xs tm-font-normal tm-tabular-nums tm-leading-snug',
+            periodBadge.color === 'warning'
+              ? 'tm-text-emotion-warning-emphasis'
+              : 'tm-text-secondary-default',
+          )}
+        >
+          {periodBadge.label}
+        </span>
+      )
+    }
 
     return (
       <span
@@ -469,9 +534,16 @@ export function JobCardPublicationPortal({
   showChannelLabel = true,
   inlineHighlights = 'all',
   portalChip = false,
+  channelLogoStatus,
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge
-    ? periodBadgeElement(periodBadge, periodPresentation, portalChip)
+    ? periodBadgeElement(
+        periodBadge,
+        periodPresentation,
+        portalChip,
+        'default',
+        variant === 'stacked',
+      )
     : null
   const highlights = inlineHighlights === 'none' ? [] : visibleHighlights(publication)
   const highlightChips = highlights.map((highlight) => (
@@ -479,10 +551,41 @@ export function JobCardPublicationPortal({
       key={highlight.id}
       publication={publication}
       highlight={highlight}
-      as={variant === 'grid' ? 'span' : 'li'}
+      as={variant === 'grid' || variant === 'stacked' ? 'span' : 'li'}
       nameDecoration={channelDecoration}
     />
   ))
+
+  if (variant === 'stacked') {
+    return (
+      <li
+        data-testid="job-card-publication"
+        className={cn(
+          'tm-flex tm-min-w-0 tm-max-w-[11rem] tm-items-start',
+          'tm-font-normal tm-text-sm',
+          expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+        )}
+      >
+        <PublicationDropdown
+          publication={publication}
+          expired={expired}
+          hoverContent={hoverContent}
+          publications={publications}
+          showProlong={showProlong}
+          onPreview={onPreview}
+          onExtend={onExtend}
+          onExtendAll={onExtendAll}
+          channelDecoration={channelDecoration}
+          dropdownPlacement={dropdownPlacement}
+          channelLogoSize={channelLogoSize}
+          showChannelLabel={showChannelLabel}
+          channelLabelFooter={badge}
+          channelLogoStatus={channelLogoStatus}
+        />
+        {highlightChips}
+      </li>
+    )
+  }
 
   if (variant === 'grid') {
     return (

@@ -806,6 +806,49 @@ describe('JobCardAdvertisement publicationPresentation simplify5', () => {
   })
 })
 
+describe('JobCardAdvertisement publicationPresentation simplify19', () => {
+  it('renders mixed end dates in a single row with dates under portal names', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      render(
+        <JobCardAdvertisement
+          publicationPresentation="simplify19"
+          periodPresentation="text"
+          publicationChannelDecoration="plain"
+          publicationChannelLogoSize={24}
+          suppressPublicationGroupHeadings
+          showPreviewLink={false}
+          advertisement={{
+            id: 'ad-running-diff',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+              { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+            ],
+          }}
+        />,
+      )
+
+      const list = screen.getByTestId('job-card-advertisement-active-publications')
+      expect(list).toHaveClass('tm-flex-row')
+
+      const portals = within(list).getAllByTestId('job-card-publication')
+      expect(within(portals[0]).getByText('Kariérní stránky')).toBeInTheDocument()
+      const firstBadge = within(portals[0]).getByTestId('job-card-publication-period-badge')
+      expect(firstBadge).toHaveTextContent('20. 9. 2026')
+      expect(firstBadge).toHaveClass('tm-text-xs', 'tm-font-normal')
+      expect(firstBadge).not.toHaveClass('tm-font-medium')
+
+      const secondBadge = within(portals[1]).getByTestId('job-card-publication-period-badge')
+      expect(secondBadge).toHaveTextContent('30. 9. 2026')
+      expect(secondBadge).toHaveClass('tm-font-normal')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
 describe('JobCardAdvertisement publicationPresentation simplify7', () => {
   it('uses regular-weight date badges and roomier chips for mixed end dates', () => {
     render(

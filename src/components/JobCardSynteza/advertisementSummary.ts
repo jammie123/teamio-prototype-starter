@@ -218,6 +218,24 @@ export function shareSameEndDate(publications: JobPublication[]) {
   return labels.every((label) => label === labels[0])
 }
 
+/** Paid portals with an end date; unlimited career/export channels are ignored. */
+export function finitePaidEndDatePublications(publications: JobPublication[]) {
+  return publications.filter(
+    (publication) => publication.endDate && !isUnlimitedPublication(publication.channel),
+  )
+}
+
+/** Same end date among paid portals only (career without expiry does not count as “mixed”). */
+export function shareSamePaidEndDate(publications: JobPublication[]) {
+  const finite = finitePaidEndDatePublications(publications)
+
+  if (finite.length === 0) {
+    return true
+  }
+
+  return shareSameEndDate(finite)
+}
+
 export function publicationDateKey(publication: JobPublication) {
   return [
     publication.startDate ? stripYear(publication.startDate) : '',

@@ -18,6 +18,7 @@ import {
   partitionPublications,
   richestDateLabel,
   shareSameEndDate,
+  shareSamePaidEndDate,
   shareSameStartDate,
   stripYear,
 } from '../JobCardSynteza/advertisementSummary'
@@ -56,6 +57,7 @@ import {
   JOB_CARD_SIMPLIFY_15_STATUS_HEADING_ICON_STROKE,
   JOB_CARD_SIMPLIFY_15_STATUS_HEADING_PADDING_TOP,
 } from '../JobCardSimplify15/constants'
+import { JobCardSimplify19PortalRow } from '../JobCardSimplify19/JobCardSimplify19PortalRow'
 
 export type JobCardAdvertisementPublicationPresentation =
   | 'default'
@@ -67,11 +69,22 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify11'
   | 'simplify13'
   | 'simplify15'
+  | 'simplify19'
 
 function isSimplify13StylePresentation(
   publicationPresentation?: JobCardAdvertisementPublicationPresentation,
 ) {
-  return publicationPresentation === 'simplify13' || publicationPresentation === 'simplify15'
+  return (
+    publicationPresentation === 'simplify13' ||
+    publicationPresentation === 'simplify15' ||
+    publicationPresentation === 'simplify19'
+  )
+}
+
+function isSimplify19Presentation(
+  publicationPresentation?: JobCardAdvertisementPublicationPresentation,
+) {
+  return publicationPresentation === 'simplify19'
 }
 
 export interface JobCardAdvertisementProps extends StyleProps {
@@ -392,8 +405,8 @@ function renderPublicationGroupHeading({
     return null
   }
 
-  if (presentation === 'simplify13' || presentation === 'simplify15') {
-    const isSimplify15 = presentation === 'simplify15'
+  if (presentation === 'simplify13' || presentation === 'simplify15' || presentation === 'simplify19') {
+    const isSimplify15 = presentation === 'simplify15' || presentation === 'simplify19'
     return (
       <div
         data-testid={`${headingTestId}-wrap`}
@@ -691,6 +704,25 @@ function PublicationGroup({
         onExtendAll={onExtendAll}
         channelDecoration={channelDecoration}
         dropdownPlacement={dropdownPlacement}
+      />
+    ) : isSimplify19Presentation(publicationPresentation) ? (
+      <JobCardSimplify19PortalRow
+        publications={publications}
+        listTestId={listTestId}
+        expired={expired}
+        periodBadge={() => undefined}
+        periodPresentation="text"
+        hoverContent={hoverContent}
+        allPublications={allPublications}
+        showProlong={showProlong}
+        onPreview={onPreview}
+        onExtend={onExtend}
+        onExtendAll={onExtendAll}
+        channelDecoration={channelDecoration}
+        dropdownPlacement={dropdownPlacement}
+        channelLogoSize={channelLogoSize}
+        showChannelLabel={showChannelLabel}
+        inlineHighlights={inlineHighlights}
       />
     ) : (
       <ul
@@ -1052,18 +1084,49 @@ function PeriodBadgeGroup({
     ? 'tm-gap-0'
     : 'tm-gap-0.5'
 
+  const badgeGroupHeading = renderPublicationGroupHeading({
+    presentation: publicationPresentation,
+    kind: badgeGroupHeadingKind,
+    heading,
+    headingTestId,
+    headingClassName: badgeGroupHeadingClassName,
+    suppressPublicationGroupHeadings,
+  })
+
+  if (isSimplify19Presentation(publicationPresentation)) {
+    return (
+      <div
+        className={cn('tm-flex tm-flex-col', badgeGroupContentGap, showLeadingDivider && ' tm-pt-2')}
+      >
+        {badgeGroupHeading}
+        <JobCardSimplify19PortalRow
+          publications={publications}
+          listTestId={listTestId}
+          expired={expired}
+          perPublicationExpired={perPublicationExpired}
+          periodBadge={periodBadge}
+          periodPresentation={periodPresentation}
+          hoverContent={hoverContent}
+          allPublications={allPublications}
+          showProlong={showProlong}
+          onPreview={onPreview}
+          onExtend={onExtend}
+          onExtendAll={onExtendAll}
+          channelDecoration={channelDecoration}
+          dropdownPlacement={dropdownPlacement}
+          channelLogoSize={channelLogoSize}
+          showChannelLabel={showChannelLabel}
+          inlineHighlights={inlineHighlights}
+        />
+      </div>
+    )
+  }
+
   return (
     <div
       className={cn('tm-flex tm-flex-col', badgeGroupContentGap, showLeadingDivider && ' tm-pt-2')}
     >
-      {renderPublicationGroupHeading({
-        presentation: publicationPresentation,
-        kind: badgeGroupHeadingKind,
-        heading,
-        headingTestId,
-        headingClassName: badgeGroupHeadingClassName,
-        suppressPublicationGroupHeadings,
-      })}
+      {badgeGroupHeading}
       <div
         data-testid={listTestId}
         className={cn(
@@ -1173,7 +1236,11 @@ export function JobCardAdvertisement({
   const publications = advertisement.publications ?? []
   const { active, expired, endingSoon } = partitionPublications(publications)
   const summary = getAdvertisementSummary(advertisement)
-  const mixedActivePeriods = active.length > 0 && !shareSameEndDate(active)
+  const mixedActivePeriods =
+    active.length > 0 &&
+    !(isSimplify19Presentation(publicationPresentation)
+      ? shareSamePaidEndDate(active)
+      : shareSameEndDate(active))
   const mixedExpiredPeriods = expired.length > 0 && !shareSameEndDate(expired)
   const endingSoonSameDate =
     !mixedActivePeriods &&
@@ -1233,7 +1300,12 @@ export function JobCardAdvertisement({
     publication.status === 'expired'
       ? simplifyExpiredPeriodBadge(publication)
       : simplifyPeriodBadge(publication)
-  const simplify13StylePartialIdSuffix = publicationPresentation === 'simplify15' ? '15' : '13'
+  const simplify13StylePartialIdSuffix =
+    publicationPresentation === 'simplify15'
+      ? '15'
+      : publicationPresentation === 'simplify19'
+        ? '19'
+        : '13'
   const mixedActiveGroupHeading = (() => {
     if (!isSimplify13StylePresentation(publicationPresentation)) {
       return {

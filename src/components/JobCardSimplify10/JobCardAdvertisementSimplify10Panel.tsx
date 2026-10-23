@@ -47,6 +47,8 @@ export interface JobCardAdvertisementSimplify10PanelProps extends StyleProps {
   actionButtonSize?: 'small' | 'medium'
   notAdvertisingMetaClassName?: string
   notAdvertisingHeadingIconSize?: number
+  notAdvertisingHeadingIconStrokeWidth?: number
+  notAdvertisingHeadingWrapClassName?: string
   notAdvertisingHeadingBorder?: boolean
   hideNotAdvertisingMeta?: boolean
   /** Under heading: only “· N vypnutý”, no date/perex (Simplify 14). */
@@ -115,12 +117,14 @@ function StatusHeading({
   className,
   testId,
   iconSize = 20,
+  iconStrokeWidth,
   children,
 }: {
   icon: 'clock' | 'alert-triangle-outline' | 'view-off'
   className: string
   testId: string
   iconSize?: number
+  iconStrokeWidth?: number
   children: string
 }) {
   return (
@@ -131,7 +135,7 @@ function StatusHeading({
         className,
       )}
     >
-      <Icon name={icon} size={iconSize} className="tm-shrink-0" />
+      <Icon name={icon} size={iconSize} strokeWidth={iconStrokeWidth} className="tm-shrink-0" />
       <span>{children}</span>
     </p>
   )
@@ -392,6 +396,8 @@ function Simplify10NotAdvertisingPanel({
   onRepublish,
   metaClassName = 'tm-text-xs tm-text-secondary-default',
   headingIconSize = 20,
+  headingIconStrokeWidth,
+  headingWrapClassName,
   headingBorder = false,
   hideMeta = false,
 }: {
@@ -399,6 +405,8 @@ function Simplify10NotAdvertisingPanel({
   onRepublish?: () => void
   metaClassName?: string
   headingIconSize?: number
+  headingIconStrokeWidth?: number
+  headingWrapClassName?: string
   headingBorder?: boolean
   hideMeta?: boolean
 }) {
@@ -417,13 +425,17 @@ function Simplify10NotAdvertisingPanel({
       {headingBorder ? (
         <div
           data-testid="job-card-simplify10-not-advertising-heading-wrap"
-          className="tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-1.5 tm-mb-2"
+          className={cn(
+            'tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-1.5 tm-mb-2',
+            headingWrapClassName,
+          )}
         >
           <StatusHeading
             icon="view-off"
             className="tm-text-secondary-default"
             testId="job-card-simplify10-not-advertising-heading"
             iconSize={headingIconSize}
+            iconStrokeWidth={headingIconStrokeWidth}
           >
             Neinzeruje se
           </StatusHeading>
@@ -434,6 +446,7 @@ function Simplify10NotAdvertisingPanel({
           className="tm-text-secondary-default"
           testId="job-card-simplify10-not-advertising-heading"
           iconSize={headingIconSize}
+          iconStrokeWidth={headingIconStrokeWidth}
         >
           Neinzeruje se
         </StatusHeading>
@@ -520,6 +533,8 @@ function renderSimplify10Panel(
           onRepublish={onRepublish}
           metaClassName={props.notAdvertisingMetaClassName}
           headingIconSize={props.notAdvertisingHeadingIconSize}
+          headingIconStrokeWidth={props.notAdvertisingHeadingIconStrokeWidth}
+          headingWrapClassName={props.notAdvertisingHeadingWrapClassName}
           headingBorder={props.notAdvertisingHeadingBorder}
           hideMeta={props.hideNotAdvertisingMeta}
         />
@@ -547,6 +562,8 @@ export function JobCardAdvertisementSimplify10Panel({
   actionButtonSize = 'small',
   notAdvertisingMetaClassName,
   notAdvertisingHeadingIconSize,
+  notAdvertisingHeadingIconStrokeWidth,
+  notAdvertisingHeadingWrapClassName,
   notAdvertisingHeadingBorder,
   hideNotAdvertisingMeta,
   headingSublineDisabledOnly,
@@ -606,6 +623,8 @@ export function JobCardAdvertisementSimplify10Panel({
       actionButtonSize,
       notAdvertisingMetaClassName,
       notAdvertisingHeadingIconSize,
+      notAdvertisingHeadingIconStrokeWidth,
+      notAdvertisingHeadingWrapClassName,
       notAdvertisingHeadingBorder,
       hideNotAdvertisingMeta,
       headingSublineDisabledOnly,

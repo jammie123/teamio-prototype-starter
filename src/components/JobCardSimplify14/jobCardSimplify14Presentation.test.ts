@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
 import {
   formatSimplify14ChannelDateLabel,
+  formatSimplify14SamePeriodRange,
   resolveSimplify14ChannelDateLabelTone,
   shouldShowPerChannelDateLabels,
+  shouldShowSimplify14SamePeriodRange,
 } from './jobCardSimplify14Presentation'
 
 const now = new Date('2026-10-22T12:00:00')
@@ -63,6 +65,39 @@ describe('shouldShowPerChannelDateLabels', () => {
     expect(
       shouldShowPerChannelDateLabels('ended', combinationD.publications ?? [], now),
     ).toBe(false)
+  })
+})
+
+describe('formatSimplify14SamePeriodRange', () => {
+  it('returns full range when active channels share start and end (combination E)', () => {
+    const publications: JobPublication[] = [
+      { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '14. 11. 2026' },
+      { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '14. 11. 2026' },
+      {
+        id: 'career',
+        channel: 'Kariérní stránky',
+        status: 'disabled',
+        startDate: '12. 7. 2026',
+      },
+    ]
+
+    expect(formatSimplify14SamePeriodRange(publications, now)).toBe('12. 7. – 14. 11. 2026')
+    expect(shouldShowSimplify14SamePeriodRange('running', publications, now)).toBe(true)
+  })
+
+  it('does not show same-period range in partial mode even when one channel runs', () => {
+    expect(
+      shouldShowSimplify14SamePeriodRange('partial', combinationD.publications ?? [], now),
+    ).toBe(false)
+  })
+
+  it('returns undefined when active channels end on different days', () => {
+    const publications: JobPublication[] = [
+      { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+      { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: '14. 11. 2026' },
+    ]
+
+    expect(formatSimplify14SamePeriodRange(publications, now)).toBeUndefined()
   })
 })
 

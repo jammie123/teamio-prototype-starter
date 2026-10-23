@@ -51,6 +51,11 @@ import {
   JOB_CARD_PRODUCT_HIGHLIGHTS_HEADING,
 } from './advertisementProductHighlights'
 import { JobCardExpiredPublicationsSimplify9Row } from './JobCardExpiredPublicationsSimplify9Row'
+import {
+  JOB_CARD_SIMPLIFY_15_STATUS_HEADING_ICON_SIZE,
+  JOB_CARD_SIMPLIFY_15_STATUS_HEADING_ICON_STROKE,
+  JOB_CARD_SIMPLIFY_15_STATUS_HEADING_PADDING_TOP,
+} from '../JobCardSimplify15/constants'
 
 export type JobCardAdvertisementPublicationPresentation =
   | 'default'
@@ -61,6 +66,13 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify9'
   | 'simplify11'
   | 'simplify13'
+  | 'simplify15'
+
+function isSimplify13StylePresentation(
+  publicationPresentation?: JobCardAdvertisementPublicationPresentation,
+) {
+  return publicationPresentation === 'simplify13' || publicationPresentation === 'simplify15'
+}
 
 export interface JobCardAdvertisementProps extends StyleProps {
   advertisement: JobAdvertisement
@@ -316,12 +328,14 @@ function PublicationStatusHeading({
   testId,
   className,
   iconSize = 20,
+  strokeWidth,
   children,
 }: {
   kind: PublicationStatusHeadingKind
   testId: string
   className?: string
   iconSize?: number
+  strokeWidth?: number
   children: string
 }) {
   return (
@@ -332,7 +346,12 @@ function PublicationStatusHeading({
         className,
       )}
     >
-      <Icon name={publicationStatusIcon(kind)} size={iconSize} className="tm-shrink-0" />
+      <Icon
+        name={publicationStatusIcon(kind)}
+        size={iconSize}
+        strokeWidth={strokeWidth}
+        className="tm-shrink-0"
+      />
       <span>{children}</span>
     </p>
   )
@@ -357,17 +376,26 @@ function renderPublicationGroupHeading({
     return null
   }
 
-  if (presentation === 'simplify13') {
+  if (presentation === 'simplify13' || presentation === 'simplify15') {
+    const isSimplify15 = presentation === 'simplify15'
     return (
       <div
         data-testid={`${headingTestId}-wrap`}
-        className="tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-1.5 tm-mb-2"
+        className={cn(
+          'tm-border-0 tm-border-b tm-border-solid tm-border-secondary tm-pb-1.5 tm-mb-2',
+          isSimplify15 && JOB_CARD_SIMPLIFY_15_STATUS_HEADING_PADDING_TOP,
+        )}
       >
         <PublicationStatusHeading
           kind={kind}
           testId={headingTestId}
           className={headingClassName}
-          iconSize={SIMPLIFY_13_STATUS_HEADING_ICON_SIZE}
+          iconSize={
+            isSimplify15
+              ? JOB_CARD_SIMPLIFY_15_STATUS_HEADING_ICON_SIZE
+              : SIMPLIFY_13_STATUS_HEADING_ICON_SIZE
+          }
+          strokeWidth={isSimplify15 ? JOB_CARD_SIMPLIFY_15_STATUS_HEADING_ICON_STROKE : undefined}
         >
           {heading}
         </PublicationStatusHeading>
@@ -454,7 +482,7 @@ function publicationStatusHeadingClass(
     return 'tm-text-13 tm-font-normal tm-text-secondary-default'
   }
 
-  if (publicationPresentation === 'simplify13') {
+  if (isSimplify13StylePresentation(publicationPresentation)) {
     return cn(
       kind === 'expired' && 'tm-text-emotion-danger-emphasis',
       kind === 'endingSoon' && 'tm-text-emotion-warning-emphasis',
@@ -573,7 +601,7 @@ function PublicationGroup({
             remainingDays,
           })
 
-  if (publicationPresentation === 'simplify13') {
+  if (isSimplify13StylePresentation(publicationPresentation)) {
     if (kind === 'running' && sameDate && date) {
       heading = `Běží do ${stripYear(date)}`
     }
@@ -682,12 +710,11 @@ function PublicationGroup({
       </ul>
     )
 
-  const contentGap =
-    publicationPresentation === 'simplify13'
-      ? 'tm-gap-0'
-      : minimalPresentation
-        ? 'tm-gap-1.5'
-        : 'tm-gap-0.5'
+  const contentGap = isSimplify13StylePresentation(publicationPresentation)
+    ? 'tm-gap-0'
+    : minimalPresentation
+      ? 'tm-gap-1.5'
+      : 'tm-gap-0.5'
 
   return (
     <div
@@ -997,16 +1024,17 @@ function PeriodBadgeGroup({
 
   const badgeGroupHeadingKind =
     statusHeadingKind ?? (expired ? 'mixedExpired' : 'mixedActive')
-  const badgeGroupHeadingClassName =
-    publicationPresentation === 'simplify13'
-      ? expired
-        ? 'tm-text-emotion-danger-emphasis'
-        : badgeGroupHeadingKind === 'partial' || badgeGroupHeadingKind === 'endingSoon'
-          ? 'tm-text-emotion-warning-emphasis'
-          : 'tm-text-emotion-success-emphasis'
-      : headingClassName
+  const badgeGroupHeadingClassName = isSimplify13StylePresentation(publicationPresentation)
+    ? expired
+      ? 'tm-text-emotion-danger-emphasis'
+      : badgeGroupHeadingKind === 'partial' || badgeGroupHeadingKind === 'endingSoon'
+        ? 'tm-text-emotion-warning-emphasis'
+        : 'tm-text-emotion-success-emphasis'
+    : headingClassName
 
-  const badgeGroupContentGap = publicationPresentation === 'simplify13' ? 'tm-gap-0' : 'tm-gap-0.5'
+  const badgeGroupContentGap = isSimplify13StylePresentation(publicationPresentation)
+    ? 'tm-gap-0'
+    : 'tm-gap-0.5'
 
   return (
     <div
@@ -1175,17 +1203,20 @@ export function JobCardAdvertisement({
 
     return expiredPeriodBadge(publication)
   }
-  const simplify13PartialActiveAndExpired =
-    publicationPresentation === 'simplify13' && active.length > 0 && expired.length > 0
-  const simplify13PartialPublications = simplify13PartialActiveAndExpired
+  const simplify13StylePartialActiveAndExpired =
+    isSimplify13StylePresentation(publicationPresentation) &&
+    active.length > 0 &&
+    expired.length > 0
+  const simplify13StylePartialPublications = simplify13StylePartialActiveAndExpired
     ? sortPublicationsBySoonestEnd([...active, ...expired])
     : []
-  const simplify13PartialPeriodBadge = (publication: JobPublication) =>
+  const simplify13StylePartialPeriodBadge = (publication: JobPublication) =>
     publication.status === 'expired'
       ? simplifyExpiredPeriodBadge(publication)
       : simplifyPeriodBadge(publication)
+  const simplify13StylePartialIdSuffix = publicationPresentation === 'simplify15' ? '15' : '13'
   const mixedActiveGroupHeading = (() => {
-    if (publicationPresentation !== 'simplify13') {
+    if (!isSimplify13StylePresentation(publicationPresentation)) {
       return {
         heading: MIXED_PERIOD_HEADING,
         headingClassName: 'tm-text-sm tm-font-medium tm-text-secondary-default',
@@ -1257,24 +1288,24 @@ export function JobCardAdvertisement({
             data-testid="job-card-publication-groups"
             className={cn(
               'tm-flex tm-flex-col',
-              publicationPresentation === 'simplify13'
+              isSimplify13StylePresentation(publicationPresentation)
                 ? 'tm-gap-3'
                 : simplifyMinimalPresentation
                   ? 'tm-gap-3'
                   : 'tm-gap-2',
             )}
           >
-            {simplify13PartialActiveAndExpired ? (
+            {simplify13StylePartialActiveAndExpired ? (
               <PeriodBadgeGroup
-                publications={simplify13PartialPublications}
+                publications={simplify13StylePartialPublications}
                 expired={false}
                 perPublicationExpired
                 heading={formatPartialRunningHeading()}
-                headingTestId="job-card-simplify13-partial-heading"
+                headingTestId={`job-card-simplify${simplify13StylePartialIdSuffix}-partial-heading`}
                 headingClassName="tm-text-emotion-warning-emphasis"
                 statusHeadingKind="partial"
-                listTestId="job-card-simplify13-partial-publications"
-                periodBadge={simplify13PartialPeriodBadge}
+                listTestId={`job-card-simplify${simplify13StylePartialIdSuffix}-partial-publications`}
+                periodBadge={simplify13StylePartialPeriodBadge}
                 periodPresentation={periodPresentation}
                 onPreview={onPreviewPublication}
                 onExtend={onExtendPublication}
@@ -1322,7 +1353,7 @@ export function JobCardAdvertisement({
                     heading="Ukončeno"
                     headingTestId="job-card-publication-ended-heading"
                     headingClassName={
-                      publicationPresentation === 'simplify13'
+                      isSimplify13StylePresentation(publicationPresentation)
                         ? 'tm-text-emotion-danger-emphasis'
                         : 'tm-text-sm tm-font-normal tm-text-secondary-default'
                     }
@@ -1347,7 +1378,7 @@ export function JobCardAdvertisement({
                 )}
               </>
             )}
-            {simplify13PartialActiveAndExpired &&
+            {simplify13StylePartialActiveAndExpired &&
             simplifyMinimalPresentation &&
             hoverPassThrough.showProductHighlights !== false ? (
               <ProductHighlightsSection
@@ -1359,7 +1390,7 @@ export function JobCardAdvertisement({
           </div>
         )}
       </div>
-      <div className={cn(publicationPresentation === 'simplify13' && 'tm-mt-3')}>
+      <div className={cn(isSimplify13StylePresentation(publicationPresentation) && 'tm-mt-3')}>
         <AdvertisementMeta
           publications={publications}
           viewCount={summary.viewCount}

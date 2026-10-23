@@ -14,16 +14,22 @@ import {
   type Simplify11ChannelVisualState,
 } from './jobCardSimplify11Presentation'
 
-function chipShellClass(_visual: Simplify11ChannelVisualState) {
+export type JobCardSimplify11ChannelChipSize = 34 | 40
+
+function chipShellClass(_visual: Simplify11ChannelVisualState, size: JobCardSimplify11ChannelChipSize) {
   return cn(
     'tm-relative tm-inline-flex tm-shrink-0 tm-items-center tm-justify-center tm-overflow-visible',
-    'tm-size-[40px]',
+    size === 34 ? 'tm-size-[34px]' : 'tm-size-[40px]',
   )
 }
 
-function chipLogoRingClass(visual: Simplify11ChannelVisualState) {
+function chipLogoRingClass(
+  visual: Simplify11ChannelVisualState,
+  size: JobCardSimplify11ChannelChipSize,
+) {
   return cn(
-    'tm-flex tm-size-[40px] tm-items-center tm-justify-center tm-overflow-hidden tm-rounded-full tm-bg-cover-light',
+    'tm-flex tm-items-center tm-justify-center tm-overflow-hidden tm-rounded-full tm-bg-cover-light',
+    size === 34 ? 'tm-size-[34px]' : 'tm-size-[40px]',
     'tm-border tm-border-solid tm-border-secondary',
     visual === 'disabled' && 'tm-border-dashed tm-border-strong',
   )
@@ -31,6 +37,7 @@ function chipLogoRingClass(visual: Simplify11ChannelVisualState) {
 
 export interface JobCardSimplify11ChannelChipProps {
   publication: JobPublication
+  chipSize?: JobCardSimplify11ChannelChipSize
   now?: Date
   onExtendPublication?: (publication: JobPublication) => void
   onEnablePublication?: (publication: JobPublication) => void
@@ -117,23 +124,28 @@ function ChannelDetailRow({
 export function JobCardSimplify11ChannelChipVisual({
   publication,
   visual,
+  chipSize = 40,
   withDropdown = true,
 }: {
   publication: JobPublication
   visual: Simplify11ChannelVisualState
+  chipSize?: JobCardSimplify11ChannelChipSize
   withDropdown?: boolean
 }) {
   return (
     <span
-      className={chipShellClass(visual)}
+      className={chipShellClass(visual, chipSize)}
       data-testid="job-card-simplify11-channel-chip"
       data-channel-state={visual}
     >
-      <span className={chipLogoRingClass(visual)}>
+      <span className={chipLogoRingClass(visual, chipSize)}>
         <JobPortalLogo
           type={jobPortalLogoTypeFromChannel(publication.channel)}
           title=""
-          className="tm-size-[40px] tm-rounded-full"
+          className={cn(
+            chipSize === 34 ? 'tm-size-[34px]' : 'tm-size-[40px]',
+            'tm-rounded-full',
+          )}
         />
       </span>
       <JobCardSimplify11ChannelStatusDot visual={visual} />
@@ -144,6 +156,7 @@ export function JobCardSimplify11ChannelChipVisual({
 
 export function JobCardSimplify11ChannelChip({
   publication,
+  chipSize = 40,
   now = new Date(),
   onExtendPublication,
   onEnablePublication,
@@ -160,7 +173,11 @@ export function JobCardSimplify11ChannelChip({
       className="tm-inline-flex"
     >
       <DropdownToggle variant="custom" className="tm-rounded-none tm-bg-transparent tm-p-0">
-        <JobCardSimplify11ChannelChipVisual publication={publication} visual={visual} />
+        <JobCardSimplify11ChannelChipVisual
+          publication={publication}
+          visual={visual}
+          chipSize={chipSize}
+        />
       </DropdownToggle>
       <DropdownBody
         data-testid="job-card-simplify11-channel-detail"

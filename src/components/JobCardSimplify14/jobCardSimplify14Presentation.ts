@@ -1,7 +1,10 @@
 import {
+  formatCompactDateRange,
   isUnlimitedPublication,
   partitionPublicationChannels,
+  richestDateLabel,
   shareSameEndDate,
+  shareSameStartDate,
   stripYear,
 } from '../JobCardSynteza/advertisementSummary'
 import type { JobPublication } from '../JobCardSynteza/types'
@@ -31,6 +34,59 @@ function finiteActivePublications(active: JobPublication[]) {
   return active.filter(
     (publication) => publication.endDate && !isUnlimitedPublication(publication.channel),
   )
+}
+
+function activePublicationsWithSamePeriod(active: JobPublication[]) {
+  const dated = active.filter(
+    (publication) =>
+      publication.startDate &&
+      publication.endDate &&
+      !isUnlimitedPublication(publication.channel),
+  )
+
+  if (dated.length === 0) {
+    return []
+  }
+
+  if (!shareSameStartDate(dated) || !shareSameEndDate(dated)) {
+    return []
+  }
+
+  return dated
+}
+
+/** Full from–to range when every active finite channel shares the same period. */
+export function formatSimplify14SamePeriodRange(
+  publications: JobPublication[],
+  now = new Date(),
+): string | undefined {
+  const { active } = partitionPublicationChannels(publications, now)
+  const dated = activePublicationsWithSamePeriod(active)
+
+  if (dated.length === 0) {
+    return undefined
+  }
+
+  const startDate = richestDateLabel(dated.map((publication) => publication.startDate!))
+  const endDate = richestDateLabel(dated.map((publication) => publication.endDate!))
+
+  return formatCompactDateRange(startDate, endDate)
+}
+
+export function shouldShowSimplify14SamePeriodRange(
+  mode: JobCardSimplify11PanelMode,
+  publications: JobPublication[],
+  now = new Date(),
+): boolean {
+  if (mode !== 'running') {
+    return false
+  }
+
+  if (shouldShowPerChannelDateLabels(mode, publications, now)) {
+    return false
+  }
+
+  return formatSimplify14SamePeriodRange(publications, now) !== undefined
 }
 
 export function shouldShowPerChannelDateLabels(

@@ -88,11 +88,13 @@ describe('JobCardSimplify14', () => {
     expect(screen.getByTestId('job-card-simplify14-running')).toBeInTheDocument()
     expect(screen.getByTestId('job-card-simplify14-channel-strip')).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-simplify14-channel-date')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('job-card-simplify14-subline')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-simplify14-subline')).toHaveTextContent(
+      '12. 7. – 14. 11. 2026',
+    )
     expect(screen.queryByText(/· 1 vypnutý/)).not.toBeInTheDocument()
   })
 
-  it('does not show a subline under the advertisement heading', () => {
+  it('does not show a same-period subline for partial combination D', () => {
     renderSimplify14()
     expect(screen.queryByTestId('job-card-simplify14-subline')).not.toBeInTheDocument()
   })

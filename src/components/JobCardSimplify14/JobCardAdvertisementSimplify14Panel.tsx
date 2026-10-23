@@ -18,7 +18,9 @@ import {
   formatMixedPeriodsHeading,
   getSimplify11PanelCta,
   resolveJobCardSimplify14PanelMode,
+  formatSimplify14SamePeriodRange,
   shouldShowPerChannelDateLabels,
+  shouldShowSimplify14SamePeriodRange,
   type JobCardSimplify14PanelMode,
 } from './jobCardSimplify14Presentation'
 
@@ -35,8 +37,8 @@ export interface JobCardAdvertisementSimplify14PanelProps extends StyleProps {
   onEnablePublication?: (publication: JobPublication) => void
 }
 
-const SIMPLIFY_14_STATUS_ICON_CLASS = 'tm-shrink-0 tm-text-2xl tm-leading-none'
-const SIMPLIFY_14_CHECK_ICON_CLASS = 'tm-shrink-0 tm-text-xl tm-leading-none'
+const SIMPLIFY_14_STATUS_ICON_CLASS = 'tm-shrink-0 tm-text-lg tm-leading-none'
+const SIMPLIFY_14_CHECK_ICON_CLASS = 'tm-shrink-0 tm-text-base tm-leading-none'
 const SIMPLIFY_14_STATUS_ICON_STROKE = 2
 const SIMPLIFY_14_CHECK_ICON_STROKE = 1.5
 
@@ -180,6 +182,9 @@ function Simplify14MixedChannelPanel({
   const summary = getAdvertisementSummary(advertisement)
   const heading = headingForMode(mode)
   const showDateLabels = shouldShowPerChannelDateLabels(mode, publications, now)
+  const samePeriodRange = shouldShowSimplify14SamePeriodRange(mode, publications, now)
+    ? formatSimplify14SamePeriodRange(publications, now)
+    : undefined
   const cta =
     mode === 'running' || mode === 'allDisabled' || mode === 'mixedPeriods'
       ? undefined
@@ -228,6 +233,14 @@ function Simplify14MixedChannelPanel({
             />
           ) : null}
         </div>
+        {samePeriodRange ? (
+          <p
+            data-testid="job-card-simplify14-subline"
+            className="tm-m-0 tm-text-sm tm-text-secondary-default"
+          >
+            {samePeriodRange}
+          </p>
+        ) : null}
       </div>
       <JobCardSimplify14ChannelStrip
         publications={publications}

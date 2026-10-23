@@ -1,6 +1,7 @@
 import { cn } from '../../lib/cn'
 import type { JobPublication } from '../JobCardSynteza/types'
 import { JobCardSimplify11ChannelChip } from '../JobCardSimplify11/JobCardSimplify11ChannelChip'
+import { JOB_CARD_SIMPLIFY_14_CHANNEL_CHIP_SIZE } from './constants'
 import {
   formatSimplify14ChannelDateLabel,
   resolveSimplify14ChannelDateLabelTone,
@@ -49,9 +50,10 @@ export function JobCardSimplify14ChannelStrip({
 
         return (
           <li key={publication.id}>
-            <div className="tm-flex tm-w-[42px] tm-flex-col tm-items-center tm-gap-0.5">
+            <div className="tm-flex tm-w-[36px] tm-flex-col tm-items-center tm-gap-0.5">
               <JobCardSimplify11ChannelChip
                 publication={publication}
+                chipSize={JOB_CARD_SIMPLIFY_14_CHANNEL_CHIP_SIZE}
                 now={now}
                 onExtendPublication={onExtendPublication}
                 onEnablePublication={onEnablePublication}

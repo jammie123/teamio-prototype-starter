@@ -1,12 +1,7 @@
-import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import {
-  formatViewCountLabel,
-  getAdvertisementSummary,
-} from '../JobCardSynteza/advertisementSummary'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
-import { JobCardPlacesSummaryTable } from '../JobCardSyntezaAds/JobCardPlacesSummaryTable'
 import { isDraftAdvertisement } from '../JobCardSyntezaAds/advertisementSummaryAds'
 import { JobCardAdvertisement } from '../JobCardSyntezaAds/JobCardAdvertisement'
 import {
@@ -80,82 +75,12 @@ function ChevronEditButton({ onEditAdvertisement }: { onEditAdvertisement: () =>
   )
 }
 
-function HeaderAggregateViews({
-  publications,
-  viewCount,
-  onViewStatisticsClick,
-  onExtendPublications,
-}: {
-  publications: JobPublication[]
-  viewCount: number
-  onViewStatisticsClick?: () => void
-  onExtendPublications?: () => void
-}) {
-  const [open, setOpen] = useState(false)
-
-  const viewsLabel = (
-    <span data-testid="job-card-advertisement-aggregate-views">{formatViewCountLabel(viewCount)}</span>
-  )
-
-  return (
-    <div
-      className="tm-relative tm-flex tm-shrink-0 tm-items-center"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button
-        type="button"
-        data-testid="job-card-advertisement-stats-toggle"
-        aria-expanded={open}
-        className="tm-border-0 tm-bg-transparent tm-p-0 tm-font-inherit tm-text-13 tm-text-secondary-default tm-cursor-pointer hover:tm-text-primary-default"
-        onClick={() => setOpen((current) => !current)}
-      >
-        {viewsLabel}
-      </button>
-      {open ? (
-        <div
-          data-testid="job-card-advertisement-stats-dropdown"
-          className="tm-absolute tm-right-0 tm-top-full tm-z-50 tm-mt-2 tm-w-max tm-max-w-[min(36rem,calc(100vw-2rem))] tm-rounded tm-border tm-border-primary tm-bg-basic tm-p-2 tm-shadow"
-        >
-          <JobCardPlacesSummaryTable
-            publications={publications}
-            showProlong={Boolean(onExtendPublications)}
-            onExtend={onExtendPublications}
-          />
-          {onViewStatisticsClick ? (
-            <button
-              type="button"
-              className="tm-mt-2 tm-w-full tm-border-0 tm-bg-transparent tm-p-0 tm-text-left tm-text-13 tm-text-secondary-default hover:tm-text-primary-default"
-              data-testid="job-card-advertisement-detailed-stats"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                onViewStatisticsClick()
-              }}
-            >
-              Přejít na podrobné statistiky
-            </button>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
 function AdvertisementStatusHeader({
   heading,
-  publications,
-  viewCount,
-  onViewStatisticsClick,
-  onExtendPublications,
   onEditAdvertisement,
   secondaryTestId = 'job-card-simplify18-advertisement-heading-secondary',
 }: {
   heading: Simplify18StatusHeading
-  publications: JobPublication[]
-  viewCount?: number
-  onViewStatisticsClick?: () => void
-  onExtendPublications?: () => void
   onEditAdvertisement?: () => void
   secondaryTestId?: string
 }) {
@@ -189,14 +114,6 @@ function AdvertisementStatusHeader({
               {heading.secondary}
             </span>
           ) : null}
-          {viewCount !== undefined ? (
-            <HeaderAggregateViews
-              publications={publications}
-              viewCount={viewCount}
-              onViewStatisticsClick={onViewStatisticsClick}
-              onExtendPublications={onExtendPublications}
-            />
-          ) : null}
         </div>
         {onEditAdvertisement ? (
           <ChevronEditButton onEditAdvertisement={onEditAdvertisement} />
@@ -206,7 +123,7 @@ function AdvertisementStatusHeader({
   )
 }
 
-function PanelActions({
+function PanelActionLinks({
   actions,
   onExtendPublication,
   onExtendPublications,
@@ -232,62 +149,58 @@ function PanelActions({
     }
   }
 
+  const extendAction = actions.find((action) => action.kind === 'extend')
+  const declineAction = actions.find((action) => action.kind === 'decline')
+
+  const showExtend = Boolean(
+    extendAction && (onExtendPublication || onExtendPublications),
+  )
+  const showDecline = declineAction && onDeclineAdvertising
+
+  if (!showExtend && !showDecline) {
+    return null
+  }
+
   return (
-    <div
-      data-testid="job-card-simplify18-panel-actions"
-      className="tm-mt-0 tm-flex tm-flex-wrap tm-items-center tm-gap-2"
-    >
-      {actions.map((action) => {
-        if (action.kind === 'extend') {
-          if (!onExtendPublication && !onExtendPublications) {
-            return null
-          }
-
-          return (
-            <Button
-              key={`extend-${action.label}`}
-              variant="secondary"
-              size="medium"
-              data-testid="job-card-simplify18-extend-advertising"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                handleExtend(action.targetPublications)
-              }}
-            >
-              {action.label}
-            </Button>
-          )
-        }
-
-        if (!onDeclineAdvertising) {
-          return null
-        }
-
-        return (
-          <Link
-            key="decline"
-            variant="secondary"
-            underlined="never"
-            className="tm-text-xs tm-text-secondary-default hover:tm-text-primary-default"
-            data-testid="job-card-simplify18-decline-advertising"
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              onDeclineAdvertising()
-            }}
-          >
-            {action.label}
-          </Link>
-        )
-      })}
-    </div>
+    <>
+      {showDecline ? (
+        <Link
+          variant="secondary"
+          underlined="never"
+          className="tm-text-xs tm-text-secondary-default hover:tm-text-primary-default"
+          data-testid="job-card-simplify18-decline-advertising"
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            onDeclineAdvertising!()
+          }}
+        >
+          {declineAction!.label}
+        </Link>
+      ) : null}
+      {showExtend ? (
+        <Link
+          variant="primary"
+          underlined="never"
+          className="tm-shrink-0 tm-text-sm"
+          data-testid="job-card-simplify18-extend-advertising"
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            handleExtend(extendAction!.targetPublications)
+          }}
+        >
+          {extendAction!.label}
+        </Link>
+      ) : null}
+    </>
   )
 }
 
 function sharedAdvertisementProps(
   props: JobCardAdvertisementSimplify18PanelProps,
   className?: string,
+  advertisementMetaTrailing?: ReactNode,
 ) {
   return {
     advertisement: props.advertisement,
@@ -305,8 +218,8 @@ function sharedAdvertisementProps(
     publicationPresentation: 'simplify15' as const,
     publicationChannelLogoSize: JOB_CARD_SIMPLIFY_18_CHANNEL_LOGO_SIZE,
     suppressPublicationGroupHeadings: true,
-    suppressAdvertisementMeta: true as const,
     publicationInlineHighlights: 'none' as const,
+    advertisementMetaTrailing,
     className,
   }
 }
@@ -327,37 +240,23 @@ function PublicationsWithActions({
   }
   advertisementClassName?: string
 }) {
-  return (
-    <div className="tm-flex tm-flex-col tm-gap-1.5">
-      <JobCardAdvertisement
-        {...sharedAdvertisementProps({ ...panelProps, advertisement }, advertisementClassName)}
-      />
-      <PanelActionBlock {...actionProps} />
-    </div>
-  )
-}
-
-function PanelActionBlock({
-  actions,
-  onExtendPublication,
-  onExtendPublications,
-  onDeclineAdvertising,
-}: {
-  actions?: Simplify18HeadingAction[]
-  onExtendPublication?: (publication: JobPublication) => void
-  onExtendPublications?: () => void
-  onDeclineAdvertising?: () => void
-}) {
-  if (!actions?.length) {
-    return null
-  }
+  const metaTrailing =
+    actionProps.actions && actionProps.actions.length > 0 ? (
+      <div
+        data-testid="job-card-simplify18-panel-actions"
+        className="tm-flex tm-items-center tm-gap-3"
+      >
+        <PanelActionLinks {...actionProps} actions={actionProps.actions} />
+      </div>
+    ) : undefined
 
   return (
-    <PanelActions
-      actions={actions}
-      onExtendPublication={onExtendPublication}
-      onExtendPublications={onExtendPublications}
-      onDeclineAdvertising={onDeclineAdvertising}
+    <JobCardAdvertisement
+      {...sharedAdvertisementProps(
+        { ...panelProps, advertisement },
+        advertisementClassName,
+        metaTrailing,
+      )}
     />
   )
 }
@@ -414,7 +313,6 @@ export function JobCardAdvertisementSimplify18Panel({
 
   const publications = advertisement.publications ?? []
   const statusHeading = buildSimplify18StatusHeading(advertisement)
-  const summary = getAdvertisementSummary(advertisement)
 
   const panelProps: JobCardAdvertisementSimplify18PanelProps = {
     advertisement,
@@ -433,17 +331,9 @@ export function JobCardAdvertisementSimplify18Panel({
     onDeclineAdvertising,
   }
 
-  const statusHeader =
-    statusHeading ? (
-      <AdvertisementStatusHeader
-        heading={statusHeading}
-        publications={publications}
-        viewCount={summary.viewCount}
-        onViewStatisticsClick={onViewStatisticsClick}
-        onExtendPublications={onExtendPublications}
-        onEditAdvertisement={onEditAdvertisement}
-      />
-    ) : null
+  const statusHeader = statusHeading ? (
+    <AdvertisementStatusHeader heading={statusHeading} onEditAdvertisement={onEditAdvertisement} />
+  ) : null
 
   if (publications.length === 0) {
     return (

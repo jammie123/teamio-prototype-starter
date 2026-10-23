@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
@@ -96,6 +96,8 @@ export interface JobCardAdvertisementProps extends StyleProps {
   suppressAdvertisementMeta?: boolean
   /** Hides per-publication highlight chips that surface view/reaction stats under portals. */
   publicationInlineHighlights?: 'all' | 'none'
+  /** Renders at the end of the aggregate meta row (e.g. Simplify 18 extend link). */
+  advertisementMetaTrailing?: ReactNode
 }
 
 function sharedFieldDateLabel(
@@ -139,6 +141,7 @@ function AdvertisementMeta({
   showProlong = false,
   onExtendAll,
   linkDecoration = 'dotted-underline',
+  metaTrailing,
 }: {
   publications: JobPublication[]
   viewCount?: number
@@ -149,28 +152,30 @@ function AdvertisementMeta({
   showProlong?: boolean
   onExtendAll?: () => void
   linkDecoration?: JobCardPublicationChannelDecoration
+  metaTrailing?: ReactNode
 }) {
   const [open, setOpen] = useState(false)
 
-  if (viewCount === undefined) {
+  if (viewCount === undefined && !metaTrailing) {
     return null
   }
 
-  const viewsLabel = (
-    <span
-      data-testid="job-card-advertisement-aggregate-views"
-      className={cn(
-        'tm-border-0',
-        linkDecoration === 'dotted-underline' &&
-          'tm-border-b tm-border-dotted tm-border-secondary',
-      )}
-    >
-      {formatViewCountLabel(viewCount)}
-    </span>
-  )
+  const viewsLabel =
+    viewCount !== undefined ? (
+      <span
+        data-testid="job-card-advertisement-aggregate-views"
+        className={cn(
+          'tm-border-0',
+          linkDecoration === 'dotted-underline' &&
+            'tm-border-b tm-border-dotted tm-border-secondary',
+        )}
+      >
+        {formatViewCountLabel(viewCount)}
+      </span>
+    ) : null
 
   const statsPanel =
-    publicationHover === 'placesTable' ? (
+    viewCount === undefined ? null : publicationHover === 'placesTable' ? (
       <div
         className="tm-relative tm-flex tm-items-center"
         onMouseEnter={() => setOpen(true)}
@@ -272,28 +277,35 @@ function AdvertisementMeta({
   return (
     <div
       data-testid="job-card-advertisement-meta"
-      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-1.5 tm-gap-y-0.5 tm-text-13 tm-text-secondary-default"
+      className="tm-flex tm-w-full tm-items-center tm-gap-x-3 tm-gap-y-0.5 tm-text-13 tm-text-secondary-default"
     >
-      {statsPanel}
-      {showPreviewLink ? (
-        <>
-          <span aria-hidden data-testid="job-card-advertisement-preview-separator">
-            ·
-          </span>
-          <Link
-            variant="secondary"
-            className="tm-inline-flex tm-items-center tm-gap-1 tm-text-13 tm-text-secondary-default"
-            data-testid="job-card-advertisement-preview"
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              onPreviewAdvertisement?.()
-            }}
-          >
-            <Icon name="search" />
-            Zobrazit náhled
-          </Link>
-        </>
+      {statsPanel || showPreviewLink ? (
+        <div className="tm-flex tm-min-w-0 tm-flex-wrap tm-items-center tm-gap-x-1.5 tm-gap-y-0.5">
+          {statsPanel}
+          {showPreviewLink ? (
+            <>
+              <span aria-hidden data-testid="job-card-advertisement-preview-separator">
+                ·
+              </span>
+              <Link
+                variant="secondary"
+                className="tm-inline-flex tm-items-center tm-gap-1 tm-text-13 tm-text-secondary-default"
+                data-testid="job-card-advertisement-preview"
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  onPreviewAdvertisement?.()
+                }}
+              >
+                <Icon name="search" />
+                Zobrazit náhled
+              </Link>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+      {metaTrailing ? (
+        <div className="tm-ml-auto tm-flex tm-shrink-0 tm-items-center tm-gap-3">{metaTrailing}</div>
       ) : null}
     </div>
   )
@@ -1107,6 +1119,7 @@ export function JobCardAdvertisement({
   suppressPublicationGroupHeadings = false,
   suppressAdvertisementMeta = false,
   publicationInlineHighlights,
+  advertisementMetaTrailing,
   className,
 }: JobCardAdvertisementProps) {
   if (isDraftAdvertisement(advertisement)) {
@@ -1397,7 +1410,8 @@ export function JobCardAdvertisement({
           </div>
         )}
       </div>
-      {!suppressAdvertisementMeta ? (
+      {!suppressAdvertisementMeta &&
+      (summary.viewCount !== undefined || advertisementMetaTrailing) ? (
         <div className={cn(isSimplify13StylePresentation(publicationPresentation) && 'tm-mt-3')}>
           <AdvertisementMeta
             publications={publications}
@@ -1408,6 +1422,7 @@ export function JobCardAdvertisement({
             onExtendAll={onExtendAll}
             linkDecoration={publicationChannelDecoration}
             onViewStatisticsClick={onViewStatisticsClick}
+            metaTrailing={advertisementMetaTrailing}
             onPreviewAdvertisement={
               onPreviewAdvertisement ??
               (onPreviewPublication

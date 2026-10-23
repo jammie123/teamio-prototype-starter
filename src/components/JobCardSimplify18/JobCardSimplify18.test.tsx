@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { JobAdvertisement } from '../JobCardSynteza/types'
@@ -105,8 +105,12 @@ describe('JobCardSimplify18', () => {
     expect(screen.getByTestId('job-card-simplify18-advertisement-heading-secondary')).toHaveTextContent(
       '1. 10. – 14. 11.',
     )
-    expect(screen.getAllByTestId('job-card-advertisement-aggregate-views')).toHaveLength(1)
-    expect(screen.queryByTestId('job-card-advertisement-meta')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-advertisement-meta')).toBeInTheDocument()
+    expect(
+      within(screen.getByTestId('job-card-simplify18-running-heading')).queryByTestId(
+        'job-card-advertisement-aggregate-views',
+      ),
+    ).not.toBeInTheDocument()
 
     await user.click(screen.getByTestId('job-card-simplify18-edit-advertisement'))
     expect(onEditAdvertisement).toHaveBeenCalledTimes(1)
@@ -127,9 +131,12 @@ describe('JobCardSimplify18', () => {
     expect(screen.getByTestId('job-card-simplify18-advertisement-heading-secondary')).toHaveTextContent(
       /1 portál končí za/,
     )
-    expect(screen.getByTestId('job-card-simplify18-extend-advertising')).toHaveTextContent(
-      'Prodloužit',
-    )
+    expect(screen.getByTestId('job-card-simplify18-extend-advertising')).toHaveTextContent('Prodloužit')
+    expect(
+      within(screen.getByTestId('job-card-advertisement-meta')).getByTestId(
+        'job-card-simplify18-extend-advertising',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('shows partial heading with expired portal secondary and extend action', () => {

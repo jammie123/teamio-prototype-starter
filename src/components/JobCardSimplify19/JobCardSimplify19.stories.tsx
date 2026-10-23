@@ -266,6 +266,13 @@ export const InzerceSkoncila: Story = {
   },
 }
 
+export const ZatimNeinzerovano: Story = {
+  name: 'Zatím neinzerováno',
+  args: {
+    advertisements: [],
+  },
+}
+
 export const Stavy_Přehled: Story = {
   name: 'Stavy / Přehled',
   parameters: {
@@ -279,6 +286,7 @@ export const Stavy_Přehled: Story = {
     <div className="tm-flex tm-flex-col tm-gap-8">
       {(
         [
+          ['Zatím neinzerováno', null],
           ['Běží — stejné období', runningSamePeriod],
           ['Běží — různá období', runningMixedPeriods],
           ['Brzy končí — všechny stejně brzy', endingSoonAllSameDate],
@@ -287,9 +295,15 @@ export const Stavy_Přehled: Story = {
           ['Inzerce skončila', advertisingEnded],
         ] as const
       ).map(([label, advertisement]) => (
-        <section key={advertisement.id} className="tm-flex tm-flex-col tm-gap-2">
+        <section
+          key={advertisement?.id ?? 'never-advertised'}
+          className="tm-flex tm-flex-col tm-gap-2"
+        >
           <h2 className="tm-m-0 tm-text-base tm-font-semibold tm-text-primary-default">{label}</h2>
-          <JobCardSimplify19 {...cardArgs} advertisements={[advertisement]} />
+          <JobCardSimplify19
+            {...cardArgs}
+            advertisements={advertisement ? [advertisement] : []}
+          />
         </section>
       ))}
     </div>

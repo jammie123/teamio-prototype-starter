@@ -69,7 +69,7 @@ export function JobCardSimplify19PortalRow({
     >
       {sorted.map((publication) => {
         const publicationExpired = perPublicationExpired
-          ? publication.status === 'expired'
+          ? publication.status === 'expired' || publication.status === 'disabled'
           : expired
         const channelLogoStatus = publicationExpired
           ? 'gray'

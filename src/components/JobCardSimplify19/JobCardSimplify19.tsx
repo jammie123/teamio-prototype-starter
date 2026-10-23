@@ -25,7 +25,6 @@ import {
   JOB_CARD_SIMPLIFY_8_SECTION_PADDING,
 } from '../JobCardSimplify8/JobCardSimplify8'
 import { JobCardStatsSimplify8 } from '../JobCardSimplify8/JobCardStatsSimplify8'
-import { JobCardSimplify19NotAdvertisingLayout } from './JobCardSimplify19NotAdvertisingLayout'
 
 export const JOB_CARD_SIMPLIFY_19_PREVIEW_LABEL = JOB_CARD_SIMPLIFY_8_PREVIEW_LABEL
 export const JOB_CARD_SIMPLIFY_19_SECTION_PADDING = JOB_CARD_SIMPLIFY_8_SECTION_PADDING
@@ -101,7 +100,8 @@ export const JobCardSimplify19 = forwardRef<HTMLElement, JobCardSimplify19Props>
 
     const selectedAdvertisement = advertisements[selectedAdIndex]
     const hasSwitcher = advertisements.length > 1
-    const isQuietCard = selectedAdvertisement?.status === 'notAdvertising'
+    const isQuietCard =
+      advertisements.length === 0 || selectedAdvertisement?.status === 'notAdvertising'
 
     function selectPreviousAdvertisement() {
       setSelectedAdIndex((current) =>
@@ -218,18 +218,25 @@ export const JobCardSimplify19 = forwardRef<HTMLElement, JobCardSimplify19Props>
             )}
           >
             {advertisements.length === 0 ? (
-              <JobCardSimplify19NotAdvertisingLayout
-                data-testid="job-card-no-advertisement"
-                advertisement={{
-                  id: 'no-ad',
-                  status: 'notAdvertising',
-                  publications: [],
-                }}
-                headingTestId="job-card-simplify19-no-advertisement-heading"
-                sublineTestId="job-card-simplify19-no-advertisement-perex"
-                onCreateAdvertisement={onCreateAdvertisement}
-                bordered
-              />
+              <div className="tm-flex tm-flex-col tm-gap-2">
+                <JobCardAdvertisementSimplify19Panel
+                  advertisement={{
+                    id: 'no-ad',
+                    status: 'notAdvertising',
+                    publications: [],
+                  }}
+                  onCompleteAdvertisement={onCompleteAdvertisement}
+                  onViewStatisticsClick={onViewStatisticsClick}
+                  onPreviewAdvertisement={onPreviewAdvertisement}
+                  onPreviewPublication={onPreviewPublication}
+                  onExtendPublication={onExtendPublication}
+                  onExtendPublications={onExtendAndRepublish}
+                  onRepublishAdvertisement={onRepublishAdvertisement ?? onExtendAndRepublish}
+                  onDeclineAdvertising={onDeclineAdvertising}
+                  onEditAdvertisement={onEditAdvertisement}
+                  onCreateAdvertisement={onCreateAdvertisement}
+                />
+              </div>
             ) : selectedAdvertisement ? (
               <div className="tm-flex tm-flex-col tm-gap-2">
                 {hasSwitcher ? (

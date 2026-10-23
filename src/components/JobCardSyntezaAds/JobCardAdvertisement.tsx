@@ -710,7 +710,7 @@ function PublicationGroup({
         publications={publications}
         listTestId={listTestId}
         expired={expired}
-        periodBadge={() => undefined}
+        periodBadge={expired ? expiredPeriodBadge : () => undefined}
         periodPresentation="text"
         hoverContent={hoverContent}
         allPublications={allPublications}

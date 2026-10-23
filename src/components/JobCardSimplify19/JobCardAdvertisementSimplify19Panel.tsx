@@ -52,7 +52,7 @@ function statusIcon(kind: Simplify19StatusHeadingKind) {
     return 'view-off' as const
   }
 
-  return 'circle-check' as const
+  return 'check' as const
 }
 
 function ChevronEditButton({ onEditAdvertisement }: { onEditAdvertisement: () => void }) {
@@ -97,14 +97,19 @@ function AdvertisementStatusHeader({
           data-testid={heading.testId}
           className="tm-m-0 tm-flex tm-min-w-0 tm-flex-1 tm-flex-wrap tm-items-baseline tm-gap-x-2 tm-gap-y-0.5 tm-text-sm tm-font-medium"
         >
-          <span className="tm-inline-flex tm-min-w-0 tm-items-center tm-gap-2">
+          <span
+            className={cn(
+              'tm-inline-flex tm-min-w-0 tm-items-center tm-gap-2',
+              heading.className,
+            )}
+          >
             <Icon
               name={statusIcon(heading.kind)}
               size={JOB_CARD_SIMPLIFY_19_STATUS_HEADING_ICON_SIZE}
               strokeWidth={JOB_CARD_SIMPLIFY_19_STATUS_HEADING_ICON_STROKE}
               className="tm-shrink-0"
             />
-            <span className={heading.className}>{heading.title}</span>
+            <span>{heading.title}</span>
           </span>
           {heading.secondary ? (
             <span

@@ -64,6 +64,17 @@ export function resolveSimplify19ChannelStatusTone(
   publication: JobPublication,
   now = new Date(),
 ): JobCardSimplify19ChannelStatusTone {
+  if (publication.status === 'expired' || publication.status === 'disabled') {
+    return 'gray'
+  }
+
+  if (publication.endDate && !isUnlimitedPublication(publication.channel)) {
+    const remainingDays = getRemainingCalendarDays(publication.endDate, now)
+    if (remainingDays !== undefined && remainingDays < 0) {
+      return 'gray'
+    }
+  }
+
   const visual = resolveSimplify11ChannelVisualState(publication, now)
 
   if (visual === 'endingSoon') {

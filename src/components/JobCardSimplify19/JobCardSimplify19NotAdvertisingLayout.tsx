@@ -27,7 +27,6 @@ export interface JobCardSimplify19NotAdvertisingLayoutProps
   onEditAdvertisement?: () => void
   onRepublishAdvertisement?: () => void
   onCreateAdvertisement?: () => void
-  bordered?: boolean
 }
 
 function ChevronEditButton({ onEditAdvertisement }: { onEditAdvertisement: () => void }) {
@@ -57,7 +56,6 @@ export function JobCardSimplify19NotAdvertisingLayout({
   onEditAdvertisement,
   onRepublishAdvertisement,
   onCreateAdvertisement,
-  bordered = false,
   className,
   ...rest
 }: JobCardSimplify19NotAdvertisingLayoutProps) {
@@ -66,12 +64,7 @@ export function JobCardSimplify19NotAdvertisingLayout({
 
   return (
     <div
-      className={cn(
-        'tm-flex tm-flex-col tm-gap-3',
-        bordered &&
-          'tm-items-start tm-rounded tm-border tm-border-secondary tm-bg-cover-light tm-p-4',
-        className,
-      )}
+      className={cn('tm-flex tm-flex-col tm-gap-3', className)}
       {...rest}
     >
       <div
@@ -137,8 +130,6 @@ export function JobCardSimplify19NotAdvertisingLayout({
       {!hasHistory && onCreateAdvertisement ? (
         <Button
           variant="secondary"
-          size="small"
-          className="!tm-min-h-7 !tm-px-3 !tm-py-1"
           data-testid="job-card-simplify19-start-advertising"
           onClick={(event) => {
             event.preventDefault()

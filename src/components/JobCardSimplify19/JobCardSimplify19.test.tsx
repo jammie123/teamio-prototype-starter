@@ -228,6 +228,9 @@ describe('JobCardSimplify19', () => {
       '20. 10. 2026',
     )
 
+    const endedList = screen.getByTestId('job-card-advertisement-ended-publications')
+    expect(within(endedList).getAllByTestId('job-card-simplify19-channel-status-dot')).toHaveLength(2)
+
     await user.click(screen.getByTestId('job-card-simplify19-extend-advertising'))
     await user.click(screen.getByTestId('job-card-simplify19-decline-advertising'))
 
@@ -252,7 +255,7 @@ describe('JobCardSimplify19', () => {
       <JobCardSimplify19 title="Test pozice" advertisements={[]} onCreateAdvertisement={() => {}} />,
     )
 
-    expect(screen.getByTestId('job-card-simplify19-no-advertisement-heading')).toHaveTextContent(
+    expect(screen.getByTestId('job-card-simplify19-not-advertising-heading')).toHaveTextContent(
       'Neinzeruje se',
     )
     expect(screen.getByTestId('job-card-simplify19-never-created-copy')).toHaveTextContent(

@@ -6,9 +6,9 @@ import {
   formatViewCountLabel,
   getAdvertisementSummary,
   getRemainingCalendarDays,
+  isEndingSoonPublication,
   isUnlimitedPublication,
   partitionPublicationChannels,
-  partitionPublications,
   richestDateLabel,
   shareSameEndDate,
   stripYear,
@@ -155,17 +155,37 @@ export function buildSimplify17NotAdvertisingPerex(advertisement: JobAdvertiseme
   return parts.join(' · ')
 }
 
-function endingSoonHeading(publications: JobPublication[], now = new Date()) {
-  const { active } = partitionPublications(publications, now)
-  const sameDate = shareSameEndDate(active)
-  const dates = active
+export function buildSimplify17EndingSoonAggregateHeading(
+  publications: JobPublication[],
+  now = new Date(),
+) {
+  const { active } = partitionPublicationChannels(publications, now)
+  const endingSoonActive = active.filter((publication) =>
+    isEndingSoonPublication(publication, now),
+  )
+
+  if (endingSoonActive.length === 0) {
+    return undefined
+  }
+
+  const finiteActive = active.filter(
+    (publication) => publication.endDate && !isUnlimitedPublication(publication.channel),
+  )
+  const allActiveShareSameEndDate =
+    finiteActive.length > 0 && shareSameEndDate(finiteActive)
+
+  if (!allActiveShareSameEndDate) {
+    return 'Končí brzy'
+  }
+
+  const dates = finiteActive
     .map((publication) => publication.endDate)
     .filter((value): value is string => Boolean(value))
   const date = dates.length > 0 ? richestDateLabel(dates) : undefined
-  const remainingDays = date ? getRemainingCalendarDays(date) : undefined
+  const remainingDays = date ? getRemainingCalendarDays(date, now) : undefined
 
   return formatEndingSoonHeading({
-    sameDate,
+    sameDate: true,
     endDate: date ? stripYear(date) : undefined,
     remainingDays,
   })
@@ -177,6 +197,22 @@ export function buildSimplify17StatusHeading(
 ): Simplify17StatusHeading | null {
   const mode = resolveJobCardSimplify11PanelMode(advertisement, now)
   const publications = advertisement.publications ?? []
+
+  const endingSoonLabel = buildSimplify17EndingSoonAggregateHeading(publications, now)
+
+  if (
+    endingSoonLabel &&
+    mode !== 'ended' &&
+    mode !== 'expiredUnexpected' &&
+    mode !== 'allDisabled'
+  ) {
+    return {
+      kind: 'endingSoon',
+      label: endingSoonLabel,
+      className: 'tm-text-emotion-warning-emphasis',
+      testId: 'job-card-simplify17-ending-soon-heading',
+    }
+  }
 
   if (mode === 'partial') {
     const { runningCount, totalCount } = partialChannelCounts(publications, now)
@@ -220,15 +256,6 @@ export function buildSimplify17StatusHeading(
       label: formatMixedPeriodsHeading(),
       className: 'tm-text-emotion-success-emphasis',
       testId: 'job-card-simplify17-mixed-periods-heading',
-    }
-  }
-
-  if (mode === 'endingSoon') {
-    return {
-      kind: 'endingSoon',
-      label: endingSoonHeading(publications, now),
-      className: 'tm-text-emotion-warning-emphasis',
-      testId: 'job-card-simplify17-ending-soon-heading',
     }
   }
 

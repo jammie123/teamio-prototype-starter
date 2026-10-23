@@ -28,6 +28,20 @@ const partialAd: JobAdvertisement = {
   ],
 }
 
+function daysFromNow(days: number) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return `${date.getDate()}. ${date.getMonth() + 1}. ${date.getFullYear()}`
+}
+
+const mixedEndingSoonAd: JobAdvertisement = {
+  id: 'ad-ending-mixed',
+  publications: [
+    { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: daysFromNow(5), viewCount: 1200 },
+    { id: 'prace', channel: 'Prace.cz', startDate: '12. 7. 2026', endDate: daysFromNow(12), viewCount: 640 },
+  ],
+}
+
 const notAdvertisingAd: JobAdvertisement = {
   id: 'ad-na',
   status: 'notAdvertising',
@@ -74,6 +88,14 @@ describe('JobCardSimplify17', () => {
 
     await user.click(screen.getByTestId('job-card-simplify17-edit-advertisement'))
     expect(onEditAdvertisement).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows Končí brzy when at least one channel ends soon on different dates', () => {
+    render(<JobCardSimplify17 title="Test pozice" advertisements={[mixedEndingSoonAd]} />)
+
+    expect(screen.getByTestId('job-card-simplify17-ending-soon-heading')).toHaveTextContent(
+      'Končí brzy',
+    )
   })
 
   it('shows partial heading in secondary tone', () => {

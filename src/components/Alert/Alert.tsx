@@ -33,23 +33,23 @@ function variantClasses(variant: AlertVariant) {
     case 'success':
       return {
         root: 'tm-text-emotion-success-emphasis tm-bg-emotion-success-background tm-border-emotion-success-active',
-        icon: 'tm-text-emotion-success-active',
+        icon: 'tm-text-emotion-success-emphasis',
       }
     case 'warning':
       return {
         root: 'tm-text-emotion-warning-emphasis tm-bg-emotion-warning-background tm-border-emotion-warning-active',
-        icon: 'tm-text-emotion-warning-active',
+        icon: 'tm-text-emotion-warning-emphasis',
       }
     case 'error':
       return {
         root: 'tm-text-emotion-danger-emphasis tm-bg-emotion-danger-background tm-border-emotion-danger-active',
-        icon: 'tm-text-emotion-danger-active',
+        icon: 'tm-text-emotion-danger-emphasis',
       }
     case 'info':
     default:
       return {
         root: 'tm-text-emotion-info-emphasis tm-bg-emotion-info-background tm-border-emotion-info-active',
-        icon: 'tm-text-emotion-info-active',
+        icon: 'tm-text-emotion-info-emphasis',
       }
   }
 }

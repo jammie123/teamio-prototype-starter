@@ -51,6 +51,22 @@ export interface JobCardPublicationPortalProps {
   channelLogoStatus?: JobCardSimplify19ChannelStatusTone
   /** Simplify 21: dot at bottom of logo; default is top-right (Simplify 19). */
   channelLogoStatusPlacement?: JobCardChannelStatusDotPlacement
+  /** Simplify 22: gray-tone logo with reduced opacity (ended portal), no status dot. */
+  channelLogoMuted?: boolean
+  /** Simplify 22: portal name uses the warning token (portal is ending soon). */
+  channelNameTone?: JobCardPublicationChannelNameTone
+  /** Simplify 22: no dotted underline / line-through on the portal name (no status dot needed). */
+  flatChannelLabel?: boolean
+}
+
+export type JobCardPublicationChannelNameTone = 'default' | 'warning'
+
+function channelNameColorClass(expired: boolean, tone: JobCardPublicationChannelNameTone) {
+  if (expired) {
+    return 'tm-text-secondary-default'
+  }
+
+  return tone === 'warning' ? 'tm-text-emotion-warning-emphasis' : 'tm-text-primary-default'
 }
 
 function portalChipSubtleClasses(
@@ -116,6 +132,9 @@ function PublicationDropdown({
   channelLabelFooter,
   channelLogoStatus,
   channelLogoStatusPlacement,
+  channelLogoMuted = false,
+  channelNameTone = 'default',
+  flatChannelLabel = false,
 }: {
   publication: JobPublication
   expired: boolean
@@ -133,11 +152,15 @@ function PublicationDropdown({
   channelLabelFooter?: ReactNode
   channelLogoStatus?: JobCardSimplify19ChannelStatusTone
   channelLogoStatusPlacement?: JobCardChannelStatusDotPlacement
+  channelLogoMuted?: boolean
+  channelNameTone?: JobCardPublicationChannelNameTone
+  flatChannelLabel?: boolean
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
   const tablePublications = publications && publications.length > 0 ? publications : [publication]
-  const simplify19ChannelLabel = Boolean(channelLogoStatus)
+  const simplify19ChannelLabel = Boolean(channelLogoStatus) || flatChannelLabel
+  const channelNameColor = channelNameColorClass(expired, channelNameTone)
 
   return (
     <Dropdown
@@ -164,7 +187,10 @@ function PublicationDropdown({
                 type={jobPortalLogoTypeFromChannel(publication.channel)}
                 title=""
                 data-testid="job-card-publication-channel-logo"
-                className={channelLogoPresentationClass(channelLogoSize)}
+                className={cn(
+                  channelLogoPresentationClass(channelLogoSize),
+                  channelLogoMuted && 'tm-opacity-80 tm-grayscale',
+                )}
               />
               {channelLogoStatus ? (
                 <JobCardSimplify19ChannelStatusDot
@@ -184,7 +210,7 @@ function PublicationDropdown({
                       !simplify19ChannelLabel &&
                         channelDecoration === 'dotted-underline' &&
                         'tm-border-b tm-border-dotted tm-border-secondary',
-                      expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+                      channelNameColor,
                       expired &&
                         !simplify19ChannelLabel &&
                         'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
@@ -203,7 +229,7 @@ function PublicationDropdown({
                     !simplify19ChannelLabel &&
                       channelDecoration === 'dotted-underline' &&
                       'tm-border-b tm-border-dotted tm-border-secondary',
-                    expired ? 'tm-text-secondary-default' : 'tm-text-primary-default',
+                    channelNameColor,
                     expired &&
                       !simplify19ChannelLabel &&
                       'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
@@ -544,6 +570,9 @@ export function JobCardPublicationPortal({
   portalChip = false,
   channelLogoStatus,
   channelLogoStatusPlacement,
+  channelLogoMuted,
+  channelNameTone,
+  flatChannelLabel,
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge
     ? periodBadgeElement(
@@ -591,6 +620,9 @@ export function JobCardPublicationPortal({
           channelLabelFooter={badge}
           channelLogoStatus={channelLogoStatus}
           channelLogoStatusPlacement={channelLogoStatusPlacement}
+          channelLogoMuted={channelLogoMuted}
+          channelNameTone={channelNameTone}
+          flatChannelLabel={flatChannelLabel}
         />
         {highlightChips}
       </li>

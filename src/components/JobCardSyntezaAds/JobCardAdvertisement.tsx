@@ -58,6 +58,7 @@ import {
   JOB_CARD_SIMPLIFY_15_STATUS_HEADING_PADDING_TOP,
 } from '../JobCardSimplify15/constants'
 import { JobCardSimplify19PortalRow } from '../JobCardSimplify19/JobCardSimplify19PortalRow'
+import { JobCardSimplify22PortalRow } from '../JobCardSimplify22/JobCardSimplify22PortalRow'
 
 export type JobCardAdvertisementPublicationPresentation =
   | 'default'
@@ -71,6 +72,7 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify15'
   | 'simplify19'
   | 'simplify21'
+  | 'simplify22'
 
 function isSimplify13StylePresentation(
   publicationPresentation?: JobCardAdvertisementPublicationPresentation,
@@ -79,14 +81,19 @@ function isSimplify13StylePresentation(
     publicationPresentation === 'simplify13' ||
     publicationPresentation === 'simplify15' ||
     publicationPresentation === 'simplify19' ||
-    publicationPresentation === 'simplify21'
+    publicationPresentation === 'simplify21' ||
+    publicationPresentation === 'simplify22'
   )
 }
 
 function isStackedPortalPresentation(
   publicationPresentation?: JobCardAdvertisementPublicationPresentation,
 ) {
-  return publicationPresentation === 'simplify19' || publicationPresentation === 'simplify21'
+  return (
+    publicationPresentation === 'simplify19' ||
+    publicationPresentation === 'simplify21' ||
+    publicationPresentation === 'simplify22'
+  )
 }
 
 function stackedPortalStatusPlacement(
@@ -713,6 +720,25 @@ function PublicationGroup({
         channelDecoration={channelDecoration}
         dropdownPlacement={dropdownPlacement}
       />
+    ) : publicationPresentation === 'simplify22' ? (
+      <JobCardSimplify22PortalRow
+        publications={publications}
+        listTestId={listTestId}
+        expired={expired}
+        periodBadge={expired ? expiredPeriodBadge : () => undefined}
+        periodPresentation="text"
+        hoverContent={hoverContent}
+        allPublications={allPublications}
+        showProlong={showProlong}
+        onPreview={onPreview}
+        onExtend={onExtend}
+        onExtendAll={onExtendAll}
+        channelDecoration={channelDecoration}
+        dropdownPlacement={dropdownPlacement}
+        channelLogoSize={channelLogoSize}
+        showChannelLabel={showChannelLabel}
+        inlineHighlights={inlineHighlights}
+      />
     ) : isStackedPortalPresentation(publicationPresentation) ? (
       <JobCardSimplify19PortalRow
         publications={publications}
@@ -1102,6 +1128,35 @@ function PeriodBadgeGroup({
     suppressPublicationGroupHeadings,
   })
 
+  if (publicationPresentation === 'simplify22') {
+    return (
+      <div
+        className={cn('tm-flex tm-flex-col', badgeGroupContentGap, showLeadingDivider && ' tm-pt-2')}
+      >
+        {badgeGroupHeading}
+        <JobCardSimplify22PortalRow
+          publications={publications}
+          listTestId={listTestId}
+          expired={expired}
+          perPublicationExpired={perPublicationExpired}
+          periodBadge={periodBadge}
+          periodPresentation={periodPresentation}
+          hoverContent={hoverContent}
+          allPublications={allPublications}
+          showProlong={showProlong}
+          onPreview={onPreview}
+          onExtend={onExtend}
+          onExtendAll={onExtendAll}
+          channelDecoration={channelDecoration}
+          dropdownPlacement={dropdownPlacement}
+          channelLogoSize={channelLogoSize}
+          showChannelLabel={showChannelLabel}
+          inlineHighlights={inlineHighlights}
+        />
+      </div>
+    )
+  }
+
   if (isStackedPortalPresentation(publicationPresentation)) {
     return (
       <div
@@ -1317,7 +1372,9 @@ export function JobCardAdvertisement({
         ? '19'
         : publicationPresentation === 'simplify21'
           ? '21'
-          : '13'
+          : publicationPresentation === 'simplify22'
+            ? '22'
+            : '13'
   const mixedActiveGroupHeading = (() => {
     if (!isSimplify13StylePresentation(publicationPresentation)) {
       return {

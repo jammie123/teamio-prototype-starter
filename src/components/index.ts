@@ -276,6 +276,13 @@ export {
   type JobCardBranch as JobCardSimplify21Branch,
 } from './JobCardSimplify21'
 export {
+  JobCardSimplify22,
+  JOB_CARD_SIMPLIFY_22_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_22_SECTION_PADDING,
+  type JobCardSimplify22Props,
+  type JobCardBranch as JobCardSimplify22Branch,
+} from './JobCardSimplify22'
+export {
   JobCardSimplify14,
   JOB_CARD_SIMPLIFY_14_PREVIEW_LABEL,
   JOB_CARD_SIMPLIFY_14_SECTION_PADDING,

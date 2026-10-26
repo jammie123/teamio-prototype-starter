@@ -806,6 +806,57 @@ describe('JobCardAdvertisement publicationPresentation simplify5', () => {
   })
 })
 
+describe('JobCardAdvertisement publicationPresentation simplify24', () => {
+  it('stacks mixed-period portals and renders dates as plain text', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 24))
+
+    try {
+      render(
+        <JobCardAdvertisement
+          publicationPresentation="simplify24"
+          periodPresentation="text"
+          publicationChannelDecoration="plain"
+          publicationChannelLogoSize={18}
+          suppressPublicationGroupHeadings
+          showPreviewLink={false}
+          advertisement={{
+            id: 'ad-running-diff',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '30. 9. 2026' },
+              { id: 'career', channel: 'Kariérní stránky', startDate: '12. 7. 2026', endDate: '20. 9. 2026' },
+            ],
+          }}
+        />,
+      )
+
+      expect(screen.queryByTestId('job-card-advertisement-period-column')).not.toBeInTheDocument()
+
+      const list = screen.getByTestId('job-card-advertisement-active-publications')
+      expect(list).toHaveClass('tm-flex-col')
+      expect(list.className).not.toMatch(/tm-grid/)
+
+      const names = within(list).getAllByTestId('job-card-publication-channel')
+      names.forEach((name) => {
+        expect(name).toHaveClass('tm-w-[100px]', 'tm-truncate')
+      })
+
+      const dates = within(list).getAllByTestId('job-card-publication-period-badge')
+      expect(dates).toHaveLength(2)
+      dates.forEach((date) => {
+        expect(date).toHaveClass('tm-text-sm')
+        expect(date).not.toHaveClass('tm-bg-emotion-info-background')
+        expect(date).not.toHaveClass('tm-bg-emotion-warning-background')
+      })
+      screen.getAllByTestId('job-card-publication-channel-logo').forEach((logo) => {
+        expect(logo).toHaveClass('tm-size-[18px]')
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
 describe('JobCardAdvertisement publicationPresentation simplify19', () => {
   it('renders mixed end dates in a single row with dates under portal names', () => {
     vi.useFakeTimers()

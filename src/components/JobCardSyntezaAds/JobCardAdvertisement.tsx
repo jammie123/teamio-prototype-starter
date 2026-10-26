@@ -75,6 +75,7 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify21'
   | 'simplify22'
   | 'simplify23'
+  | 'simplify24'
 
 function isSimplify13StylePresentation(
   publicationPresentation?: JobCardAdvertisementPublicationPresentation,
@@ -472,6 +473,7 @@ interface PublicationHoverPassThrough {
   portalChip?: boolean
   publicationPresentation?: JobCardAdvertisementPublicationPresentation
   suppressPublicationGroupHeadings?: boolean
+  channelNameClamp?: '100'
 }
 
 function simplify6PortalListGapClass() {
@@ -619,6 +621,7 @@ function PublicationGroup({
   minimalPresentation,
   publicationPresentation,
   suppressPublicationGroupHeadings,
+  channelNameClamp,
 }: {
   publications: JobPublication[]
   kind: PublicationGroupKind
@@ -785,12 +788,17 @@ function PublicationGroup({
       <ul
         data-testid={listTestId}
         className={cn(
-          'tm-m-0 tm-flex tm-flex-row tm-flex-wrap tm-list-none tm-p-0',
-          isSimplify6Family
-            ? simplify6PortalListGapClass()
-            : minimalPresentation
-              ? 'tm-gap-x-3 tm-gap-y-2'
-              : 'tm-gap-x-2 tm-gap-y-1.5',
+          'tm-m-0 tm-flex tm-list-none tm-p-0',
+          publicationPresentation === 'simplify24'
+            ? 'tm-flex-col tm-gap-1'
+            : 'tm-flex-row tm-flex-wrap',
+          publicationPresentation === 'simplify24'
+            ? undefined
+            : isSimplify6Family
+              ? simplify6PortalListGapClass()
+              : minimalPresentation
+                ? 'tm-gap-x-3 tm-gap-y-2'
+                : 'tm-gap-x-2 tm-gap-y-1.5',
         )}
       >
         {publications.map((publication, index) => (
@@ -798,7 +806,9 @@ function PublicationGroup({
             key={publication.id}
             publication={publication}
             expired={expired}
-            withSeparator={!minimalPresentation && index > 0}
+            withSeparator={
+              publicationPresentation !== 'simplify24' && !minimalPresentation && index > 0
+            }
             hoverContent={hoverContent}
             publications={allPublications}
             showProlong={showProlong}
@@ -810,6 +820,7 @@ function PublicationGroup({
             channelLogoSize={channelLogoSize}
             showChannelLabel={showChannelLabel}
             inlineHighlights={inlineHighlights}
+            channelNameClamp={channelNameClamp}
           />
         ))}
       </ul>
@@ -879,6 +890,7 @@ function PeriodBadgeColumn({
   channelLogoSize,
   showChannelLabel,
   inlineHighlights,
+  channelNameClamp,
 }: {
   publications: JobPublication[]
   expired: boolean
@@ -891,7 +903,12 @@ function PeriodBadgeColumn({
   return (
     <div
       data-testid="job-card-advertisement-period-column"
-      className="tm-grid tm-grid-cols-[minmax(0,10rem)_auto] tm-items-center tm-content-start tm-gap-x-2 tm-gap-y-1"
+      className={cn(
+        'tm-grid tm-items-center tm-content-start tm-gap-x-2 tm-gap-y-1',
+        channelNameClamp === '100'
+          ? 'tm-grid-cols-[100px_auto]'
+          : 'tm-grid-cols-[minmax(0,10rem)_auto]',
+      )}
     >
       {publications.map((publication) => (
         <JobCardPublicationPortal
@@ -913,6 +930,7 @@ function PeriodBadgeColumn({
           channelLogoSize={channelLogoSize}
           showChannelLabel={showChannelLabel}
           inlineHighlights={inlineHighlights}
+          channelNameClamp={channelNameClamp}
         />
       ))}
     </div>
@@ -944,6 +962,7 @@ function PeriodBadgeGroup({
   portalChip,
   publicationPresentation,
   suppressPublicationGroupHeadings,
+  channelNameClamp,
   statusHeadingKind,
   perPublicationExpired = false,
 }: {
@@ -1208,6 +1227,43 @@ function PeriodBadgeGroup({
     )
   }
 
+  if (publicationPresentation === 'simplify24') {
+    return (
+      <div
+        className={cn('tm-flex tm-flex-col', badgeGroupContentGap, showLeadingDivider && ' tm-pt-2')}
+      >
+        {badgeGroupHeading}
+        <ul
+          data-testid={listTestId}
+          className="tm-m-0 tm-flex tm-list-none tm-flex-col tm-gap-1 tm-p-0"
+        >
+          {sortedPublications.map((publication) => (
+            <JobCardPublicationPortal
+              key={publication.id}
+              publication={publication}
+              expired={perPublicationExpired ? publication.status === 'expired' : expired}
+              withSeparator={false}
+              periodBadge={periodBadge(publication)}
+              periodPresentation={periodPresentation}
+              hoverContent={hoverContent}
+              publications={allPublications}
+              showProlong={showProlong}
+              onPreview={onPreview}
+              onExtend={onExtend}
+              onExtendAll={onExtendAll}
+              channelDecoration={channelDecoration}
+              dropdownPlacement={dropdownPlacement}
+              channelLogoSize={channelLogoSize}
+              showChannelLabel={showChannelLabel}
+              inlineHighlights={inlineHighlights}
+              channelNameClamp={channelNameClamp}
+            />
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
   if (isStackedPortalPresentation(publicationPresentation)) {
     return (
       <div
@@ -1273,6 +1329,7 @@ function PeriodBadgeGroup({
             channelLogoSize={channelLogoSize}
             showChannelLabel={showChannelLabel}
             inlineHighlights={inlineHighlights}
+            channelNameClamp={channelNameClamp}
           />
         ))}
       </div>
@@ -1485,6 +1542,7 @@ export function JobCardAdvertisement({
       : publicationChannelLogoSize
         ? { channelLogoSize: publicationChannelLogoSize }
         : {}),
+    ...(publicationPresentation === 'simplify24' ? { channelNameClamp: '100' as const } : {}),
   }
 
   return (

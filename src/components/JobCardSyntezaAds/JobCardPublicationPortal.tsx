@@ -59,9 +59,15 @@ export interface JobCardPublicationPortalProps {
   channelNameTone?: JobCardPublicationChannelNameTone
   /** Simplify 22: no dotted underline / line-through on the portal name (no status dot needed). */
   flatChannelLabel?: boolean
+  /** Simplify 24: fixed portal-name width with ellipsis. */
+  channelNameClamp?: '100'
 }
 
 export type JobCardPublicationChannelNameTone = 'default' | 'warning'
+
+function channelNameClampClass(clamp?: '100') {
+  return clamp === '100' ? 'tm-w-[100px] tm-max-w-[100px] tm-truncate' : undefined
+}
 
 function channelNameColorClass(expired: boolean, tone: JobCardPublicationChannelNameTone) {
   if (expired) {
@@ -162,6 +168,7 @@ function PublicationDropdown({
   channelLogoMuted = false,
   channelNameTone = 'default',
   flatChannelLabel = false,
+  channelNameClamp,
 }: {
   publication: JobPublication
   expired: boolean
@@ -183,12 +190,14 @@ function PublicationDropdown({
   channelLogoMuted?: boolean
   channelNameTone?: JobCardPublicationChannelNameTone
   flatChannelLabel?: boolean
+  channelNameClamp?: '100'
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
   const tablePublications = publications && publications.length > 0 ? publications : [publication]
   const simplify19ChannelLabel = Boolean(channelLogoStatus) || flatChannelLabel
   const channelNameColor = channelNameColorClass(expired, channelNameTone)
+  const channelNameWidthClass = channelNameClampClass(channelNameClamp)
   const resolvedLogoType = channelLogoType ?? jobPortalLogoTypeFromChannel(publication.channel)
   const karierkyWordmark = resolvedLogoType === 'karierky'
 
@@ -260,6 +269,7 @@ function PublicationDropdown({
                 <span className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0 tm-leading-snug">
                   <span
                     data-testid="job-card-publication-channel"
+                    title={channelNameClamp ? publication.channel : undefined}
                     className={cn(
                       'tm-border-0',
                       'tm-font-normal',
@@ -267,6 +277,7 @@ function PublicationDropdown({
                         channelDecoration === 'dotted-underline' &&
                         'tm-border-b tm-border-dotted tm-border-secondary',
                       channelNameColor,
+                      channelNameWidthClass,
                       expired &&
                         !simplify19ChannelLabel &&
                         'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
@@ -279,6 +290,7 @@ function PublicationDropdown({
               ) : (
                 <span
                   data-testid="job-card-publication-channel"
+                  title={channelNameClamp ? publication.channel : undefined}
                   className={cn(
                     'tm-border-0',
                     'tm-font-normal',
@@ -286,6 +298,7 @@ function PublicationDropdown({
                       channelDecoration === 'dotted-underline' &&
                       'tm-border-b tm-border-dotted tm-border-secondary',
                     channelNameColor,
+                    channelNameWidthClass,
                     expired &&
                       !simplify19ChannelLabel &&
                       'tm-line-through tm-group-hover:tm-no-underline tm-group-open:tm-no-underline',
@@ -632,6 +645,7 @@ export function JobCardPublicationPortal({
   channelLogoMuted,
   channelNameTone,
   flatChannelLabel,
+  channelNameClamp,
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge
     ? periodBadgeElement(
@@ -683,6 +697,7 @@ export function JobCardPublicationPortal({
           channelLogoMuted={channelLogoMuted}
           channelNameTone={channelNameTone}
           flatChannelLabel={flatChannelLabel}
+          channelNameClamp={channelNameClamp}
         />
         {highlightChips}
       </li>
@@ -719,6 +734,7 @@ export function JobCardPublicationPortal({
             channelLogoSize={channelLogoSize}
             showChannelLabel={showChannelLabel}
             channelLogoType={channelLogoType}
+            channelNameClamp={channelNameClamp}
           />
           {highlightChips}
         </span>
@@ -781,6 +797,7 @@ export function JobCardPublicationPortal({
               channelLogoSize={channelLogoSize}
               showChannelLabel={showChannelLabel}
               channelLogoType={channelLogoType}
+              channelNameClamp={channelNameClamp}
             />
             {badge}
           </span>
@@ -800,6 +817,7 @@ export function JobCardPublicationPortal({
               channelLogoSize={channelLogoSize}
               showChannelLabel={showChannelLabel}
               channelLogoType={channelLogoType}
+              channelNameClamp={channelNameClamp}
             />
             {badge}
           </>

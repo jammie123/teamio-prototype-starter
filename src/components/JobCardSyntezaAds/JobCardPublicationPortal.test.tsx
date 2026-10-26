@@ -112,4 +112,19 @@ describe('JobCardPublicationPortal', () => {
     expect(badge.querySelector('[data-logo-type="pages"]')).toHaveClass('tm-size-[30px]')
     expect(screen.queryByTestId('job-card-publication-channel')).not.toBeInTheDocument()
   })
+
+  it('clamps the channel name to 100px and exposes the full name as title', () => {
+    render(
+      <JobCardPublicationPortal
+        publication={publication('Práce za rohem')}
+        expired={false}
+        withSeparator={false}
+        channelNameClamp="100"
+      />,
+    )
+
+    const channel = screen.getByTestId('job-card-publication-channel')
+    expect(channel).toHaveClass('tm-w-[100px]', 'tm-max-w-[100px]', 'tm-truncate')
+    expect(channel).toHaveAttribute('title', 'Práce za rohem')
+  })
 })

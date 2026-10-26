@@ -18,6 +18,7 @@ import { JobCardPlacesSummaryTable } from './JobCardPlacesSummaryTable'
 import { JobCardPublicationHighlight } from './JobCardPublicationHighlight'
 import {
   JobCardSimplify19ChannelStatusDot,
+  type JobCardChannelStatusDotPlacement,
   type JobCardSimplify19ChannelStatusTone,
 } from '../JobCardSimplify19/JobCardSimplify19ChannelStatusDot'
 
@@ -46,8 +47,10 @@ export interface JobCardPublicationPortalProps {
   inlineHighlights?: 'all' | 'none'
   /** Pill wrapper (logo + period) for Simplify 5 mixed periods. */
   portalChip?: boolean
-  /** Simplify 19 status dot on the portal logo. */
+  /** Simplify 19/21 status dot on the portal logo. */
   channelLogoStatus?: JobCardSimplify19ChannelStatusTone
+  /** Simplify 21: dot at bottom of logo; default is top-right (Simplify 19). */
+  channelLogoStatusPlacement?: JobCardChannelStatusDotPlacement
 }
 
 function portalChipSubtleClasses(
@@ -112,6 +115,7 @@ function PublicationDropdown({
   showChannelLabel = true,
   channelLabelFooter,
   channelLogoStatus,
+  channelLogoStatusPlacement,
 }: {
   publication: JobPublication
   expired: boolean
@@ -128,6 +132,7 @@ function PublicationDropdown({
   /** Second line under channel name (Simplify 19 stacked portals). */
   channelLabelFooter?: ReactNode
   channelLogoStatus?: JobCardSimplify19ChannelStatusTone
+  channelLogoStatusPlacement?: JobCardChannelStatusDotPlacement
 }) {
   const conversion = formatConversionRate(publication.reactionCount, publication.viewCount)
   const period = formatPublicationRange(publication.startDate, publication.endDate)
@@ -162,7 +167,10 @@ function PublicationDropdown({
                 className={channelLogoPresentationClass(channelLogoSize)}
               />
               {channelLogoStatus ? (
-                <JobCardSimplify19ChannelStatusDot tone={channelLogoStatus} />
+                <JobCardSimplify19ChannelStatusDot
+                  tone={channelLogoStatus}
+                  placement={channelLogoStatusPlacement}
+                />
               ) : null}
             </span>
             {showChannelLabel ? (
@@ -535,6 +543,7 @@ export function JobCardPublicationPortal({
   inlineHighlights = 'all',
   portalChip = false,
   channelLogoStatus,
+  channelLogoStatusPlacement,
 }: JobCardPublicationPortalProps) {
   const badge = periodBadge
     ? periodBadgeElement(
@@ -581,6 +590,7 @@ export function JobCardPublicationPortal({
           showChannelLabel={showChannelLabel}
           channelLabelFooter={badge}
           channelLogoStatus={channelLogoStatus}
+          channelLogoStatusPlacement={channelLogoStatusPlacement}
         />
         {highlightChips}
       </li>

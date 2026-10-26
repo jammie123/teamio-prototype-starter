@@ -10,6 +10,7 @@ import {
   type JobCardPublicationChannelDecoration,
   type JobCardPublicationHover,
 } from '../JobCardSyntezaAds/JobCardPublicationPortal'
+import type { JobCardChannelStatusDotPlacement } from './JobCardSimplify19ChannelStatusDot'
 import { resolveSimplify19ChannelStatusTone } from './jobCardSimplify19Presentation'
 
 export interface JobCardSimplify19PortalRowProps {
@@ -30,6 +31,7 @@ export interface JobCardSimplify19PortalRowProps {
   channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
   inlineHighlights?: 'all' | 'none'
+  channelLogoStatusPlacement?: JobCardChannelStatusDotPlacement
 }
 
 export function shouldShowSimplify19PerPortalDates(publications: JobPublication[]) {
@@ -54,6 +56,7 @@ export function JobCardSimplify19PortalRow({
   channelLogoSize = 30,
   showChannelLabel = true,
   inlineHighlights = 'none',
+  channelLogoStatusPlacement,
 }: JobCardSimplify19PortalRowProps) {
   if (publications.length === 0) {
     return null
@@ -83,6 +86,7 @@ export function JobCardSimplify19PortalRow({
           withSeparator={false}
           variant="stacked"
           channelLogoStatus={channelLogoStatus}
+          channelLogoStatusPlacement={channelLogoStatusPlacement}
           periodBadge={showPerPortalDates ? periodBadge(publication) : undefined}
           periodPresentation={periodPresentation}
           hoverContent={hoverContent}

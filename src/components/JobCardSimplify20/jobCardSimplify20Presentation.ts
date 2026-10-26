@@ -217,7 +217,7 @@ export function buildSimplify20EndingSoonSecondary(
   return formatSimplify20NearestEndingSecondary(remainingDays, fullEndDate)
 }
 
-function expiredPaidCount(publications: JobPublication[], now = new Date()) {
+export function expiredPaidCount(publications: JobPublication[], now = new Date()) {
   const { expired } = partitionPublicationChannels(publications, now)
   return expired.filter((publication) => !isUnlimitedPublication(publication.channel)).length
 }

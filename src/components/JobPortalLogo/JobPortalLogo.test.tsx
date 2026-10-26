@@ -48,6 +48,7 @@ describe('JobPortalLogo', () => {
       'export',
       'jobs-cz',
       'jobs-cz-prace-cz',
+      'karierky',
       'pages',
       'prace-cz',
       'prace-za-rohem',
@@ -58,10 +59,20 @@ describe('JobPortalLogo', () => {
     ])
   })
 
+  it('renders the Kariérky wordmark when type is karierky', () => {
+    render(<JobPortalLogo type="karierky" />)
+
+    const logo = screen.getByRole('img', { name: 'Kariérky' })
+    expect(logo).toHaveAttribute('data-logo-type', 'karierky')
+    expect(logo).not.toHaveAttribute('data-logo-fallback')
+    expect(logo.querySelector('img')).toHaveAttribute('src')
+  })
+
   it('maps publication channel names to logo types', () => {
     expect(jobPortalLogoTypeFromChannel('Jobs.cz')).toBe('jobs-cz')
     expect(jobPortalLogoTypeFromChannel('Prace.cz')).toBe('prace-cz')
     expect(jobPortalLogoTypeFromChannel('Kariérní stránky')).toBe('pages')
+    expect(jobPortalLogoTypeFromChannel('Kariérní web')).toBe('pages')
     expect(jobPortalLogoTypeFromChannel('Atmoskop')).toBe('atmoskop')
     expect(jobPortalLogoTypeFromChannel('Profesia')).toBe('profesia')
     expect(jobPortalLogoTypeFromChannel('Práce za rohem')).toBe('prace-za-rohem')

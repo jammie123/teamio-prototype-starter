@@ -5,6 +5,7 @@ import atmoskopSrc from './logos/atmoskop.svg'
 import exportSrc from './logos/export.svg'
 import jobsCzSrc from './logos/jobs-cz.svg'
 import jobsCzPraceCzSrc from './logos/jobs-cz-prace-cz.svg'
+import karierkySrc from './logos/karierky.svg'
 import pagesSrc from './logos/pages.svg'
 import praceCzSrc from './logos/prace-cz.svg'
 import praceZaRohemSrc from './logos/prace-za-rohem.svg'
@@ -18,6 +19,7 @@ export const JOB_PORTAL_LOGO_TYPES = [
   'export',
   'jobs-cz',
   'jobs-cz-prace-cz',
+  'karierky',
   'pages',
   'prace-cz',
   'prace-za-rohem',
@@ -35,6 +37,7 @@ const logoAssets = {
   export: { src: exportSrc, label: 'Export' },
   'jobs-cz': { src: jobsCzSrc, label: 'Jobs.cz' },
   'jobs-cz-prace-cz': { src: jobsCzPraceCzSrc, label: 'Jobs.cz + Prace.cz' },
+  karierky: { src: karierkySrc, label: 'Kariérky' },
   pages: { src: pagesSrc, label: 'Kariérní stránky' },
   'prace-cz': { src: praceCzSrc, label: 'Prace.cz' },
   'prace-za-rohem': { src: praceZaRohemSrc, label: 'Práce za rohem' },

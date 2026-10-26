@@ -69,4 +69,47 @@ describe('JobCardPublicationPortal', () => {
       'Jobs.cz',
     )
   })
+
+  it('keeps the period footer when the channel label is hidden', () => {
+    render(
+      <JobCardPublicationPortal
+        publication={publication('Jobs.cz')}
+        expired={false}
+        withSeparator={false}
+        variant="stacked"
+        showChannelLabel={false}
+        periodBadge={{ color: 'informative', label: 'od 1. 10. 2026' }}
+        periodPresentation="text"
+        inlineHighlights="none"
+      />,
+    )
+
+    expect(screen.queryByTestId('job-card-publication-channel')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-publication-period-badge')).toHaveTextContent('od 1. 10. 2026')
+    expect(screen.getByTestId('job-card-publication-channel-logo').closest('[role="button"]')).toHaveAttribute(
+      'aria-label',
+      'Jobs.cz',
+    )
+  })
+
+  it('renders a Kariérky badge with the pages logo and label', () => {
+    render(
+      <JobCardPublicationPortal
+        publication={publication('Kariérní web')}
+        expired={false}
+        withSeparator={false}
+        channelLogoSize={30}
+        showChannelLabel={false}
+        channelLogoType="karierky"
+        inlineHighlights="none"
+      />,
+    )
+
+    const badge = screen.getByTestId('job-card-publication-channel-logo')
+    expect(badge).toHaveAttribute('data-logo-type', 'karierky')
+    expect(badge).toHaveClass('tm-h-[30px]')
+    expect(badge).toHaveTextContent('Kariérky')
+    expect(badge.querySelector('[data-logo-type="pages"]')).toHaveClass('tm-size-[30px]')
+    expect(screen.queryByTestId('job-card-publication-channel')).not.toBeInTheDocument()
+  })
 })

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
-import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
+import { JobPortalLogo, jobPortalLogoTypeFromChannel, type JobPortalLogoType } from '../JobPortalLogo'
 import { cn } from '../../lib/cn'
 import { formatCount } from '../JobCardSynteza/formatCount'
 import {
@@ -44,6 +44,8 @@ export interface JobCardPublicationPortalProps {
   dropdownPlacement?: Placement
   channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
+  /** Overrides the logo resolved from `publication.channel` (Simplify 23 Kariérky wordmark). */
+  channelLogoType?: JobPortalLogoType
   inlineHighlights?: 'all' | 'none'
   /** Pill wrapper (logo + period) for Simplify 5 mixed periods. */
   portalChip?: boolean
@@ -111,6 +113,30 @@ export function channelLogoPresentationClass(size: 18 | 20 | 24 | 30 | 35 | 40 =
   return cn(channelLogoSizeClass(size), 'tm-overflow-hidden', 'tm-rounded-full')
 }
 
+function channelLogoHeightClass(size: 18 | 20 | 24 | 30 | 35 | 40 = 18) {
+  if (size === 40) {
+    return 'tm-h-[40px]'
+  }
+
+  if (size === 35) {
+    return 'tm-h-[35px]'
+  }
+
+  if (size === 30) {
+    return 'tm-h-[30px]'
+  }
+
+  if (size === 24) {
+    return 'tm-h-[24px]'
+  }
+
+  if (size === 20) {
+    return 'tm-h-[20px]'
+  }
+
+  return 'tm-h-[18px]'
+}
+
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
   { key: 'viewCount', label: 'Zhlédnutí' },
   { key: 'reactionCount', label: 'Reakce' },
@@ -129,6 +155,7 @@ function PublicationDropdown({
   dropdownPlacement = 'bottom-start',
   channelLogoSize = 18,
   showChannelLabel = true,
+  channelLogoType,
   channelLabelFooter,
   channelLogoStatus,
   channelLogoStatusPlacement,
@@ -148,6 +175,7 @@ function PublicationDropdown({
   dropdownPlacement?: Placement
   channelLogoSize?: 18 | 20 | 24 | 30 | 35 | 40
   showChannelLabel?: boolean
+  channelLogoType?: JobPortalLogoType
   /** Second line under channel name (Simplify 19 stacked portals). */
   channelLabelFooter?: ReactNode
   channelLogoStatus?: JobCardSimplify19ChannelStatusTone
@@ -161,6 +189,8 @@ function PublicationDropdown({
   const tablePublications = publications && publications.length > 0 ? publications : [publication]
   const simplify19ChannelLabel = Boolean(channelLogoStatus) || flatChannelLabel
   const channelNameColor = channelNameColorClass(expired, channelNameTone)
+  const resolvedLogoType = channelLogoType ?? jobPortalLogoTypeFromChannel(publication.channel)
+  const karierkyWordmark = resolvedLogoType === 'karierky'
 
   return (
     <Dropdown
@@ -179,19 +209,45 @@ function PublicationDropdown({
           <span
             className={cn(
               'tm-inline-flex tm-gap-1.5',
-              channelLabelFooter ? 'tm-items-start' : 'tm-items-center tm-gap-1',
+              !showChannelLabel && channelLabelFooter
+                ? 'tm-flex-col tm-items-center tm-gap-0.5'
+                : channelLabelFooter
+                  ? 'tm-items-start'
+                  : 'tm-items-center tm-gap-1',
             )}
           >
             <span className="tm-relative tm-inline-flex tm-shrink-0">
-              <JobPortalLogo
-                type={jobPortalLogoTypeFromChannel(publication.channel)}
-                title=""
-                data-testid="job-card-publication-channel-logo"
-                className={cn(
-                  channelLogoPresentationClass(channelLogoSize),
-                  channelLogoMuted && 'tm-opacity-80 tm-grayscale',
-                )}
-              />
+              {karierkyWordmark ? (
+                <span
+                  data-testid="job-card-publication-channel-logo"
+                  data-logo-type="karierky"
+                  className={cn(
+                    'tm-inline-flex tm-items-center tm-gap-1 tm-rounded-full tm-pr-2',
+                    'tm-bg-[#FFF5E1]',
+                    channelLogoHeightClass(channelLogoSize),
+                    channelLogoMuted && 'tm-opacity-80 tm-grayscale',
+                  )}
+                >
+                  <JobPortalLogo
+                    type="pages"
+                    title=""
+                    className={channelLogoPresentationClass(channelLogoSize)}
+                  />
+                  <span className="tm-pr-0.5 tm-text-[11px] tm-font-semibold tm-leading-none tm-text-[#963F00]">
+                    Kariérky
+                  </span>
+                </span>
+              ) : (
+                <JobPortalLogo
+                  type={resolvedLogoType}
+                  title=""
+                  data-testid="job-card-publication-channel-logo"
+                  className={cn(
+                    channelLogoPresentationClass(channelLogoSize),
+                    channelLogoMuted && 'tm-opacity-80 tm-grayscale',
+                  )}
+                />
+              )}
               {channelLogoStatus ? (
                 <JobCardSimplify19ChannelStatusDot
                   tone={channelLogoStatus}
@@ -238,7 +294,9 @@ function PublicationDropdown({
                   {publication.channel}
                 </span>
               )
-            ) : null}
+            ) : (
+              channelLabelFooter
+            )}
           </span>
         </DropdownToggle>
         <DropdownBody
@@ -566,6 +624,7 @@ export function JobCardPublicationPortal({
   dropdownPlacement = 'bottom-start',
   channelLogoSize = 18,
   showChannelLabel = true,
+  channelLogoType,
   inlineHighlights = 'all',
   portalChip = false,
   channelLogoStatus,
@@ -617,6 +676,7 @@ export function JobCardPublicationPortal({
           dropdownPlacement={dropdownPlacement}
           channelLogoSize={channelLogoSize}
           showChannelLabel={showChannelLabel}
+          channelLogoType={channelLogoType}
           channelLabelFooter={badge}
           channelLogoStatus={channelLogoStatus}
           channelLogoStatusPlacement={channelLogoStatusPlacement}
@@ -658,6 +718,7 @@ export function JobCardPublicationPortal({
             dropdownPlacement={dropdownPlacement}
             channelLogoSize={channelLogoSize}
             showChannelLabel={showChannelLabel}
+            channelLogoType={channelLogoType}
           />
           {highlightChips}
         </span>
@@ -719,6 +780,7 @@ export function JobCardPublicationPortal({
               dropdownPlacement={dropdownPlacement}
               channelLogoSize={channelLogoSize}
               showChannelLabel={showChannelLabel}
+              channelLogoType={channelLogoType}
             />
             {badge}
           </span>
@@ -737,6 +799,7 @@ export function JobCardPublicationPortal({
               dropdownPlacement={dropdownPlacement}
               channelLogoSize={channelLogoSize}
               showChannelLabel={showChannelLabel}
+              channelLogoType={channelLogoType}
             />
             {badge}
           </>

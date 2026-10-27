@@ -13,9 +13,9 @@ export function AdvertisementList({ status, children, className }: Advertisement
     <ul
       data-testid="advertisement-list"
       data-status={status}
-      data-layout="column"
+      data-layout="row"
       className={cn(
-        'tm-m-0 tm-flex tm-list-none tm-flex-col tm-gap-2 tm-p-0',
+        'tm-m-0 tm-flex tm-list-none tm-flex-row tm-gap-2 tm-p-0',
         className,
       )}
     >

@@ -9,5 +9,5 @@ export const JOB_CARD_SIMPLIFY_26_SECTION_PADDING = JOB_CARD_SIMPLIFY_13_SECTION
 export const JOB_CARD_SIMPLIFY_26_ADVERTISEMENT_HEADING_OFFSET =
   JOB_CARD_SIMPLIFY_13_ADVERTISEMENT_HEADING_OFFSET
 
-/** Portal mark on a JobBoardItem. Matches Simplify 13 (24px). */
-export const JOB_CARD_SIMPLIFY_26_CHANNEL_LOGO_SIZE = 24 as const
+/** Portal mark on a JobBoardItem. Matches Simplify 19 (30px). */
+export const JOB_CARD_SIMPLIFY_26_CHANNEL_LOGO_SIZE = 30 as const

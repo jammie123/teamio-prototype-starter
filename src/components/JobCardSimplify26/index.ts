@@ -11,3 +11,4 @@ export {
 export { JobCardAdvertisementSimplify26Panel } from './JobCardAdvertisementSimplify26Panel'
 export { JobBoardItem, type JobBoardItemProps } from './JobBoardItem'
 export { AdvertisementList, type AdvertisementListProps } from './AdvertisementList'
+export { AdvertisementHeader, type AdvertisementHeaderProps } from './AdvertisementHeader'

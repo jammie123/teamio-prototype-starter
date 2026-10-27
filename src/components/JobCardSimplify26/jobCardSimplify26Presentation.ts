@@ -1,29 +1,22 @@
+import type { TagColor } from '../Tag/Tag'
 import {
-  finitePaidEndDatePublications,
   formatCompactDateRange,
-  formatPublicationRange,
   isUnlimitedPublication,
   partitionPublications,
   richestDateLabel,
   shareSameEndDate,
   shareSameStartDate,
 } from '../JobCardSynteza/advertisementSummary'
-import { isDraftAdvertisement } from '../JobCardSyntezaAds/advertisementSummaryAds'
+import { isDraftAdvertisement, MIXED_PERIOD_HEADING } from '../JobCardSyntezaAds/advertisementSummaryAds'
 import type { JobAdvertisement, JobPublication, JobPublicationStatus } from '../JobCardSynteza/types'
 
-export const SIMPLIFY_26_RUNNING_TITLE = 'Běží' as const
-export const SIMPLIFY_26_MIXED_PERIOD_TITLE = 'Běží v různá období' as const
-export const SIMPLIFY_26_ENDING_SOON_TITLE = 'Brzy končí' as const
-export const SIMPLIFY_26_ENDED_TITLE = 'Inzerce skončila' as const
 export const SIMPLIFY_26_NOT_ADVERTISING_TITLE = 'Neinzeruje se' as const
-
-export const SIMPLIFY_26_RUNNING_CLASS = 'tm-text-emotion-success-emphasis' as const
-export const SIMPLIFY_26_ENDING_SOON_CLASS = 'tm-text-emotion-warning-emphasis' as const
-export const SIMPLIFY_26_ENDED_CLASS = 'tm-text-secondary-default' as const
 export const SIMPLIFY_26_NOT_ADVERTISING_CLASS = 'tm-text-secondary-default' as const
+export const SIMPLIFY_26_RUNNING_TITLE = 'Běží' as const
+export const SIMPLIFY_26_ENDED_TITLE = 'Ukončeno' as const
+export const SIMPLIFY_26_MIXED_PERIOD_TITLE = MIXED_PERIOD_HEADING
 
 export type Simplify26GroupKind = 'running' | 'endingSoon' | 'expired'
-export type Simplify26ListLayout = 'row' | 'column'
 export type Simplify26ListStatus = 'active' | 'inactive'
 
 export interface Simplify26BoardItemModel {
@@ -35,12 +28,13 @@ export interface Simplify26BoardItemModel {
 
 export interface Simplify26GroupModel {
   kind: Simplify26GroupKind
-  title: string
-  className: string
-  testId: string
-  layout: Simplify26ListLayout
   listStatus: Simplify26ListStatus
   items: Simplify26BoardItemModel[]
+}
+
+export interface Simplify26HeaderBadge {
+  color: TagColor
+  label: string
 }
 
 export type Simplify26AdvertisementModel =
@@ -52,8 +46,11 @@ export type Simplify26AdvertisementModel =
     }
   | {
       kind: 'groups'
-      active: Simplify26GroupModel[]
-      inactive: Simplify26GroupModel[]
+      title: string
+      titleTestId: string
+      badges: Simplify26HeaderBadge[]
+      /** Running and ending-soon portals first, then ended portals. */
+      groups: Simplify26GroupModel[]
     }
   | { kind: 'fallback' }
 
@@ -63,66 +60,6 @@ const NOT_ADVERTISING_MODEL = {
   className: SIMPLIFY_26_NOT_ADVERTISING_CLASS,
   testId: 'job-card-simplify26-not-advertising-heading',
 } as const satisfies Simplify26AdvertisementModel
-
-function datedPaidPublications(publications: JobPublication[]) {
-  return publications.filter(
-    (publication) =>
-      publication.startDate &&
-      publication.endDate &&
-      !isUnlimitedPublication(publication.channel),
-  )
-}
-
-function sharedPeriodRange(publications: JobPublication[]) {
-  const dated = datedPaidPublications(publications)
-
-  if (dated.length === 0) {
-    return undefined
-  }
-
-  if (!shareSameStartDate(dated) || !shareSameEndDate(dated)) {
-    return undefined
-  }
-
-  const startDate = richestDateLabel(dated.map((publication) => publication.startDate))
-  const endDate = richestDateLabel(
-    dated.map((publication) => publication.endDate).filter((value): value is string => Boolean(value)),
-  )
-
-  return formatCompactDateRange(startDate, endDate)
-}
-
-function sharedEndLabel(publications: JobPublication[]) {
-  const finite = finitePaidEndDatePublications(publications)
-
-  if (finite.length === 0 || !shareSameEndDate(finite)) {
-    return undefined
-  }
-
-  return richestDateLabel(
-    finite.map((publication) => publication.endDate).filter((value): value is string => Boolean(value)),
-  )
-}
-
-function periodsDiffer(publications: JobPublication[]) {
-  const dated = datedPaidPublications(publications)
-
-  if (dated.length === 0) {
-    return false
-  }
-
-  return !shareSameStartDate(dated) || !shareSameEndDate(dated)
-}
-
-function endDatesDiffer(publications: JobPublication[]) {
-  const finite = finitePaidEndDatePublications(publications)
-
-  if (finite.length === 0) {
-    return false
-  }
-
-  return !shareSameEndDate(finite)
-}
 
 function itemStatus(publication: JobPublication, kind: Simplify26GroupKind): JobPublicationStatus {
   if (publication.status) {
@@ -140,82 +77,107 @@ function itemStatus(publication: JobPublication, kind: Simplify26GroupKind): Job
   return 'active'
 }
 
-function itemDate(
-  publication: JobPublication,
-  kind: Simplify26GroupKind,
-  showDate: boolean,
-) {
-  if (!showDate || isUnlimitedPublication(publication.channel)) {
+/** Every portal shows only its end date („do …“); unlimited portals have none. */
+function itemDate(publication: JobPublication): string | undefined {
+  if (isUnlimitedPublication(publication.channel) || !publication.endDate) {
     return undefined
   }
 
-  if (kind === 'running') {
-    return formatPublicationRange(publication.startDate, publication.endDate)
-  }
-
-  return publication.endDate
+  return `do ${publication.endDate}`
 }
 
-function toItems(
+function toGroup(
   publications: JobPublication[],
   kind: Simplify26GroupKind,
-  showDate: boolean,
-): Simplify26BoardItemModel[] {
-  return publications.map((publication) => ({
-    id: publication.id,
-    channel: publication.channel,
-    status: itemStatus(publication, kind),
-    date: itemDate(publication, kind, showDate),
-  }))
-}
-
-function runningGroup(publications: JobPublication[]): Simplify26GroupModel {
-  const mixed = periodsDiffer(publications)
-  const range = mixed ? undefined : sharedPeriodRange(publications)
-
+): Simplify26GroupModel {
   return {
-    kind: 'running',
-    title: mixed
-      ? SIMPLIFY_26_MIXED_PERIOD_TITLE
-      : range
-        ? `${SIMPLIFY_26_RUNNING_TITLE} ${range}`
-        : SIMPLIFY_26_RUNNING_TITLE,
-    className: SIMPLIFY_26_RUNNING_CLASS,
-    testId: 'job-card-simplify26-running-heading',
-    layout: 'column',
-    listStatus: 'active',
-    items: toItems(publications, 'running', mixed),
+    kind,
+    listStatus: kind === 'expired' ? 'inactive' : 'active',
+    items: publications.map((publication) => ({
+      id: publication.id,
+      channel: publication.channel,
+      status: itemStatus(publication, kind),
+      date: itemDate(publication),
+    })),
   }
 }
 
-function endingSoonGroup(publications: JobPublication[]): Simplify26GroupModel {
-  const mixed = endDatesDiffer(publications)
-  const endLabel = mixed ? undefined : sharedEndLabel(publications)
+/** Czech plural for ended portals: 1 ukončený, 2–4 ukončené, 5+ ukončených. */
+export function formatEndedPortalsBadgeLabel(count: number) {
+  const lastTwo = count % 100
+  const last = count % 10
+
+  if (count === 1) {
+    return `${count} ukončený`
+  }
+
+  if (last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14)) {
+    return `${count} ukončené`
+  }
+
+  return `${count} ukončených`
+}
+
+function finiteDatedPublications(publications: JobPublication[]) {
+  return publications.filter(
+    (publication) =>
+      Boolean(publication.startDate) &&
+      Boolean(publication.endDate) &&
+      !isUnlimitedPublication(publication.channel),
+  )
+}
+
+/** Live portals: same period → „Běží od–do“, mixed dates → „Běží v různá období“, else „Běží“. */
+function formatActiveHeaderTitle(active: JobPublication[]) {
+  const dated = finiteDatedPublications(active)
+
+  if (dated.length === 0) {
+    return SIMPLIFY_26_RUNNING_TITLE
+  }
+
+  if (shareSameStartDate(dated) && shareSameEndDate(dated)) {
+    const startDate = richestDateLabel(dated.map((publication) => publication.startDate))
+    const endDate = richestDateLabel(dated.map((publication) => publication.endDate!))
+    return `${SIMPLIFY_26_RUNNING_TITLE} ${formatCompactDateRange(startDate, endDate)}`
+  }
+
+  return SIMPLIFY_26_MIXED_PERIOD_TITLE
+}
+
+function buildHeaderTitle(active: JobPublication[]) {
+  if (active.length === 0) {
+    return {
+      title: SIMPLIFY_26_ENDED_TITLE,
+      titleTestId: 'job-card-simplify26-ended-heading',
+    }
+  }
 
   return {
-    kind: 'endingSoon',
-    title: endLabel ? `${SIMPLIFY_26_ENDING_SOON_TITLE} ${endLabel}` : SIMPLIFY_26_ENDING_SOON_TITLE,
-    className: SIMPLIFY_26_ENDING_SOON_CLASS,
-    testId: 'job-card-simplify26-ending-soon-heading',
-    layout: 'column',
-    listStatus: 'active',
-    items: toItems(publications, 'endingSoon', mixed),
+    title: formatActiveHeaderTitle(active),
+    titleTestId: 'job-card-simplify26-running-heading',
   }
 }
 
-function expiredGroup(publications: JobPublication[]): Simplify26GroupModel {
-  const mixed = endDatesDiffer(publications)
-  const endLabel = mixed ? undefined : sharedEndLabel(publications)
+function buildHeaderBadges(counts: {
+  running: number
+  endingSoon: number
+  expired: number
+}): Simplify26HeaderBadge[] {
+  const badges: Simplify26HeaderBadge[] = []
 
-  return {
-    kind: 'expired',
-    title: endLabel ? `${SIMPLIFY_26_ENDED_TITLE} ${endLabel}` : SIMPLIFY_26_ENDED_TITLE,
-    className: SIMPLIFY_26_ENDED_CLASS,
-    testId: 'job-card-simplify26-ended-heading',
-    layout: 'column',
-    listStatus: 'inactive',
-    items: toItems(publications, 'expired', mixed),
+  if (counts.running > 0) {
+    badges.push({ color: 'success', label: `${counts.running} Běží` })
   }
+
+  if (counts.endingSoon > 0) {
+    badges.push({ color: 'warning', label: `${counts.endingSoon} Brzy končí` })
+  }
+
+  if (counts.expired > 0) {
+    badges.push({ color: 'neutral', label: formatEndedPortalsBadgeLabel(counts.expired) })
+  }
+
+  return badges
 }
 
 export function buildSimplify26AdvertisementModel(
@@ -238,12 +200,20 @@ export function buildSimplify26AdvertisementModel(
     return NOT_ADVERTISING_MODEL
   }
 
+  const groups: Simplify26GroupModel[] = [
+    ...(running.length > 0 ? [toGroup(running, 'running')] : []),
+    ...(endingSoon.length > 0 ? [toGroup(endingSoon, 'endingSoon')] : []),
+    ...(expired.length > 0 ? [toGroup(expired, 'expired')] : []),
+  ]
+
   return {
     kind: 'groups',
-    active: [
-      ...(running.length > 0 ? [runningGroup(running)] : []),
-      ...(endingSoon.length > 0 ? [endingSoonGroup(endingSoon)] : []),
-    ],
-    inactive: expired.length > 0 ? [expiredGroup(expired)] : [],
+    ...buildHeaderTitle([...running, ...endingSoon]),
+    badges: buildHeaderBadges({
+      running: running.length,
+      endingSoon: endingSoon.length,
+      expired: expired.length,
+    }),
+    groups,
   }
 }

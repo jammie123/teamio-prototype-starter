@@ -27,7 +27,7 @@ describe('JobCardSimplify26', () => {
     )
   })
 
-  it('shows a shared running period in the heading and portals in a row without dates', () => {
+  it('shows one header with a running count badge and portals stacked with their periods', () => {
     const endDate = daysFromNow(40)
     const advertisement: JobAdvertisement = {
       id: 'running-same',
@@ -39,79 +39,71 @@ describe('JobCardSimplify26', () => {
 
     render(<JobCardSimplify26 title="Pozice" advertisements={[advertisement]} />)
 
-    const column = screen.getByTestId('job-card-simplify26-active-column')
+    expect(screen.getAllByTestId('advertisement-header')).toHaveLength(1)
     expect(screen.getByTestId('job-card-simplify26-running-heading')).toHaveTextContent(
       `Běží ${formatCompactDateRange('1. 10. 2026', endDate)}`,
     )
-    expect(screen.queryByTestId('job-card-simplify26-inactive-column')).not.toBeInTheDocument()
+    const badges = screen.getAllByTestId('advertisement-header-badge')
+    expect(badges.map((badge) => badge.textContent)).toEqual(['2 Běží'])
+    expect(badges[0]).toHaveAttribute('data-tone', 'success')
+    expect(badges[0].className).toContain('tm-text-[11px]')
+    expect(badges[0].className).toContain('tm-font-semibold')
 
-    const list = within(column).getByTestId('advertisement-list')
-    expect(list).toHaveAttribute('data-layout', 'column')
+    expect(screen.queryByTestId('job-card-simplify26-columns')).not.toBeInTheDocument()
+
+    const list = screen.getByTestId('advertisement-list')
     expect(list).toHaveAttribute('data-status', 'active')
-    expect(within(list).queryByTestId('job-board-item-date')).not.toBeInTheDocument()
-    expect(within(list).getAllByTestId('job-board-item')[0]).toHaveAttribute('data-status', 'active')
+
+    const items = within(list).getAllByTestId('job-board-item')
+    expect(items[0]).toHaveAttribute('data-status', 'active')
+    expect(within(items[0]).getByTestId('job-board-item-date')).toHaveTextContent(
+      `do ${endDate}`,
+    )
+    expect(within(items[0]).getByTestId('job-portal-logo').className).toContain('tm-size-[30px]')
+    expect(within(items[0]).getByTestId('job-card-simplify19-channel-status-dot')).toHaveAttribute(
+      'data-channel-status',
+      'success',
+    )
   })
 
-  it('splits mixed running periods and a shared ended date into two bordered columns', () => {
+  it('stacks running, ending-soon and ended groups vertically under one header', () => {
     const advertisement: JobAdvertisement = {
       id: 'screen',
       publications: [
         publication({ id: 'jobs-live', channel: 'Jobs.cz', endDate: daysFromNow(40) }),
-        publication({
-          id: 'recommend-live',
-          channel: 'Doporučení',
-          startDate: '15. 9. 2026',
-          endDate: daysFromNow(60),
-        }),
+        publication({ id: 'recommend-live', channel: 'Doporučení', startDate: '15. 9. 2026', endDate: daysFromNow(60) }),
         publication({ id: 'export-live', channel: 'Export' }),
-        publication({
-          id: 'jobs-ended',
-          channel: 'Jobs.cz',
-          status: 'expired',
-          endDate: '1. 1. 2026',
-        }),
-        publication({
-          id: 'recommend-ended',
-          channel: 'Doporučení',
-          status: 'expired',
-          endDate: '1. 1. 2026',
-        }),
-        publication({
-          id: 'export-ended',
-          channel: 'Export',
-          status: 'expired',
-          startDate: '1. 10. 2025',
-        }),
+        publication({ id: 'jobs-ended', channel: 'Jobs.cz', status: 'expired', endDate: '1. 1. 2026' }),
+        publication({ id: 'recommend-ended', channel: 'Doporučení', status: 'expired', endDate: '1. 1. 2026' }),
+        publication({ id: 'export-ended', channel: 'Export', status: 'expired', startDate: '1. 10. 2025' }),
       ],
     }
 
     render(<JobCardSimplify26 title="Pozice" advertisements={[advertisement]} />)
 
+    expect(screen.getAllByTestId('advertisement-header')).toHaveLength(1)
     expect(screen.getByTestId('job-card-simplify26-running-heading')).toHaveTextContent(
       'Běží v různá období',
     )
-    expect(screen.getByTestId('job-card-simplify26-ended-heading')).toHaveTextContent(
-      'Inzerce skončila 1. 1. 2026',
+    expect(screen.getAllByTestId('advertisement-header-badge').map((badge) => badge.textContent)).toEqual([
+      '3 Běží',
+      '3 ukončené',
+    ])
+
+    const lists = screen.getAllByTestId('advertisement-list')
+    expect(lists.map((list) => list.getAttribute('data-status'))).toEqual(['active', 'inactive'])
+
+    const endedItems = within(lists[1]).getAllByTestId('job-board-item')
+    expect(endedItems).toHaveLength(3)
+    expect(endedItems[0]).toHaveAttribute('data-status', 'expired')
+    expect(within(endedItems[0]).getByTestId('job-card-simplify19-channel-status-dot')).toHaveAttribute(
+      'data-channel-status',
+      'gray',
     )
-
-    const active = screen.getByTestId('job-card-simplify26-active-column')
-    const inactive = screen.getByTestId('job-card-simplify26-inactive-column')
-    expect(inactive.className).toContain('tm-border-l')
-    expect(within(active).getByTestId('advertisement-list')).toHaveAttribute('data-layout', 'column')
-    expect(within(inactive).getByTestId('advertisement-list')).toHaveAttribute('data-layout', 'column')
-    expect(within(inactive).getByTestId('advertisement-list')).toHaveAttribute('data-status', 'inactive')
-
-    const activeItems = within(active).getAllByTestId('job-board-item')
-    const jobsDate = within(activeItems[0]).getByTestId('job-board-item-date')
-    expect(jobsDate).toHaveTextContent(formatCompactDateRange('1. 10. 2026', daysFromNow(40)))
-    expect(jobsDate.parentElement).toHaveClass('tm-flex-col')
-    expect(jobsDate.previousElementSibling).toHaveTextContent('Jobs.cz')
-    expect(within(activeItems[2]).queryByTestId('job-board-item-date')).not.toBeInTheDocument()
-    expect(within(inactive).queryByTestId('job-board-item-date')).not.toBeInTheDocument()
-    expect(within(inactive).getAllByTestId('job-board-item')[0]).toHaveAttribute('data-status', 'expired')
+    expect(within(endedItems[0]).getByTestId('job-board-item-date')).toHaveTextContent('do 1. 1. 2026')
   })
 
-  it('stacks ending soon under running and shows differing end dates on items', () => {
+  it('shows warning and success badges together and lists ending-soon dates on items', () => {
     const soonA = daysFromNow(2)
     const soonB = daysFromNow(5)
     const advertisement: JobAdvertisement = {
@@ -125,19 +117,25 @@ describe('JobCardSimplify26', () => {
 
     render(<JobCardSimplify26 title="Pozice" advertisements={[advertisement]} />)
 
-    const active = screen.getByTestId('job-card-simplify26-active-column')
-    const headings = within(active).getAllByRole('paragraph')
-    expect(headings.map((heading) => heading.textContent)).toEqual([
-      expect.stringMatching(/^Běží /),
-      'Brzy končí',
-    ])
-    expect(within(active).getAllByTestId('job-board-item-date').map((node) => node.textContent)).toEqual([
-      soonA,
-      soonB,
-    ])
+    expect(screen.getByTestId('job-card-simplify26-running-heading')).toHaveTextContent(
+      'Běží v různá období',
+    )
+    const badges = screen.getAllByTestId('advertisement-header-badge')
+    expect(badges.map((badge) => badge.textContent)).toEqual(['1 Běží', '2 Brzy končí'])
+    expect(badges[1]).toHaveAttribute('data-tone', 'warning')
+
+    const [, endingSoonList] = screen.getAllByTestId('advertisement-list')
+    expect(
+      within(endingSoonList).getAllByTestId('job-board-item-date').map((node) => node.textContent),
+    ).toEqual([`do ${soonA}`, `do ${soonB}`])
+    expect(
+      within(endingSoonList)
+        .getAllByTestId('job-card-simplify19-channel-status-dot')
+        .map((dot) => dot.getAttribute('data-channel-status')),
+    ).toEqual(['warning', 'warning'])
   })
 
-  it('shows Neinzeruje se without advertisement columns', () => {
+  it('shows Neinzeruje se without portal lists', () => {
     render(
       <JobCardSimplify26
         title="Pozice"
@@ -146,11 +144,11 @@ describe('JobCardSimplify26', () => {
     )
 
     const heading = screen.getByTestId('job-card-simplify26-not-advertising-heading')
+    expect(screen.getByTestId('advertisement-header')).toContainElement(heading)
     expect(heading).toHaveTextContent('Neinzeruje se')
     expect(heading.className).toContain('tm-text-secondary-default')
     expect(screen.getByTestId('job-card')).toHaveAttribute('data-quiet', 'true')
-    expect(screen.queryByTestId('job-card-simplify26-active-column')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('job-card-simplify26-inactive-column')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('advertisement-list')).not.toBeInTheDocument()
   })
 
   it('keeps a draft advertisement on the Simplify 13 panel', () => {

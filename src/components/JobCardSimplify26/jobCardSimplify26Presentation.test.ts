@@ -2,10 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
 import {
   buildSimplify26AdvertisementModel,
-  SIMPLIFY_26_ENDED_CLASS,
-  SIMPLIFY_26_ENDING_SOON_CLASS,
-  SIMPLIFY_26_NOT_ADVERTISING_CLASS,
-  SIMPLIFY_26_RUNNING_CLASS,
+  formatEndedPortalsBadgeLabel,
 } from './jobCardSimplify26Presentation'
 
 const NOW = new Date(2026, 9, 27)
@@ -24,7 +21,7 @@ function advertisement(
 }
 
 describe('buildSimplify26AdvertisementModel', () => {
-  it('puts a shared running period into the heading and lays portals in a row', () => {
+  it('shows one running count badge and one item per portal with its period', () => {
     const model = buildSimplify26AdvertisementModel(
       advertisement([
         publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
@@ -39,20 +36,19 @@ describe('buildSimplify26AdvertisementModel', () => {
       return
     }
 
-    expect(model.inactive).toEqual([])
-    expect(model.active).toHaveLength(1)
-    expect(model.active[0]).toMatchObject({
-      kind: 'running',
-      title: 'Běží 1. 10. – 14. 11. 2026',
-      className: SIMPLIFY_26_RUNNING_CLASS,
-      layout: 'column',
-      listStatus: 'active',
+    expect(model.title).toBe('Běží 1. 10. – 14. 11. 2026')
+    expect(model.badges).toEqual([{ color: 'success', label: '3 Běží' }])
+    expect(model.groups).toHaveLength(1)
+    expect(model.groups[0]).toMatchObject({ kind: 'running', listStatus: 'active' })
+    expect(model.groups[0].items[0]).toMatchObject({
+      channel: 'Jobs.cz',
+      status: 'active',
+      date: 'do 14. 11. 2026',
     })
-    expect(model.active[0].items.map((item) => item.date)).toEqual([undefined, undefined, undefined])
-    expect(model.active[0].items[0]?.status).toBe('active')
+    expect(model.groups[0].items[2].date).toBeUndefined()
   })
 
-  it('uses a mixed-period heading and shows each running period on the item', () => {
+  it('shows a running period per portal when running periods differ', () => {
     const model = buildSimplify26AdvertisementModel(
       advertisement([
         publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
@@ -62,7 +58,6 @@ describe('buildSimplify26AdvertisementModel', () => {
           startDate: '15. 9. 2026',
           endDate: '30. 11. 2026',
         }),
-        publication({ id: 'export', channel: 'Export', startDate: '1. 10. 2026' }),
       ]),
       NOW,
     )
@@ -72,141 +67,19 @@ describe('buildSimplify26AdvertisementModel', () => {
       return
     }
 
-    expect(model.active[0]).toMatchObject({
-      title: 'Běží v různá období',
-      layout: 'column',
-    })
-    expect(model.active[0].items.map((item) => ({ channel: item.channel, date: item.date }))).toEqual([
-      { channel: 'Jobs.cz', date: '1. 10. – 14. 11. 2026' },
-      { channel: 'Doporučení', date: '15. 9. – 30. 11. 2026' },
-      { channel: 'Export', date: undefined },
+    expect(model.title).toBe('Běží v různá období')
+    expect(model.groups[0].items.map((item) => item.date)).toEqual([
+      'do 14. 11. 2026',
+      'do 30. 11. 2026',
     ])
   })
 
-  it('puts a shared ending-soon date into the heading', () => {
-    const model = buildSimplify26AdvertisementModel(
-      advertisement([
-        publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '3. 11. 2026' }),
-        publication({ id: 'prace', channel: 'Prace.cz', endDate: '3. 11. 2026' }),
-      ]),
-      NOW,
-    )
-
-    expect(model.kind).toBe('groups')
-    if (model.kind !== 'groups') {
-      return
-    }
-
-    expect(model.active[0]).toMatchObject({
-      kind: 'endingSoon',
-      title: 'Brzy končí 3. 11. 2026',
-      className: SIMPLIFY_26_ENDING_SOON_CLASS,
-      layout: 'column',
-      listStatus: 'active',
-    })
-    expect(model.active[0].items.every((item) => item.date === undefined)).toBe(true)
-    expect(model.active[0].items[0]?.status).toBe('endingSoon')
-  })
-
-  it('keeps Brzy končí plain and shows each end date when they differ', () => {
-    const model = buildSimplify26AdvertisementModel(
-      advertisement([
-        publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '30. 10. 2026' }),
-        publication({ id: 'prace', channel: 'Prace.cz', endDate: '2. 11. 2026' }),
-      ]),
-      NOW,
-    )
-
-    expect(model.kind).toBe('groups')
-    if (model.kind !== 'groups') {
-      return
-    }
-
-    expect(model.active[0]).toMatchObject({
-      title: 'Brzy končí',
-      layout: 'column',
-    })
-    expect(model.active[0].items.map((item) => item.date)).toEqual(['30. 10. 2026', '2. 11. 2026'])
-  })
-
-  it('puts a shared ended date into the heading and uses the inactive column', () => {
-    const model = buildSimplify26AdvertisementModel(
-      advertisement([
-        publication({
-          id: 'jobs',
-          channel: 'Jobs.cz',
-          status: 'expired',
-          endDate: '1. 1. 2026',
-        }),
-        publication({
-          id: 'prace',
-          channel: 'Prace.cz',
-          status: 'expired',
-          endDate: '1. 1. 2026',
-        }),
-      ]),
-      NOW,
-    )
-
-    expect(model.kind).toBe('groups')
-    if (model.kind !== 'groups') {
-      return
-    }
-
-    expect(model.active).toEqual([])
-    expect(model.inactive[0]).toMatchObject({
-      kind: 'expired',
-      title: 'Inzerce skončila 1. 1. 2026',
-      className: SIMPLIFY_26_ENDED_CLASS,
-      layout: 'column',
-      listStatus: 'inactive',
-    })
-    expect(model.inactive[0].items.every((item) => item.date === undefined)).toBe(true)
-    expect(model.inactive[0].items[0]?.status).toBe('expired')
-  })
-
-  it('keeps Inzerce skončila plain when end dates differ', () => {
-    const model = buildSimplify26AdvertisementModel(
-      advertisement([
-        publication({
-          id: 'jobs',
-          channel: 'Jobs.cz',
-          status: 'expired',
-          endDate: '1. 1. 2026',
-        }),
-        publication({
-          id: 'prace',
-          channel: 'Prace.cz',
-          status: 'expired',
-          endDate: '15. 2. 2026',
-        }),
-      ]),
-      NOW,
-    )
-
-    expect(model.kind).toBe('groups')
-    if (model.kind !== 'groups') {
-      return
-    }
-
-    expect(model.inactive[0]).toMatchObject({
-      title: 'Inzerce skončila',
-      layout: 'column',
-    })
-    expect(model.inactive[0].items.map((item) => item.date)).toEqual(['1. 1. 2026', '15. 2. 2026'])
-  })
-
-  it('stacks running and ending soon in the active column and ended ads in the inactive column', () => {
+  it('lists ending-soon portals after running ones with a warning badge', () => {
     const model = buildSimplify26AdvertisementModel(
       advertisement([
         publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
-        publication({ id: 'prace', channel: 'Prace.cz', endDate: '30. 10. 2026' }),
-        publication({
-          id: 'atmoskop',
-          channel: 'Atmoskop',
-          status: 'expired',
-          endDate: '1. 1. 2026',
-        }),
+        publication({ id: 'prace', channel: 'Prace.cz', endDate: '3. 11. 2026' }),
+        publication({ id: 'atmoskop', channel: 'Atmoskop', endDate: '30. 10. 2026' }),
       ]),
       NOW,
     )
@@ -216,8 +89,73 @@ describe('buildSimplify26AdvertisementModel', () => {
       return
     }
 
-    expect(model.active.map((group) => group.kind)).toEqual(['running', 'endingSoon'])
-    expect(model.inactive.map((group) => group.kind)).toEqual(['expired'])
+    expect(model.title).toBe('Běží v různá období')
+    expect(model.badges).toEqual([
+      { color: 'success', label: '1 Běží' },
+      { color: 'warning', label: '2 Brzy končí' },
+    ])
+    expect(model.groups.map((group) => group.kind)).toEqual(['running', 'endingSoon'])
+    expect(model.groups[1].items.map((item) => item.date)).toEqual(['do 3. 11. 2026', 'do 30. 10. 2026'])
+    expect(model.groups[1].items.map((item) => item.status)).toEqual(['endingSoon', 'endingSoon'])
+  })
+
+  it('puts ended portals in an inactive group with a neutral badge and their end dates', () => {
+    const model = buildSimplify26AdvertisementModel(
+      advertisement([
+        publication({ id: 'jobs', channel: 'Jobs.cz', status: 'expired', endDate: '1. 1. 2026' }),
+        publication({ id: 'prace', channel: 'Prace.cz', status: 'expired', endDate: '15. 2. 2026' }),
+      ]),
+      NOW,
+    )
+
+    expect(model.kind).toBe('groups')
+    if (model.kind !== 'groups') {
+      return
+    }
+
+    expect(model.title).toBe('Ukončeno')
+    expect(model.badges).toEqual([{ color: 'neutral', label: '2 ukončené' }])
+    expect(model.groups[0]).toMatchObject({ kind: 'expired', listStatus: 'inactive' })
+    expect(model.groups[0].items.map((item) => item.date)).toEqual(['do 1. 1. 2026', 'do 15. 2. 2026'])
+    expect(model.groups[0].items.every((item) => item.status === 'expired')).toBe(true)
+  })
+
+  it('shows running, ending-soon and ended badges together in the same order as the groups', () => {
+    const model = buildSimplify26AdvertisementModel(
+      advertisement([
+        publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
+        publication({ id: 'prace', channel: 'Prace.cz', endDate: '3. 11. 2026' }),
+        publication({ id: 'atmoskop', channel: 'Atmoskop', status: 'expired', endDate: '1. 1. 2026' }),
+      ]),
+      NOW,
+    )
+
+    expect(model.kind).toBe('groups')
+    if (model.kind !== 'groups') {
+      return
+    }
+
+    expect(model.title).toBe('Běží v různá období')
+    expect(model.badges.map((badge) => badge.label)).toEqual([
+      '1 Běží',
+      '1 Brzy končí',
+      '1 ukončený',
+    ])
+    expect(model.groups.map((group) => group.kind)).toEqual(['running', 'endingSoon', 'expired'])
+  })
+
+  it('uses Běží when the only live portals have no end date', () => {
+    const model = buildSimplify26AdvertisementModel(
+      advertisement([publication({ id: 'export', channel: 'Export', startDate: '1. 10. 2026' })]),
+      NOW,
+    )
+
+    expect(model.kind).toBe('groups')
+    if (model.kind !== 'groups') {
+      return
+    }
+
+    expect(model.title).toBe('Běží')
   })
 
   it('renders Neinzeruje se for a declined advertisement', () => {
@@ -232,7 +170,6 @@ describe('buildSimplify26AdvertisementModel', () => {
     expect(model).toMatchObject({
       kind: 'notAdvertising',
       title: 'Neinzeruje se',
-      className: SIMPLIFY_26_NOT_ADVERTISING_CLASS,
     })
   })
 
@@ -254,5 +191,16 @@ describe('buildSimplify26AdvertisementModel', () => {
     expect(buildSimplify26AdvertisementModel({ id: 'empty', publications: [] }, NOW).kind).toBe(
       'fallback',
     )
+  })
+})
+
+describe('formatEndedPortalsBadgeLabel', () => {
+  it('uses the Czech plural that matches the count', () => {
+    expect(formatEndedPortalsBadgeLabel(1)).toBe('1 ukončený')
+    expect(formatEndedPortalsBadgeLabel(2)).toBe('2 ukončené')
+    expect(formatEndedPortalsBadgeLabel(4)).toBe('4 ukončené')
+    expect(formatEndedPortalsBadgeLabel(5)).toBe('5 ukončených')
+    expect(formatEndedPortalsBadgeLabel(12)).toBe('12 ukončených')
+    expect(formatEndedPortalsBadgeLabel(22)).toBe('22 ukončené')
   })
 })

@@ -209,7 +209,7 @@ export const JobCardSimplify26 = forwardRef<HTMLElement, JobCardSimplify26Props>
           <div
             data-testid="job-card-advertisements"
             className={cn(
-              'tm-relative tm-w-full tm-min-w-0 tm-overflow-visible md:tm-w-1/2 md:tm-flex-none md:tm-self-stretch md:tm-border-0 md:tm-border-l md:tm-border-solid md:tm-border-secondary',
+              'tm-relative tm-w-full tm-min-w-0 tm-overflow-visible md:tm-w-[40%] md:tm-flex-none md:tm-self-stretch md:tm-border-0 md:tm-border-l md:tm-border-solid md:tm-border-secondary',
               JOB_CARD_SIMPLIFY_26_SECTION_PADDING,
             )}
           >

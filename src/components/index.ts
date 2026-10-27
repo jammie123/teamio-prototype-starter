@@ -305,12 +305,14 @@ export {
 } from './JobCardSimplify25'
 export {
   JobCardSimplify26,
+  AdvertisementHeader,
   AdvertisementList,
   JobBoardItem,
   JOB_CARD_SIMPLIFY_26_PREVIEW_LABEL,
   JOB_CARD_SIMPLIFY_26_SECTION_PADDING,
   type JobCardSimplify26Props,
   type JobCardBranch as JobCardSimplify26Branch,
+  type AdvertisementHeaderProps,
   type AdvertisementListProps,
   type JobBoardItemProps,
 } from './JobCardSimplify26'

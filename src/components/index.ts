@@ -304,6 +304,17 @@ export {
   type JobCardBranch as JobCardSimplify25Branch,
 } from './JobCardSimplify25'
 export {
+  JobCardSimplify26,
+  AdvertisementList,
+  JobBoardItem,
+  JOB_CARD_SIMPLIFY_26_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_26_SECTION_PADDING,
+  type JobCardSimplify26Props,
+  type JobCardBranch as JobCardSimplify26Branch,
+  type AdvertisementListProps,
+  type JobBoardItemProps,
+} from './JobCardSimplify26'
+export {
   JobCardSimplify14,
   JOB_CARD_SIMPLIFY_14_PREVIEW_LABEL,
   JOB_CARD_SIMPLIFY_14_SECTION_PADDING,

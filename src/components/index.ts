@@ -317,6 +317,15 @@ export {
   type JobBoardItemProps,
 } from './JobCardSimplify26'
 export {
+  JobCardSimplify27,
+  AdvertiseProlongHighlight,
+  JOB_CARD_SIMPLIFY_27_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_27_SECTION_PADDING,
+  type JobCardSimplify27Props,
+  type JobCardBranch as JobCardSimplify27Branch,
+  type AdvertiseProlongHighlightProps,
+} from './JobCardSimplify27'
+export {
   JobCardSimplify14,
   JOB_CARD_SIMPLIFY_14_PREVIEW_LABEL,
   JOB_CARD_SIMPLIFY_14_SECTION_PADDING,

@@ -326,6 +326,16 @@ export {
   type AdvertiseProlongHighlightProps,
 } from './JobCardSimplify27'
 export {
+  JobCardSimplify28,
+  JOB_CARD_SIMPLIFY_28_ADVERTISEMENT_WIDTH_CLASS,
+  JOB_CARD_SIMPLIFY_28_MAX_WIDTH_CLASS,
+  JOB_CARD_SIMPLIFY_28_PIPELINE_MAX_WIDTH_CLASS,
+  JOB_CARD_SIMPLIFY_28_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_28_SECTION_PADDING,
+  type JobCardSimplify28Props,
+  type JobCardBranch as JobCardSimplify28Branch,
+} from './JobCardSimplify28'
+export {
   JobCardSimplify14,
   JOB_CARD_SIMPLIFY_14_PREVIEW_LABEL,
   JOB_CARD_SIMPLIFY_14_SECTION_PADDING,

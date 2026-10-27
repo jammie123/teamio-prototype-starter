@@ -7,7 +7,7 @@ export interface AdvertisementHeaderProps extends StyleProps {
   /** Status title: „Běží“, „Běží od–do“, „Běží v různá období“, „Ukončeno“, „Neinzeruje se“. */
   title?: string
   titleTestId?: string
-  /** Count badges such as „2 Běží“, „1 Brzy končí“, „3 ukončené“. */
+  /** Count badges such as „1 Brzy končí“, „3 ukončené“. */
   badges?: Simplify26HeaderBadge[]
 }
 

@@ -21,7 +21,7 @@ function advertisement(
 }
 
 describe('buildSimplify26AdvertisementModel', () => {
-  it('shows one running count badge and one item per portal with its period', () => {
+  it('shows a success running heading and one item per portal with its period', () => {
     const model = buildSimplify26AdvertisementModel(
       advertisement([
         publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
@@ -37,7 +37,8 @@ describe('buildSimplify26AdvertisementModel', () => {
     }
 
     expect(model.title).toBe('Běží 1. 10. – 14. 11. 2026')
-    expect(model.badges).toEqual([{ color: 'success', label: '3 Běží' }])
+    expect(model.titleClassName).toBe('tm-text-emotion-success-emphasis')
+    expect(model.badges).toEqual([])
     expect(model.groups).toHaveLength(1)
     expect(model.groups[0]).toMatchObject({ kind: 'running', listStatus: 'active' })
     expect(model.groups[0].items[0]).toMatchObject({
@@ -90,10 +91,8 @@ describe('buildSimplify26AdvertisementModel', () => {
     }
 
     expect(model.title).toBe('Běží v různá období')
-    expect(model.badges).toEqual([
-      { color: 'success', label: '1 Běží' },
-      { color: 'warning', label: '2 Brzy končí' },
-    ])
+    expect(model.titleClassName).toBe('tm-text-emotion-success-emphasis')
+    expect(model.badges).toEqual([{ color: 'warning', label: '2 Brzy končí' }])
     expect(model.groups.map((group) => group.kind)).toEqual(['running', 'endingSoon'])
     expect(model.groups[1].items.map((item) => item.date)).toEqual(['do 3. 11. 2026', 'do 30. 10. 2026'])
     expect(model.groups[1].items.map((item) => item.status)).toEqual(['endingSoon', 'endingSoon'])
@@ -120,7 +119,7 @@ describe('buildSimplify26AdvertisementModel', () => {
     expect(model.groups[0].items.every((item) => item.status === 'expired')).toBe(true)
   })
 
-  it('shows running, ending-soon and ended badges together in the same order as the groups', () => {
+  it('shows ending-soon and ended badges together in the same order as the groups', () => {
     const model = buildSimplify26AdvertisementModel(
       advertisement([
         publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
@@ -136,11 +135,7 @@ describe('buildSimplify26AdvertisementModel', () => {
     }
 
     expect(model.title).toBe('Běží v různá období')
-    expect(model.badges.map((badge) => badge.label)).toEqual([
-      '1 Běží',
-      '1 Brzy končí',
-      '1 ukončený',
-    ])
+    expect(model.badges.map((badge) => badge.label)).toEqual(['1 Brzy končí', '1 ukončený'])
     expect(model.groups.map((group) => group.kind)).toEqual(['running', 'endingSoon', 'expired'])
   })
 
@@ -156,6 +151,7 @@ describe('buildSimplify26AdvertisementModel', () => {
     }
 
     expect(model.title).toBe('Běží')
+    expect(model.titleClassName).toBe('tm-text-emotion-success-emphasis')
   })
 
   it('renders Neinzeruje se for a declined advertisement', () => {

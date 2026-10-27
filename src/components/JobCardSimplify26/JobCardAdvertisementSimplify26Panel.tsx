@@ -62,6 +62,7 @@ export function JobCardAdvertisementSimplify26Panel({
       <AdvertisementHeader
         title={model.title}
         titleTestId={model.titleTestId}
+        className={model.titleClassName}
         badges={model.badges}
       />
       {model.groups.map((group) => (

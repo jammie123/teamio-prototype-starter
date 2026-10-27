@@ -13,6 +13,7 @@ import type { JobAdvertisement, JobPublication, JobPublicationStatus } from '../
 export const SIMPLIFY_26_NOT_ADVERTISING_TITLE = 'Neinzeruje se' as const
 export const SIMPLIFY_26_NOT_ADVERTISING_CLASS = 'tm-text-secondary-default' as const
 export const SIMPLIFY_26_RUNNING_TITLE = 'Běží' as const
+export const SIMPLIFY_26_RUNNING_CLASS = 'tm-text-emotion-success-emphasis' as const
 export const SIMPLIFY_26_ENDED_TITLE = 'Ukončeno' as const
 export const SIMPLIFY_26_MIXED_PERIOD_TITLE = MIXED_PERIOD_HEADING
 
@@ -48,6 +49,7 @@ export type Simplify26AdvertisementModel =
       kind: 'groups'
       title: string
       titleTestId: string
+      titleClassName?: string
       badges: Simplify26HeaderBadge[]
       /** Running and ending-soon portals first, then ended portals. */
       groups: Simplify26GroupModel[]
@@ -155,19 +157,15 @@ function buildHeaderTitle(active: JobPublication[]) {
   return {
     title: formatActiveHeaderTitle(active),
     titleTestId: 'job-card-simplify26-running-heading',
+    titleClassName: SIMPLIFY_26_RUNNING_CLASS,
   }
 }
 
 function buildHeaderBadges(counts: {
-  running: number
   endingSoon: number
   expired: number
 }): Simplify26HeaderBadge[] {
   const badges: Simplify26HeaderBadge[] = []
-
-  if (counts.running > 0) {
-    badges.push({ color: 'success', label: `${counts.running} Běží` })
-  }
 
   if (counts.endingSoon > 0) {
     badges.push({ color: 'warning', label: `${counts.endingSoon} Brzy končí` })
@@ -210,7 +208,6 @@ export function buildSimplify26AdvertisementModel(
     kind: 'groups',
     ...buildHeaderTitle([...running, ...endingSoon]),
     badges: buildHeaderBadges({
-      running: running.length,
       endingSoon: endingSoon.length,
       expired: expired.length,
     }),

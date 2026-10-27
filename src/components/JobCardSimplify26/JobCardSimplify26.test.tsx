@@ -27,7 +27,7 @@ describe('JobCardSimplify26', () => {
     )
   })
 
-  it('shows one header with a running count badge and portals stacked with their periods', () => {
+  it('shows one success running heading and portals with their periods', () => {
     const endDate = daysFromNow(40)
     const advertisement: JobAdvertisement = {
       id: 'running-same',
@@ -40,14 +40,10 @@ describe('JobCardSimplify26', () => {
     render(<JobCardSimplify26 title="Pozice" advertisements={[advertisement]} />)
 
     expect(screen.getAllByTestId('advertisement-header')).toHaveLength(1)
-    expect(screen.getByTestId('job-card-simplify26-running-heading')).toHaveTextContent(
-      `Běží ${formatCompactDateRange('1. 10. 2026', endDate)}`,
-    )
-    const badges = screen.getAllByTestId('advertisement-header-badge')
-    expect(badges.map((badge) => badge.textContent)).toEqual(['2 Běží'])
-    expect(badges[0]).toHaveAttribute('data-tone', 'success')
-    expect(badges[0].className).toContain('tm-text-[11px]')
-    expect(badges[0].className).toContain('tm-font-semibold')
+    const heading = screen.getByTestId('job-card-simplify26-running-heading')
+    expect(heading).toHaveTextContent(`Běží ${formatCompactDateRange('1. 10. 2026', endDate)}`)
+    expect(heading.className).toContain('tm-text-emotion-success-emphasis')
+    expect(screen.queryByTestId('advertisement-header-badge')).not.toBeInTheDocument()
 
     expect(screen.queryByTestId('job-card-simplify26-columns')).not.toBeInTheDocument()
 
@@ -82,13 +78,13 @@ describe('JobCardSimplify26', () => {
     render(<JobCardSimplify26 title="Pozice" advertisements={[advertisement]} />)
 
     expect(screen.getAllByTestId('advertisement-header')).toHaveLength(1)
-    expect(screen.getByTestId('job-card-simplify26-running-heading')).toHaveTextContent(
-      'Běží v různá období',
-    )
-    expect(screen.getAllByTestId('advertisement-header-badge').map((badge) => badge.textContent)).toEqual([
-      '3 Běží',
-      '3 ukončené',
-    ])
+    const heading = screen.getByTestId('job-card-simplify26-running-heading')
+    expect(heading).toHaveTextContent('Běží v různá období')
+    expect(heading.className).toContain('tm-text-emotion-success-emphasis')
+    const badges = screen.getAllByTestId('advertisement-header-badge')
+    expect(badges.map((badge) => badge.textContent)).toEqual(['3 ukončené'])
+    expect(badges[0].className).toContain('tm-text-[11px]')
+    expect(badges[0].className).toContain('tm-font-semibold')
 
     const lists = screen.getAllByTestId('advertisement-list')
     expect(lists.map((list) => list.getAttribute('data-status'))).toEqual(['active', 'inactive'])
@@ -103,7 +99,7 @@ describe('JobCardSimplify26', () => {
     expect(within(endedItems[0]).getByTestId('job-board-item-date')).toHaveTextContent('do 1. 1. 2026')
   })
 
-  it('shows warning and success badges together and lists ending-soon dates on items', () => {
+  it('shows a warning badge and lists ending-soon dates on items', () => {
     const soonA = daysFromNow(2)
     const soonB = daysFromNow(5)
     const advertisement: JobAdvertisement = {
@@ -121,8 +117,8 @@ describe('JobCardSimplify26', () => {
       'Běží v různá období',
     )
     const badges = screen.getAllByTestId('advertisement-header-badge')
-    expect(badges.map((badge) => badge.textContent)).toEqual(['1 Běží', '2 Brzy končí'])
-    expect(badges[1]).toHaveAttribute('data-tone', 'warning')
+    expect(badges.map((badge) => badge.textContent)).toEqual(['2 Brzy končí'])
+    expect(badges[0]).toHaveAttribute('data-tone', 'warning')
 
     const [, endingSoonList] = screen.getAllByTestId('advertisement-list')
     expect(

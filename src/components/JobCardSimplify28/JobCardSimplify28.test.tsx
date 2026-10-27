@@ -1,6 +1,5 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { formatCompactDateRange } from '../JobCardSynteza/advertisementSummary'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
 import { JobCardSimplify28 } from './JobCardSimplify28'
 
@@ -48,11 +47,8 @@ describe('JobCardSimplify28', () => {
 
     render(<JobCardSimplify28 title="Pozice" advertisements={[advertisement]} />)
 
-    expect(screen.getAllByTestId('advertisement-header')).toHaveLength(1)
-    const heading = screen.getByTestId('job-card-simplify28-running-heading')
-    expect(heading).toHaveTextContent(`Běží ${formatCompactDateRange('1. 10. 2026', endDate)}`)
-    expect(heading.className).toContain('tm-text-emotion-success-emphasis')
-    expect(screen.queryByTestId('advertisement-header-badge')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('advertisement-header')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-simplify28-running-heading')).not.toBeInTheDocument()
     expect(screen.queryByTestId('advertise-prolong-highlight')).not.toBeInTheDocument()
 
     const list = screen.getByTestId('advertisement-list')
@@ -102,17 +98,22 @@ describe('JobCardSimplify28', () => {
 
     render(<JobCardSimplify28 title="Pozice" advertisements={[advertisement]} />)
 
-    expect(screen.getByTestId('job-card-simplify28-running-heading')).toHaveTextContent(
-      'Běží v různá období',
-    )
+    expect(screen.queryByTestId('advertisement-header')).not.toBeInTheDocument()
     expect(screen.queryByTestId('advertise-prolong-highlight')).not.toBeInTheDocument()
 
     const lists = screen.getAllByTestId('advertisement-list')
-    expect(lists.map((list) => list.getAttribute('data-status'))).toEqual(['success', 'default'])
-    expect(lists.map((list) => list.getAttribute('data-layout'))).toEqual(['column', 'column'])
-    expect(
-      lists.map((list) => within(list).getByTestId('advertisement-list-badge').textContent),
-    ).toEqual(['Běží', '3 ukončené'])
+    expect(lists.map((list) => list.getAttribute('data-status'))).toEqual(['success'])
+    expect(within(lists[0]).getByTestId('advertisement-list-badge')).toHaveTextContent('Běží')
+
+    const ended = screen.getByTestId('advertise-list-end')
+    expect(ended).toHaveAttribute('data-expanded', 'false')
+    expect(within(ended).getByText('3 ukončené')).toBeInTheDocument()
+    expect(within(ended).queryByTestId('advertisement-list-badge')).not.toBeInTheDocument()
+    expect(within(ended).queryByTestId('job-board-item')).not.toBeInTheDocument()
+    const toggle = within(ended).getByTestId('advertise-list-end-toggle')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(within(toggle).getByTestId('icon')).toHaveAttribute('data-icon-name', 'chevron-down')
+    expect(within(toggle).getByTestId('icon').className).toContain('-tm-rotate-90')
 
     const liveItems = within(lists[0]).getAllByTestId('job-board-item')
     expect(liveItems).toHaveLength(3)
@@ -123,12 +124,15 @@ describe('JobCardSimplify28', () => {
     expect(liveItems[0].className).not.toContain('tm-w-[10.5rem]')
     expect(within(liveItems[0]).getByTestId('job-board-item-date')).toBeInTheDocument()
 
-    const endedItems = within(lists[1]).getAllByTestId('job-board-item')
+    fireEvent.click(toggle)
+    expect(ended).toHaveAttribute('data-expanded', 'true')
+    const endedItems = within(ended).getAllByTestId('job-board-item')
     expect(endedItems.map((item) => item.getAttribute('data-status'))).toEqual([
       'expired',
       'expired',
       'expired',
     ])
+    expect(within(toggle).getByTestId('icon').className).not.toContain('-tm-rotate-90')
   })
 
   it('shows ending-soon portals in a second success list', () => {
@@ -145,9 +149,7 @@ describe('JobCardSimplify28', () => {
 
     render(<JobCardSimplify28 title="Pozice" advertisements={[advertisement]} />)
 
-    expect(screen.getByTestId('job-card-simplify28-running-heading')).toHaveTextContent(
-      'Běží v různá období',
-    )
+    expect(screen.queryByTestId('advertisement-header')).not.toBeInTheDocument()
     const lists = screen.getAllByTestId('advertisement-list')
     expect(
       lists.map((list) => within(list).getByTestId('advertisement-list-badge').textContent),
@@ -183,13 +185,14 @@ describe('JobCardSimplify28', () => {
 
     render(<JobCardSimplify28 title="Pozice" advertisements={[advertisement]} />)
 
-    expect(screen.getByTestId('job-card-simplify28-ended-heading')).toHaveTextContent('Ukončeno')
+    expect(screen.queryByTestId('job-card-simplify28-ended-heading')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('advertisement-list')).not.toBeInTheDocument()
     expect(screen.queryByTestId('advertise-prolong-highlight')).not.toBeInTheDocument()
-    const list = screen.getByTestId('advertisement-list')
-    expect(list).toHaveAttribute('data-status', 'default')
-    expect(within(list).getByTestId('advertisement-list-badge')).toHaveTextContent('1 ukončený')
-    expect(within(list).getByTestId('advertisement-list-badge')).toHaveAttribute('data-tone', 'default')
-    expect(within(list).getByText('Jobs.cz')).toBeInTheDocument()
+    const ended = screen.getByTestId('advertise-list-end')
+    expect(within(ended).getByTestId('advertise-list-end-toggle')).toHaveTextContent('Jobs.cz')
+    expect(within(ended).queryByTestId('job-board-item')).not.toBeInTheDocument()
+    fireEvent.click(within(ended).getByTestId('advertise-list-end-toggle'))
+    expect(within(ended).getByTestId('job-board-item')).toHaveTextContent('Jobs.cz')
   })
 
   it('shows Neinzeruje se without portal lists or a prolong banner', () => {

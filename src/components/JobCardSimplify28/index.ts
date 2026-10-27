@@ -12,6 +12,7 @@ export {
   JOB_CARD_SIMPLIFY_28_SECTION_PADDING,
 } from './constants'
 export { JobCardAdvertisementSimplify28Panel } from './JobCardAdvertisementSimplify28Panel'
+export { AdvertiseListEnd, type AdvertiseListEndProps } from './AdvertiseListEnd'
 export { JobBoardItem, type JobBoardItemProps } from './JobBoardItem'
 export { AdvertisementList, type AdvertisementListProps } from './AdvertisementList'
 export { AdvertisementHeader, type AdvertisementHeaderProps } from './AdvertisementHeader'

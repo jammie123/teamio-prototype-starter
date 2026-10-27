@@ -327,6 +327,7 @@ export {
 } from './JobCardSimplify27'
 export {
   JobCardSimplify28,
+  AdvertiseListEnd,
   JOB_CARD_SIMPLIFY_28_ADVERTISEMENT_WIDTH_CLASS,
   JOB_CARD_SIMPLIFY_28_MAX_WIDTH_CLASS,
   JOB_CARD_SIMPLIFY_28_PIPELINE_MAX_WIDTH_CLASS,
@@ -334,6 +335,7 @@ export {
   JOB_CARD_SIMPLIFY_28_SECTION_PADDING,
   type JobCardSimplify28Props,
   type JobCardBranch as JobCardSimplify28Branch,
+  type AdvertiseListEndProps,
 } from './JobCardSimplify28'
 export {
   JobCardSimplify14,

@@ -806,6 +806,90 @@ describe('JobCardAdvertisement publicationPresentation simplify5', () => {
   })
 })
 
+describe('JobCardAdvertisement publicationPresentation simplify25', () => {
+  const sharedProps = {
+    publicationPresentation: 'simplify25' as const,
+    periodPresentation: 'text' as const,
+    publicationChannelDecoration: 'plain' as const,
+    publicationChannelLogoSize: 18 as const,
+    suppressPublicationGroupHeadings: true,
+    showPreviewLink: false,
+  }
+
+  it('puts running portals in column 1 and ended portals in column 2', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 9, 23))
+
+    try {
+      render(
+        <JobCardAdvertisement
+          {...sharedProps}
+          advertisement={{
+            id: 'ad-partial',
+            publications: [
+              { id: 'jobs', channel: 'Jobs.cz', startDate: '12. 7. 2026', endDate: '14. 11. 2026' },
+              {
+                id: 'prace',
+                channel: 'Prace.cz',
+                status: 'expired',
+                startDate: '12. 6. 2026',
+                endDate: '20. 10. 2026',
+              },
+            ],
+          }}
+        />,
+      )
+
+      const groups = screen.getByTestId('job-card-publication-groups')
+      expect(groups).toHaveClass('tm-grid', 'tm-grid-cols-2')
+
+      const running = screen.getByTestId('job-card-advertisement-active-publications')
+      const ended = screen.getByTestId('job-card-advertisement-ended-publications')
+      expect(within(running).getByText('Jobs.cz')).toBeInTheDocument()
+      expect(within(ended).getByText('Prace.cz')).toBeInTheDocument()
+      expect(running).toHaveClass('tm-flex-col')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('keeps a single column when every portal is running', () => {
+    render(
+      <JobCardAdvertisement
+        {...sharedProps}
+        advertisement={{
+          id: 'ad-running',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 10. 2026', endDate: '14. 11. 2026' },
+            { id: 'prace', channel: 'Prace.cz', startDate: '1. 10. 2026', endDate: '14. 11. 2026' },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-publication-groups')).toHaveClass('tm-flex-col')
+    expect(screen.getByTestId('job-card-publication-groups')).not.toHaveClass('tm-grid-cols-2')
+    expect(screen.queryByTestId('job-card-advertisement-ended-publications')).not.toBeInTheDocument()
+  })
+
+  it('clamps portal names like simplify24', () => {
+    render(
+      <JobCardAdvertisement
+        {...sharedProps}
+        advertisement={{
+          id: 'ad-running',
+          publications: [
+            { id: 'jobs', channel: 'Jobs.cz', startDate: '1. 10. 2026', endDate: '14. 11. 2026' },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-publication-channel')).toHaveClass('tm-w-[100px]', 'tm-truncate')
+    expect(screen.getByTestId('job-card-publication-channel-logo')).toHaveClass('tm-size-[18px]')
+  })
+})
+
 describe('JobCardAdvertisement publicationPresentation simplify24', () => {
   it('stacks mixed-period portals and renders dates as plain text', () => {
     vi.useFakeTimers()

@@ -1,9 +1,8 @@
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { Link } from '../Link'
 import {
   earliestStartDateLabel,
@@ -11,7 +10,6 @@ import {
   formatEndingSoonHeading,
   formatPartialRunningHeading,
   formatRunningHeading,
-  formatViewCountLabel,
   getAdvertisementSummary,
   getRemainingCalendarDays,
   isEndingSoonPublication,
@@ -23,7 +21,6 @@ import {
   stripYear,
 } from '../JobCardSynteza/advertisementSummary'
 import type { JobAdvertisement, JobPublication } from '../JobCardSynteza/types'
-import { formatCount } from '../JobCardSynteza/formatCount'
 import { Tag } from '../Tag'
 import {
   DRAFT_ADVERTISEMENT_BADGE,
@@ -37,7 +34,8 @@ import {
   splitIntoBalancedColumns,
   type PublicationPeriodBadge,
 } from './advertisementSummaryAds'
-import { JobCardPlacesSummaryTable, shouldShowPlacesProlong } from './JobCardPlacesSummaryTable'
+import { shouldShowPlacesProlong } from './JobCardPlacesSummaryTable'
+import { JobCardAdvertisementStatsToggle } from './JobCardAdvertisementStatsToggle'
 import type { Placement } from '@floating-ui/react'
 import {
   JobCardExpiredPublicationMiniLogoRow,
@@ -76,6 +74,7 @@ export type JobCardAdvertisementPublicationPresentation =
   | 'simplify22'
   | 'simplify23'
   | 'simplify24'
+  | 'simplify25'
 
 function isSimplify13StylePresentation(
   publicationPresentation?: JobCardAdvertisementPublicationPresentation,
@@ -98,6 +97,12 @@ function isStackedPortalPresentation(
     publicationPresentation === 'simplify21' ||
     publicationPresentation === 'simplify22'
   )
+}
+
+function isSimplify24FamilyPresentation(
+  publicationPresentation?: JobCardAdvertisementPublicationPresentation,
+) {
+  return publicationPresentation === 'simplify24' || publicationPresentation === 'simplify25'
 }
 
 function stackedPortalStatusPlacement(
@@ -186,124 +191,21 @@ function AdvertisementMeta({
   linkDecoration?: JobCardPublicationChannelDecoration
   metaTrailing?: ReactNode
 }) {
-  const [open, setOpen] = useState(false)
-
   if (viewCount === undefined && !metaTrailing) {
     return null
   }
 
-  const viewsLabel =
-    viewCount !== undefined ? (
-      <span
-        data-testid="job-card-advertisement-aggregate-views"
-        className={cn(
-          'tm-border-0',
-          linkDecoration === 'dotted-underline' &&
-            'tm-border-b tm-border-dotted tm-border-secondary',
-        )}
-      >
-        {formatViewCountLabel(viewCount)}
-      </span>
-    ) : null
-
   const statsPanel =
-    viewCount === undefined ? null : publicationHover === 'placesTable' ? (
-      <div
-        className="tm-relative tm-flex tm-items-center"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-      >
-        <button
-          type="button"
-          data-testid="job-card-advertisement-stats-toggle"
-          aria-expanded={open}
-          className="tm-border-0 tm-bg-transparent tm-p-0 tm-font-inherit tm-text-13 tm-text-secondary-default tm-cursor-pointer"
-          onClick={() => setOpen((current) => !current)}
-        >
-          {viewsLabel}
-        </button>
-        {open ? (
-          <div
-            data-testid="job-card-advertisement-stats-dropdown"
-            className="tm-absolute tm-left-0 tm-top-full tm-z-50 tm-mt-2 tm-w-max tm-max-w-[min(36rem,calc(100vw-2rem))] tm-rounded tm-border tm-border-primary tm-bg-basic tm-p-2 tm-shadow"
-          >
-            <JobCardPlacesSummaryTable
-              publications={publications}
-              showProlong={showProlong}
-              onExtend={onExtendAll}
-            />
-          </div>
-        ) : null}
-      </div>
-    ) : (
-      <div
-        className="tm-relative tm-flex tm-items-center"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-      >
-        <button
-          type="button"
-          data-testid="job-card-advertisement-stats-toggle"
-          aria-expanded={open}
-          className="tm-border-0 tm-bg-transparent tm-p-0 tm-font-inherit tm-text-13 tm-text-secondary-default tm-cursor-pointer"
-          onClick={() => setOpen((current) => !current)}
-        >
-          {viewsLabel}
-        </button>
-        {open ? (
-          <div
-            data-testid="job-card-advertisement-stats-dropdown"
-            className="tm-absolute tm-left-0 tm-top-full tm-z-50 tm-mt-2 tm-rounded tm-border tm-border-primary tm-bg-basic tm-p-3 tm-shadow"
-          >
-            <div className="tm-flex tm-w-[16rem] tm-flex-col tm-gap-3">
-              <ul
-                data-testid="job-card-advertisement-stats-list"
-                className="tm-m-0 tm-flex tm-list-none tm-flex-col tm-gap-2 tm-p-0"
-              >
-                {publications.map((publication) => (
-                  <li
-                    key={publication.id}
-                    data-testid="job-card-advertisement-stats-row"
-                    className="tm-flex tm-items-start tm-gap-2"
-                  >
-                    <JobPortalLogo
-                      type={jobPortalLogoTypeFromChannel(publication.channel)}
-                      title=""
-                      className="tm-size-6"
-                    />
-                    <div className="tm-min-w-0 tm-flex-1">
-                      <div className="tm-text-sm tm-font-medium tm-text-primary-default">
-                        {publication.channel}
-                      </div>
-                      <div className="tm-text-13 tm-tabular-nums tm-text-secondary-default">
-                        {publication.viewCount === undefined
-                          ? '– zhlédnutí'
-                          : `${formatCount(publication.viewCount)} zhlédnutí`}
-                        {' · '}
-                        {publication.reactionCount === undefined
-                          ? '– reakcí'
-                          : `${formatCount(publication.reactionCount)} reakcí`}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                variant="secondary"
-                size="small"
-                data-testid="job-card-advertisement-detailed-stats"
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  onViewStatisticsClick?.()
-                }}
-              >
-                Přejít na podrobné statistiky
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </div>
+    viewCount === undefined ? null : (
+      <JobCardAdvertisementStatsToggle
+        publications={publications}
+        viewCount={viewCount}
+        onViewStatisticsClick={onViewStatisticsClick}
+        publicationHover={publicationHover}
+        showProlong={showProlong}
+        onExtendAll={onExtendAll}
+        linkDecoration={linkDecoration}
+      />
     )
 
   return (
@@ -789,10 +691,10 @@ function PublicationGroup({
         data-testid={listTestId}
         className={cn(
           'tm-m-0 tm-flex tm-list-none tm-p-0',
-          publicationPresentation === 'simplify24'
+          isSimplify24FamilyPresentation(publicationPresentation)
             ? 'tm-flex-col tm-gap-1'
             : 'tm-flex-row tm-flex-wrap',
-          publicationPresentation === 'simplify24'
+          isSimplify24FamilyPresentation(publicationPresentation)
             ? undefined
             : isSimplify6Family
               ? simplify6PortalListGapClass()
@@ -807,7 +709,9 @@ function PublicationGroup({
             publication={publication}
             expired={expired}
             withSeparator={
-              publicationPresentation !== 'simplify24' && !minimalPresentation && index > 0
+              !isSimplify24FamilyPresentation(publicationPresentation) &&
+              !minimalPresentation &&
+              index > 0
             }
             hoverContent={hoverContent}
             publications={allPublications}
@@ -1227,7 +1131,7 @@ function PeriodBadgeGroup({
     )
   }
 
-  if (publicationPresentation === 'simplify24') {
+  if (isSimplify24FamilyPresentation(publicationPresentation)) {
     return (
       <div
         className={cn('tm-flex tm-flex-col', badgeGroupContentGap, showLeadingDivider && ' tm-pt-2')}
@@ -1542,7 +1446,9 @@ export function JobCardAdvertisement({
       : publicationChannelLogoSize
         ? { channelLogoSize: publicationChannelLogoSize }
         : {}),
-    ...(publicationPresentation === 'simplify24' ? { channelNameClamp: '100' as const } : {}),
+    ...(isSimplify24FamilyPresentation(publicationPresentation)
+      ? { channelNameClamp: '100' as const }
+      : {}),
   }
 
   return (
@@ -1559,12 +1465,16 @@ export function JobCardAdvertisement({
           <div
             data-testid="job-card-publication-groups"
             className={cn(
-              'tm-flex tm-flex-col',
-              isSimplify13StylePresentation(publicationPresentation)
-                ? 'tm-gap-3'
-                : simplifyMinimalPresentation
-                  ? 'tm-gap-3'
-                  : 'tm-gap-2',
+              publicationPresentation === 'simplify25' && active.length > 0 && expired.length > 0
+                ? 'tm-grid tm-grid-cols-2 tm-items-start tm-gap-4'
+                : cn(
+                    'tm-flex tm-flex-col',
+                    isSimplify13StylePresentation(publicationPresentation)
+                      ? 'tm-gap-3'
+                      : simplifyMinimalPresentation
+                        ? 'tm-gap-3'
+                        : 'tm-gap-2',
+                  ),
             )}
           >
             {simplify13StylePartialActiveAndExpired ? (
@@ -1631,7 +1541,10 @@ export function JobCardAdvertisement({
                     }
                     statusHeadingKind="mixedExpired"
                     listTestId="job-card-advertisement-ended-publications"
-                    showLeadingDivider={active.length > 0}
+                    showLeadingDivider={
+                      active.length > 0 &&
+                      !(publicationPresentation === 'simplify25' && expired.length > 0)
+                    }
                     periodBadge={simplifyExpiredPeriodBadge}
                     periodPresentation={periodPresentation}
                     onPreview={onPreviewPublication}
@@ -1642,7 +1555,10 @@ export function JobCardAdvertisement({
                   <PublicationGroup
                     kind="expired"
                     publications={expired}
-                    showLeadingDivider={active.length > 0}
+                    showLeadingDivider={
+                      active.length > 0 &&
+                      !(publicationPresentation === 'simplify25' && expired.length > 0)
+                    }
                     onPreview={onPreviewPublication}
                     onExtend={onExtendPublication}
                     {...hoverPassThrough}

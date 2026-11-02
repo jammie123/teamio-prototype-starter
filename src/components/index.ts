@@ -149,6 +149,12 @@ export {
   type BuildJobCardMenuOptions,
   type JobCardSelectableStatus,
 } from './JobCard'
+export {
+  JobCardV2,
+  type JobCardV2Props,
+  type JobCardCandidates as JobCardV2Candidates,
+  type JobCandidateStat as JobCardV2CandidateStat,
+} from './JobCardV2'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

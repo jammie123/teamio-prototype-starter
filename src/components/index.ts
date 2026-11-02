@@ -155,6 +155,12 @@ export {
   type JobCardCandidates as JobCardV2Candidates,
   type JobCandidateStat as JobCardV2CandidateStat,
 } from './JobCardV2'
+export {
+  JobCardV3,
+  type JobCardV3Props,
+  type JobCardCandidates as JobCardV3Candidates,
+  type JobCandidateStat as JobCardV3CandidateStat,
+} from './JobCardV3'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

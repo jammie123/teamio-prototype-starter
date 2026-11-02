@@ -342,6 +342,13 @@ export {
   type JobCardSimplify14Props,
   type JobCardBranch as JobCardSimplify14Branch,
 } from './JobCardSimplify14'
+export {
+  JobCardSimplify14v2,
+  JOB_CARD_SIMPLIFY_14V2_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_14V2_SECTION_PADDING,
+  type JobCardSimplify14v2Props,
+  type JobCardBranch as JobCardSimplify14v2Branch,
+} from './JobCardSimplify14v2'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
 export { JobCardSyntezaMoreAds, type JobCardSyntezaMoreAdsProps } from './JobCardSyntezaMoreAds'
 export {

@@ -39,6 +39,7 @@ export interface JobCardSimplify11ChannelChipProps {
   publication: JobPublication
   chipSize?: JobCardSimplify11ChannelChipSize
   now?: Date
+  statusDotClassName?: string
   onExtendPublication?: (publication: JobPublication) => void
   onEnablePublication?: (publication: JobPublication) => void
 }
@@ -126,11 +127,13 @@ export function JobCardSimplify11ChannelChipVisual({
   visual,
   chipSize = 40,
   withDropdown = true,
+  statusDotClassName,
 }: {
   publication: JobPublication
   visual: Simplify11ChannelVisualState
   chipSize?: JobCardSimplify11ChannelChipSize
   withDropdown?: boolean
+  statusDotClassName?: string
 }) {
   return (
     <span
@@ -148,7 +151,7 @@ export function JobCardSimplify11ChannelChipVisual({
           )}
         />
       </span>
-      <JobCardSimplify11ChannelStatusDot visual={visual} />
+      <JobCardSimplify11ChannelStatusDot visual={visual} className={statusDotClassName} />
       {withDropdown ? null : null}
     </span>
   )
@@ -158,6 +161,7 @@ export function JobCardSimplify11ChannelChip({
   publication,
   chipSize = 40,
   now = new Date(),
+  statusDotClassName,
   onExtendPublication,
   onEnablePublication,
 }: JobCardSimplify11ChannelChipProps) {
@@ -177,6 +181,7 @@ export function JobCardSimplify11ChannelChip({
           publication={publication}
           visual={visual}
           chipSize={chipSize}
+          statusDotClassName={statusDotClassName}
         />
       </DropdownToggle>
       <DropdownBody

@@ -5,7 +5,7 @@ import { cn } from '../../lib/cn'
 import { formatCount } from '../JobCard/formatCount'
 import { formatConversionRate, formatPublicationRange } from '../JobCard/advertisementSummary'
 import type { JobPublication } from '../JobCard/types'
-import type { JobCardV2Tone } from './jobCardV2Presentation'
+import type { JobCardV2Tone } from '../JobCardV2/jobCardV2Presentation'
 
 export interface JobCardPublicationPortalV9Props {
   publication: JobPublication

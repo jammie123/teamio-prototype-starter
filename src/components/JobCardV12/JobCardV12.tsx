@@ -8,7 +8,7 @@ import { buildJobCardMenuSections, type JobCardMenuHandlers } from '../JobCard/j
 import { getInitials } from '../JobCardSynteza/getInitials'
 import { buildJobCardPeople, JobCardPeople } from '../JobCardSynteza/JobCardPeople'
 import { Icon } from '../Icon'
-import { JobCardAdvertisementV9 } from '../JobCardV9/JobCardAdvertisementV9'
+import { JobCardAdvertisementV12 } from './JobCardAdvertisementV12'
 import { JobCardStatsV7 } from '../JobCardV7/JobCardStatsV7'
 import type {
   JobAdvertisement,
@@ -42,7 +42,8 @@ export interface JobCardV12Props
 
 const ADVERTISEMENT_BAND_CLASS = 'tm-flex tm-flex-col -tm-mb-4'
 const ADVERTISEMENT_ROW_CLASS = '!tm-px-0 !tm-py-5'
-const ADVERTISEMENT_HEADING_CLASS = '!tm-w-[220px] !tm-min-w-[220px] tm-max-w-[220px]'
+const ADVERTISEMENT_HEADING_CLASS =
+  '!tm-w-[220px] !tm-min-w-[220px] tm-max-w-[220px] tm-flex-col !tm-items-start !tm-gap-0 tm-whitespace-normal'
 const ADVERTISEMENT_RULE_CLASS =
   'tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-py-5'
 
@@ -260,12 +261,13 @@ export const JobCardV12 = forwardRef<HTMLElement, JobCardV12Props>(function JobC
               ) : (
                 <>
                   {visibleAdvertisements.map((advertisement) => (
-                    <JobCardAdvertisementV9
+                    <JobCardAdvertisementV12
                       key={`${advertisement.id}-${status}`}
                       advertisement={advertisement}
                       showTitle={showAdvertisementTitle}
                       now={now}
                       onProlong={onExtendAndRepublish}
+                      endingSoonFullWidthWarningBackground
                       className={ADVERTISEMENT_ROW_CLASS}
                       headingClassName={ADVERTISEMENT_HEADING_CLASS}
                     />

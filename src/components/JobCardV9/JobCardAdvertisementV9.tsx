@@ -3,11 +3,14 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
 import {
+  formatCompactDateRange,
   formatViewCountLabel,
   getAdvertisementSummary,
+  shareSameEndDate,
   stripYear,
   visibleHighlights,
 } from '../JobCard/advertisementSummary'
+import type { JobPublication } from '../JobCard/types'
 import { JobCardPublicationHighlight } from '../JobCard/JobCardPublicationPortal'
 import { JobCardPublicationPortalV9 } from './JobCardPublicationPortalV9'
 import {
@@ -23,6 +26,7 @@ export interface JobCardAdvertisementV9Props extends StyleProps {
   showTitle?: boolean
   now?: Date
   onProlong?: () => void
+  headingClassName?: string
 }
 
 const HEADING_WIDTH_CLASS = 'tm-min-w-[160px] tm-shrink-0'
@@ -41,6 +45,169 @@ function oneRowHeading(model: Exclude<JobCardV2AdvertisementModel, { kind: 'empt
   const separator = ' · '
   const index = model.heading.lastIndexOf(separator)
   return index === -1 ? model.heading : model.heading.slice(0, index)
+}
+
+function formatHeadingDateRange(startDate: string, endDate: string) {
+  return formatCompactDateRange(startDate, endDate)
+}
+
+function samePeriodLivePublication(advertisement: JobAdvertisement) {
+  const liveDated = (advertisement.publications ?? []).filter(
+    (publication) =>
+      isLivePublication(publication) && publication.startDate && publication.endDate,
+  )
+
+  if (
+    liveDated.length === 0 ||
+    !shareSameStartDate(liveDated) ||
+    !shareSameEndDate(liveDated)
+  ) {
+    return undefined
+  }
+
+  return liveDated[0]
+}
+
+function isLivePublication(publication: JobPublication) {
+  return publication.status !== 'expired'
+}
+
+function shareSameStartDate(publications: JobPublication[]) {
+  if (publications.length === 0) {
+    return false
+  }
+
+  const labels = publications.map((publication) =>
+    publication.startDate ? stripYear(publication.startDate) : undefined,
+  )
+
+  if (labels.some((label) => label === undefined)) {
+    return false
+  }
+
+  return labels.every((label) => label === labels[0])
+}
+
+function resolveHeadingDisplay(
+  model: Exclude<JobCardV2AdvertisementModel, { kind: 'empty' }>,
+  advertisement: JobAdvertisement,
+) {
+  const split = splitAdvertisementHeading(oneRowHeading(model))
+  const samePeriod = samePeriodLivePublication(advertisement)
+
+  if (
+    samePeriod?.startDate &&
+    samePeriod.endDate &&
+    (model.kind === 'endingSoon' || model.kind === 'runningSame')
+  ) {
+    return {
+      label: split.label,
+      dateInfo: formatHeadingDateRange(samePeriod.startDate, samePeriod.endDate),
+    }
+  }
+
+  return split
+}
+
+function splitAdvertisementHeading(heading: string): {
+  label: string
+  dateInfo?: string
+  dateSeparator?: string
+} {
+  const bulletSeparator = ' · '
+  const bulletIndex = heading.lastIndexOf(bulletSeparator)
+  if (bulletIndex !== -1) {
+    return {
+      label: heading.slice(0, bulletIndex),
+      dateSeparator: bulletSeparator,
+      dateInfo: heading.slice(bulletIndex + bulletSeparator.length),
+    }
+  }
+
+  if (heading.startsWith('Ukončeno ')) {
+    return {
+      label: 'Ukončeno',
+      dateInfo: heading.slice('Ukončeno '.length),
+    }
+  }
+
+  if (heading.startsWith('Běží od ')) {
+    const rest = heading.slice('Běží od '.length)
+    const rangeSeparator = ' do '
+    const rangeIndex = rest.lastIndexOf(rangeSeparator)
+    if (rangeIndex !== -1) {
+      const startPart = rest.slice(0, rangeIndex).trim()
+      const endPart = rest.slice(rangeIndex + rangeSeparator.length).trim()
+      const endYear = endPart.match(/(\d{4})\.?$/)?.[1]
+      const startDate = endYear && !startPart.match(/(\d{4})\.?$/)
+        ? `${startPart.replace(/\s+$/, '')} ${endYear}`
+        : startPart
+
+      return {
+        label: 'Běží',
+        dateInfo: formatHeadingDateRange(startDate, endPart),
+      }
+    }
+
+    return { label: 'Běží', dateInfo: rest }
+  }
+
+  if (heading.startsWith('Běží do ')) {
+    return {
+      label: 'Běží',
+      dateInfo: heading.slice('Běží do '.length),
+    }
+  }
+
+  return { label: heading }
+}
+
+function AdvertisementHeading({
+  model,
+  advertisement,
+  className,
+}: {
+  model: Exclude<JobCardV2AdvertisementModel, { kind: 'empty' }>
+  advertisement: JobAdvertisement
+  className?: string
+}) {
+  const { label, dateInfo, dateSeparator } = resolveHeadingDisplay(model, advertisement)
+
+  return (
+    <div
+      data-testid="job-card-advertisement-heading"
+      className={cn(
+        HEADING_WIDTH_CLASS,
+        'tm-flex tm-items-baseline tm-gap-x-1 tm-whitespace-nowrap tm-text-sm tm-font-medium',
+        HEADING_CLASS[model.headingTone],
+        className,
+      )}
+    >
+      <span data-testid="job-card-advertisement-heading-label">{label}</span>
+      {dateInfo ? (
+        <>
+          {dateSeparator?.includes('·') ? (
+            <span
+              data-testid="job-card-advertisement-heading-separator"
+              aria-hidden="true"
+            >
+              {dateSeparator}
+            </span>
+          ) : (
+            <span data-testid="job-card-advertisement-heading-separator" aria-hidden="true">
+              {' '}
+            </span>
+          )}
+          <span
+            data-testid="job-card-advertisement-heading-date"
+            className="tm-font-normal tm-text-secondary-default"
+          >
+            {dateInfo}
+          </span>
+        </>
+      ) : null}
+    </div>
+  )
 }
 
 function AdvertisementMeta({ title, viewCount }: { title?: string; viewCount?: number }) {
@@ -75,6 +242,7 @@ export function JobCardAdvertisementV9({
   showTitle = false,
   now,
   onProlong,
+  headingClassName,
   className,
 }: JobCardAdvertisementV9Props) {
   const model = buildJobCardV2AdvertisementModel(advertisement, now)
@@ -106,16 +274,11 @@ export function JobCardAdvertisementV9({
           Inzerát není nikde vystavený.
         </p>
       ) : (
-        <div
-          data-testid="job-card-advertisement-heading"
-          className={cn(
-            HEADING_WIDTH_CLASS,
-            'tm-whitespace-nowrap tm-text-sm tm-font-medium',
-            HEADING_CLASS[model.headingTone],
-          )}
-        >
-          {oneRowHeading(model)}
-        </div>
+        <AdvertisementHeading
+          model={model}
+          advertisement={advertisement}
+          className={headingClassName}
+        />
       )}
       {model.kind === 'empty' ? null : (
         <ul

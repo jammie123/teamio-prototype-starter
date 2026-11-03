@@ -42,6 +42,7 @@ export interface JobCardV12Props
 
 const ADVERTISEMENT_BAND_CLASS = 'tm-flex tm-flex-col -tm-mb-4'
 const ADVERTISEMENT_ROW_CLASS = '!tm-px-0 !tm-py-5'
+const ADVERTISEMENT_HEADING_CLASS = '!tm-w-[220px] !tm-min-w-[220px] tm-max-w-[220px]'
 const ADVERTISEMENT_RULE_CLASS =
   'tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-py-5'
 
@@ -266,6 +267,7 @@ export const JobCardV12 = forwardRef<HTMLElement, JobCardV12Props>(function JobC
                       now={now}
                       onProlong={onExtendAndRepublish}
                       className={ADVERTISEMENT_ROW_CLASS}
+                      headingClassName={ADVERTISEMENT_HEADING_CLASS}
                     />
                   ))}
                   {collapseToFirstAd ? (

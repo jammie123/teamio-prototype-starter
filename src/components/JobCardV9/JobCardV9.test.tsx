@@ -125,7 +125,7 @@ describe('JobCardV9', () => {
     const channels = within(advertisement).getByTestId('job-card-advertisement-publication-list')
     const views = within(advertisement).getByTestId('job-card-advertisement-aggregate-views')
 
-    expect(heading).toHaveTextContent('Běží od 1. 1. do 1. 2. 2026')
+    expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
     expect(heading.className).toContain('tm-min-w-[160px]')
     expect(heading.parentElement).toBe(advertisement)
     expect(channels.parentElement).toBe(advertisement)
@@ -243,7 +243,7 @@ describe('JobCardV9', () => {
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     const heading = within(advertisement).getByTestId('job-card-advertisement-heading')
-    expect(heading).toHaveTextContent('Běží do 30. 10.')
+    expect(heading).toHaveTextContent('Běží 30. 10.')
     expect(heading).not.toHaveTextContent('portál')
     expect(within(advertisement).getByText('ukončeno 15. 8.')).toBeInTheDocument()
     expect(advertisement.className).toContain('tm-flex-row')
@@ -258,7 +258,7 @@ describe('JobCardV9', () => {
     const heading = within(advertisement).getByTestId('job-card-advertisement-heading')
     const prolong = within(advertisement).getByRole('button', { name: 'Prodloužit' })
 
-    expect(heading).toHaveTextContent('Končí za 3 dny · 30. 9.')
+    expect(heading).toHaveTextContent('Končí za 3 dny 1. 9. – 30. 9. 2026')
     expect(heading.parentElement).toBe(advertisement)
     expect(prolong.parentElement).toBe(advertisement)
     expect(screen.queryByTestId('job-card-disappearance-notice')).not.toBeInTheDocument()

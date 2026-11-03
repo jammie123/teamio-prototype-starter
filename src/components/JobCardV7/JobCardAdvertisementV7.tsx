@@ -25,6 +25,8 @@ export interface JobCardAdvertisementV7Props extends StyleProps {
   onProlong?: () => void
 }
 
+const HEADING_WIDTH_CLASS = 'tm-min-w-[160px] tm-shrink-0'
+
 const HEADING_CLASS: Record<JobCardV2Tone, string> = {
   success: 'tm-text-emotion-success-emphasis',
   warning: 'tm-text-emotion-warning-emphasis',
@@ -107,7 +109,8 @@ export function JobCardAdvertisementV7({
         <div
           data-testid="job-card-advertisement-heading"
           className={cn(
-            'tm-shrink-0 tm-whitespace-nowrap tm-text-sm tm-font-medium',
+            HEADING_WIDTH_CLASS,
+            'tm-whitespace-nowrap tm-text-sm tm-font-medium',
             HEADING_CLASS[model.headingTone],
           )}
         >

@@ -100,6 +100,7 @@ describe('JobCardV7', () => {
     const views = within(advertisement).getByTestId('job-card-advertisement-aggregate-views')
 
     expect(heading).toHaveTextContent('Běží od 1. 1. do 1. 2. 2026')
+    expect(heading.className).toContain('tm-min-w-[160px]')
     expect(heading.parentElement).toBe(advertisement)
     expect(channels.parentElement).toBe(advertisement)
     expect(views.parentElement?.parentElement).toBe(advertisement)

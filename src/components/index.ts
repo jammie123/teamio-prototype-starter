@@ -188,6 +188,13 @@ export {
   type JobCandidateStat as JobCardV7CandidateStat,
   type JobCardNote as JobCardV7Note,
 } from './JobCardV7'
+export {
+  JobCardV8,
+  type JobCardV8Props,
+  type JobCardCandidates as JobCardV8Candidates,
+  type JobCandidateStat as JobCardV8CandidateStat,
+  type JobCardNote as JobCardV8Note,
+} from './JobCardV8'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

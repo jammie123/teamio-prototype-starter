@@ -202,6 +202,13 @@ export {
   type JobCandidateStat as JobCardV9CandidateStat,
   type JobCardNote as JobCardV9Note,
 } from './JobCardV9'
+export {
+  JobCardV11,
+  type JobCardV11Props,
+  type JobCardCandidates as JobCardV11Candidates,
+  type JobCandidateStat as JobCardV11CandidateStat,
+  type JobCardNote as JobCardV11Note,
+} from './JobCardV11'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

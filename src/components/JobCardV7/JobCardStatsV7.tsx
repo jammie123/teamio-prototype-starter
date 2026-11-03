@@ -7,6 +7,8 @@ import type { JobCandidateStat, JobCardCandidates } from './types'
 export interface JobCardStatsV7Props extends StyleProps {
   candidates: JobCardCandidates
   onStatClick?: (stat: JobCandidateStat) => void
+  /** Applied to each `job-card-stat-*` cell (e.g. fixed width). */
+  statItemClassName?: string
 }
 
 const STAT_LABELS: Record<JobCandidateStat, string> = {
@@ -36,7 +38,12 @@ function StatHighlightBadge({
   )
 }
 
-export function JobCardStatsV7({ candidates, onStatClick, className }: JobCardStatsV7Props) {
+export function JobCardStatsV7({
+  candidates,
+  onStatClick,
+  statItemClassName,
+  className,
+}: JobCardStatsV7Props) {
   const items = STAT_ORDER.filter((key) => candidates[key] !== undefined)
 
   if (items.length === 0) {
@@ -74,6 +81,7 @@ export function JobCardStatsV7({ candidates, onStatClick, className }: JobCardSt
           'tm-py-2',
           'tm-text-left',
           index > 0 && 'tm-border-0 tm-border-l tm-border-solid tm-border-secondary',
+          statItemClassName,
         )
 
         const content = (

@@ -98,17 +98,19 @@ describe('JobCardV12', () => {
     expect(pipeline.className).toContain('tm-ml-auto')
   })
 
-  it('renders job portals as board items', () => {
+  it('renders job portals in normal weight', () => {
     renderJobCard()
 
-    const items = screen.getAllByTestId('job-board-item')
-    expect(items).toHaveLength(3)
-    expect(items.map((item) => item.textContent)).toEqual([
-      expect.stringContaining('Jobs.cz'),
-      expect.stringContaining('Prace.cz'),
-      expect.stringContaining('Kariérní stránky'),
+    const channels = screen.getAllByTestId('job-card-publication-channel')
+    expect(channels.map((channel) => channel.textContent)).toEqual([
+      'Jobs.cz',
+      'Prace.cz',
+      'Kariérní stránky',
     ])
-    expect(screen.queryByTestId('job-card-advertisement-badges')).not.toBeInTheDocument()
+    for (const channel of channels) {
+      expect(channel.className).toContain('tm-font-normal')
+      expect(channel.className).not.toContain('tm-font-medium')
+    }
   })
 
   it('renders Neposouzený, Ve hře and Celkem without a pipeline background', () => {
@@ -167,6 +169,7 @@ describe('JobCardV12', () => {
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(advertisement.className).toContain('!tm-px-0')
     expect(advertisement.className).toContain('!tm-py-5')
+    expect(advertisement.className).toContain('tm-border-t')
     expect(advertisement.className).toContain('tm-flex-row')
     expect(advertisement.className).not.toContain('tm-flex-col')
     expect(advertisement.className).not.toContain('tm-rounded')
@@ -187,13 +190,14 @@ describe('JobCardV12', () => {
     expect(heading.className).toContain('tm-max-w-[220px]')
     expect(heading.className).toContain('tm-flex-col')
     expect(heading.className).toContain('!tm-items-start')
-    expect(heading.className).toContain('!tm-gap-0')
-    expect(advertisement).toContainElement(heading)
+    expect(heading.parentElement).toBe(advertisement)
     expect(channels.parentElement).toBe(advertisement)
     expect(views.parentElement?.parentElement).toBe(advertisement)
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(channels.compareDocumentPosition(views) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(within(channels).getAllByTestId('job-board-item')).toHaveLength(3)
+    expect(within(channels).getByText('Jobs.cz')).toBeInTheDocument()
+    expect(within(channels).getByText('Prace.cz')).toBeInTheDocument()
+    expect(within(channels).getByText('Kariérní stránky')).toBeInTheDocument()
     expect(views).toHaveTextContent(/3\s170 zhlédnutí/)
   })
 
@@ -259,10 +263,8 @@ describe('JobCardV12', () => {
     expect(within(advertisement).getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Běží v různých obdobích',
     )
-    expect(within(advertisement).getAllByTestId('job-board-item-date').map((node) => node.textContent)).toEqual([
-      'do 30. 10.',
-      'do 15. 11.',
-    ])
+    expect(within(advertisement).getByText('do 30. 10.')).toBeInTheDocument()
+    expect(within(advertisement).getByText('do 15. 11.')).toBeInTheDocument()
     expect(advertisement).not.toHaveTextContent('1. 9. – 30. 10.')
   })
 
@@ -304,9 +306,6 @@ describe('JobCardV12', () => {
     expect(heading).toHaveTextContent('Běží 30. 10.')
     expect(heading).not.toHaveTextContent('portál')
     expect(within(advertisement).getByText('ukončeno 15. 8.')).toBeInTheDocument()
-    expect(within(advertisement).getByTestId('job-card-advertisement-badges')).toHaveTextContent(
-      '1 ukončený',
-    )
     expect(advertisement.className).toContain('tm-flex-row')
   })
 
@@ -323,7 +322,7 @@ describe('JobCardV12', () => {
     expect(within(heading).getByTestId('job-card-advertisement-heading-date')).toHaveTextContent(
       '1. 9. – 30. 9. 2026',
     )
-    expect(advertisement).toContainElement(heading)
+    expect(heading.parentElement).toBe(advertisement)
     expect(prolong.parentElement).toBe(advertisement)
     expect(screen.queryByTestId('job-card-disappearance-notice')).not.toBeInTheDocument()
     expect(advertisement).not.toHaveTextContent('zmizí inzerát')

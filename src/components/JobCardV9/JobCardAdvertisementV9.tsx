@@ -162,7 +162,7 @@ function splitAdvertisementHeading(heading: string): {
   return { label: heading }
 }
 
-export function AdvertisementHeading({
+function AdvertisementHeading({
   model,
   advertisement,
   className,
@@ -210,7 +210,7 @@ export function AdvertisementHeading({
   )
 }
 
-export function AdvertisementMeta({ title, viewCount }: { title?: string; viewCount?: number }) {
+function AdvertisementMeta({ title, viewCount }: { title?: string; viewCount?: number }) {
   if (!title && viewCount === undefined) {
     return null
   }

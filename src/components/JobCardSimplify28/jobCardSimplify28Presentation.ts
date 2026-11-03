@@ -1,5 +1,7 @@
 import {
   formatCompactDateRange,
+  getRemainingCalendarDays,
+  isEndingSoonPublication,
   isUnlimitedPublication,
   partitionPublications,
   richestDateLabel,
@@ -13,11 +15,12 @@ export const SIMPLIFY_28_NOT_ADVERTISING_TITLE = 'Neinzeruje se' as const
 export const SIMPLIFY_28_NOT_ADVERTISING_CLASS = 'tm-text-secondary-default' as const
 export const SIMPLIFY_28_RUNNING_TITLE = 'Běží' as const
 export const SIMPLIFY_28_RUNNING_CLASS = 'tm-text-emotion-success-emphasis' as const
+export const SIMPLIFY_28_ENDING_SOON_TITLE = 'Brzy končí' as const
 export const SIMPLIFY_28_ENDED_TITLE = 'Ukončeno' as const
 export const SIMPLIFY_28_MIXED_PERIOD_TITLE = MIXED_PERIOD_HEADING
 
-export type Simplify28GroupKind = 'running' | 'endingSoon' | 'expired'
-export type Simplify28ListStatus = 'success' | 'default'
+export type Simplify28GroupKind = 'running' | 'expired'
+export type Simplify28ListStatus = 'success' | 'default' | 'warning'
 export type Simplify28DateLayout = 'hidden' | 'beside'
 
 export interface Simplify28BoardItemModel {
@@ -37,6 +40,7 @@ export interface Simplify28GroupModel {
   kind: Simplify28GroupKind
   listStatus: Simplify28ListStatus
   badge: Simplify28ListBadge
+  extraBadge?: Simplify28ListBadge
   items: Simplify28BoardItemModel[]
 }
 
@@ -64,28 +68,75 @@ const NOT_ADVERTISING_MODEL = {
   testId: 'job-card-simplify28-not-advertising-heading',
 } as const satisfies Simplify28AdvertisementModel
 
-function itemStatus(publication: JobPublication, kind: Simplify28GroupKind): JobPublicationStatus {
+function itemStatus(
+  publication: JobPublication,
+  kind: Simplify28GroupKind,
+  now: Date,
+): JobPublicationStatus {
   if (publication.status) {
     return publication.status
-  }
-
-  if (kind === 'endingSoon') {
-    return 'endingSoon'
   }
 
   if (kind === 'expired') {
     return 'expired'
   }
 
+  if (isEndingSoonPublication(publication, now)) {
+    return 'endingSoon'
+  }
+
   return 'active'
 }
 
-function itemDate(publication: JobPublication, datesDiffer: boolean): string | undefined {
-  if (!datesDiffer || isUnlimitedPublication(publication.channel) || !publication.endDate) {
+function publicationSortDays(publication: JobPublication, now: Date) {
+  if (!publication.endDate || isUnlimitedPublication(publication.channel)) {
+    return undefined
+  }
+
+  return getRemainingCalendarDays(publication.endDate, now)
+}
+
+/** Nearest end date first; portals without a finite end date stay last. */
+function comparePublicationsByEndDate(now: Date) {
+  return (left: JobPublication, right: JobPublication) => {
+    const leftDays = publicationSortDays(left, now)
+    const rightDays = publicationSortDays(right, now)
+
+    if (leftDays === undefined && rightDays === undefined) {
+      return 0
+    }
+
+    if (leftDays === undefined) {
+      return 1
+    }
+
+    if (rightDays === undefined) {
+      return -1
+    }
+
+    return leftDays - rightDays
+  }
+}
+
+function formatItemDate(publication: JobPublication): string | undefined {
+  if (isUnlimitedPublication(publication.channel) || !publication.endDate) {
     return undefined
   }
 
   return `do ${publication.endDate}`
+}
+
+function shouldShowItemDate(
+  publication: JobPublication,
+  datesDiffer: boolean,
+  kind: Simplify28GroupKind,
+  now: Date,
+): boolean {
+  if (!formatItemDate(publication)) {
+    return false
+  }
+
+  return datesDiffer || (kind === 'running' && isEndingSoonPublication(publication, now))
 }
 
 function publicationDatesDiffer(publications: JobPublication[]) {
@@ -105,10 +156,6 @@ function badgeFor(kind: Simplify28GroupKind, count: number): Simplify28ListBadge
     return { tone: 'default', label: formatEndedPortalsBadgeLabel(count) }
   }
 
-  if (kind === 'endingSoon') {
-    return { tone: 'success', label: `${count} Brzy končí` }
-  }
-
   return { tone: 'success', label: SIMPLIFY_28_RUNNING_TITLE }
 }
 
@@ -116,21 +163,27 @@ function toGroup(
   publications: JobPublication[],
   kind: Simplify28GroupKind,
   datesDiffer: boolean,
+  now: Date,
+  extraBadge?: Simplify28ListBadge,
 ): Simplify28GroupModel {
   const badge = badgeFor(kind, publications.length)
-  const dateLayout: Simplify28DateLayout = datesDiffer ? 'beside' : 'hidden'
 
   return {
     kind,
     listStatus: badge.tone,
     badge,
-    items: publications.map((publication) => ({
-      id: publication.id,
-      channel: publication.channel,
-      status: itemStatus(publication, kind),
-      date: itemDate(publication, datesDiffer),
-      dateLayout,
-    })),
+    ...(extraBadge ? { extraBadge } : {}),
+    items: publications.map((publication) => {
+      const showDate = shouldShowItemDate(publication, datesDiffer, kind, now)
+
+      return {
+        id: publication.id,
+        channel: publication.channel,
+        status: itemStatus(publication, kind, now),
+        date: showDate ? formatItemDate(publication) : undefined,
+        dateLayout: showDate ? 'beside' : 'hidden',
+      }
+    }),
   }
 }
 
@@ -211,12 +264,17 @@ export function buildSimplify28AdvertisementModel(
     return NOT_ADVERTISING_MODEL
   }
 
-  const live = [...running, ...endingSoon]
+  const live = [...running, ...endingSoon].sort(comparePublicationsByEndDate(now))
   const datesDiffer = publicationDatesDiffer(live)
+  const endingSoonBadge =
+    endingSoon.length > 0
+      ? { tone: 'warning' as const, label: SIMPLIFY_28_ENDING_SOON_TITLE }
+      : undefined
   const groups: Simplify28GroupModel[] = [
-    ...(running.length > 0 ? [toGroup(running, 'running', datesDiffer)] : []),
-    ...(endingSoon.length > 0 ? [toGroup(endingSoon, 'endingSoon', datesDiffer)] : []),
-    ...(expired.length > 0 ? [toGroup(expired, 'expired', publicationDatesDiffer(expired))] : []),
+    ...(live.length > 0 ? [toGroup(live, 'running', datesDiffer, now, endingSoonBadge)] : []),
+    ...(expired.length > 0
+      ? [toGroup(expired, 'expired', publicationDatesDiffer(expired), now)]
+      : []),
   ]
 
   return {

@@ -161,6 +161,33 @@ export {
   type JobCardCandidates as JobCardV3Candidates,
   type JobCandidateStat as JobCardV3CandidateStat,
 } from './JobCardV3'
+export {
+  JobCardV4,
+  type JobCardV4Props,
+  type JobCardCandidates as JobCardV4Candidates,
+  type JobCandidateStat as JobCardV4CandidateStat,
+} from './JobCardV4'
+export {
+  JobCardV5,
+  type JobCardV5Props,
+  type JobCardCandidates as JobCardV5Candidates,
+  type JobCandidateStat as JobCardV5CandidateStat,
+  type JobCardNote as JobCardV5Note,
+} from './JobCardV5'
+export {
+  JobCardV6,
+  type JobCardV6Props,
+  type JobCardCandidates as JobCardV6Candidates,
+  type JobCandidateStat as JobCardV6CandidateStat,
+  type JobCardNote as JobCardV6Note,
+} from './JobCardV6'
+export {
+  JobCardV7,
+  type JobCardV7Props,
+  type JobCardCandidates as JobCardV7Candidates,
+  type JobCandidateStat as JobCardV7CandidateStat,
+  type JobCardNote as JobCardV7Note,
+} from './JobCardV7'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'
@@ -347,6 +374,13 @@ export {
   type JobCardSimplify28Props,
   type JobCardBranch as JobCardSimplify28Branch,
 } from './JobCardSimplify28'
+export {
+  JobCardSimplify29,
+  JOB_CARD_SIMPLIFY_29_PREVIEW_LABEL,
+  JOB_CARD_SIMPLIFY_29_SECTION_PADDING,
+  type JobCardSimplify29Props,
+  type JobCardBranch as JobCardSimplify29Branch,
+} from './JobCardSimplify29'
 export {
   JobCardSimplify14,
   JOB_CARD_SIMPLIFY_14_PREVIEW_LABEL,

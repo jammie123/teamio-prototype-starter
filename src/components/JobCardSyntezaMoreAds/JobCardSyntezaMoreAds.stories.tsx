@@ -77,7 +77,7 @@ const runningBatch = [mainAdvertisement, brigadeAdvertisement, shiftAdvertisemen
 
 const meta = {
   id: 'jobs-jobcard-synteza-more-ads',
-  title: 'Jobs/Job Cards Variant/JobCard Syntéza More Ads',
+  title: 'Jobs/Job Cards Variant/Job Card Archive/JobCard Syntéza More Ads',
   component: JobCardSyntezaMoreAds,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',

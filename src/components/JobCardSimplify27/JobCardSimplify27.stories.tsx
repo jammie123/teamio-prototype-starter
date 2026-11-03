@@ -147,7 +147,7 @@ const notAdvertising: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-simplify-27',
-  title: 'Jobs/Job Cards Variant/Job Card Simplify 27',
+  title: 'Jobs/Job Cards Variant/Row + Icon/Job Card Simplify 27',
   component: JobCardSimplify27,
   args: {
     ...cardArgs,

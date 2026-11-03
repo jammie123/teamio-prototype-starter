@@ -30,6 +30,7 @@ const preview: Preview = {
           'Jobs',
           [
             'Job Cards Variant',
+            ['data-oriented-all', 'Row + Icon', 'Only Icons', '*', 'Job Card Archive'],
             'JobModals',
             'JobPageHeader',
             ['V1'],

@@ -244,7 +244,7 @@ const withHighlights: JobAdvertisement = {
 }
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardOld',
+  title: 'Jobs/Job Cards Variant/Job Card Archive/JobCardOld',
   component: JobCardOld,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',

@@ -146,7 +146,7 @@ const paidEndedOwnChannels: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-simplify-12',
-  title: 'Jobs/Job Cards Variant/JobCard Simplify 12',
+  title: 'Jobs/Job Cards Variant/Job Card Archive/JobCard Simplify 12',
   component: JobCardSimplify12,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',

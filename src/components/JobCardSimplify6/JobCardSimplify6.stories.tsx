@@ -308,7 +308,7 @@ const draftAdvertisement: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-simplify-6',
-  title: 'Jobs/Job Cards Variant/JobCard Simplify 6',
+  title: 'Jobs/Job Cards Variant/Only Icons/JobCard Simplify 6',
   component: JobCardSimplify6,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',

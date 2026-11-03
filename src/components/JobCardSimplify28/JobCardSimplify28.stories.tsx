@@ -95,6 +95,16 @@ const endingSoonDifferentDates: JobAdvertisement = {
   ],
 }
 
+const runningWithEndingSoon: JobAdvertisement = {
+  id: 'running-with-ending-soon',
+  title: 'Běží a brzy končí',
+  publications: [
+    publication({ id: 'jobs', channel: 'Jobs.cz', endDate: daysFromNow(40) }),
+    publication({ id: 'prace', channel: 'Prace.cz', endDate: daysFromNow(2) }),
+    publication({ id: 'atmoskop', channel: 'Atmoskop', endDate: daysFromNow(5) }),
+  ],
+}
+
 const endedSameDate: JobAdvertisement = {
   id: 'ended-same',
   title: 'Inzerce skončila — stejný den',
@@ -147,7 +157,7 @@ const notAdvertising: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-simplify-28',
-  title: 'Jobs/Job Cards Variant/Job Card Simplify 28',
+  title: 'Jobs/Job Cards Variant/Job Card Archive/Job Card Simplify 28',
   component: JobCardSimplify28,
   args: {
     ...cardArgs,
@@ -203,6 +213,13 @@ export const BrzyKonciRuzne: Story = {
   },
 }
 
+export const BeziABrzyKonci: Story = {
+  name: 'Běží / S brzy končí',
+  args: {
+    advertisements: [runningWithEndingSoon],
+  },
+}
+
 export const InzerceSkoncilaStejne: Story = {
   name: 'Inzerce skončila / Stejný den',
   args: {
@@ -247,6 +264,7 @@ export const Prehled: Story = {
           ['Screen', screenAdvertisement],
           ['Běží — stejné období', runningSamePeriod],
           ['Běží — různá období', runningMixedPeriods],
+          ['Běží a brzy končí', runningWithEndingSoon],
           ['Brzy končí — stejný den', endingSoonSameDate],
           ['Brzy končí — různě', endingSoonDifferentDates],
           ['Inzerce skončila — stejný den', endedSameDate],

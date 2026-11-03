@@ -333,7 +333,7 @@ const fivePortalsAllEnded = fivePortalAdvertisement('ad-five-ended', '5 port√°l≈
 
 const meta = {
   id: 'jobs-jobcard-simplify-22',
-  title: 'Jobs/Job Cards Variant/Job Card Simplify 22',
+  title: 'Jobs/Job Cards Variant/Row + Icon/Job Card Simplify 22',
   component: JobCardSimplify22,
   args: {
     ...cardArgs,

@@ -189,7 +189,7 @@ const mixedDifferentDates: JobAdvertisement = {
 
 const meta = {
   id: 'jobs-jobcard-synteza-pipeline',
-  title: 'Jobs/Job Cards Variant/JobCard Syntéza Pipeline',
+  title: 'Jobs/Job Cards Variant/Job Card Archive/JobCard Syntéza Pipeline',
   component: JobCardSyntezaPipeline,
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',

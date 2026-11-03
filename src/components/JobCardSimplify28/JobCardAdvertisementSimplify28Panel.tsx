@@ -60,7 +60,13 @@ export function JobCardAdvertisementSimplify28Panel({
   return (
     <div data-testid="job-card-simplify28-portals" className={cn('tm-flex tm-flex-col tm-gap-4', className)}>
       {model.groups.map((group) => (
-        <AdvertisementList key={group.kind} status={group.listStatus} badge={group.badge.label}>
+        <AdvertisementList
+          key={group.kind}
+          status={group.listStatus}
+          badge={group.badge.label}
+          extraBadge={group.extraBadge?.label}
+          extraBadgeTone={group.extraBadge?.tone}
+        >
           {group.items.map((item) => (
             <JobBoardItem
               key={item.id}

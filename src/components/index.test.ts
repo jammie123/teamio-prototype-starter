@@ -129,6 +129,7 @@ describe('components barrel', () => {
     expect(components.JobModalBoost).toBeTypeOf('function')
     expect(components.JobModalTop).toBeTypeOf('function')
     expect(components.EvaluationCriteriaModal).toBeTypeOf('function')
+    expect(components.EvaluationCriteriaModalV3).toBeTypeOf('function')
     expect(components.EvaluationCriterionDetailModal).toBeTypeOf('function')
     expect(components.findEeoViolation).toBeTypeOf('function')
     expect(components.JOB_MODAL_COPY).toBeTypeOf('object')

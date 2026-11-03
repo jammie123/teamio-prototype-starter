@@ -68,25 +68,34 @@ describe('JobCardV12', () => {
     expect(title.className).not.toContain('tm-font-semibold')
   })
 
-  it('puts the actions menu to the left of the title and people under the title', () => {
+  it('puts the menu in the left corner with avatars under the title and pipeline on the right', () => {
     renderJobCard()
 
-    const titleRow = screen.getByTestId('job-card-title-row')
+    const layoutRow = screen.getByTestId('job-card-layout-row')
+    const main = screen.getByTestId('job-card-main')
     const headingRow = screen.getByTestId('job-card-title-heading-row')
+    const titleRow = screen.getByTestId('job-card-title-row')
     const actions = screen.getByTestId('job-card-actions-toggle')
+    const pipeline = screen.getByTestId('job-card-pipeline')
     const people = screen.getByTestId('job-card-people')
     const title = screen.getByTestId('job-card-title')
 
+    expect(layoutRow).toContainElement(actions)
+    expect(layoutRow).toContainElement(main)
+    expect(main).toContainElement(titleRow)
+    expect(titleRow).not.toContainElement(actions)
     expect(titleRow).toContainElement(headingRow)
-    expect(titleRow).toContainElement(people)
-    expect(headingRow).toContainElement(actions)
+    expect(titleRow).toContainElement(pipeline)
     expect(headingRow).toContainElement(title)
-    expect(headingRow.className).toContain('tm-items-center')
+    expect(headingRow).toContainElement(people)
+    expect(headingRow).not.toContainElement(pipeline)
+    expect(headingRow.className).toContain('tm-flex-col')
     expect(
       actions.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
-    expect(headingRow.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(people.parentElement?.parentElement?.className).toContain('tm-pl-10')
+    expect(title.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(title.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(pipeline.className).toContain('tm-ml-auto')
   })
 
   it('renders job portals in normal weight', () => {
@@ -118,10 +127,10 @@ describe('JobCardV12', () => {
     const total = screen.getByTestId('job-card-stat-total')
 
     expect(unassessed.className).toContain('tm-items-start')
-    expect(unassessed.className).toContain('tm-w-36')
+    expect(unassessed.className).toContain('tm-w-[150px]')
     expect(inProgress.className).toContain('tm-border-l')
-    expect(inProgress.className).toContain('tm-w-36')
-    expect(total.className).toContain('tm-w-36')
+    expect(inProgress.className).toContain('tm-w-[150px]')
+    expect(total.className).toContain('tm-w-[150px]')
     expect(within(unassessed).getByText('14').className).toContain('tm-font-normal')
     expect(within(unassessed).getByText('14').className).toContain('tm-text-2xl')
     expect(within(total).getByText('52').className).toContain('tm-text-xl')
@@ -131,28 +140,35 @@ describe('JobCardV12', () => {
     )
   })
 
-  it('aligns the candidate pipeline to the right in the header row', () => {
+  it('aligns the candidate pipeline to the right beside the title block', () => {
     renderJobCard({ note: undefined })
 
-    const headerRow = screen.getByTestId('job-card-header-row')
-    const pipeline = screen.getByTestId('job-card-pipeline')
     const titleRow = screen.getByTestId('job-card-title-row')
+    const headingRow = screen.getByTestId('job-card-title-heading-row')
+    const pipeline = screen.getByTestId('job-card-pipeline')
+    const title = screen.getByTestId('job-card-title')
 
-    expect(headerRow).toContainElement(titleRow)
-    expect(headerRow).toContainElement(pipeline)
+    expect(titleRow).toContainElement(headingRow)
+    expect(titleRow).toContainElement(pipeline)
+    expect(headingRow).toContainElement(title)
     expect(pipeline.className).toContain('tm-ml-auto')
-    expect(titleRow.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(headingRow.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('puts the advertisement status, portals and views on one row', () => {
     renderJobCard()
 
+    const main = screen.getByTestId('job-card-main')
+    const title = screen.getByTestId('job-card-title')
     const band = screen.getByTestId('job-card-advertisements')
-    expect(band.className).toContain('-tm-mx-4')
+    expect(main).toContainElement(title)
+    expect(main).toContainElement(band)
+    expect(band.className).not.toContain('-tm-mx-4')
     expect(band.className).toContain('-tm-mb-4')
 
     const advertisement = screen.getByTestId('job-card-advertisement')
-    expect(advertisement.className).toContain('tm-px-4')
+    expect(advertisement.className).toContain('!tm-px-0')
+    expect(advertisement.className).toContain('!tm-py-5')
     expect(advertisement.className).toContain('tm-border-t')
     expect(advertisement.className).toContain('tm-flex-row')
     expect(advertisement.className).not.toContain('tm-flex-col')
@@ -178,10 +194,12 @@ describe('JobCardV12', () => {
   it('shows the note below the header row', () => {
     renderJobCard()
 
+    const main = screen.getByTestId('job-card-main')
     const headerRow = screen.getByTestId('job-card-header-row')
     const recruitmentNote = screen.getByTestId('job-card-note')
     const advertisement = screen.getByTestId('job-card-advertisement')
 
+    expect(main).toContainElement(recruitmentNote)
     expect(recruitmentNote.className).toContain('tm-w-full')
     expect(recruitmentNote.className).toContain('tm-bg-emotion-warning-background')
     expect(recruitmentNote.className).not.toContain('tm-ml-auto')

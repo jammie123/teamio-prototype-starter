@@ -40,9 +40,10 @@ export interface JobCardV12Props
   now?: Date
 }
 
-const ADVERTISEMENT_BLEED_CLASS = '-tm-mx-4 -tm-mb-4'
+const ADVERTISEMENT_BAND_CLASS = 'tm-flex tm-flex-col -tm-mb-4'
+const ADVERTISEMENT_ROW_CLASS = '!tm-px-0 !tm-py-5'
 const ADVERTISEMENT_RULE_CLASS =
-  'tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-px-4 tm-py-3'
+  'tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-py-5'
 
 function formatNoteMeta(note: JobCardNote) {
   const initials = note.author.trim() ? getInitials(note.author) : ''
@@ -180,106 +181,108 @@ export const JobCardV12 = forwardRef<HTMLElement, JobCardV12Props>(function JobC
       ref={ref}
       data-testid="job-card"
       data-variant="v12"
-      className={cn('tm-flex', 'tm-flex-col', 'tm-gap-4', className)}
+      className={cn('tm-flex', 'tm-flex-col', '!tm-pt-6', className)}
       {...rest}
     >
       <div
-        data-testid="job-card-header-row"
-        className="tm-flex tm-w-full tm-flex-wrap tm-items-start tm-gap-3"
+        data-testid="job-card-layout-row"
+        className="tm-flex tm-w-full tm-items-start tm-gap-2"
       >
+        {menuSections.length ? (
+          <JobCardActions
+            sections={menuSections}
+            label="Akce nad náborem a inzerátem"
+            testId="job-card-actions-toggle"
+            className="tm-shrink-0 tm-self-start"
+          />
+        ) : null}
         <div
-          data-testid="job-card-title-row"
-          className="tm-flex tm-min-w-[12rem] tm-flex-1 tm-flex-col tm-gap-1"
+          data-testid="job-card-main"
+          className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-4"
         >
           <div
-            data-testid="job-card-title-heading-row"
-            className="tm-flex tm-min-w-0 tm-items-center tm-gap-2"
+            data-testid="job-card-header-row"
+            className="tm-flex tm-w-full tm-items-start tm-gap-3"
           >
-            {menuSections.length ? (
-              <JobCardActions
-                sections={menuSections}
-                label="Akce nad náborem a inzerátem"
-                testId="job-card-actions-toggle"
-                className="tm-shrink-0 tm-self-center"
-              />
-            ) : null}
-            <h3
-              data-testid="job-card-title"
-              className="tm-mb-0 tm-min-w-0 tm-flex-1 tm-text-lg tm-font-normal tm-leading-tight tm-text-teamio-blue"
-            >
-              {title}
-            </h3>
-          </div>
-          {people.length ? (
             <div
-              className={cn(
-                'tm-min-w-0',
-                menuSections.length ? 'tm-pl-10' : undefined,
-              )}
+              data-testid="job-card-title-row"
+              className="tm-flex tm-min-w-0 tm-flex-1 tm-items-center tm-gap-3"
             >
-              <JobCardPeople people={people} onInviteMore={onInviteColleagues} />
+              <div
+                data-testid="job-card-title-heading-row"
+                className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-0.5"
+              >
+                <h3
+                  data-testid="job-card-title"
+                  className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-normal tm-leading-tight tm-text-teamio-blue"
+                >
+                  {title}
+                </h3>
+                {people.length ? (
+                  <div className="tm-min-w-0">
+                    <JobCardPeople people={people} onInviteMore={onInviteColleagues} />
+                  </div>
+                ) : null}
+              </div>
+              {candidates ? (
+                <div data-testid="job-card-pipeline" className="tm-ml-auto tm-shrink-0">
+                  <JobCardStatsV7
+                    candidates={candidates}
+                    onStatClick={onCandidatesClick}
+                    statItemClassName="tm-w-[150px]"
+                  />
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {visibleNote ? (
+            <JobCardNoteBar note={visibleNote} onExpand={onExpandNote} className="tm-w-full" />
+          ) : null}
+
+          {showAdvertisements ? (
+            <div data-testid="job-card-advertisements" className={ADVERTISEMENT_BAND_CLASS}>
+              {shownAdvertisements.length === 0 ? (
+                <div className={cn(ADVERTISEMENT_RULE_CLASS)}>
+                  <div
+                    data-testid="job-card-no-advertisement"
+                    className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
+                  >
+                    <span>Nábor nemá žádný inzerát.</span>
+                    {onCreateAdvertisement ? (
+                      <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
+                        Vytvořit inzerát
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {visibleAdvertisements.map((advertisement) => (
+                    <JobCardAdvertisementV9
+                      key={`${advertisement.id}-${status}`}
+                      advertisement={advertisement}
+                      showTitle={showAdvertisementTitle}
+                      now={now}
+                      onProlong={onExtendAndRepublish}
+                      className={ADVERTISEMENT_ROW_CLASS}
+                    />
+                  ))}
+                  {collapseToFirstAd ? (
+                    <Link
+                      className="tm-pb-3 tm-text-sm"
+                      data-testid="job-card-additional-advertisements"
+                      onClick={onAdditionalAdvertisementsClick}
+                    >
+                      {`Zobrazit další inzeráty (${additionalAdvertisementsCount})`}
+                    </Link>
+                  ) : null}
+                </>
+              )}
             </div>
           ) : null}
         </div>
-
-        {candidates ? (
-          <div data-testid="job-card-pipeline" className="tm-ml-auto tm-shrink-0">
-            <JobCardStatsV7
-              candidates={candidates}
-              onStatClick={onCandidatesClick}
-              statItemClassName="tm-w-36"
-            />
-          </div>
-        ) : null}
       </div>
-
-      {visibleNote ? (
-        <JobCardNoteBar note={visibleNote} onExpand={onExpandNote} className="tm-w-full" />
-      ) : null}
-
-      {showAdvertisements ? (
-        <div
-          data-testid="job-card-advertisements"
-          className={cn(ADVERTISEMENT_BLEED_CLASS, 'tm-flex', 'tm-flex-col')}
-        >
-          {shownAdvertisements.length === 0 ? (
-            <div className={cn(ADVERTISEMENT_RULE_CLASS)}>
-              <div
-                data-testid="job-card-no-advertisement"
-                className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
-              >
-                <span>Nábor nemá žádný inzerát.</span>
-                {onCreateAdvertisement ? (
-                  <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
-                    Vytvořit inzerát
-                  </Link>
-                ) : null}
-              </div>
-            </div>
-          ) : (
-            <>
-              {visibleAdvertisements.map((advertisement) => (
-                <JobCardAdvertisementV9
-                  key={`${advertisement.id}-${status}`}
-                  advertisement={advertisement}
-                  showTitle={showAdvertisementTitle}
-                  now={now}
-                  onProlong={onExtendAndRepublish}
-                />
-              ))}
-              {collapseToFirstAd ? (
-                <Link
-                  className="tm-px-4 tm-pb-3 tm-text-sm"
-                  data-testid="job-card-additional-advertisements"
-                  onClick={onAdditionalAdvertisementsClick}
-                >
-                  {`Zobrazit další inzeráty (${additionalAdvertisementsCount})`}
-                </Link>
-              ) : null}
-            </>
-          )}
-        </div>
-      ) : null}
     </Card>
   )
 })

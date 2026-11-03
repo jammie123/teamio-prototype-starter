@@ -1,33 +1,15 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { Icon } from '../Icon'
 import { Tag } from '../Tag'
 import { formatViewCountLabel } from '../JobCardSynteza/advertisementSummary'
-import type {
-  Simplify14v2HeaderBadge,
-  Simplify14v2HeadingIcon,
-} from './jobCardSimplify14v2Presentation'
+import type { Simplify14v2HeaderBadge } from './jobCardSimplify14v2Presentation'
 
 export interface AdvertisementHeaderProps extends StyleProps {
   title?: string
   titleTestId?: string
-  icon?: Simplify14v2HeadingIcon
   badges?: Simplify14v2HeaderBadge[]
   viewCount?: number
   onViewStatisticsClick?: () => void
-}
-
-const STATUS_ICON_CLASS = 'tm-shrink-0 tm-text-lg tm-leading-none'
-const CHECK_ICON_CLASS = 'tm-shrink-0 tm-text-base tm-leading-none'
-const STATUS_ICON_STROKE = 2
-const CHECK_ICON_STROKE = 1.5
-
-function statusIconStroke(icon: Simplify14v2HeadingIcon) {
-  return icon === 'circle-check' ? CHECK_ICON_STROKE : STATUS_ICON_STROKE
-}
-
-function statusIconClass(icon: Simplify14v2HeadingIcon) {
-  return icon === 'circle-check' ? CHECK_ICON_CLASS : STATUS_ICON_CLASS
 }
 
 function AggregateViews({
@@ -70,7 +52,6 @@ function AggregateViews({
 export function AdvertisementHeader({
   title,
   titleTestId,
-  icon,
   badges = [],
   viewCount,
   onViewStatisticsClick,
@@ -90,19 +71,9 @@ export function AdvertisementHeader({
           {title ? (
             <p
               data-testid={titleTestId}
-              className={cn(
-                'tm-m-0 tm-flex tm-min-w-0 tm-items-center tm-gap-2 tm-text-sm tm-font-medium',
-                className,
-              )}
+              className={cn('tm-m-0 tm-text-sm tm-font-medium', className)}
             >
-              {icon ? (
-                <Icon
-                  name={icon}
-                  strokeWidth={statusIconStroke(icon)}
-                  className={statusIconClass(icon)}
-                />
-              ) : null}
-              <span>{title}</span>
+              {title}
             </p>
           ) : null}
           {badges.map((badge) => (

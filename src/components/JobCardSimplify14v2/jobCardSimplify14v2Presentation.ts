@@ -27,21 +27,15 @@ export {
 }
 
 export type Simplify14v2ChannelDateLabelTone = 'default' | 'muted' | 'warning' | 'danger'
-export type Simplify14v2HeadingIcon =
-  | 'circle-check'
-  | 'alert-triangle-outline'
-  | 'warning'
-  | 'view-off'
 
 export const SIMPLIFY_14V2_RUNNING_TITLE = 'Běží' as const
 export const SIMPLIFY_14V2_ENDED_TITLE = 'Ukončeno' as const
-export const SIMPLIFY_14V2_ENDING_SOON_TITLE = 'Brzy končí' as const
+export const SIMPLIFY_14V2_ENDING_SOON_TITLE = 'Blíží se konec' as const
 export const SIMPLIFY_14V2_NOT_ADVERTISING_TITLE = 'Neinzeruje se' as const
 export const SIMPLIFY_14V2_ENDED_CLASS = 'tm-text-secondary-default' as const
 export const SIMPLIFY_14V2_ENDED_STATUS_DOT_CLASS = '!tm-bg-[#C2C8CE]' as const
 
 export interface Simplify14v2Heading {
-  icon: Simplify14v2HeadingIcon
   className: string
   testId: string
   label: string
@@ -124,35 +118,30 @@ export function buildSimplify14v2Heading(
     case 'partial':
     case 'running':
       return {
-        icon: 'circle-check',
         className: 'tm-text-emotion-success-emphasis',
         testId: 'job-card-simplify14v2-running-heading',
         label: headingLabel(SIMPLIFY_14V2_RUNNING_TITLE, periodRange),
       }
     case 'ended':
       return {
-        icon: 'warning',
         className: SIMPLIFY_14V2_ENDED_CLASS,
         testId: 'job-card-simplify14v2-ended-heading',
         label: headingLabel(SIMPLIFY_14V2_ENDED_TITLE, periodRange),
       }
     case 'endingSoon':
       return {
-        icon: 'alert-triangle-outline',
         className: 'tm-text-emotion-warning-emphasis',
         testId: 'job-card-simplify14v2-ending-soon-heading',
         label: headingLabel(SIMPLIFY_14V2_ENDING_SOON_TITLE, periodRange),
       }
     case 'allDisabled':
       return {
-        icon: 'view-off',
         className: 'tm-text-secondary-default',
         testId: 'job-card-simplify14v2-all-disabled-heading',
         label: SIMPLIFY_14V2_NOT_ADVERTISING_TITLE,
       }
     case 'mixedPeriods':
       return {
-        icon: 'circle-check',
         className: 'tm-text-emotion-success-emphasis',
         testId: 'job-card-simplify14v2-mixed-periods-heading',
         label: formatMixedPeriodsHeading(),
@@ -223,25 +212,32 @@ export function shouldShowSimplify14v2SamePeriodRange(
   return formatSimplify14v2SamePeriodRange(mode, publications, now) !== undefined
 }
 
-export function formatSimplify14v2ChannelDateLabel(
+export function formatSimplify14v2ChannelStatusLabel(
   publication: JobPublication,
   now = new Date(),
 ): string {
   const visual = resolveSimplify11ChannelVisualState(publication, now)
 
-  if (visual === 'disabled') {
-    return 'vypnuto'
+  if (visual === 'expired' || visual === 'disabled') {
+    return SIMPLIFY_14V2_ENDED_TITLE
   }
 
-  if (isUnlimitedPublication(publication.channel) && visual !== 'expired') {
-    return 'bez limitu'
+  if (visual === 'endingSoon') {
+    return SIMPLIFY_14V2_ENDING_SOON_TITLE
   }
 
-  if (publication.endDate) {
-    return stripYear(publication.endDate)
+  return SIMPLIFY_14V2_RUNNING_TITLE
+}
+
+export function formatSimplify14v2ChannelDateLabel(
+  publication: JobPublication,
+  _now = new Date(),
+): string {
+  if (isUnlimitedPublication(publication.channel) || !publication.endDate) {
+    return '–'
   }
 
-  return '–'
+  return stripYear(publication.endDate)
 }
 
 export function resolveSimplify14v2ChannelDateLabelTone(
@@ -250,15 +246,7 @@ export function resolveSimplify14v2ChannelDateLabelTone(
 ): Simplify14v2ChannelDateLabelTone {
   const visual = resolveSimplify11ChannelVisualState(publication, now)
 
-  if (visual === 'disabled') {
-    return 'muted'
-  }
-
-  if (isUnlimitedPublication(publication.channel) && visual !== 'expired') {
-    return 'muted'
-  }
-
-  if (visual === 'expired') {
+  if (visual === 'expired' || visual === 'disabled') {
     return 'muted'
   }
 

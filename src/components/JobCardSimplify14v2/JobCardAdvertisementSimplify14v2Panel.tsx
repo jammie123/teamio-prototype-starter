@@ -111,7 +111,6 @@ function Simplify14v2StripPanel({
       <AdvertisementHeader
         title={heading?.label}
         titleTestId={heading?.testId}
-        icon={heading?.icon}
         className={heading?.className}
         badges={badges}
         viewCount={summary.viewCount}

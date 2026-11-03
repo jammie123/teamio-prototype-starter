@@ -27,12 +27,14 @@ export function JobBoardItem({
   onEnablePublication,
   className,
 }: JobBoardItemProps) {
-  const label = formatSimplify14v2ChannelDateLabel(publication, now)
   const tone = resolveSimplify14v2ChannelDateLabelTone(publication, now)
   const visual = resolveSimplify11ChannelVisualState(publication, now)
 
   return (
-    <li data-testid="job-board-item" className={cn('tm-flex tm-w-10 tm-flex-col tm-items-center tm-gap-0.5', className)}>
+    <li
+      data-testid="job-board-item"
+      className={cn('tm-flex tm-w-10 tm-flex-col tm-items-center tm-gap-0.5', className)}
+    >
       <JobCardSimplify11ChannelChip
         publication={publication}
         chipSize={JOB_CARD_SIMPLIFY_14V2_CHANNEL_CHIP_SIZE}
@@ -49,7 +51,7 @@ export function JobBoardItem({
             simplify14v2ChannelDateLabelClassName(tone),
           )}
         >
-          {label}
+          {formatSimplify14v2ChannelDateLabel(publication, now)}
         </span>
       ) : null}
     </li>

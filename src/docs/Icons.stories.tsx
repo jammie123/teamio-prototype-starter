@@ -41,6 +41,8 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   phone: 'Telefon',
   ban: 'Zamítnuto',
   'circle-check': 'Přijato',
+  'circle-help': 'Nápověda',
+  'refresh-cw': 'Obnovit',
   'message-square': 'Zpráva',
   'sliders-horizontal': 'Filtry',
   'columns-3': 'Sloupce',
@@ -52,6 +54,10 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   'thumb-up': 'K pozvání',
   'thumb-down': 'Nevyhovující',
   'stop-reason': 'Nechat na později',
+  'advertisement-preview': 'Náhled inzerátu',
+  'alert-triangle-outline': 'Varování (obrys)',
+  clock: 'Čas',
+  'view-off': 'Skrýt',
 }
 
 const KNOWN_ICONS = Object.keys(ICON_LABELS) as KnownIconName[]

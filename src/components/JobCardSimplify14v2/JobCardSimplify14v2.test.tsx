@@ -152,7 +152,7 @@ describe('JobCardSimplify14v2', () => {
     expect(dots.every((dot) => dot.className.includes('tm-bg-[#C2C8CE]'))).toBe(true)
   })
 
-  it('shows Brzy končí with od–do when every live portal is ending soon on the same day', () => {
+  it('shows Blíží se konec with od–do when every live portal is ending soon on the same day', () => {
     const endDate = daysFromNow(3)
     renderCard({
       id: 'ending-soon',
@@ -163,7 +163,7 @@ describe('JobCardSimplify14v2', () => {
     })
 
     expect(screen.getByTestId('job-card-simplify14v2-ending-soon-heading')).toHaveTextContent(
-      `Brzy končí 1. 10. – ${endDate}`,
+      `Blíží se konec 1. 10. – ${endDate}`,
     )
     expect(screen.queryByTestId('job-card-simplify14v2-subline')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-simplify14v2-channel-date')).not.toBeInTheDocument()

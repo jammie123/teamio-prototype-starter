@@ -4,6 +4,7 @@ import {
   buildSimplify14v2HeaderBadges,
   buildSimplify14v2Heading,
   buildSimplify14v2StripGroups,
+  formatSimplify14v2ChannelStatusLabel,
   formatSimplify14v2SamePeriodRange,
   resolveJobCardSimplify14v2PanelMode,
   resolveSimplify14v2ChannelDateLabelTone,
@@ -88,7 +89,6 @@ describe('resolveJobCardSimplify14v2PanelMode', () => {
 describe('buildSimplify14v2Heading', () => {
   it('uses Běží for running', () => {
     expect(buildSimplify14v2Heading('running')).toMatchObject({
-      icon: 'circle-check',
       className: 'tm-text-emotion-success-emphasis',
       testId: 'job-card-simplify14v2-running-heading',
       label: 'Běží',
@@ -103,7 +103,6 @@ describe('buildSimplify14v2Heading', () => {
 
   it('uses Běží od–do for partial instead of a running-portals badge title', () => {
     expect(buildSimplify14v2Heading('partial', '1. 10. – 14. 11. 2026')).toMatchObject({
-      icon: 'circle-check',
       className: 'tm-text-emotion-success-emphasis',
       testId: 'job-card-simplify14v2-running-heading',
       label: 'Běží 1. 10. – 14. 11. 2026',
@@ -112,7 +111,6 @@ describe('buildSimplify14v2Heading', () => {
 
   it('uses Běží v různá období for mixedPeriods', () => {
     expect(buildSimplify14v2Heading('mixedPeriods')).toMatchObject({
-      icon: 'circle-check',
       className: 'tm-text-emotion-success-emphasis',
       testId: 'job-card-simplify14v2-mixed-periods-heading',
       label: 'Běží v různá období',
@@ -121,7 +119,6 @@ describe('buildSimplify14v2Heading', () => {
 
   it('uses gray Ukončeno for ended', () => {
     expect(buildSimplify14v2Heading('ended')).toMatchObject({
-      icon: 'warning',
       className: 'tm-text-secondary-default',
       testId: 'job-card-simplify14v2-ended-heading',
       label: 'Ukončeno',
@@ -135,19 +132,64 @@ describe('buildSimplify14v2Heading', () => {
     })
   })
 
-  it('uses Brzy končí for endingSoon', () => {
+  it('uses Blíží se konec for endingSoon', () => {
     expect(buildSimplify14v2Heading('endingSoon')).toMatchObject({
-      icon: 'alert-triangle-outline',
       className: 'tm-text-emotion-warning-emphasis',
       testId: 'job-card-simplify14v2-ending-soon-heading',
-      label: 'Brzy končí',
+      label: 'Blíží se konec',
     })
   })
 
   it('puts the od–do range into the endingSoon heading', () => {
     expect(buildSimplify14v2Heading('endingSoon', '1. 10. – 30. 10. 2026')).toMatchObject({
-      label: 'Brzy končí 1. 10. – 30. 10. 2026',
+      label: 'Blíží se konec 1. 10. – 30. 10. 2026',
     })
+  })
+})
+
+describe('formatSimplify14v2ChannelStatusLabel', () => {
+  it('maps live portals to Běží', () => {
+    expect(
+      formatSimplify14v2ChannelStatusLabel(
+        publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '14. 11. 2026' }),
+        NOW,
+      ),
+    ).toBe('Běží')
+  })
+
+  it('maps expired and disabled portals to Ukončeno', () => {
+    expect(
+      formatSimplify14v2ChannelStatusLabel(
+        publication({
+          id: 'jobs',
+          channel: 'Jobs.cz',
+          status: 'expired',
+          endDate: '1. 1. 2026',
+        }),
+        NOW,
+      ),
+    ).toBe('Ukončeno')
+
+    expect(
+      formatSimplify14v2ChannelStatusLabel(
+        publication({
+          id: 'jobs',
+          channel: 'Jobs.cz',
+          status: 'disabled',
+          endDate: '1. 1. 2026',
+        }),
+        NOW,
+      ),
+    ).toBe('Ukončeno')
+  })
+
+  it('maps ending-soon portals to Blíží se konec', () => {
+    expect(
+      formatSimplify14v2ChannelStatusLabel(
+        publication({ id: 'jobs', channel: 'Jobs.cz', endDate: '30. 10. 2026' }),
+        NOW,
+      ),
+    ).toBe('Blíží se konec')
   })
 })
 

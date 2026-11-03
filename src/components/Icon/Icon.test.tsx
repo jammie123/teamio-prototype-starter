@@ -61,6 +61,8 @@ describe('Icon', () => {
   it.each([
     'ban',
     'circle-check',
+    'circle-help',
+    'refresh-cw',
     'message-square',
     'sliders-horizontal',
     'columns-3',

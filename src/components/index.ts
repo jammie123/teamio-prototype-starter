@@ -203,12 +203,26 @@ export {
   type JobCardNote as JobCardV9Note,
 } from './JobCardV9'
 export {
+  JobCardV10,
+  type JobCardV10Props,
+  type JobCardCandidates as JobCardV10Candidates,
+  type JobCandidateStat as JobCardV10CandidateStat,
+  type JobCardNote as JobCardV10Note,
+} from './JobCardV10'
+export {
   JobCardV11,
   type JobCardV11Props,
   type JobCardCandidates as JobCardV11Candidates,
   type JobCandidateStat as JobCardV11CandidateStat,
   type JobCardNote as JobCardV11Note,
 } from './JobCardV11'
+export {
+  JobCardV12,
+  type JobCardV12Props,
+  type JobCardCandidates as JobCardV12Candidates,
+  type JobCandidateStat as JobCardV12CandidateStat,
+  type JobCardNote as JobCardV12Note,
+} from './JobCardV12'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'
@@ -474,6 +488,30 @@ export {
   EvaluationCriteriaModalV3,
   type EvaluationCriteriaModalV3Props,
 } from './EvaluationCriteriaModalV3'
+export {
+  ScoreSummary,
+  ScoreSummaryHeader,
+  ScoreSummaryBadge,
+  ScoreSummaryBody,
+  EvaluationItem,
+  SCORE_SUMMARY_COPY,
+  SCORE_SUMMARY_HELP_URL,
+  clampScore,
+  getScoreBadgeTone,
+  sampleScoreSummaryCriteria,
+  sampleScoreSummaryQuestions,
+  sampleScoreSummaryText,
+  type ScoreSummaryProps,
+  type ScoreSummaryHeaderProps,
+  type ScoreSummaryBadgeProps,
+  type ScoreSummaryBadgeType,
+  type ScoreSummaryBodyProps,
+  type EvaluationItemProps,
+  type EvaluationItemData,
+  type EvaluationItemStatus,
+  type ScoreBadgeTone,
+  type ScoreSummaryType,
+} from './ScoreSummary'
 export {
   AdvertisementTimeline,
   formatAdvertisementTimelineTimestamp,

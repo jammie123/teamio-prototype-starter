@@ -343,9 +343,14 @@ export default {
                     '0%': { backgroundPosition: '200% 0' },
                     '100%': { backgroundPosition: '-200% 0' },
                 },
+                'sparkle-pulse': {
+                    '0%, 100%': { opacity: '0.35', transform: 'scale(0.7)' },
+                    '50%': { opacity: '1', transform: 'scale(1.2)' },
+                },
             },
             animation: {
                 shimmer: 'shimmer 2s infinite linear',
+                'sparkle-pulse': 'sparkle-pulse 1.1s ease-in-out infinite',
             },
         },
     },

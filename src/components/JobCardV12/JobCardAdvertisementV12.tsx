@@ -25,7 +25,6 @@ export interface JobCardAdvertisementV12Props extends StyleProps {
   now?: Date
   onProlong?: () => void
   headingClassName?: string
-  endingSoonFullWidthWarningBackground?: boolean
 }
 
 function portalStatus(tone: JobCardV2Tone): JobPublicationStatus {
@@ -54,7 +53,6 @@ export function JobCardAdvertisementV12({
   now,
   onProlong,
   headingClassName,
-  endingSoonFullWidthWarningBackground = false,
   className,
 }: JobCardAdvertisementV12Props) {
   const resolvedNow = now ?? new Date()
@@ -64,8 +62,6 @@ export function JobCardAdvertisementV12({
   const visibleTitle = showTitle ? advertisement.title : undefined
   const disappearance = buildAdvertiseDisappearanceNotice(advertisement, resolvedNow)
   const badges = boardModel.kind === 'groups' ? boardModel.badges : []
-  const endingSoonHighlight =
-    endingSoonFullWidthWarningBackground && model.kind === 'endingSoon'
 
   return (
     <div
@@ -80,7 +76,6 @@ export function JobCardAdvertisementV12({
         'tm-border-0',
         'tm-border-solid',
         'tm-border-secondary',
-        endingSoonHighlight && 'tm-w-full tm-bg-emotion-warning-background',
         className,
       )}
     >

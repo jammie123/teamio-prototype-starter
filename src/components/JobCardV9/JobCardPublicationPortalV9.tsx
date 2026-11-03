@@ -11,6 +11,8 @@ export interface JobCardPublicationPortalV9Props {
   publication: JobPublication
   tone: JobCardV2Tone
   dateLabel?: string
+  variant?: 'default' | 'badge'
+  showStatusDot?: boolean
 }
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
@@ -130,27 +132,32 @@ export function JobCardPublicationPortalV9({
   publication,
   tone,
   dateLabel,
+  variant = 'default',
+  showStatusDot = true,
 }: JobCardPublicationPortalV9Props) {
-  return (
-    <li
-      data-testid="job-card-publication"
-      className={cn('tm-flex', 'tm-items-center', 'tm-gap-1.5', 'tm-font-normal', 'tm-text-sm')}
-    >
-      <span
-        data-testid="job-card-publication-dot"
-        className={cn('tm-h-1.5', 'tm-w-1.5', 'tm-shrink-0', 'tm-rounded-full', DOT_CLASS[tone])}
-      />
+  const content = (
+    <>
+      {showStatusDot ? (
+        <span
+          data-testid="job-card-publication-dot"
+          className={cn('tm-h-1.5', 'tm-w-1.5', 'tm-shrink-0', 'tm-rounded-full', DOT_CLASS[tone])}
+        />
+      ) : null}
       <HoverDropdown
         dropdownTestId="job-card-publication-dropdown"
         trigger={
           <span
             data-testid="job-card-publication-channel"
             className={cn(
-              'tm-border-0',
-              'tm-border-b',
-              'tm-border-dotted',
-              'tm-border-secondary',
-              CHANNEL_CLASS[tone],
+              variant === 'badge'
+                ? CHANNEL_CLASS[tone]
+                : cn(
+                    'tm-border-0',
+                    'tm-border-b',
+                    'tm-border-dotted',
+                    'tm-border-secondary',
+                    CHANNEL_CLASS[tone],
+                  ),
             )}
           >
             {publication.channel}
@@ -167,6 +174,39 @@ export function JobCardPublicationPortalV9({
           {dateLabel}
         </span>
       ) : null}
+    </>
+  )
+
+  if (variant === 'badge') {
+    return (
+      <span
+        data-testid="job-card-publication"
+        className={cn(
+          'tm-inline-flex',
+          'tm-items-center',
+          'tm-gap-1.5',
+          'tm-rounded-full',
+          'tm-border',
+          'tm-border-solid',
+          'tm-border-secondary',
+          'tm-bg-basic',
+          'tm-px-4',
+          'tm-py-1',
+          'tm-text-sm',
+          'tm-font-normal',
+        )}
+      >
+        {content}
+      </span>
+    )
+  }
+
+  return (
+    <li
+      data-testid="job-card-publication"
+      className={cn('tm-flex', 'tm-items-center', 'tm-gap-1.5', 'tm-font-normal', 'tm-text-sm')}
+    >
+      {content}
     </li>
   )
 }

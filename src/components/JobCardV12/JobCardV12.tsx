@@ -43,7 +43,7 @@ export interface JobCardV12Props
 const ADVERTISEMENT_BAND_CLASS = 'tm-flex tm-flex-col -tm-mb-4'
 const ADVERTISEMENT_ROW_CLASS = '!tm-px-0 !tm-py-5'
 const ADVERTISEMENT_HEADING_CLASS =
-  '!tm-w-[220px] !tm-min-w-[220px] tm-max-w-[220px] tm-flex-col !tm-items-start !tm-gap-x-0 tm-gap-y-0.5 tm-whitespace-normal'
+  '!tm-w-[220px] !tm-min-w-[220px] tm-max-w-[220px] tm-flex-col !tm-items-start !tm-gap-0 tm-whitespace-normal'
 const ADVERTISEMENT_RULE_CLASS =
   'tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-py-5'
 
@@ -267,6 +267,8 @@ export const JobCardV12 = forwardRef<HTMLElement, JobCardV12Props>(function JobC
                       showTitle={showAdvertisementTitle}
                       now={now}
                       onProlong={onExtendAndRepublish}
+                      publicationsInBadges
+                      showPublicationStatusDotsOnlyWhenMixed
                       className={ADVERTISEMENT_ROW_CLASS}
                       headingClassName={ADVERTISEMENT_HEADING_CLASS}
                     />

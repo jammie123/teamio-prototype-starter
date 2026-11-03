@@ -16,6 +16,7 @@ import { JobCardPublicationPortalV9 } from './JobCardPublicationPortalV9'
 import {
   buildJobCardV2AdvertisementModel,
   type JobCardV2AdvertisementModel,
+  type JobCardV2PortalModel,
   type JobCardV2Tone,
 } from '../JobCardV2/jobCardV2Presentation'
 import { buildAdvertiseDisappearanceNotice } from '../JobCardV3/jobCardV3Presentation'
@@ -27,6 +28,14 @@ export interface JobCardAdvertisementV9Props extends StyleProps {
   now?: Date
   onProlong?: () => void
   headingClassName?: string
+  /** Každý portál jako Tag badge místo položky seznamu. */
+  publicationsInBadges?: boolean
+  /** Skrýt tečku stavu, dokud portály nemají různý tón. */
+  showPublicationStatusDotsOnlyWhenMixed?: boolean
+}
+
+function hasMixedPublicationTones(portals: JobCardV2PortalModel[]) {
+  return new Set(portals.map((portal) => portal.tone)).size > 1
 }
 
 const HEADING_WIDTH_CLASS = 'tm-min-w-[160px] tm-shrink-0'
@@ -162,7 +171,7 @@ function splitAdvertisementHeading(heading: string): {
   return { label: heading }
 }
 
-function AdvertisementHeading({
+export function AdvertisementHeading({
   model,
   advertisement,
   className,
@@ -210,7 +219,7 @@ function AdvertisementHeading({
   )
 }
 
-function AdvertisementMeta({ title, viewCount }: { title?: string; viewCount?: number }) {
+export function AdvertisementMeta({ title, viewCount }: { title?: string; viewCount?: number }) {
   if (!title && viewCount === undefined) {
     return null
   }
@@ -243,12 +252,19 @@ export function JobCardAdvertisementV9({
   now,
   onProlong,
   headingClassName,
+  publicationsInBadges = false,
+  showPublicationStatusDotsOnlyWhenMixed = false,
   className,
 }: JobCardAdvertisementV9Props) {
   const model = buildJobCardV2AdvertisementModel(advertisement, now)
   const summary = getAdvertisementSummary(advertisement)
   const visibleTitle = showTitle ? advertisement.title : undefined
   const disappearance = buildAdvertiseDisappearanceNotice(advertisement, now)
+  const showPublicationStatusDots =
+    model.kind === 'empty'
+      ? false
+      : !showPublicationStatusDotsOnlyWhenMixed || hasMixedPublicationTones(model.portals)
+  const PublicationListTag = publicationsInBadges ? 'div' : 'ul'
 
   return (
     <div
@@ -281,8 +297,12 @@ export function JobCardAdvertisementV9({
         />
       )}
       {model.kind === 'empty' ? null : (
-        <ul
-          data-testid="job-card-advertisement-publication-list"
+        <PublicationListTag
+          data-testid={
+            publicationsInBadges
+              ? 'job-card-advertisement-badges'
+              : 'job-card-advertisement-publication-list'
+          }
           className={cn(
             'tm-m-0',
             'tm-flex',
@@ -291,9 +311,8 @@ export function JobCardAdvertisementV9({
             'tm-flex-row',
             'tm-flex-wrap',
             'tm-items-center',
-            'tm-gap-x-6',
-            'tm-gap-y-1.5',
-            'tm-list-none',
+            publicationsInBadges ? 'tm-gap-2' : 'tm-gap-x-6 tm-gap-y-1.5',
+            !publicationsInBadges && 'tm-list-none',
             'tm-p-0',
           )}
         >
@@ -302,6 +321,8 @@ export function JobCardAdvertisementV9({
               <JobCardPublicationPortalV9
                 publication={item.publication}
                 tone={item.tone}
+                variant={publicationsInBadges ? 'badge' : 'default'}
+                showStatusDot={showPublicationStatusDots}
                 dateLabel={
                   item.tone !== 'ended' && item.dateLabel && item.publication.endDate
                     ? `do ${stripYear(item.publication.endDate)}`
@@ -319,7 +340,7 @@ export function JobCardAdvertisementV9({
                   ))}
             </Fragment>
           ))}
-        </ul>
+        </PublicationListTag>
       )}
       {model.kind === 'empty' ? null : (
         <AdvertisementMeta title={visibleTitle} viewCount={summary.viewCount} />

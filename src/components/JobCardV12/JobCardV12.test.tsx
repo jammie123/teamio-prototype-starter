@@ -98,8 +98,14 @@ describe('JobCardV12', () => {
     expect(pipeline.className).toContain('tm-ml-auto')
   })
 
-  it('renders job portals in normal weight', () => {
+  it('renders job portals in badge chips', () => {
     renderJobCard()
+
+    const badges = screen.getByTestId('job-card-advertisement-badges')
+    const publications = within(badges).getAllByTestId('job-card-publication')
+    expect(publications).toHaveLength(3)
+    expect(publications[0].className).toContain('tm-border-secondary')
+    expect(screen.queryByTestId('job-card-publication-dot')).not.toBeInTheDocument()
 
     const channels = screen.getAllByTestId('job-card-publication-channel')
     expect(channels.map((channel) => channel.textContent)).toEqual([
@@ -175,7 +181,7 @@ describe('JobCardV12', () => {
     expect(advertisement.className).not.toContain('tm-rounded')
 
     const heading = within(advertisement).getByTestId('job-card-advertisement-heading')
-    const channels = within(advertisement).getByTestId('job-card-advertisement-publication-list')
+    const channels = within(advertisement).getByTestId('job-card-advertisement-badges')
     const views = within(advertisement).getByTestId('job-card-advertisement-aggregate-views')
 
     expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
@@ -190,14 +196,13 @@ describe('JobCardV12', () => {
     expect(heading.className).toContain('tm-max-w-[220px]')
     expect(heading.className).toContain('tm-flex-col')
     expect(heading.className).toContain('!tm-items-start')
+    expect(heading.className).toContain('!tm-gap-0')
     expect(heading.parentElement).toBe(advertisement)
     expect(channels.parentElement).toBe(advertisement)
     expect(views.parentElement?.parentElement).toBe(advertisement)
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(channels.compareDocumentPosition(views) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(within(channels).getByText('Jobs.cz')).toBeInTheDocument()
-    expect(within(channels).getByText('Prace.cz')).toBeInTheDocument()
-    expect(within(channels).getByText('Kariérní stránky')).toBeInTheDocument()
+    expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
     expect(views).toHaveTextContent(/3\s170 zhlédnutí/)
   })
 
@@ -319,6 +324,7 @@ describe('JobCardV12', () => {
     const prolong = within(advertisement).getByRole('button', { name: 'Prodloužit' })
 
     expect(heading).toHaveTextContent('Končí za 3 dny 1. 9. – 30. 9. 2026')
+    expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background')
     expect(within(heading).getByTestId('job-card-advertisement-heading-date')).toHaveTextContent(
       '1. 9. – 30. 9. 2026',
     )

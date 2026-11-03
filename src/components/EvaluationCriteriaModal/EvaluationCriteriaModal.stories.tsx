@@ -6,7 +6,7 @@ import { sampleEvaluationCriteria } from './fixtures'
 
 const meta = {
   id: 'jobs-evaluationcriteriamodal',
-  title: 'Jobs/EvaluationCriteriaModal',
+  title: 'AI Evaluation/EvaluationCriteriaModal/V1',
   component: EvaluationCriteriaModal,
   args: {
     defaultCriteria: sampleEvaluationCriteria,

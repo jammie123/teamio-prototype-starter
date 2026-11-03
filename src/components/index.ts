@@ -446,6 +446,10 @@ export {
   type EvaluationCriterionPriority,
 } from './EvaluationCriteriaModal'
 export {
+  EvaluationCriteriaModalV2,
+  type EvaluationCriteriaModalV2Props,
+} from './EvaluationCriteriaModalV2'
+export {
   EvaluationCriteriaModalV3,
   type EvaluationCriteriaModalV3Props,
 } from './EvaluationCriteriaModalV3'

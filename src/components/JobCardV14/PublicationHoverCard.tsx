@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
+import { Icon } from '../Icon'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
+import { Link } from '../Link'
 import { formatConversionRate, formatCount } from './lib/format'
 import { formatPublicationRange } from './lib/dates'
 import type { JobPublication } from './types'
@@ -44,6 +46,19 @@ export function PlacementStats({
         </dd>
       </div>
     </dl>
+  )
+}
+
+export function AdvertisementDetailLink({ onClick }: { onClick?: () => void }) {
+  return (
+    <Link
+      className="tm-inline-flex tm-items-center tm-gap-0.5 tm-text-sm"
+      data-testid="job-card-advertisement-detail-link"
+      onClick={onClick}
+    >
+      Detail inzerce
+      <Icon name="chevron-right" className="tm-text-base tm-leading-none" />
+    </Link>
   )
 }
 

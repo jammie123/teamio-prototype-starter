@@ -38,6 +38,7 @@ export interface JobCardV14Props
   actions?: JobCardAction[]
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
+  onAdvertisementDetailClick?: () => void
 }
 
 /** An unpublished job keeps its advertisements, but every portal counts as ended. */
@@ -81,6 +82,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
     onEndPublication,
     onHighlightAdvertisement,
     onTopAdvertisement,
+    onAdvertisementDetailClick,
     now,
     className,
     ...rest
@@ -135,7 +137,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
         ) : null}
         <div
           data-testid="job-card-main"
-          className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-4"
+          className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-2"
         >
           <div
             data-testid="job-card-header-row"
@@ -201,6 +203,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
                       showTitle={showAdvertisementTitle}
                       now={now}
                       onProlong={onExtendAndRepublish}
+                      onAdvertisementDetailClick={onAdvertisementDetailClick}
                     />
                   ))}
                   {collapseToFirstAd ? (

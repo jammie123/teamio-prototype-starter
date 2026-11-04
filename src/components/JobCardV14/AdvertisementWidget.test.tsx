@@ -39,20 +39,25 @@ describe('AdvertisementWidget', () => {
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(advertisement.className).toContain('tm-border-t')
     expect(advertisement.className).toContain('tm-flex-col')
-    expect(advertisement.className).toContain('tm-py-5')
+    expect(advertisement.className).toContain('tm-pt-4')
+    expect(advertisement.className).toContain('tm-pb-5')
     expect(advertisement.className).not.toContain('tm-rounded')
 
     const topRow = within(advertisement).getByTestId('job-card-advertisement-top')
     const heading = within(topRow).getByTestId('job-card-advertisement-heading')
-    const channels = within(advertisement).getByTestId('job-card-advertisement-publications')
-    const views = within(topRow).getByTestId('job-card-advertisement-aggregate-views')
+    const channels = within(topRow).getByTestId('job-card-advertisement-publications')
+    const topRight = within(topRow).getByTestId('job-card-advertisement-top-right')
+    const views = within(topRight).getByTestId('job-card-advertisement-aggregate-views')
+    const detailLink = within(topRight).getByTestId('job-card-advertisement-detail-link')
 
     expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
     expect(topRow.parentElement).toBe(advertisement)
-    expect(heading.parentElement).toBe(topRow)
-    expect(views.parentElement?.parentElement).toBe(topRow)
+    expect(heading.parentElement?.parentElement).toBe(topRow)
+    expect(channels.parentElement).toBe(heading.parentElement)
+    expect(topRight.parentElement).toBe(topRow)
+    expect(views.compareDocumentPosition(detailLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(topRow.className).toContain('tm-justify-between')
-    expect(topRow.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
     expect(views).toHaveTextContent(/3\s170 zhlédnutí/)
   })
@@ -133,7 +138,7 @@ describe('AdvertisementWidget', () => {
 
     expect(heading).toHaveTextContent('Končí za 3 dny 1. 9. – 30. 9. 2026')
     expect(heading.className).toContain('tm-text-emotion-warning-emphasis')
-    expect(heading.parentElement).toBe(topRow)
+    expect(heading.parentElement?.parentElement).toBe(topRow)
     expect(prolong.parentElement).toBe(advertisement)
     expect(advertisement).not.toHaveTextContent('zmizí inzerát')
 
@@ -196,6 +201,15 @@ describe('AdvertisementWidget', () => {
     const highlight = screen.getByTestId('job-card-publication-highlight')
     expect(highlight).toHaveTextContent('+ Jobstip')
     expect(screen.getAllByTestId('job-card-publication-highlight-name')).toHaveLength(1)
+  })
+
+  it('calls onAdvertisementDetailClick from Detail inzerce under the views', async () => {
+    const user = userEvent.setup()
+    const onAdvertisementDetailClick = vi.fn()
+    renderWidget(runningSame, { onAdvertisementDetailClick })
+
+    await user.click(screen.getByTestId('job-card-advertisement-detail-link'))
+    expect(onAdvertisementDetailClick).toHaveBeenCalledOnce()
   })
 
   it('shows the title next to the views when requested', () => {

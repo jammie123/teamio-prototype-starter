@@ -5,6 +5,7 @@ import { Button } from '../Button'
 import { AdvertisementHeader } from './AdvertisementHeader'
 import { buildAdvertisementModel } from './lib/advertisementModel'
 import { formatViewCountLabel } from './lib/format'
+import { AdvertisementDetailLink } from './PublicationHoverCard'
 import { PublicationHighlights, PublicationItem } from './PublicationItem'
 import type { JobAdvertisement } from './types'
 
@@ -15,6 +16,7 @@ export interface AdvertisementWidgetProps extends StyleProps {
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
   onProlong?: () => void
+  onAdvertisementDetailClick?: () => void
 }
 
 function AdvertisementMeta({
@@ -64,6 +66,7 @@ export function AdvertisementWidget({
   showTitle = false,
   now,
   onProlong,
+  onAdvertisementDetailClick,
   className,
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now)
@@ -82,41 +85,54 @@ export function AdvertisementWidget({
         'tm-border-t',
         'tm-border-solid',
         'tm-border-secondary',
-        'tm-py-5',
+        'tm-pt-4',
+        'tm-pb-5',
         className,
       )}
     >
-      <div
-        data-testid="job-card-advertisement-top"
-        className="tm-flex tm-w-full tm-items-start tm-justify-between tm-gap-2"
-      >
+      {isNotPublished ? (
         <AdvertisementHeader {...model.header} />
-        {isNotPublished ? null : (
-          <AdvertisementMeta
-            title={showTitle ? advertisement.title : undefined}
-            viewCount={model.viewCount}
-            className="tm-shrink-0 tm-self-start"
-          />
-        )}
-      </div>
+      ) : (
+        <div
+          data-testid="job-card-advertisement-top"
+          className="tm-flex tm-w-full tm-items-start tm-justify-between tm-gap-2"
+        >
+          <div className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-2">
+            <AdvertisementHeader {...model.header} />
+            <div
+              data-testid="job-card-advertisement-publications"
+              className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-center tm-gap-4 tm-p-0"
+            >
+              {model.publications.map((item) => (
+                <Fragment key={item.publication.id}>
+                  <PublicationItem
+                    publication={item.publication}
+                    status={item.status}
+                    dateLabel={item.dateLabel}
+                    showStatusDot
+                  />
+                  <PublicationHighlights
+                    publication={item.publication}
+                    highlights={item.highlights}
+                  />
+                </Fragment>
+              ))}
+            </div>
+          </div>
+          <div
+            data-testid="job-card-advertisement-top-right"
+            className="tm-flex tm-shrink-0 tm-flex-col tm-items-end tm-gap-1 tm-self-start"
+          >
+            <AdvertisementMeta
+              title={showTitle ? advertisement.title : undefined}
+              viewCount={model.viewCount}
+            />
+            <AdvertisementDetailLink onClick={onAdvertisementDetailClick} />
+          </div>
+        </div>
+      )}
       {isNotPublished ? null : (
         <>
-          <div
-            data-testid="job-card-advertisement-publications"
-            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-center tm-gap-4 tm-p-0"
-          >
-            {model.publications.map((item) => (
-              <Fragment key={item.publication.id}>
-                <PublicationItem
-                  publication={item.publication}
-                  status={item.status}
-                  dateLabel={item.dateLabel}
-                  showStatusDot
-                />
-                <PublicationHighlights publication={item.publication} highlights={item.highlights} />
-              </Fragment>
-            ))}
-          </div>
           {model.canProlong ? (
             <Button
               variant="primary"

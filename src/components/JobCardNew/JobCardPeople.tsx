@@ -70,7 +70,7 @@ export function JobCardPeople({ people, className }: JobCardPeopleProps) {
         className="tm-inline-flex tm-h-8 tm-items-center tm-rounded-full"
       >
         <span
-          className="tm-flex tm-items-center tm-gap-0.5"
+          className="tm-flex tm-items-center tm-gap-0.5 tm-font-medium"
           data-testid={hiringManagers.length ? 'job-card-hiring-managers' : undefined}
         >
           {people.map((person) => (

@@ -144,7 +144,12 @@ export const JobCard = forwardRef<HTMLElement, JobCardProps>(function JobCard(
             <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-4 tm-gap-y-1 tm-text-sm tm-text-secondary-default">
               {owner ? <span data-testid="job-card-owner">{owner}</span> : null}
               {hiringManagers?.length ? (
-                <span data-testid="job-card-hiring-managers">{hiringManagers.join(', ')}</span>
+                <span
+                  data-testid="job-card-hiring-managers"
+                  className="tm-font-medium"
+                >
+                  {hiringManagers.join(', ')}
+                </span>
               ) : null}
             </div>
           ) : null}

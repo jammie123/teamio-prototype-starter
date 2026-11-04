@@ -36,6 +36,7 @@ export interface JobCardV15Props
   actions?: JobCardAction[]
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
+  onViewStatisticsClick?: () => void
   onAdvertisementDetailClick?: () => void
   onAdvertisementPreviewClick?: () => void
 }
@@ -80,6 +81,7 @@ export const JobCardV15 = forwardRef<HTMLElement, JobCardV15Props>(function JobC
     onEndPublication,
     onHighlightAdvertisement,
     onTopAdvertisement,
+    onViewStatisticsClick,
     onAdvertisementDetailClick,
     onAdvertisementPreviewClick,
     now,
@@ -201,6 +203,7 @@ export const JobCardV15 = forwardRef<HTMLElement, JobCardV15Props>(function JobC
                       advertisement={advertisement}
                       now={now}
                       onProlong={onExtendAndRepublish}
+                      onViewStatisticsClick={onViewStatisticsClick}
                       onAdvertisementDetailClick={onAdvertisementDetailClick}
                       onAdvertisementPreviewClick={onAdvertisementPreviewClick}
                     />

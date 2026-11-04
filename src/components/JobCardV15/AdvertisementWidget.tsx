@@ -5,13 +5,14 @@ import { AdvertisementHeader } from '../JobCardV14/AdvertisementHeader'
 import { buildAdvertisementModel } from '../JobCardV14/lib/advertisementModel'
 import { PublicationHighlights, PublicationItem } from '../JobCardV14/PublicationItem'
 import type { JobAdvertisement } from '../JobCardV14/types'
-import { ActionWidget } from './ActionWidget'
+import { AdvertisementAction } from './AdvertisementAction'
 
 export interface AdvertisementWidgetProps extends StyleProps {
   advertisement: JobAdvertisement
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
   onProlong?: () => void
+  onViewStatisticsClick?: () => void
   onAdvertisementDetailClick?: () => void
   onAdvertisementPreviewClick?: () => void
 }
@@ -27,6 +28,7 @@ export function AdvertisementWidget({
   advertisement,
   now,
   onProlong,
+  onViewStatisticsClick,
   onAdvertisementDetailClick,
   onAdvertisementPreviewClick,
   className,
@@ -118,12 +120,13 @@ export function AdvertisementWidget({
               </div>
             )}
           </div>
-          <ActionWidget
+          <AdvertisementAction
             viewCount={model.viewCount}
             showProlong={model.canProlong}
-            onPreview={onAdvertisementPreviewClick}
+            onStatistics={onViewStatisticsClick}
             onDetail={onAdvertisementDetailClick}
             onProlong={onProlong}
+            onPreview={onAdvertisementPreviewClick}
           />
         </div>
       )}

@@ -41,12 +41,12 @@ function renderWidget(advertisement: JobAdvertisement, props = {}) {
 }
 
 describe('AdvertisementWidget (V15)', () => {
-  it('renders meta and action widget in a panel', () => {
+  it('renders meta and advertisement actions in a panel', () => {
     renderWidget(runningSame)
 
     const panel = screen.getByTestId('job-card-advertisement-panel')
     const meta = within(panel).getByTestId('job-card-advertisement-meta')
-    const actionWidget = within(panel).getByTestId('job-card-action-widget')
+    const actions = within(panel).getByTestId('job-card-advertisement-action')
 
     expect(within(meta).getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Běží 1. 1. – 1. 2. 2026',
@@ -54,12 +54,12 @@ describe('AdvertisementWidget (V15)', () => {
     expect(within(meta).getByTestId('job-card-advertisement-channel-summary')).toHaveTextContent(
       'Jobs.cz · Prace.cz · Kariérní stránky',
     )
-    expect(within(actionWidget).getByText('3 170')).toBeInTheDocument()
-    expect(within(actionWidget).getByText('Náhled')).toBeInTheDocument()
-    expect(within(actionWidget).getByText('Detail')).toBeInTheDocument()
+    expect(within(actions).getByText('3 170')).toBeInTheDocument()
+    expect(within(actions).getByText('Detail')).toBeInTheDocument()
+    expect(within(actions).getByText('Náhled')).toBeInTheDocument()
   })
 
-  it('shows Prodloužit in the action widget when ending soon', async () => {
+  it('shows Prodloužit in advertisement actions when ending soon', async () => {
     const user = userEvent.setup()
     const onProlong = vi.fn()
     renderWidget(endingSoon, { onProlong })
@@ -86,15 +86,22 @@ describe('AdvertisementWidget (V15)', () => {
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(2)
   })
 
-  it('calls detail and preview handlers from the action widget', async () => {
+  it('calls statistics, detail and preview handlers from advertisement actions', async () => {
     const user = userEvent.setup()
+    const onViewStatisticsClick = vi.fn()
     const onAdvertisementDetailClick = vi.fn()
     const onAdvertisementPreviewClick = vi.fn()
-    renderWidget(runningSame, { onAdvertisementDetailClick, onAdvertisementPreviewClick })
+    renderWidget(runningSame, {
+      onViewStatisticsClick,
+      onAdvertisementDetailClick,
+      onAdvertisementPreviewClick,
+    })
 
+    await user.click(screen.getByTestId('job-card-advertisement-aggregate-views'))
     await user.click(screen.getByTestId('job-card-advertisement-detail-action'))
     await user.click(screen.getByTestId('job-card-advertisement-preview-action'))
 
+    expect(onViewStatisticsClick).toHaveBeenCalledOnce()
     expect(onAdvertisementDetailClick).toHaveBeenCalledOnce()
     expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
   })

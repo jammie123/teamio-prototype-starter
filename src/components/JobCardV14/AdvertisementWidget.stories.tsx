@@ -17,6 +17,9 @@ const meta = {
   args: {
     advertisement: runningSame,
     onProlong: fn(),
+    onViewStatisticsClick: fn(),
+    onAdvertisementDetailClick: fn(),
+    onAdvertisementPreviewClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -67,6 +70,21 @@ export const WithHighlights: Story = {
 export const WithTitle: Story = {
   name: 'S názvem inzerátu',
   args: { advertisement: { ...runningSame, title: 'Řidič/ka sk. C – hlavní inzerát' }, showTitle: true },
+}
+
+export const InlineActions: Story = {
+  name: 'Inline akce (statistiky + Detail)',
+  args: { actionLayout: 'inline' },
+}
+
+export const ColumnActions: Story = {
+  name: 'Column akce (statistiky nad Detailem o inzerci)',
+  args: { actionLayout: 'column' },
+}
+
+export const ColumnActionsWithProlong: Story = {
+  name: 'Column akce (s Prodloužit)',
+  args: { actionLayout: 'column', advertisement: endingSoonSame, showProlong: true },
 }
 
 export const Overview: Story = {

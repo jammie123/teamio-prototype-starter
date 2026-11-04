@@ -120,13 +120,24 @@ describe('JobCardV14', () => {
     )
     expect(headerRow.compareDocumentPosition(recruitmentNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(recruitmentNote.compareDocumentPosition(advertisement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(advertisement.className).not.toContain('tm-border-t')
   })
 
   it('hides the note when its text is empty', () => {
     renderJobCard({ note: { ...note, text: '   ' } })
 
-    expect(screen.getByTestId('job-card-advertisement')).toBeInTheDocument()
+    const advertisement = screen.getByTestId('job-card-advertisement')
+    expect(advertisement).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
+    expect(advertisement.className).toContain('tm-border-t')
+  })
+
+  it('keeps the top border on later advertisements when a note exists', () => {
+    renderJobCard({ advertisements: [runningSame, { ...endingSoon, id: 'ad-2' }] })
+
+    const advertisements = screen.getAllByTestId('job-card-advertisement')
+    expect(advertisements[0].className).not.toContain('tm-border-t')
+    expect(advertisements[1].className).toContain('tm-border-t')
   })
 
   it('renders the advertisement inside the bottom band', () => {
@@ -151,7 +162,7 @@ describe('JobCardV14', () => {
       'Končí za 3 dny 1. 9. – 30. 9. 2026',
     )
 
-    await user.click(screen.getByRole('button', { name: 'Prodloužit' }))
+    await user.click(screen.getByTestId('job-card-disappearance-prolong'))
     expect(onExtendAndRepublish).toHaveBeenCalledOnce()
   })
 
@@ -159,7 +170,7 @@ describe('JobCardV14', () => {
     renderJobCard({ status: 'unpublished' })
 
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent('Ukončeno')
-    expect(screen.queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
   })
 
   it('hides advertisements for drafts and archived jobs', () => {
@@ -178,6 +189,38 @@ describe('JobCardV14', () => {
     )
     await user.click(screen.getByText('Vytvořit inzerát'))
     expect(onCreateAdvertisement).toHaveBeenCalledOnce()
+  })
+
+  it('can render inline advertisement actions', () => {
+    renderJobCard({ advertisements: [runningSame], advertisementActionLayout: 'inline' })
+
+    expect(screen.getByTestId('job-card-advertisement-action')).toHaveAttribute(
+      'data-layout',
+      'inline',
+    )
+    expect(screen.queryByTestId('job-card-advertisement-preview-action')).not.toBeInTheDocument()
+  })
+
+  it('can render column advertisement actions', () => {
+    renderJobCard({ advertisements: [runningSame], advertisementActionLayout: 'column' })
+
+    expect(screen.getByTestId('job-card-advertisement-action')).toHaveAttribute(
+      'data-layout',
+      'column',
+    )
+    expect(screen.getByTestId('job-card-advertisement-detail-action')).toHaveTextContent(
+      'Detail o inzerci',
+    )
+  })
+
+  it('can show Prodloužit on column advertisement actions', () => {
+    renderJobCard({
+      advertisements: [runningSame],
+      advertisementActionLayout: 'column',
+      showProlong: true,
+    })
+
+    expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveTextContent('Prodloužit')
   })
 
   it('collapses to the first advertisement behind a "show more" link', async () => {

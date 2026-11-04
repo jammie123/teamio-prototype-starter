@@ -1,72 +1,44 @@
 import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { Button } from '../Button'
+import { AdvertisementAction, type AdvertisementActionLayout } from './AdvertisementAction'
 import { AdvertisementHeader } from './AdvertisementHeader'
 import { buildAdvertisementModel } from './lib/advertisementModel'
-import { formatViewCountLabel } from './lib/format'
-import { AdvertisementDetailLink } from './PublicationHoverCard'
 import { PublicationHighlights, PublicationItem } from './PublicationItem'
 import type { JobAdvertisement } from './types'
 
 export interface AdvertisementWidgetProps extends StyleProps {
   advertisement: JobAdvertisement
-  /** Show the advertisement title next to the views. */
+  /** Show the advertisement title next to the status. */
   showTitle?: boolean
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
   onProlong?: () => void
+  /** Override whether Prodloužit is shown. Defaults to the advertisement model. */
+  showProlong?: boolean
+  onViewStatisticsClick?: () => void
   onAdvertisementDetailClick?: () => void
-}
-
-function AdvertisementMeta({
-  title,
-  viewCount,
-  className,
-}: StyleProps & { title?: string; viewCount?: number }) {
-  if (!title && viewCount === undefined) {
-    return null
-  }
-
-  return (
-    <div
-      className={cn(
-        'tm-flex tm-shrink-0 tm-items-baseline tm-gap-2 tm-whitespace-nowrap tm-text-xs tm-text-secondary-default',
-        className,
-      )}
-    >
-      {title ? (
-        <span
-          data-testid="job-card-advertisement-title"
-          className="tm-max-w-48 tm-truncate tm-font-normal"
-        >
-          {title}
-        </span>
-      ) : null}
-      {title && viewCount !== undefined ? (
-        <span data-testid="job-card-advertisement-title-separator" aria-hidden>
-          ·
-        </span>
-      ) : null}
-      {viewCount === undefined ? null : (
-        <span data-testid="job-card-advertisement-aggregate-views">
-          {formatViewCountLabel(viewCount)}
-        </span>
-      )}
-    </div>
-  )
+  onAdvertisementPreviewClick?: () => void
+  actionLayout?: AdvertisementActionLayout
+  /** Drop the top divider, e.g. when a JobNote already sits above. */
+  hideTopBorder?: boolean
 }
 
 /**
- * Advertisement block of a job card: status header with views on the right, then
- * portal rows (with Jobstip / Topováno highlights) and "Prodloužit" when it ends soon.
+ * Advertisement block of a job card: status and portals on the left,
+ * AdvertisementAction (stats, Detail, optional Prodloužit, Náhled) on the right.
  */
 export function AdvertisementWidget({
   advertisement,
   showTitle = false,
   now,
   onProlong,
+  showProlong,
+  onViewStatisticsClick,
   onAdvertisementDetailClick,
+  onAdvertisementPreviewClick,
+  actionLayout,
+  hideTopBorder = false,
   className,
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now)
@@ -82,10 +54,10 @@ export function AdvertisementWidget({
         'tm-items-start',
         'tm-gap-2',
         'tm-border-0',
-        'tm-border-t',
+        !hideTopBorder && 'tm-border-t',
         'tm-border-solid',
         'tm-border-secondary',
-        'tm-pt-4',
+        'tm-pt-1',
         'tm-pb-5',
         className,
       )}
@@ -95,9 +67,17 @@ export function AdvertisementWidget({
       ) : (
         <div
           data-testid="job-card-advertisement-top"
-          className="tm-flex tm-w-full tm-items-start tm-justify-between tm-gap-2"
+          className="tm-flex tm-w-full tm-items-center tm-justify-between tm-gap-2"
         >
-          <div className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-2">
+          <div className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-justify-center tm-gap-2">
+            {showTitle && advertisement.title ? (
+              <span
+                data-testid="job-card-advertisement-title"
+                className="tm-max-w-48 tm-truncate tm-text-xs tm-font-normal tm-text-secondary-default"
+              >
+                {advertisement.title}
+              </span>
+            ) : null}
             <AdvertisementHeader {...model.header} />
             <div
               data-testid="job-card-advertisement-publications"
@@ -119,36 +99,16 @@ export function AdvertisementWidget({
               ))}
             </div>
           </div>
-          <div
-            data-testid="job-card-advertisement-top-right"
-            className="tm-flex tm-shrink-0 tm-flex-col tm-items-end tm-gap-1 tm-self-start"
-          >
-            <AdvertisementMeta
-              title={showTitle ? advertisement.title : undefined}
-              viewCount={model.viewCount}
-            />
-            <AdvertisementDetailLink onClick={onAdvertisementDetailClick} />
-          </div>
+          <AdvertisementAction
+            viewCount={model.viewCount}
+            showProlong={showProlong ?? model.canProlong}
+            layout={actionLayout}
+            onStatistics={onViewStatisticsClick}
+            onDetail={onAdvertisementDetailClick}
+            onProlong={onProlong}
+            onPreview={onAdvertisementPreviewClick}
+          />
         </div>
-      )}
-      {isNotPublished ? null : (
-        <>
-          {model.canProlong ? (
-            <Button
-              variant="primary"
-              size="small"
-              className="!tm-min-h-8 !tm-shrink-0 !tm-px-4"
-              data-testid="job-card-disappearance-prolong"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                onProlong?.()
-              }}
-            >
-              Prodloužit
-            </Button>
-          ) : null}
-        </>
       )}
     </div>
   )

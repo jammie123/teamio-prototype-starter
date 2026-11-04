@@ -38,7 +38,9 @@ const meta = {
     advertisements: [runningSame],
     note: recruitmentNote,
     onExpandNote: fn(),
+    onViewStatisticsClick: fn(),
     onAdvertisementDetailClick: fn(),
+    onAdvertisementPreviewClick: fn(),
     ...menuHandlers,
   },
   decorators: [
@@ -140,4 +142,19 @@ export const NoAdvertisement: Story = {
 export const Unpublished: Story = {
   name: 'Nezveřejněný nábor',
   args: { status: 'unpublished', advertisements: [runningSame] },
+}
+
+export const InlineAdvertisementActions: Story = {
+  name: 'Inline akce inzerátu (statistiky + Detail)',
+  args: { advertisementActionLayout: 'inline' },
+}
+
+export const ColumnAdvertisementActions: Story = {
+  name: 'Column akce inzerátu (statistiky nad Detailem o inzerci)',
+  args: { advertisementActionLayout: 'column' },
+}
+
+export const ColumnAdvertisementActionsWithProlong: Story = {
+  name: 'Column akce inzerátu (s Prodloužit)',
+  args: { advertisementActionLayout: 'column', advertisements: [endingSoonSame], showProlong: true },
 }

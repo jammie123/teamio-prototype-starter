@@ -29,37 +29,50 @@ const endingSoon: JobAdvertisement = {
 }
 
 function renderWidget(advertisement: JobAdvertisement, props = {}) {
-  return render(<AdvertisementWidget advertisement={advertisement} now={now} {...props} />)
+  return render(
+    <AdvertisementWidget
+      advertisement={advertisement}
+      now={now}
+      onAdvertisementPreviewClick={vi.fn()}
+      onAdvertisementDetailClick={vi.fn()}
+      {...props}
+    />,
+  )
 }
 
 describe('AdvertisementWidget', () => {
-  it('puts status and views on the top row, portals below', () => {
+  it('puts status and portals on the left and advertisement actions on the right', () => {
     renderWidget(runningSame)
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(advertisement.className).toContain('tm-border-t')
     expect(advertisement.className).toContain('tm-flex-col')
-    expect(advertisement.className).toContain('tm-pt-4')
+    expect(advertisement.className).toContain('tm-pt-3')
     expect(advertisement.className).toContain('tm-pb-5')
     expect(advertisement.className).not.toContain('tm-rounded')
 
     const topRow = within(advertisement).getByTestId('job-card-advertisement-top')
     const heading = within(topRow).getByTestId('job-card-advertisement-heading')
     const channels = within(topRow).getByTestId('job-card-advertisement-publications')
-    const topRight = within(topRow).getByTestId('job-card-advertisement-top-right')
-    const views = within(topRight).getByTestId('job-card-advertisement-aggregate-views')
-    const detailLink = within(topRight).getByTestId('job-card-advertisement-detail-link')
+    const actions = within(topRow).getByTestId('job-card-advertisement-action')
 
     expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
     expect(topRow.parentElement).toBe(advertisement)
     expect(heading.parentElement?.parentElement).toBe(topRow)
     expect(channels.parentElement).toBe(heading.parentElement)
-    expect(topRight.parentElement).toBe(topRow)
-    expect(views.compareDocumentPosition(detailLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(actions.parentElement).toBe(topRow)
     expect(topRow.className).toContain('tm-justify-between')
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
-    expect(views).toHaveTextContent(/3\s170 zhlédnutí/)
+    expect(within(actions).getByText('3 170')).toBeInTheDocument()
+    expect(within(actions).getByText('Detail')).toBeInTheDocument()
+    expect(within(actions).getByText('Náhled')).toBeInTheDocument()
+  })
+
+  it('can drop the top border', () => {
+    renderWidget(runningSame, { hideTopBorder: true })
+
+    expect(screen.getByTestId('job-card-advertisement').className).not.toContain('tm-border-t')
   })
 
   it('renders each portal with a status dot and dotted underline', () => {
@@ -126,7 +139,7 @@ describe('AdvertisementWidget', () => {
     expect(advertisement.className).toContain('tm-flex-col')
   })
 
-  it('puts Prodloužit below portals when an advertisement ends soon', async () => {
+  it('shows Prodloužit in advertisement actions when an advertisement ends soon', async () => {
     const user = userEvent.setup()
     const onProlong = vi.fn()
     renderWidget(endingSoon, { onProlong })
@@ -134,12 +147,12 @@ describe('AdvertisementWidget', () => {
     const advertisement = screen.getByTestId('job-card-advertisement')
     const topRow = within(advertisement).getByTestId('job-card-advertisement-top')
     const heading = within(topRow).getByTestId('job-card-advertisement-heading')
-    const prolong = within(advertisement).getByRole('button', { name: 'Prodloužit' })
+    const prolong = within(advertisement).getByTestId('job-card-disappearance-prolong')
 
     expect(heading).toHaveTextContent('Končí za 3 dny 1. 9. – 30. 9. 2026')
     expect(heading.className).toContain('tm-text-emotion-warning-emphasis')
     expect(heading.parentElement?.parentElement).toBe(topRow)
-    expect(prolong.parentElement).toBe(advertisement)
+    expect(prolong.parentElement).toBe(screen.getByTestId('job-card-advertisement-action'))
     expect(advertisement).not.toHaveTextContent('zmizí inzerát')
 
     await user.click(prolong)
@@ -170,7 +183,7 @@ describe('AdvertisementWidget', () => {
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Ukončeno 1. 8. – 15. 8. 2026',
     )
-    expect(screen.queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
     expect(screen.queryByText(/ukončeno 15\. 8\./)).not.toBeInTheDocument()
   })
 
@@ -203,19 +216,65 @@ describe('AdvertisementWidget', () => {
     expect(screen.getAllByTestId('job-card-publication-highlight-name')).toHaveLength(1)
   })
 
-  it('calls onAdvertisementDetailClick from Detail inzerce under the views', async () => {
+  it('calls statistics, detail and preview handlers from advertisement actions', async () => {
     const user = userEvent.setup()
+    const onViewStatisticsClick = vi.fn()
     const onAdvertisementDetailClick = vi.fn()
-    renderWidget(runningSame, { onAdvertisementDetailClick })
+    const onAdvertisementPreviewClick = vi.fn()
+    renderWidget(runningSame, {
+      onViewStatisticsClick,
+      onAdvertisementDetailClick,
+      onAdvertisementPreviewClick,
+    })
 
-    await user.click(screen.getByTestId('job-card-advertisement-detail-link'))
+    await user.click(screen.getByTestId('job-card-advertisement-aggregate-views'))
+    await user.click(screen.getByTestId('job-card-advertisement-detail-action'))
+    await user.click(screen.getByTestId('job-card-advertisement-preview-action'))
+
+    expect(onViewStatisticsClick).toHaveBeenCalledOnce()
     expect(onAdvertisementDetailClick).toHaveBeenCalledOnce()
+    expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
   })
 
-  it('shows the title next to the views when requested', () => {
+  it('can render inline stats + Detail actions', () => {
+    renderWidget(runningSame, { actionLayout: 'inline' })
+
+    expect(screen.getByTestId('job-card-advertisement-action')).toHaveAttribute(
+      'data-layout',
+      'inline',
+    )
+    expect(screen.getByTestId('job-card-advertisement-aggregate-views')).toBeInTheDocument()
+    expect(screen.getByTestId('job-card-advertisement-detail-action')).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-preview-action')).not.toBeInTheDocument()
+  })
+
+  it('can render column stats above Detail o inzerci', () => {
+    renderWidget(runningSame, { actionLayout: 'column' })
+
+    expect(screen.getByTestId('job-card-advertisement-action')).toHaveAttribute(
+      'data-layout',
+      'column',
+    )
+    expect(screen.getByTestId('job-card-advertisement-detail-action')).toHaveTextContent(
+      'Detail o inzerci',
+    )
+  })
+
+  it('can force Prodloužit on in the column layout', () => {
+    renderWidget(runningSame, { actionLayout: 'column', showProlong: true })
+
+    expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveTextContent('Prodloužit')
+  })
+
+  it('can hide Prodloužit even when the advertisement ends soon', () => {
+    renderWidget(endingSoon, { actionLayout: 'column', showProlong: false })
+
+    expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
+  })
+
+  it('shows the title above the status when requested', () => {
     renderWidget({ ...runningSame, title: 'Hlavní inzerát' }, { showTitle: true })
 
     expect(screen.getByTestId('job-card-advertisement-title')).toHaveTextContent('Hlavní inzerát')
-    expect(screen.getByTestId('job-card-advertisement-title-separator')).toBeInTheDocument()
   })
 })

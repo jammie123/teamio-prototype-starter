@@ -1,15 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
-import { ActionWidget } from './ActionWidget'
+import { AdvertisementAction } from './AdvertisementAction'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV15/ActionWidget',
-  component: ActionWidget,
+  title: 'Jobs/Job Cards Variant/JobCardV16/AdvertisementAction',
+  component: AdvertisementAction,
   args: {
     viewCount: 2610,
-    onPreview: fn(),
+    onStatistics: fn(),
     onDetail: fn(),
     onProlong: fn(),
+    onPreview: fn(),
   },
   decorators: [
     (Story) => (
@@ -18,17 +19,22 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof ActionWidget>
+} satisfies Meta<typeof AdvertisementAction>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Running: Story = {
-  name: 'Běží (bez Prodloužit)',
+  name: 'Běží (statistiky, Detail, Náhled)',
   args: { showProlong: false },
 }
 
 export const EndingSoon: Story = {
   name: 'Brzy končí (s Prodloužit)',
   args: { showProlong: true },
+}
+
+export const WithoutStatistics: Story = {
+  name: 'Bez statistik',
+  args: { viewCount: undefined, showProlong: false },
 }

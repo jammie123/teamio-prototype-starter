@@ -27,6 +27,17 @@ describe('Icon', () => {
     expect(ref.current).toHaveClass('tm-text-xl')
   })
 
+  it('renders the custom calendar-clock stroke icon', () => {
+    render(<Icon name="calendar-clock" title="Prodloužit" />)
+    const wrapper = screen.getByTestId('icon')
+    expect(wrapper).toHaveAttribute('data-icon-name', 'calendar-clock')
+    expect(wrapper).not.toHaveAttribute('data-icon-fallback')
+    const svg = wrapper.querySelector('svg')
+    expect(svg).toHaveClass('tm-stroke-current')
+    expect(svg).not.toHaveClass('lucide-calendar')
+    expect(screen.getByRole('img', { name: 'Prodloužit' })).toBeInTheDocument()
+  })
+
   it('applies current-color stroke class on the Lucide SVG', () => {
     render(<Icon name="plus" />)
     const svg = screen.getByTestId('icon').querySelector('svg')

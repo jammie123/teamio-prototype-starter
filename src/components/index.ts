@@ -246,22 +246,38 @@ export {
 } from './JobCardV13'
 export {
   JobCardV14,
+  AdvertisementAction as JobCardV14AdvertisementAction,
+  AdvertisementWidget as JobCardV14AdvertisementWidget,
   type JobCardV14Props,
+  type AdvertisementActionLayout as JobCardV14AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV14AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV14AdvertisementWidgetProps,
   type JobCardCandidates as JobCardV14Candidates,
   type JobCandidateStat as JobCardV14CandidateStat,
   type JobCardNote as JobCardV14Note,
 } from './JobCardV14'
 export {
   JobCardV15,
-  ActionWidget as JobCardV15ActionWidget,
+  AdvertisementAction as JobCardV15AdvertisementAction,
   AdvertisementWidget as JobCardV15AdvertisementWidget,
   type JobCardV15Props,
-  type ActionWidgetProps as JobCardV15ActionWidgetProps,
+  type AdvertisementActionProps as JobCardV15AdvertisementActionProps,
   type AdvertisementWidgetProps as JobCardV15AdvertisementWidgetProps,
   type JobCardCandidates as JobCardV15Candidates,
   type JobCandidateStat as JobCardV15CandidateStat,
   type JobCardNote as JobCardV15Note,
 } from './JobCardV15'
+export {
+  JobCardV16,
+  AdvertisementAction as JobCardV16AdvertisementAction,
+  AdvertisementWidget as JobCardV16AdvertisementWidget,
+  type JobCardV16Props,
+  type AdvertisementActionProps as JobCardV16AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV16AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV16Candidates,
+  type JobCandidateStat as JobCardV16CandidateStat,
+  type JobCardNote as JobCardV16Note,
+} from './JobCardV16'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

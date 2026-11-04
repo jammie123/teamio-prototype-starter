@@ -31,7 +31,6 @@ export function AdvertisementHeader({
       className={cn(
         'tm-flex',
         'tm-min-w-0',
-        'tm-flex-1',
         'tm-flex-row',
         'tm-flex-wrap',
         'tm-items-baseline',

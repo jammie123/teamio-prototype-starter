@@ -53,6 +53,7 @@ import type { StyleProps } from '../../lib/types'
 import {
   AdvertisementPreviewIcon,
   AlertTriangleOutlineIcon,
+  CalendarClockIcon,
   CandidateMoveIcon,
   ClockIcon,
   OpalIcon,
@@ -92,6 +93,7 @@ const iconMap = {
   briefcase: Briefcase,
   database: Database,
   calendar: Calendar,
+  'calendar-clock': CalendarClockIcon,
   'bar-chart': BarChart3,
   mail: Mail,
   notification: Bell,

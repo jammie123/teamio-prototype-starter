@@ -3,6 +3,7 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
 import { Link } from '../Link'
+import type { AdvertisementActionLayout } from './AdvertisementAction'
 import { AdvertisementWidget } from './AdvertisementWidget'
 import { JobAssignee } from './JobAssignee'
 import { JobCardActions } from './JobCardActions'
@@ -39,6 +40,9 @@ export interface JobCardV14Props
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
   onAdvertisementDetailClick?: () => void
+  advertisementActionLayout?: AdvertisementActionLayout
+  /** Override whether Prodloužit is shown on advertisement actions. */
+  showProlong?: boolean
 }
 
 /** An unpublished job keeps its advertisements, but every portal counts as ended. */
@@ -83,6 +87,8 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
     onHighlightAdvertisement,
     onTopAdvertisement,
     onAdvertisementDetailClick,
+    advertisementActionLayout,
+    showProlong,
     now,
     className,
     ...rest
@@ -113,6 +119,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
     ? shownAdvertisements.slice(0, 1)
     : shownAdvertisements
   const additionalAdvertisementsCount = shownAdvertisements.length - 1
+  const hasNote = Boolean(note?.text.trim())
 
   return (
     <Card
@@ -181,7 +188,12 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
               className="tm-flex tm-flex-col -tm-mb-4"
             >
               {shownAdvertisements.length === 0 ? (
-                <div className="tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-py-5">
+                <div
+                  className={cn(
+                    'tm-border-0 tm-border-solid tm-border-secondary tm-py-5',
+                    !hasNote && 'tm-border-t',
+                  )}
+                >
                   <div
                     data-testid="job-card-no-advertisement"
                     className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
@@ -196,7 +208,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
                 </div>
               ) : (
                 <>
-                  {visibleAdvertisements.map((advertisement) => (
+                  {visibleAdvertisements.map((advertisement, index) => (
                     <AdvertisementWidget
                       key={`${advertisement.id}-${status}`}
                       advertisement={advertisement}
@@ -204,6 +216,9 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
                       now={now}
                       onProlong={onExtendAndRepublish}
                       onAdvertisementDetailClick={onAdvertisementDetailClick}
+                      actionLayout={advertisementActionLayout}
+                      showProlong={showProlong}
+                      hideTopBorder={hasNote && index === 0}
                     />
                   ))}
                   {collapseToFirstAd ? (

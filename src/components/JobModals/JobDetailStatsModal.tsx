@@ -14,7 +14,6 @@ import {
   ModalTrigger,
   type ModalProps,
 } from '../Modal'
-import { Select } from '../Select'
 import { Skeleton } from '../Skeleton'
 import { Spinner } from '../Spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table'
@@ -23,11 +22,11 @@ import {
   type JobDetailStatsHiddenSeries,
   type JobDetailStatsSeriesKey,
 } from './JobDetailStatsChart'
-import { JOB_DETAIL_STATS_COPY, JOB_DETAIL_STATS_PERIOD_LABELS } from './jobDetailStatsCopy'
+import { JOB_DETAIL_STATS_COPY } from './jobDetailStatsCopy'
 import { JOB_MODAL_CLOSE_ARIA_LABEL } from './JobModalFrame'
+import { JobDetailStatsPeriodHeader } from './JobDetailStatsPeriodHeader'
 import {
-  formatJobDetailStatsPublicationRange,
-  JOB_DETAIL_STATS_PERIODS,
+  sumJobDetailStatsPlaces,
   type JobDetailStatsPeriod,
   type JobDetailStatsSummary,
   type JobDetailStatsTimeSeriesPoint,
@@ -111,12 +110,17 @@ export function JobDetailStatsModal({
     status === 'empty' || (status === 'ready' && series.length === 0 && !showContentLoading)
   const showChart = status === 'ready' && !isEmpty && !showInitialLoading
   const showError = status === 'error'
+  const tableTotals =
+    summary && summary.places.length > 0 ? sumJobDetailStatsPlaces(summary.places) : null
 
   return (
     <Modal open={open} defaultOpen={defaultOpen} onOpenChange={handleOpenChange}>
       {trigger ? <ModalTrigger asChild>{trigger}</ModalTrigger> : null}
       <ModalContent size="wide" className={className} data-testid="job-detail-stats-modal">
-        <ModalTitle className="tm-text-2xl">{JOB_DETAIL_STATS_COPY.title}</ModalTitle>
+        <ModalTitle className="tm-pb-2 tm-text-2xl">{JOB_DETAIL_STATS_COPY.title}</ModalTitle>
+        <div className="tm-px-6 tm-pr-14 tm-pb-4">
+          <JobDetailStatsPeriodHeader period={period} onPeriodChange={handlePeriodChange} />
+        </div>
         <ModalClose aria-label={JOB_MODAL_CLOSE_ARIA_LABEL} />
         <ModalBody
           className="tm-flex tm-min-h-0 tm-flex-col tm-gap-8 tm-pb-8"
@@ -126,29 +130,6 @@ export function JobDetailStatsModal({
             aria-label="Statistický widget"
             className="tm-flex tm-flex-col tm-gap-4 tm-rounded-lg tm-border tm-border-secondary tm-p-4 md:tm-p-5"
           >
-            <div className="tm-flex tm-flex-wrap tm-items-end tm-justify-between tm-gap-4">
-              <label className="tm-flex tm-flex-col tm-gap-2 tm-text-sm">
-                <span className="tm-font-semibold tm-text-primary-default">
-                  {JOB_DETAIL_STATS_COPY.periodLabel}
-                </span>
-                <Select
-                  aria-label={JOB_DETAIL_STATS_COPY.periodLabel}
-                  className="tm-w-auto tm-min-w-[240px]"
-                  value={period}
-                  onChange={(event) =>
-                    handlePeriodChange(event.target.value as JobDetailStatsPeriod)
-                  }
-                  data-testid="job-detail-stats-period-select"
-                >
-                  {JOB_DETAIL_STATS_PERIODS.map((option) => (
-                    <option key={option} value={option}>
-                      {JOB_DETAIL_STATS_PERIOD_LABELS[option]}
-                    </option>
-                  ))}
-                </Select>
-              </label>
-            </div>
-
             <div className="tm-relative tm-min-h-[220px] tm-overflow-visible">
               {showError ? (
                 <Alert variant="error">
@@ -206,15 +187,9 @@ export function JobDetailStatsModal({
           </section>
 
           <section
-            aria-labelledby="job-detail-stats-table-heading"
+            aria-label={JOB_DETAIL_STATS_COPY.tableAriaLabel}
             className="tm-flex tm-flex-col tm-gap-2"
           >
-            <h3
-              id="job-detail-stats-table-heading"
-              className="tm-m-0 tm-text-sm tm-font-semibold tm-text-primary-default"
-            >
-              {JOB_DETAIL_STATS_COPY.tableSectionTitle}
-            </h3>
             {jobTitle ? (
               <p
                 className="tm-m-0 tm-text-sm tm-font-medium tm-text-primary-default"
@@ -232,10 +207,9 @@ export function JobDetailStatsModal({
                   className="tm-w-full tm-table-fixed tm-text-sm"
                 >
                   <colgroup>
-                    <col className="tm-w-[26%]" />
-                    <col className="tm-w-[34%]" />
-                    <col className="tm-w-[20%]" />
-                    <col className="tm-w-[20%]" />
+                    <col className="tm-w-[44%]" />
+                    <col className="tm-w-[28%]" />
+                    <col className="tm-w-[28%]" />
                   </colgroup>
                   <TableHead>
                     <TableRow>
@@ -244,12 +218,6 @@ export function JobDetailStatsModal({
                         className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium !tm-border-b-0"
                       >
                         {JOB_DETAIL_STATS_COPY.columns.place}
-                      </TableHeader>
-                      <TableHeader
-                        scope="col"
-                        className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium !tm-border-b-0 tm-whitespace-nowrap"
-                      >
-                        {JOB_DETAIL_STATS_COPY.columns.publication}
                       </TableHeader>
                       <TableHeader
                         scope="col"
@@ -266,51 +234,43 @@ export function JobDetailStatsModal({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {summary.places.map((place, index) => {
-                      const isLast = index === summary.places.length - 1
-                      const cellClass = cn('tm-px-2 tm-py-1.5', isLast && '!tm-border-b-0')
-
-                      return (
-                        <TableRow key={place.id}>
-                          <TableCell className={cellClass}>
-                            <span className="tm-inline-flex tm-min-w-0 tm-items-center tm-gap-2">
-                              <JobPortalLogo
-                                type={place.logoType ?? jobPortalLogoTypeFromChannel(place.placeName)}
-                                title=""
-                                className="tm-size-5 tm-shrink-0"
-                              />
-                              <span className="tm-min-w-0 tm-truncate tm-text-sm tm-font-medium tm-leading-tight tm-text-primary-default">
-                                {place.placeName}
-                              </span>
+                    {summary.places.map((place) => (
+                      <TableRow key={place.id}>
+                        <TableCell className="tm-px-2 tm-py-1.5">
+                          <span className="tm-inline-flex tm-min-w-0 tm-items-center tm-gap-2">
+                            <JobPortalLogo
+                              type={
+                                place.logoType ?? jobPortalLogoTypeFromChannel(place.placeName)
+                              }
+                              title=""
+                              className="tm-size-5 tm-shrink-0"
+                            />
+                            <span className="tm-min-w-0 tm-truncate tm-text-sm tm-font-medium tm-leading-tight tm-text-primary-default">
+                              {place.placeName}
                             </span>
-                          </TableCell>
-                          <TableCell
-                            className={cn(
-                              cellClass,
-                              'tm-text-13 tm-tabular-nums tm-whitespace-nowrap tm-text-secondary-default',
-                            )}
-                          >
-                            {formatJobDetailStatsPublicationRange(place.startDate, place.endDate)}
-                          </TableCell>
-                          <TableCell
-                            className={cn(
-                              cellClass,
-                              'tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default',
-                            )}
-                          >
-                            {formatCount(place.views)}
-                          </TableCell>
-                          <TableCell
-                            className={cn(
-                              cellClass,
-                              'tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default',
-                            )}
-                          >
-                            {formatCount(place.reactions)}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
+                          </span>
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default">
+                          {formatCount(place.views)}
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default">
+                          {formatCount(place.reactions)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {tableTotals ? (
+                      <TableRow data-testid="job-detail-stats-table-total">
+                        <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-sm tm-font-semibold tm-text-primary-default">
+                          {JOB_DETAIL_STATS_COPY.columns.total}
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-13 tm-font-semibold tm-tabular-nums tm-text-right tm-text-primary-default">
+                          {formatCount(tableTotals.views)}
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-13 tm-font-semibold tm-tabular-nums tm-text-right tm-text-primary-default">
+                          {formatCount(tableTotals.reactions)}
+                        </TableCell>
+                      </TableRow>
+                    ) : null}
                   </TableBody>
                 </Table>
               ) : null}

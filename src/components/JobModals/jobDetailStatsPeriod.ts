@@ -2,23 +2,32 @@ import type { JobPortalLogoType } from '../JobPortalLogo'
 
 export type JobDetailStatsPeriod = 'sincePublication' | 'last6Months' | 'lastMonth'
 
+export interface JobDetailStatsTimeSeriesByPlace {
+  placeId: string
+  placeName: string
+  views: number
+  reactions: number
+  logoType?: JobPortalLogoType
+}
+
 export interface JobDetailStatsTimeSeriesPoint {
   date: string
   views: number
   reactions: number
+  byPlace: JobDetailStatsTimeSeriesByPlace[]
 }
 
 export interface JobDetailStatsPublicationRow {
   id: string
   placeName: string
-  startDate: string
-  endDate: string
   views: number
   reactions: number
   logoType?: JobPortalLogoType
 }
 
 export interface JobDetailStatsSummary {
+  periodStartDate: string
+  periodEndDate: string
   places: JobDetailStatsPublicationRow[]
 }
 
@@ -97,6 +106,16 @@ export function filterSeriesByRange(
   const startIso = toDateOnlyIso(range.start)
   const endIso = toDateOnlyIso(range.end)
   return series.filter((point) => point.date >= startIso && point.date <= endIso)
+}
+
+export function sumJobDetailStatsPlaces(places: JobDetailStatsPublicationRow[]) {
+  return places.reduce(
+    (acc, place) => ({
+      views: acc.views + place.views,
+      reactions: acc.reactions + place.reactions,
+    }),
+    { views: 0, reactions: 0 },
+  )
 }
 
 const chartAxisDateFormatter = new Intl.DateTimeFormat('cs-CZ', {

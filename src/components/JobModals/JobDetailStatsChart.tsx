@@ -2,11 +2,12 @@ import { useCallback, useId, useMemo, useState, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../lib/cn'
 import { formatCount } from '../JobCard/formatCount'
+import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { JOB_DETAIL_STATS_COPY } from './jobDetailStatsCopy'
 import { formatJobDetailStatsChartDate, type JobDetailStatsTimeSeriesPoint } from './jobDetailStatsPeriod'
 
 /** Matches theme purple.500 and brand-blue.600 from src/styles/colors.js */
-const CHART_STROKE = {
+export const JOB_DETAIL_STATS_CHART_STROKE = {
   views: '#a866ff',
   reactions: '#0087d6',
 } as const
@@ -63,6 +64,12 @@ function yForValue(value: number, max: number, bottom: number, top: number): num
   return bottom - ratio * (bottom - top)
 }
 
+function indexToPlotX(index: number, seriesLength: number): number {
+  const width = PLOT.right - PLOT.left
+  const lastIndex = Math.max(seriesLength - 1, 1)
+  return PLOT.left + (index / lastIndex) * width
+}
+
 function pointsToPolyline(
   series: JobDetailStatsTimeSeriesPoint[],
   valueKey: 'views' | 'reactions',
@@ -84,8 +91,33 @@ function pointsToPolyline(
 
 interface TooltipState {
   index: number
-  clientX: number
-  clientY: number
+  anchorLeft: number
+  anchorTop: number
+}
+
+function ChartLegendLine({
+  color,
+  dashed = false,
+  width = 20,
+}: {
+  color: string
+  dashed?: boolean
+  width?: number
+}) {
+  return (
+    <svg width={width} height={8} aria-hidden="true" className="tm-shrink-0">
+      <line
+        x1={0}
+        y1={4}
+        x2={width}
+        y2={4}
+        stroke={color}
+        strokeWidth={3}
+        strokeLinecap="round"
+        strokeDasharray={dashed ? '6 5' : undefined}
+      />
+    </svg>
+  )
 }
 
 export function JobDetailStatsChart({
@@ -124,14 +156,11 @@ export function JobDetailStatsChart({
     return indices
   }, [series.length])
 
-  const updateTooltipFromEvent = useCallback(
+  const resolveIndexFromEvent = useCallback(
     (event: MouseEvent<SVGRectElement>) => {
-      if (series.length === 0) {
-        return
-      }
       const svg = event.currentTarget.ownerSVGElement
-      if (!svg) {
-        return
+      if (!svg || series.length === 0) {
+        return null
       }
       const rect = svg.getBoundingClientRect()
       const relativeX = ((event.clientX - rect.left) / rect.width) * VIEWBOX.width
@@ -139,16 +168,25 @@ export function JobDetailStatsChart({
       const clamped = Math.min(Math.max(relativeX - PLOT.left, 0), plotWidth)
       const index =
         series.length === 1 ? 0 : Math.round((clamped / plotWidth) * (series.length - 1))
-      setTooltip({
-        index,
-        clientX: event.clientX,
-        clientY: event.clientY,
-      })
+      const xView = indexToPlotX(index, series.length)
+      const anchorLeft = rect.left + (xView / VIEWBOX.width) * rect.width
+      return { index, anchorLeft, anchorTop: rect.top }
     },
     [series.length],
   )
 
+  const updateTooltipFromEvent = useCallback(
+    (event: MouseEvent<SVGRectElement>) => {
+      const next = resolveIndexFromEvent(event)
+      if (next) {
+        setTooltip(next)
+      }
+    },
+    [resolveIndexFromEvent],
+  )
+
   const activePoint = tooltip != null ? series[tooltip.index] : null
+  const crosshairX = tooltip != null ? indexToPlotX(tooltip.index, series.length) : null
 
   return (
     <div className={cn('tm-flex tm-flex-col tm-gap-4', className)}>
@@ -161,7 +199,7 @@ export function JobDetailStatsChart({
         <LegendToggle
           seriesKey="views"
           label={JOB_DETAIL_STATS_COPY.legend.views}
-          color={CHART_STROKE.views}
+          color={JOB_DETAIL_STATS_CHART_STROKE.views}
           dashed={false}
           hidden={hiddenSeries.views}
           onToggle={() => onToggleSeries('views')}
@@ -169,7 +207,7 @@ export function JobDetailStatsChart({
         <LegendToggle
           seriesKey="reactions"
           label={JOB_DETAIL_STATS_COPY.legend.reactions}
-          color={CHART_STROKE.reactions}
+          color={JOB_DETAIL_STATS_CHART_STROKE.reactions}
           dashed
           hidden={hiddenSeries.reactions}
           onToggle={() => onToggleSeries('reactions')}
@@ -238,7 +276,7 @@ export function JobDetailStatsChart({
           {!hiddenSeries.views ? (
             <polyline
               fill="none"
-              stroke={CHART_STROKE.views}
+              stroke={JOB_DETAIL_STATS_CHART_STROKE.views}
               strokeWidth={2.5}
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -250,7 +288,7 @@ export function JobDetailStatsChart({
           {!hiddenSeries.reactions ? (
             <polyline
               fill="none"
-              stroke={CHART_STROKE.reactions}
+              stroke={JOB_DETAIL_STATS_CHART_STROKE.reactions}
               strokeWidth={2.5}
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -258,6 +296,40 @@ export function JobDetailStatsChart({
               points={pointsToPolyline(series, 'reactions', reactionsMax)}
               data-testid="job-detail-stats-chart-reactions"
             />
+          ) : null}
+
+          {crosshairX != null ? (
+            <g pointerEvents="none" data-testid="job-detail-stats-chart-crosshair">
+              <line
+                x1={crosshairX}
+                y1={PLOT.top}
+                x2={crosshairX}
+                y2={PLOT.bottom}
+                stroke="#767676"
+                strokeWidth={1}
+                strokeDasharray="4 3"
+              />
+              {!hiddenSeries.views && activePoint ? (
+                <circle
+                  cx={crosshairX}
+                  cy={yForValue(activePoint.views, viewsMax, PLOT.bottom, PLOT.top)}
+                  r={4.5}
+                  fill={JOB_DETAIL_STATS_CHART_STROKE.views}
+                  stroke="#FFFFFF"
+                  strokeWidth={2}
+                />
+              ) : null}
+              {!hiddenSeries.reactions && activePoint ? (
+                <circle
+                  cx={crosshairX}
+                  cy={yForValue(activePoint.reactions, reactionsMax, PLOT.bottom, PLOT.top)}
+                  r={4.5}
+                  fill={JOB_DETAIL_STATS_CHART_STROKE.reactions}
+                  stroke="#FFFFFF"
+                  strokeWidth={2}
+                />
+              ) : null}
+            </g>
           ) : null}
 
           {series.length > 0 ? (
@@ -282,7 +354,8 @@ export function JobDetailStatsChart({
                   'tm-pointer-events-none',
                   'tm-fixed',
                   'tm-z-[100]',
-                  'tm-max-w-xs',
+                  'tm-min-w-[14rem]',
+                  'tm-max-w-sm',
                   'tm-rounded',
                   'tm-border',
                   'tm-border-secondary',
@@ -294,19 +367,51 @@ export function JobDetailStatsChart({
                   'tm-font-poppins',
                 )}
                 style={{
-                  left: tooltip.clientX + 12,
-                  top: tooltip.clientY + 12,
+                  left: tooltip.anchorLeft,
+                  top: tooltip.anchorTop - 8,
+                  transform: 'translate(-50%, -100%)',
                 }}
               >
-                <p className="tm-m-0 tm-font-semibold tm-text-primary-default">
+                <p className="tm-m-0 tm-mb-2 tm-border-b tm-border-secondary tm-pb-2 tm-text-center tm-font-semibold tm-text-primary-default">
                   {formatJobDetailStatsChartDate(activePoint.date)}
                 </p>
-                <p className="tm-m-0 tm-mt-1 tm-text-secondary-default">
-                  {JOB_DETAIL_STATS_COPY.legend.views}: {formatCount(activePoint.views)}
-                </p>
-                <p className="tm-m-0 tm-text-secondary-default">
-                  {JOB_DETAIL_STATS_COPY.legend.reactions}: {formatCount(activePoint.reactions)}
-                </p>
+                <ul className="tm-m-0 tm-flex tm-list-none tm-flex-col tm-gap-2 tm-p-0">
+                  {(activePoint.byPlace ?? []).map((place) => (
+                    <li
+                      key={place.placeId}
+                      className="tm-flex tm-items-center tm-gap-2 tm-text-secondary-default"
+                    >
+                      <JobPortalLogo
+                        type={place.logoType ?? jobPortalLogoTypeFromChannel(place.placeName)}
+                        title=""
+                        className="tm-size-4"
+                      />
+                      <span className="tm-min-w-0 tm-flex-1 tm-truncate tm-font-medium tm-text-primary-default">
+                        {place.placeName}
+                      </span>
+                      <span className="tm-flex tm-shrink-0 tm-items-center tm-gap-2 tm-tabular-nums">
+                        <span
+                          className="tm-inline-flex tm-items-center tm-gap-1"
+                          title={JOB_DETAIL_STATS_COPY.legend.views}
+                        >
+                          <ChartLegendLine color={JOB_DETAIL_STATS_CHART_STROKE.views} width={16} />
+                          {formatCount(place.views)}
+                        </span>
+                        <span
+                          className="tm-inline-flex tm-items-center tm-gap-1"
+                          title={JOB_DETAIL_STATS_COPY.legend.reactions}
+                        >
+                          <ChartLegendLine
+                            color={JOB_DETAIL_STATS_CHART_STROKE.reactions}
+                            dashed
+                            width={16}
+                          />
+                          {formatCount(place.reactions)}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>,
               document.body,
             )
@@ -349,18 +454,7 @@ function LegendToggle({ seriesKey, label, color, dashed, hidden, onToggle }: Leg
         hidden && 'tm-opacity-50',
       )}
     >
-      <svg width={28} height={8} aria-hidden="true" className="tm-shrink-0">
-        <line
-          x1={0}
-          y1={4}
-          x2={28}
-          y2={4}
-          stroke={color}
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeDasharray={dashed ? '6 5' : undefined}
-        />
-      </svg>
+      <ChartLegendLine color={color} dashed={dashed} width={28} />
       <span className="tm-text-secondary-default">{label}</span>
     </button>
   )

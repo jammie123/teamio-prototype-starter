@@ -6,7 +6,6 @@ import { JobDetailStatsModal } from './JobDetailStatsModal'
 import {
   jobDetailStatsFixtureForPeriod,
   sampleJobDetailStatsJobTitle,
-  sampleJobDetailStatsPublicationEnd,
   sampleJobDetailStatsPublishedAt,
   sampleJobDetailStatsPublishedRecent,
 } from './jobDetailStatsFixtures'
@@ -17,7 +16,6 @@ const STORY_TODAY = new Date(2026, 10, 4)
 const defaultFixture = jobDetailStatsFixtureForPeriod(
   'sincePublication',
   sampleJobDetailStatsPublishedAt,
-  sampleJobDetailStatsPublicationEnd,
   STORY_TODAY,
 )
 
@@ -75,7 +73,7 @@ export const EmptyPeriod: Story = {
     defaultOpen: true,
     status: 'empty',
     series: [],
-    summary: { places: [] },
+    summary: { periodStartDate: '2026-11-01', periodEndDate: '2026-11-04', places: [] },
   },
 }
 
@@ -94,7 +92,6 @@ export const YoungJob: Story = {
     ...jobDetailStatsFixtureForPeriod(
       'last6Months',
       sampleJobDetailStatsPublishedRecent,
-      sampleJobDetailStatsPublicationEnd,
       STORY_TODAY,
     ),
   },
@@ -112,7 +109,6 @@ function PeriodSwitchDemo() {
   const fixture = jobDetailStatsFixtureForPeriod(
     period,
     sampleJobDetailStatsPublishedAt,
-    sampleJobDetailStatsPublicationEnd,
     STORY_TODAY,
   )
 

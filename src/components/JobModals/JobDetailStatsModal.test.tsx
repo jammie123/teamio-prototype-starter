@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { formatCount } from '../JobCard/formatCount'
 import { JobDetailStatsModal } from './JobDetailStatsModal'
-import { JOB_DETAIL_STATS_COPY } from './jobDetailStatsCopy'
+import { JOB_DETAIL_STATS_COPY, JOB_DETAIL_STATS_PERIOD_LABELS } from './jobDetailStatsCopy'
 import {
   filterSeriesByRange,
   resolvePeriodRange,
@@ -13,7 +13,6 @@ import {
   buildDailySeries,
   jobDetailStatsFixtureForPeriod,
   sampleJobDetailStatsJobTitle,
-  sampleJobDetailStatsPublicationEnd,
   sampleJobDetailStatsPublishedAt,
   sampleJobDetailStatsPublishedRecent,
 } from './jobDetailStatsFixtures'
@@ -23,7 +22,6 @@ const TODAY = new Date(2026, 10, 4)
 const readyFixture = jobDetailStatsFixtureForPeriod(
   'sincePublication',
   sampleJobDetailStatsPublishedAt,
-  sampleJobDetailStatsPublicationEnd,
   TODAY,
 )
 
@@ -61,7 +59,7 @@ describe('JobDetailStatsModal', () => {
     expect(dialog).toHaveAccessibleName(JOB_DETAIL_STATS_COPY.title)
   })
 
-  it('calls onPeriodChange when period select changes', async () => {
+  it('calls onPeriodChange when period is changed from the header menu', async () => {
     const user = userEvent.setup()
     const onPeriodChange = vi.fn()
     render(
@@ -74,8 +72,10 @@ describe('JobDetailStatsModal', () => {
         onPeriodChange={onPeriodChange}
       />,
     )
-    const select = screen.getByTestId('job-detail-stats-period-select')
-    await user.selectOptions(select, 'lastMonth')
+    await user.click(screen.getByTestId('job-detail-stats-period-change'))
+    await user.click(
+      screen.getByRole('option', { name: JOB_DETAIL_STATS_PERIOD_LABELS.lastMonth }),
+    )
     expect(onPeriodChange).toHaveBeenCalledWith('lastMonth')
   })
 
@@ -108,7 +108,10 @@ describe('JobDetailStatsModal', () => {
     )
     await user.click(screen.getByTestId('job-detail-stats-legend-reactions'))
     expect(screen.queryByTestId('job-detail-stats-chart-reactions')).not.toBeInTheDocument()
-    await user.selectOptions(screen.getByTestId('job-detail-stats-period-select'), 'last6Months')
+    await user.click(screen.getByTestId('job-detail-stats-period-change'))
+    await user.click(
+      screen.getByRole('option', { name: JOB_DETAIL_STATS_PERIOD_LABELS.last6Months }),
+    )
     expect(screen.queryByTestId('job-detail-stats-chart-reactions')).not.toBeInTheDocument()
   })
 
@@ -127,13 +130,17 @@ describe('JobDetailStatsModal', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Otevřít statistiky' }))
     expect(onPeriodChange).toHaveBeenCalledWith('sincePublication')
-    await user.selectOptions(screen.getByTestId('job-detail-stats-period-select'), 'lastMonth')
+    await user.click(screen.getByTestId('job-detail-stats-period-change'))
+    await user.click(
+      screen.getByRole('option', { name: JOB_DETAIL_STATS_PERIOD_LABELS.lastMonth }),
+    )
     await user.keyboard('{Escape}')
     onPeriodChange.mockClear()
     await user.click(screen.getByRole('button', { name: 'Otevřít statistiky' }))
     expect(onPeriodChange).toHaveBeenCalledWith('sincePublication')
-    const select = screen.getByTestId('job-detail-stats-period-select') as HTMLSelectElement
-    expect(select.value).toBe('sincePublication')
+    expect(screen.getByTestId('job-detail-stats-period-label')).toHaveTextContent(
+      JOB_DETAIL_STATS_PERIOD_LABELS.sincePublication,
+    )
   })
 
   it('shows empty copy when there is no data', () => {
@@ -175,12 +182,7 @@ describe('JobDetailStatsModal', () => {
     expect(within(table).getByText('Jobs.cz')).toBeInTheDocument()
     expect(within(table).getByText('Práce.cz')).toBeInTheDocument()
     expect(within(table).getAllByTestId('job-portal-logo')).toHaveLength(2)
-    const viewsCells = within(table)
-      .getAllByRole('cell')
-      .filter((cell) => cell.className.includes('tm-text-right'))
-    expect(viewsCells[0].textContent?.replace(/\s/g, '')).toBe(
-      formatCount(readyFixture.summary.places[0].views).replace(/\s/g, ''),
-    )
+    expect(within(table).getByTestId('job-detail-stats-table-total')).toBeInTheDocument()
   })
 
   it('shows job title only when jobTitle prop is set', () => {

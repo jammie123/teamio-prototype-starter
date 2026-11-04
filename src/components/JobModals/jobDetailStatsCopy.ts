@@ -3,7 +3,7 @@ import type { JobDetailStatsPeriod } from './jobDetailStatsPeriod'
 export const JOB_DETAIL_STATS_COPY = {
   title: 'Detail inzerátu',
   periodLabel: 'Období',
-  tableSectionTitle: 'Přehled',
+  changePeriod: 'Změnit',
   empty: 'Pro vybrané období nejsou k dispozici žádná data',
   error: 'Statistiky se nepodařilo načíst.',
   retry: 'Zkusit znovu',
@@ -13,9 +13,12 @@ export const JOB_DETAIL_STATS_COPY = {
   },
   columns: {
     place: 'Místo vystavení',
-    publication: 'Vystavení',
     views: 'Zobrazení',
     reactions: 'Reakce',
+    total: 'Celkem',
+  },
+  tooltip: {
+    total: 'Celkem',
   },
   tableAriaLabel: 'Souhrn statistik inzerátu',
   chartAriaLabel: 'Čárový graf zobrazení a reakcí inzerátu',

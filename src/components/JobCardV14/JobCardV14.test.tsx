@@ -201,8 +201,8 @@ describe('JobCardV14', () => {
     expect(screen.queryByTestId('job-card-advertisement-preview-action')).not.toBeInTheDocument()
   })
 
-  it('can render column advertisement actions', () => {
-    renderJobCard({ advertisements: [runningSame], advertisementActionLayout: 'column' })
+  it('uses column advertisement actions by default', () => {
+    renderJobCard({ advertisements: [runningSame] })
 
     expect(screen.getByTestId('job-card-advertisement-action')).toHaveAttribute(
       'data-layout',
@@ -211,6 +211,7 @@ describe('JobCardV14', () => {
     expect(screen.getByTestId('job-card-advertisement-detail-action')).toHaveTextContent(
       'Detail o inzerci',
     )
+    expect(screen.queryByTestId('job-card-advertisement-preview-action')).not.toBeInTheDocument()
   })
 
   it('can show Prodloužit on column advertisement actions', () => {

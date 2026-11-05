@@ -40,6 +40,7 @@ export interface JobCardV14Props
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
   onAdvertisementDetailClick?: () => void
+  /** Advertisement action layout. Defaults to column (stats above Detail o inzerci). */
   advertisementActionLayout?: AdvertisementActionLayout
   /** Override whether Prodloužit is shown on advertisement actions. */
   showProlong?: boolean
@@ -87,7 +88,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
     onHighlightAdvertisement,
     onTopAdvertisement,
     onAdvertisementDetailClick,
-    advertisementActionLayout,
+    advertisementActionLayout = 'column',
     showProlong,
     now,
     className,

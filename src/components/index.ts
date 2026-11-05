@@ -513,7 +513,6 @@ export {
   resolvePeriodRange,
   buildPlaceRowsFromTotals,
   sampleJobDetailStatsJobTitle,
-  sampleJobDetailStatsPublicationEnd,
   sampleJobDetailStatsPublishedAt,
   sampleJobDetailStatsPublishedRecent,
   summarizeSeries,

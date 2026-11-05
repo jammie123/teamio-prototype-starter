@@ -213,7 +213,7 @@ describe('JobCardV14', () => {
       'column',
     )
     expect(screen.getByTestId('job-card-advertisement-detail-action')).toHaveTextContent(
-      'Detail o inzerci',
+      'Zobrazit detail',
     )
     expect(screen.queryByTestId('job-card-advertisement-preview-action')).not.toBeInTheDocument()
   })

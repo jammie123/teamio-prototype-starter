@@ -18,18 +18,19 @@ describe('AdvertisementAction', () => {
     const preview = screen.getByTestId('job-card-advertisement-preview-action')
     expect(statistics).toHaveAccessibleName(`${formatCount(2610)} zhlédnutí`)
     expect(within(statistics).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
-    for (const action of [statistics, detail, preview]) {
+    for (const action of [statistics, preview]) {
       expect(action.className).not.toMatch(/(?:^|\s)tm-h-/)
       expect(action.className).not.toMatch(/(?:^|\s)tm-min-h-/)
       expect(action.className).toContain('tm-text-action-link-secondary-default')
       const iconSvg = within(action).getByTestId('icon').querySelector('svg')
       expect(iconSvg).toHaveStyle({ width: '20px', height: '20px' })
     }
-    expect(detail).toHaveTextContent('Detail')
+    expect(detail).toHaveTextContent('Zobrazit detail')
+    expect(detail.className).toContain('tm-text-secondary-default')
     expect(detail.className).toContain('tm-font-normal')
     expect(detail.className).not.toContain('tm-font-medium')
     expect(screen.getByTestId('job-card-advertisement-detail-action')).toHaveAccessibleName(
-      'Detail inzerce',
+      'Zobrazit detail inzerce',
     )
     expect(preview).toHaveTextContent('Náhled')
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
@@ -132,11 +133,11 @@ describe('AdvertisementAction', () => {
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
     expect(screen.getAllByRole('separator', { hidden: true })).toHaveLength(1)
     expect(statistics).toHaveAccessibleName(`${formatCount(2610)} zhlédnutí`)
-    expect(detail).toHaveTextContent('Detail inzerce')
-    expect(detail).toHaveAccessibleName('Detail inzerce')
+    expect(detail).toHaveTextContent('Zobrazit detail')
+    expect(detail).toHaveAccessibleName('Zobrazit detail inzerce')
     expect(statistics.className).toContain('tm-text-secondary-default')
-    expect(detail.className).toContain('tm-text-action-link-default')
-    expect(detail.className).not.toContain('tm-text-secondary-default')
+    expect(detail.className).toContain('tm-text-secondary-default')
+    expect(detail.className).not.toContain('tm-text-action-link-default')
     expect(root.className).toContain('hover:tm-bg-interactive-hover')
     expect(statistics.className).not.toContain('hover:tm-bg-interactive-hover')
     expect(detail.className).not.toContain('hover:tm-bg-interactive-hover')
@@ -189,9 +190,9 @@ describe('AdvertisementAction', () => {
     expect(statistics.className).toContain('tm-text-secondary-default')
     expect(within(statistics).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
     expect(statistics.firstElementChild).toBe(within(statistics).getByTestId('icon'))
-    expect(detail).toHaveTextContent('Detail o inzerci')
-    expect(detail).toHaveAccessibleName('Detail o inzerci')
-    expect(detail.className).toContain('tm-text-action-link-default')
+    expect(detail).toHaveTextContent('Zobrazit detail')
+    expect(detail).toHaveAccessibleName('Zobrazit detail inzerce')
+    expect(detail.className).toContain('tm-text-secondary-default')
     expect(within(detail).queryByTestId('icon')).not.toBeInTheDocument()
     expect(
       statistics.compareDocumentPosition(detail) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -216,18 +217,10 @@ describe('AdvertisementAction', () => {
 
     const root = screen.getByTestId('job-card-advertisement-action')
     const prolong = screen.getByTestId('job-card-disappearance-prolong')
-    const icon = within(prolong).getByTestId('icon')
 
     expect(prolong).toHaveTextContent('Prodloužit')
-    expect(prolong.className).toContain('tm-flex-col')
-    expect(prolong.className).toContain('tm-text-emotion-warning-emphasis')
-    expect(icon).toHaveAttribute('data-icon-name', 'calendar-clock')
-    expect(icon.querySelector('svg')).toHaveClass('tm-stroke-current')
-    expect(icon.querySelector('svg')?.className).not.toContain('lucide-calendar')
-    expect(icon.className).not.toContain('group-hover:tm-scale-110')
-    expect(prolong.firstElementChild).toBe(icon)
-    expect(prolong.className).toContain('tm-px-6')
-    expect(prolong.className).toContain('tm-py-3')
+    expect(prolong.tagName).toBe('BUTTON')
+    expect(within(prolong).queryByTestId('icon')).not.toBeInTheDocument()
     expect(root.firstElementChild).toBe(prolong)
     expect(
       prolong.compareDocumentPosition(screen.getByTestId('job-card-advertisement-action-main')) &

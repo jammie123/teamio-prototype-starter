@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Button } from '../Button'
 import { Icon, type KnownIconName } from '../Icon'
 import { Link } from '../Link'
 import { formatCount } from './lib/format'
@@ -26,8 +27,8 @@ const ACTION_CONFIG: Record<
   { label: string; ariaLabel: string; icon: KnownIconName; testId: string }
 > = {
   detail: {
-    label: 'Detail',
-    ariaLabel: 'Detail inzerce',
+    label: 'Zobrazit detail',
+    ariaLabel: 'Zobrazit detail inzerce',
     icon: 'external-link',
     testId: 'job-card-advertisement-detail-action',
   },
@@ -141,6 +142,30 @@ function AdvertisementActionItem({
   )
 }
 
+function AdvertisementProlongButton({
+  onClick,
+  className,
+}: {
+  onClick?: () => void
+  className?: string
+}) {
+  return (
+    <Button
+      variant="primary"
+      size="small"
+      aria-label={ACTION_CONFIG.prolong.ariaLabel}
+      data-testid={ACTION_CONFIG.prolong.testId}
+      className={cn('!tm-shrink-0', className)}
+      onClick={(event) => {
+        event.stopPropagation()
+        onClick?.()
+      }}
+    >
+      {ACTION_CONFIG.prolong.label}
+    </Button>
+  )
+}
+
 function AdvertisementActionDivider({ compact = false }: { compact?: boolean }) {
   return (
     <div
@@ -174,7 +199,6 @@ export function AdvertisementAction({
   const isInline = layout === 'inline'
   const isColumn = layout === 'column'
   const isCompact = isInline || isColumn
-  const detailLabel = isColumn ? 'Detail o inzerci' : isInline ? 'Detail inzerce' : ACTION_CONFIG.detail.label
   const items = [
     formattedViews === undefined
       ? null
@@ -191,14 +215,13 @@ export function AdvertisementAction({
     {
       key: 'detail',
       ...ACTION_CONFIG.detail,
-      label: detailLabel,
-      ariaLabel: isCompact ? detailLabel : ACTION_CONFIG.detail.ariaLabel,
       icon: isCompact ? undefined : ACTION_CONFIG.detail.icon,
       iconPosition: isInline ? ('end' as const) : ('start' as const),
+      tone: 'secondary' as const,
       onClick: onDetail,
     },
     (isColumn || !isCompact) && showProlong
-      ? { key: 'prolong', ...ACTION_CONFIG.prolong, tone: 'warning' as const, onClick: onProlong }
+      ? { key: 'prolong', ...ACTION_CONFIG.prolong, onClick: onProlong }
       : null,
     !isCompact ? { key: 'preview', ...ACTION_CONFIG.preview, onClick: onPreview } : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null)
@@ -217,19 +240,32 @@ export function AdvertisementAction({
     item: (typeof items)[number],
     itemLayout: AdvertisementActionLayout = layout,
     spacious = false,
-  ) => (
-    <AdvertisementActionItem
-      icon={item.icon}
-      label={item.label}
-      ariaLabel={item.ariaLabel}
-      testId={item.testId}
-      tone={'tone' in item ? item.tone : 'default'}
-      layout={itemLayout}
-      iconPosition={'iconPosition' in item ? item.iconPosition : 'start'}
-      spacious={spacious}
-      onClick={item.onClick}
-    />
-  )
+  ) => {
+    if (item.key === 'prolong') {
+      return (
+        <AdvertisementProlongButton
+          onClick={item.onClick}
+          className={
+            spacious ? '!tm-min-h-8 !tm-px-4' : 'tm-self-center tm-mx-1 last:tm-rounded-r-xl'
+          }
+        />
+      )
+    }
+
+    return (
+      <AdvertisementActionItem
+        icon={item.icon}
+        label={item.label}
+        ariaLabel={item.ariaLabel}
+        testId={item.testId}
+        tone={'tone' in item ? item.tone : 'default'}
+        layout={itemLayout}
+        iconPosition={'iconPosition' in item ? item.iconPosition : 'start'}
+        spacious={spacious}
+        onClick={item.onClick}
+      />
+    )
+  }
 
   if (isColumn) {
     return (

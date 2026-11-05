@@ -65,7 +65,7 @@ describe('AdvertisementWidget', () => {
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
     expect(within(actions).getByText('3 170')).toBeInTheDocument()
-    expect(within(actions).getByText('Detail')).toBeInTheDocument()
+    expect(within(actions).getByText('Zobrazit detail')).toBeInTheDocument()
     expect(within(actions).getByText('Náhled')).toBeInTheDocument()
   })
 
@@ -258,7 +258,7 @@ describe('AdvertisementWidget', () => {
       'column',
     )
     expect(screen.getByTestId('job-card-advertisement-detail-action')).toHaveTextContent(
-      'Detail o inzerci',
+      'Zobrazit detail',
     )
   })
 

@@ -42,7 +42,9 @@ export function AdvertisementHeader({
         className,
       )}
     >
-      <span data-testid="job-card-advertisement-heading-label">{label}</span>
+      <span data-testid="job-card-advertisement-heading-label" className="tm-text-base">
+        {label}
+      </span>
       {dateInfo ? (
         <span
           data-testid="job-card-advertisement-heading-date"

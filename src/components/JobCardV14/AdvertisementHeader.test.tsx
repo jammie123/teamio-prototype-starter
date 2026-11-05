@@ -15,6 +15,7 @@ describe('AdvertisementHeader', () => {
     expect(heading.className).toContain('tm-items-baseline')
     expect(heading.className).toContain('tm-text-emotion-success-emphasis')
     expect(label).toHaveTextContent('Běží')
+    expect(label.className).toContain('tm-text-base')
     expect(date).toHaveTextContent('1. 1. – 1. 2. 2026')
     expect(label.compareDocumentPosition(date) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(date.className).toContain('tm-font-normal')

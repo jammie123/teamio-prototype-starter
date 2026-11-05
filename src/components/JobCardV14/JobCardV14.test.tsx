@@ -121,6 +121,7 @@ describe('JobCardV14', () => {
     expect(headerRow.compareDocumentPosition(recruitmentNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(recruitmentNote.compareDocumentPosition(advertisement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(advertisement.className).not.toContain('tm-border-t')
+    expect(advertisement.className).toContain('tm-pt-3')
   })
 
   it('hides the note when its text is empty', () => {
@@ -130,6 +131,7 @@ describe('JobCardV14', () => {
     expect(advertisement).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
     expect(advertisement.className).toContain('tm-border-t')
+    expect(advertisement.className).toContain('tm-pt-3')
   })
 
   it('keeps the top border on later advertisements when a note exists', () => {
@@ -137,7 +139,9 @@ describe('JobCardV14', () => {
 
     const advertisements = screen.getAllByTestId('job-card-advertisement')
     expect(advertisements[0].className).not.toContain('tm-border-t')
+    expect(advertisements[0].className).toContain('tm-pt-3')
     expect(advertisements[1].className).toContain('tm-border-t')
+    expect(advertisements[1].className).toContain('tm-pt-3')
   })
 
   it('renders the advertisement inside the bottom band', () => {

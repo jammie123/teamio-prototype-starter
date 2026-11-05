@@ -69,10 +69,12 @@ describe('AdvertisementWidget', () => {
     expect(within(actions).getByText('Náhled')).toBeInTheDocument()
   })
 
-  it('can drop the top border', () => {
+  it('can drop the top border and use larger top padding', () => {
     renderWidget(runningSame, { hideTopBorder: true })
 
-    expect(screen.getByTestId('job-card-advertisement').className).not.toContain('tm-border-t')
+    const advertisement = screen.getByTestId('job-card-advertisement')
+    expect(advertisement.className).not.toContain('tm-border-t')
+    expect(advertisement.className).toContain('tm-pt-3')
   })
 
   it('renders each portal with a status dot and dotted underline', () => {

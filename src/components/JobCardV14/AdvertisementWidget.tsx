@@ -57,7 +57,7 @@ export function AdvertisementWidget({
         !hideTopBorder && 'tm-border-t',
         'tm-border-solid',
         'tm-border-secondary',
-        'tm-pt-1',
+        'tm-pt-3',
         'tm-pb-5',
         className,
       )}

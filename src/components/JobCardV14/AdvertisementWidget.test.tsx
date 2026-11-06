@@ -47,8 +47,10 @@ describe('AdvertisementWidget', () => {
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(advertisement.className).toContain('tm-border-t')
     expect(advertisement.className).toContain('tm-flex-col')
-    expect(advertisement.className).toContain('tm-pt-3')
+    expect(advertisement.className).toContain('tm-pt-4')
     expect(advertisement.className).toContain('tm-pb-5')
+    expect(advertisement.className).toContain('tm-bg-cover-light/80')
+    expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
     expect(advertisement.className).not.toContain('tm-rounded')
 
     const topRow = within(advertisement).getByTestId('job-card-advertisement-top')
@@ -74,7 +76,7 @@ describe('AdvertisementWidget', () => {
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(advertisement.className).not.toContain('tm-border-t')
-    expect(advertisement.className).toContain('tm-pt-3')
+    expect(advertisement.className).toContain('tm-pt-4')
   })
 
   it('renders each portal with a status dot and dotted underline', () => {
@@ -155,6 +157,9 @@ describe('AdvertisementWidget', () => {
     expect(heading.className).toContain('tm-text-emotion-warning-emphasis')
     expect(heading.parentElement?.parentElement).toBe(topRow)
     expect(prolong.parentElement).toBe(screen.getByTestId('job-card-advertisement-action'))
+    expect(prolong.className).toContain('tm-min-w-[100px]')
+    expect(advertisement.className).toContain('tm-bg-emotion-warning-background/80')
+    expect(advertisement.className).not.toContain('tm-bg-cover-light/80')
     expect(advertisement).not.toHaveTextContent('zmizí inzerát')
 
     await user.click(prolong)

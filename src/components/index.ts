@@ -278,6 +278,18 @@ export {
   type JobCandidateStat as JobCardV16CandidateStat,
   type JobCardNote as JobCardV16Note,
 } from './JobCardV16'
+export {
+  JobCardV17,
+  AdvertisementAction as JobCardV17AdvertisementAction,
+  AdvertisementWidget as JobCardV17AdvertisementWidget,
+  type JobCardV17Props,
+  type AdvertisementActionLayout as JobCardV17AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV17AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV17AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV17Candidates,
+  type JobCandidateStat as JobCardV17CandidateStat,
+  type JobCardNote as JobCardV17Note,
+} from './JobCardV17'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

@@ -6,7 +6,7 @@ import { JobAssignee } from '../JobCardV14/JobAssignee'
 import { JobCardActions } from '../JobCardV14/JobCardActions'
 import { buildJobCardMenuSections, type JobCardMenuHandlers } from '../JobCardV14/jobCardMenu'
 import { JobNote } from '../JobCardV14/JobNote'
-import { JobPipeline } from '../JobCardV14/JobPipeline'
+import { JobPipeline } from './JobPipeline'
 import type {
   JobAdvertisement,
   JobCandidateStat,
@@ -14,7 +14,7 @@ import type {
   JobCardCandidates,
   JobCardNote,
   JobStatus,
-} from '../JobCardV14/types'
+} from './types'
 import { Link } from '../Link'
 import { AdvertisementWidget } from './AdvertisementWidget'
 

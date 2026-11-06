@@ -40,7 +40,7 @@ function PersonAvatar({ name, testId }: { name: string; testId?: string }) {
         'tm-rounded-full',
         'tm-p-0.5',
         'tm-bg-cover-default',
-        'tm-font-semibold',
+        'tm-font-normal',
         'border-1 border-solid border-primary-default',
         'tm-leading-none',
         'tm-size-6',

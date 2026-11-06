@@ -39,7 +39,7 @@ function renderJobCard(props: Partial<JobCardV16Props> = {}) {
       title="Řidič/ka sk. C ČB PO–PÁ"
       owner="Petra Nováková"
       hiringManagers={['Lukáš Procházka']}
-      candidates={{ new: 5, unassessed: 14, inProgress: 6, newOpalcovani: 3, total: 52 }}
+      candidates={{ new: 5, unassessed: 14, preselected: 6, evaluated: 8 }}
       advertisements={[runningSame]}
       note={note}
       onEditJob={vi.fn()}
@@ -85,6 +85,25 @@ describe('JobCardV16', () => {
     expect(actions.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(title.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(title.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('renders Neposouzený, Předvybraný and Ohodnocený in the candidate pipeline', () => {
+    renderJobCard()
+
+    const stats = within(screen.getByTestId('job-card-pipeline')).getByTestId('job-card-stats')
+    expect(within(stats).getByText('Neposouzený')).toBeInTheDocument()
+    expect(within(stats).getByText('Předvybraný')).toBeInTheDocument()
+    expect(within(stats).getByText('Ohodnocený')).toBeInTheDocument()
+    expect(within(stats).queryByText('Ve hře')).not.toBeInTheDocument()
+    expect(within(stats).queryByText('Celkem')).not.toBeInTheDocument()
+    expect(within(stats).getByTestId('job-card-new-candidates')).toHaveTextContent('5 nový')
+  })
+
+  it('omits the pipeline without candidates', () => {
+    renderJobCard({ candidates: undefined })
+
+    expect(screen.queryByTestId('job-card-pipeline')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-note')).toBeInTheDocument()
   })
 
   it('renders advertisement actions on the right of the advertisement panel', () => {

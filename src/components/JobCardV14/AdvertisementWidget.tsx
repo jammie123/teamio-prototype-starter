@@ -43,6 +43,7 @@ export function AdvertisementWidget({
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now)
   const isNotPublished = model.kind === 'notPublished'
+  const isEndingSoon = model.kind === 'endingSoon'
 
   return (
     <div
@@ -57,8 +58,9 @@ export function AdvertisementWidget({
         !hideTopBorder && 'tm-border-t',
         'tm-border-solid',
         'tm-border-secondary',
-        'tm-pt-3',
+        'tm-pt-4',
         'tm-pb-5',
+        isEndingSoon ? 'tm-bg-emotion-warning-background/80' : 'tm-bg-cover-light/80',
         className,
       )}
     >

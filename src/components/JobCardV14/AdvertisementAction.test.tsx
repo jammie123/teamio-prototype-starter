@@ -16,6 +16,8 @@ describe('AdvertisementAction', () => {
     const statistics = screen.getByTestId('job-card-advertisement-aggregate-views')
     const detail = screen.getByTestId('job-card-advertisement-detail-action')
     const preview = screen.getByTestId('job-card-advertisement-preview-action')
+    expect(statistics.className).toContain('tm-font-normal')
+    expect(statistics.className).not.toContain('tm-font-medium')
     expect(statistics).toHaveAccessibleName(`${formatCount(2610)} zhlédnutí`)
     expect(within(statistics).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
     for (const action of [statistics, preview]) {
@@ -59,6 +61,9 @@ describe('AdvertisementAction', () => {
       .filter((id): id is string => Boolean(id))
 
     expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveTextContent('Prodloužit')
+    expect(screen.getByTestId('job-card-disappearance-prolong').className).toContain(
+      'tm-min-w-[100px]',
+    )
     expect(screen.getAllByRole('separator', { hidden: true })).toHaveLength(3)
     expect(items).toEqual([
       'job-card-advertisement-aggregate-views',
@@ -219,6 +224,7 @@ describe('AdvertisementAction', () => {
     const prolong = screen.getByTestId('job-card-disappearance-prolong')
 
     expect(prolong).toHaveTextContent('Prodloužit')
+    expect(prolong.className).toContain('tm-min-w-[100px]')
     expect(prolong.tagName).toBe('BUTTON')
     expect(within(prolong).queryByTestId('icon')).not.toBeInTheDocument()
     expect(root.firstElementChild).toBe(prolong)

@@ -62,11 +62,11 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
           key === 'inProgress' ? highlightCount(candidates.newOpalcovani) : undefined
         const layout = cn(
           'tm-flex',
-          'tm-w-[150px]',
+          'tm-w-[120px]',
           'tm-min-w-0',
           'tm-shrink-0',
           'tm-flex-col',
-          'tm-items-start',
+          'tm-items-end',
           'tm-justify-center',
           'tm-gap-0.5',
           'tm-px-4',
@@ -77,7 +77,7 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
 
         const content = (
           <>
-            <span className="tm-inline-flex tm-flex-wrap tm-items-center tm-gap-1.5">
+            <span className="tm-inline-flex tm-flex-col-reverse tm-flex-wrap tm-items-center tm-gap-2">
               <span
                 className={cn(
                   isFirst ? 'tm-text-2xl' : 'tm-text-xl',

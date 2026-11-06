@@ -50,14 +50,15 @@ function renderJobCard(props: Partial<JobCardV14Props> = {}) {
 }
 
 describe('JobCardV14', () => {
-  it('renders the job title in normal weight', () => {
+  it('renders the job title in medium weight', () => {
     renderJobCard()
 
     const title = screen.getByTestId('job-card-title')
     expect(title.tagName).toBe('H3')
     expect(title).toHaveTextContent('Řidič/ka sk. C ČB PO–PÁ')
     expect(title.className).toContain('tm-text-lg')
-    expect(title.className).toContain('tm-font-normal')
+    expect(title.className).toContain('tm-font-medium')
+    expect(title.className).not.toContain('tm-font-normal')
     expect(title.className).not.toContain('tm-font-semibold')
   })
 
@@ -79,6 +80,7 @@ describe('JobCardV14', () => {
     expect(titleRow).not.toContainElement(actions)
     expect(titleRow).toContainElement(headingRow)
     expect(titleRow).toContainElement(pipeline)
+    expect(titleRow.className).toContain('tm-gap-12')
     expect(headingRow).toContainElement(title)
     expect(headingRow).toContainElement(people)
     expect(headingRow).not.toContainElement(pipeline)
@@ -121,7 +123,7 @@ describe('JobCardV14', () => {
     expect(headerRow.compareDocumentPosition(recruitmentNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(recruitmentNote.compareDocumentPosition(advertisement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(advertisement.className).not.toContain('tm-border-t')
-    expect(advertisement.className).toContain('tm-pt-3')
+    expect(advertisement.className).toContain('tm-pt-4')
   })
 
   it('hides the note when its text is empty', () => {
@@ -131,7 +133,7 @@ describe('JobCardV14', () => {
     expect(advertisement).toBeInTheDocument()
     expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
     expect(advertisement.className).toContain('tm-border-t')
-    expect(advertisement.className).toContain('tm-pt-3')
+    expect(advertisement.className).toContain('tm-pt-4')
   })
 
   it('keeps the top border on later advertisements when a note exists', () => {
@@ -139,22 +141,44 @@ describe('JobCardV14', () => {
 
     const advertisements = screen.getAllByTestId('job-card-advertisement')
     expect(advertisements[0].className).not.toContain('tm-border-t')
-    expect(advertisements[0].className).toContain('tm-pt-3')
+    expect(advertisements[0].className).toContain('tm-pt-4')
     expect(advertisements[1].className).toContain('tm-border-t')
-    expect(advertisements[1].className).toContain('tm-pt-3')
+    expect(advertisements[1].className).toContain('tm-pt-4')
   })
 
-  it('renders the advertisement inside the bottom band', () => {
+  it('renders advertisements full width of the card, outside the padded header', () => {
     renderJobCard()
 
+    const card = screen.getByTestId('job-card')
+    const layoutRow = screen.getByTestId('job-card-layout-row')
+    const main = screen.getByTestId('job-card-main')
     const band = screen.getByTestId('job-card-advertisements')
-    expect(screen.getByTestId('job-card-main')).toContainElement(band)
-    expect(band.className).toContain('-tm-mb-4')
-    expect(band).toContainElement(screen.getByTestId('job-card-advertisement'))
+    const advertisement = screen.getByTestId('job-card-advertisement')
+
+    expect(card.className).toContain('!tm-p-0')
+    expect(card.className).not.toContain('!tm-pt-6')
+    expect(layoutRow.className).toContain('tm-px-4')
+    expect(layoutRow.className).toContain('tm-pt-6')
+    expect(card).toContainElement(band)
+    expect(main).not.toContainElement(band)
+    expect(layoutRow).not.toContainElement(band)
+    expect(band.className).toContain('tm-w-full')
+    expect(band.className).not.toContain('-tm-mb-4')
+    expect(band).toContainElement(advertisement)
+    expect(advertisement.className).toContain('tm-pl-14')
+    expect(advertisement.className).toContain('tm-pr-6')
+    expect(advertisement.className).not.toContain('tm-px-4')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Běží 1. 1. – 1. 2. 2026',
     )
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
+  })
+
+  it('keeps bottom padding on the header when advertisements are hidden', () => {
+    renderJobCard({ status: 'draft' })
+
+    expect(screen.queryByTestId('job-card-advertisements')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-layout-row').className).toContain('tm-pb-4')
   })
 
   it('calls onExtendAndRepublish from Prodloužit when the advertisement ends soon', async () => {

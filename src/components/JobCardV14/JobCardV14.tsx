@@ -128,12 +128,15 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
       ref={ref}
       data-testid="job-card"
       data-variant="v14"
-      className={cn('tm-flex', 'tm-flex-col', '!tm-pt-6', className)}
+      className={cn('tm-flex', 'tm-flex-col', 'tm-gap-2', '!tm-p-0', className)}
       {...rest}
     >
       <div
         data-testid="job-card-layout-row"
-        className="tm-flex tm-w-full tm-items-start tm-gap-2"
+        className={cn(
+          'tm-flex tm-w-full tm-items-start tm-gap-2 tm-px-4 tm-pt-6',
+          !showAdvertisements && 'tm-pb-4',
+        )}
       >
         {menuSections.length ? (
           <JobCardActions
@@ -153,7 +156,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
           >
             <div
               data-testid="job-card-title-row"
-              className="tm-flex tm-min-w-0 tm-flex-1 tm-items-center tm-gap-3"
+              className="tm-flex tm-min-w-0 tm-flex-1 tm-items-center tm-gap-12"
             >
               <div
                 data-testid="job-card-title-heading-row"
@@ -161,7 +164,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
               >
                 <h3
                   data-testid="job-card-title"
-                  className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-normal tm-leading-tight tm-text-teamio-blue"
+                  className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-medium tm-leading-tight tm-text-teamio-blue"
                 >
                   {title}
                 </h3>
@@ -182,61 +185,59 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
           </div>
 
           {note ? <JobNote note={note} onExpand={onExpandNote} className="tm-w-full" /> : null}
-
-          {showAdvertisements ? (
-            <div
-              data-testid="job-card-advertisements"
-              className="tm-flex tm-flex-col -tm-mb-4"
-            >
-              {shownAdvertisements.length === 0 ? (
-                <div
-                  className={cn(
-                    'tm-border-0 tm-border-solid tm-border-secondary tm-py-5',
-                    !hasNote && 'tm-border-t',
-                  )}
-                >
-                  <div
-                    data-testid="job-card-no-advertisement"
-                    className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
-                  >
-                    <span>Nábor nemá žádný inzerát.</span>
-                    {onCreateAdvertisement ? (
-                      <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
-                        Vytvořit inzerát
-                      </Link>
-                    ) : null}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {visibleAdvertisements.map((advertisement, index) => (
-                    <AdvertisementWidget
-                      key={`${advertisement.id}-${status}`}
-                      advertisement={advertisement}
-                      showTitle={showAdvertisementTitle}
-                      now={now}
-                      onProlong={onExtendAndRepublish}
-                      onAdvertisementDetailClick={onAdvertisementDetailClick}
-                      actionLayout={advertisementActionLayout}
-                      showProlong={showProlong}
-                      hideTopBorder={hasNote && index === 0}
-                    />
-                  ))}
-                  {collapseToFirstAd ? (
-                    <Link
-                      className="tm-pb-3 tm-text-sm"
-                      data-testid="job-card-additional-advertisements"
-                      onClick={onAdditionalAdvertisementsClick}
-                    >
-                      {`Zobrazit další inzeráty (${additionalAdvertisementsCount})`}
-                    </Link>
-                  ) : null}
-                </>
-              )}
-            </div>
-          ) : null}
         </div>
       </div>
+
+      {showAdvertisements ? (
+        <div data-testid="job-card-advertisements" className="tm-flex tm-w-full tm-flex-col">
+          {shownAdvertisements.length === 0 ? (
+            <div
+              className={cn(
+                'tm-border-0 tm-border-solid tm-border-secondary tm-px-4 tm-py-5',
+                !hasNote && 'tm-border-t',
+              )}
+            >
+              <div
+                data-testid="job-card-no-advertisement"
+                className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
+              >
+                <span>Nábor nemá žádný inzerát.</span>
+                {onCreateAdvertisement ? (
+                  <Link className="tm-text-sm" onClick={onCreateAdvertisement}>
+                    Vytvořit inzerát
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          ) : (
+            <>
+              {visibleAdvertisements.map((advertisement, index) => (
+                <AdvertisementWidget
+                  key={`${advertisement.id}-${status}`}
+                  advertisement={advertisement}
+                  showTitle={showAdvertisementTitle}
+                  now={now}
+                  onProlong={onExtendAndRepublish}
+                  onAdvertisementDetailClick={onAdvertisementDetailClick}
+                  actionLayout={advertisementActionLayout}
+                  showProlong={showProlong}
+                  hideTopBorder={hasNote && index === 0}
+                  className="tm-pl-14 tm-pr-6"
+                />
+              ))}
+              {collapseToFirstAd ? (
+                <Link
+                  className="tm-px-4 tm-pb-3 tm-text-sm"
+                  data-testid="job-card-additional-advertisements"
+                  onClick={onAdditionalAdvertisementsClick}
+                >
+                  {`Zobrazit další inzeráty (${additionalAdvertisementsCount})`}
+                </Link>
+              ) : null}
+            </>
+          )}
+        </div>
+      ) : null}
     </Card>
   )
 })

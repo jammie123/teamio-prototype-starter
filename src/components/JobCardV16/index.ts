@@ -1,4 +1,5 @@
 export { JobCardV16, type JobCardV16Props } from './JobCardV16'
+export { JobPipeline, type JobPipelineProps } from './JobPipeline'
 export { AdvertisementAction, type AdvertisementActionProps } from './AdvertisementAction'
 export { AdvertisementWidget, type AdvertisementWidgetProps } from './AdvertisementWidget'
 export type {
@@ -12,4 +13,4 @@ export type {
   JobPublicationHighlight,
   JobPublicationStatus,
   JobStatus,
-} from '../JobCardV14/types'
+} from './types'

@@ -34,7 +34,7 @@ export function AdvertisementHeader({
         'tm-flex-row',
         'tm-flex-wrap',
         'tm-items-baseline',
-        'tm-gap-x-2',
+        'tm-gap-5',
         'tm-whitespace-normal',
         'tm-text-sm',
         'tm-font-medium',

@@ -100,7 +100,10 @@ function AdvertisementActionItem({
         '!tm-inline-flex',
         'tm-items-center',
         'tm-justify-center',
-        testId === 'job-card-advertisement-detail-action' ? 'tm-font-normal' : 'tm-font-medium',
+        testId === 'job-card-advertisement-detail-action' ||
+          testId === 'job-card-advertisement-aggregate-views'
+          ? 'tm-font-normal'
+          : 'tm-font-medium',
         'tm-no-underline',
         'hover:tm-no-underline',
         'tm-transition-colors',
@@ -155,7 +158,7 @@ function AdvertisementProlongButton({
       size="small"
       aria-label={ACTION_CONFIG.prolong.ariaLabel}
       data-testid={ACTION_CONFIG.prolong.testId}
-      className={cn('!tm-shrink-0', className)}
+      className={cn('!tm-shrink-0', 'tm-min-w-[100px]', className)}
       onClick={(event) => {
         event.stopPropagation()
         onClick?.()

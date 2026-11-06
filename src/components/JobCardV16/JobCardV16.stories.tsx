@@ -33,7 +33,7 @@ const meta = {
     owner: 'Petra Nováková',
     hiringManagers: ['Lukáš Procházka'],
     status: 'published',
-    candidates: { new: 5, newOpalcovani: 3, unassessed: 14, inProgress: 6, total: 52 },
+    candidates: { new: 5, unassessed: 14, preselected: 6, evaluated: 8 },
     onCandidatesClick: fn(),
     advertisements: [runningSame],
     note: recruitmentNote,

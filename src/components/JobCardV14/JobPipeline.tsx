@@ -77,7 +77,7 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
 
         const content = (
           <>
-            <span className="tm-inline-flex tm-flex-col-reverse tm-flex-wrap tm-items-center tm-gap-2">
+            <span className="tm-inline-flex tm-flex-row-reverse tm-flex-wrap tm-items-center tm-gap-2">
               <span
                 className={cn(
                   isFirst ? 'tm-text-2xl' : 'tm-text-xl',

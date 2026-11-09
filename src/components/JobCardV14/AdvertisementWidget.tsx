@@ -60,7 +60,7 @@ export function AdvertisementWidget({
         'tm-border-secondary',
         'tm-pt-4',
         'tm-pb-5',
-        isEndingSoon ? 'tm-bg-emotion-warning-background/80' : 'tm-bg-cover-light/80',
+        isEndingSoon && 'tm-bg-emotion-warning-background/80',
         className,
       )}
     >

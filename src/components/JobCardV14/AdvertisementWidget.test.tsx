@@ -49,8 +49,9 @@ describe('AdvertisementWidget', () => {
     expect(advertisement.className).toContain('tm-flex-col')
     expect(advertisement.className).toContain('tm-pt-4')
     expect(advertisement.className).toContain('tm-pb-5')
-    expect(advertisement.className).toContain('tm-bg-cover-light/80')
+    expect(advertisement.className).not.toContain('tm-bg-cover-light/80')
     expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
+    expect(advertisement.className).not.toMatch(/tm-bg-/)
     expect(advertisement.className).not.toContain('tm-rounded')
 
     const topRow = within(advertisement).getByTestId('job-card-advertisement-top')

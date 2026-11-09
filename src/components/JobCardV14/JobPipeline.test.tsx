@@ -30,10 +30,11 @@ describe('JobPipeline', () => {
     expect(inProgress.className).toContain('tm-border-l')
     expect(within(unassessed).getByText('14').className).toContain('tm-text-2xl')
     expect(within(unassessed).getByText('14').parentElement?.className).toContain(
-      'tm-flex-col-reverse',
-    )
-    expect(within(unassessed).getByText('14').parentElement?.className).not.toContain(
       'tm-flex-row-reverse',
+    )
+    expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-items-center')
+    expect(within(unassessed).getByText('14').parentElement?.className).not.toContain(
+      'tm-flex-col-reverse',
     )
     expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-gap-2')
     expect(within(total).getByText('52').className).toContain('tm-text-xl')

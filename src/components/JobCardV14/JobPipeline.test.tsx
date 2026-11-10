@@ -19,22 +19,21 @@ describe('JobPipeline', () => {
     const inProgress = screen.getByTestId('job-card-stat-inProgress')
     const total = screen.getByTestId('job-card-stat-total')
 
-    expect(unassessed.className).toContain('tm-w-[120px]')
-    expect(unassessed.className).not.toContain('tm-w-[150px]')
-    expect(unassessed.className).toContain('tm-items-end')
-    expect(inProgress.className).toContain('tm-w-[120px]')
-    expect(inProgress.className).toContain('tm-items-end')
-    expect(total.className).toContain('tm-items-end')
+    expect(unassessed.className).toContain('tm-w-[150px]')
+    expect(unassessed.className).not.toContain('tm-w-[120px]')
+    expect(unassessed.className).toContain('tm-items-start')
+    expect(inProgress.className).toContain('tm-w-[150px]')
+    expect(inProgress.className).not.toContain('tm-w-[120px]')
+    expect(inProgress.className).toContain('tm-items-start')
+    expect(total.className).toContain('tm-items-start')
     expect(total.className).toContain('tm-w-[120px]')
     expect(total.className).not.toContain('tm-w-[150px]')
     expect(inProgress.className).toContain('tm-border-l')
     expect(within(unassessed).getByText('14').className).toContain('tm-text-2xl')
-    expect(within(unassessed).getByText('14').parentElement?.className).toContain(
-      'tm-flex-row-reverse',
-    )
+    expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-flex-row')
     expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-items-center')
     expect(within(unassessed).getByText('14').parentElement?.className).not.toContain(
-      'tm-flex-col-reverse',
+      'tm-flex-row-reverse',
     )
     expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-gap-2')
     expect(within(total).getByText('52').className).toContain('tm-text-xl')

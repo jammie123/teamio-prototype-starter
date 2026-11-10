@@ -120,7 +120,6 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
     ? shownAdvertisements.slice(0, 1)
     : shownAdvertisements
   const additionalAdvertisementsCount = shownAdvertisements.length - 1
-  const hasNote = Boolean(note?.text.trim())
 
   return (
     <Card
@@ -191,12 +190,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
       {showAdvertisements ? (
         <div data-testid="job-card-advertisements" className="tm-flex tm-w-full tm-flex-col">
           {shownAdvertisements.length === 0 ? (
-            <div
-              className={cn(
-                'tm-border-0 tm-border-solid tm-border-secondary tm-px-4 tm-py-5',
-                !hasNote && 'tm-border-t',
-              )}
-            >
+            <div className="tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-px-4 tm-py-5">
               <div
                 data-testid="job-card-no-advertisement"
                 className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm tm-text-secondary-default"
@@ -211,7 +205,7 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
             </div>
           ) : (
             <>
-              {visibleAdvertisements.map((advertisement, index) => (
+              {visibleAdvertisements.map((advertisement) => (
                 <AdvertisementWidget
                   key={`${advertisement.id}-${status}`}
                   advertisement={advertisement}
@@ -221,7 +215,6 @@ export const JobCardV14 = forwardRef<HTMLElement, JobCardV14Props>(function JobC
                   onAdvertisementDetailClick={onAdvertisementDetailClick}
                   actionLayout={advertisementActionLayout}
                   showProlong={showProlong}
-                  hideTopBorder={hasNote && index === 0}
                   className="tm-pl-14 tm-pr-6"
                 />
               ))}

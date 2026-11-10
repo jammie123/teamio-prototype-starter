@@ -122,7 +122,7 @@ describe('JobCardV14', () => {
     )
     expect(headerRow.compareDocumentPosition(recruitmentNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(recruitmentNote.compareDocumentPosition(advertisement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(advertisement.className).not.toContain('tm-border-t')
+    expect(advertisement.className).toContain('tm-border-t')
     expect(advertisement.className).toContain('tm-pt-4')
   })
 
@@ -136,11 +136,11 @@ describe('JobCardV14', () => {
     expect(advertisement.className).toContain('tm-pt-4')
   })
 
-  it('keeps the top border on later advertisements when a note exists', () => {
+  it('keeps the top border on advertisements when a note exists', () => {
     renderJobCard({ advertisements: [runningSame, { ...endingSoon, id: 'ad-2' }] })
 
     const advertisements = screen.getAllByTestId('job-card-advertisement')
-    expect(advertisements[0].className).not.toContain('tm-border-t')
+    expect(advertisements[0].className).toContain('tm-border-t')
     expect(advertisements[0].className).toContain('tm-pt-4')
     expect(advertisements[1].className).toContain('tm-border-t')
     expect(advertisements[1].className).toContain('tm-pt-4')

@@ -290,6 +290,15 @@ export {
   type JobCandidateStat as JobCardV17CandidateStat,
   type JobCardNote as JobCardV17Note,
 } from './JobCardV17'
+export {
+  JobCardV20,
+  AdvertisementWidget as JobCardV20AdvertisementWidget,
+  type JobCardV20Props,
+  type AdvertisementWidgetProps as JobCardV20AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV20Candidates,
+  type JobCandidateStat as JobCardV20CandidateStat,
+  type JobCardNote as JobCardV20Note,
+} from './JobCardV20'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

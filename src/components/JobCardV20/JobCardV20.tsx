@@ -124,6 +124,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
   const statsModel = statsAdvertisement
     ? buildAdvertisementModel(statsAdvertisement, now)
     : undefined
+  const isMuted = status === 'unpublished' || statsModel?.kind === 'ended'
 
   return (
     <Card
@@ -131,7 +132,13 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
       ref={ref}
       data-testid="job-card"
       data-variant="v20"
-      className={cn('tm-flex', 'tm-flex-col', '!tm-p-0', className)}
+      className={cn(
+        'tm-flex',
+        'tm-flex-col',
+        '!tm-p-0',
+        isMuted && '!tm-bg-white/70',
+        className,
+      )}
       {...rest}
     >
       <div
@@ -204,6 +211,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                     showHeadingLabel={showAdvertisementHeadingLabel}
                     now={now}
                     hideTopBorder={index === 0}
+                    onProlong={onExtendAndRepublish}
                   />
                 ))}
                 {collapseToFirstAd ? (

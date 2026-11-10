@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Button } from '../Button'
 import { AdvertisementHeader } from './AdvertisementHeader'
 import { buildAdvertisementModel } from './lib/advertisementModel'
 import { PublicationHighlights, PublicationItem } from './PublicationItem'
@@ -16,6 +17,8 @@ export interface AdvertisementWidgetProps extends StyleProps {
   now?: Date
   /** Drop the top divider. Defaults to true for the compact right column. */
   hideTopBorder?: boolean
+  /** Called from Naplánovat prodloužení when the advertisement is ending soon. */
+  onProlong?: () => void
 }
 
 /**
@@ -28,6 +31,7 @@ export function AdvertisementWidget({
   showHeadingLabel = false,
   now,
   hideTopBorder = true,
+  onProlong,
   className,
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now)
@@ -82,6 +86,19 @@ export function AdvertisementWidget({
               </Fragment>
             ))}
           </div>
+          {model.canProlong ? (
+            <Button
+              variant="primary"
+              data-testid="job-card-disappearance-prolong"
+              aria-label="Naplánovat prodloužení"
+              onClick={(event) => {
+                event.stopPropagation()
+                onProlong?.()
+              }}
+            >
+              Naplánovat prodloužení
+            </Button>
+          ) : null}
         </>
       )}
     </div>

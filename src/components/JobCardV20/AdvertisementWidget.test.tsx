@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import { AdvertisementWidget } from './AdvertisementWidget'
 import type { JobAdvertisement, JobPublication } from './types'
 
@@ -52,6 +53,7 @@ describe('AdvertisementWidget', () => {
     expect(channels.className).not.toContain('tm-flex-row')
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
     expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-action')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-top')).not.toBeInTheDocument()
   })
@@ -128,18 +130,31 @@ describe('AdvertisementWidget', () => {
     expect(screen.getAllByTestId('job-card-publication-dot')).toHaveLength(3)
   })
 
-  it('shows ending-soon warning without Prodloužit', () => {
-    renderWidget(endingSoon)
+  it('shows a primary schedule-extension button below publications when ending soon', async () => {
+    const user = userEvent.setup()
+    const onProlong = vi.fn()
+    renderWidget(endingSoon, { onProlong })
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     const heading = within(advertisement).getByTestId('job-card-advertisement-heading')
+    const publications = within(advertisement).getByTestId('job-card-advertisement-publications')
+    const prolong = within(advertisement).getByTestId('job-card-disappearance-prolong')
 
     expect(heading).toHaveTextContent('Končí za 3 dny 1. 9. – 30. 9. 2026')
     expect(heading.className).toContain('tm-text-emotion-warning-emphasis')
     expect(advertisement).toHaveAttribute('data-kind', 'endingSoon')
     expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
     expect(advertisement.className).not.toMatch(/tm-bg-/)
-    expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
+    expect(prolong).toHaveTextContent('Naplánovat prodloužení')
+    expect(prolong).toHaveClass('tm-bg-action-primary-default')
+    expect(prolong).toHaveClass('tm-min-h-8')
+    expect(prolong).not.toHaveClass('tm-min-h-6')
+    expect(
+      publications.compareDocumentPosition(prolong) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+
+    await user.click(prolong)
+    expect(onProlong).toHaveBeenCalledOnce()
   })
 
   it('shows an ended advertisement with from-to dates', () => {

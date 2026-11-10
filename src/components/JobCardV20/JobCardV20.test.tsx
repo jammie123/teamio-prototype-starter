@@ -33,6 +33,19 @@ const endingSoon: JobAdvertisement = {
   ),
 }
 
+const ended: JobAdvertisement = {
+  id: 'ad-ended',
+  publications: [
+    portal({
+      id: 'jobs',
+      channel: 'Jobs.cz',
+      status: 'expired',
+      startDate: '1. 8. 2026',
+      endDate: '15. 8. 2026',
+    }),
+  ],
+}
+
 function renderJobCard(props: Partial<JobCardV20Props> = {}) {
   return render(
     <JobCardV20
@@ -144,6 +157,7 @@ describe('JobCardV20', () => {
 
     expect(card).toHaveAttribute('data-variant', 'v20')
     expect(card.className).toContain('!tm-p-0')
+    expect(card.className).not.toContain('tm-bg-white/70')
     expect(layoutRow).toContainElement(column)
     expect(main).not.toContainElement(column)
     expect(column.className).toContain('tm-border-l')
@@ -186,9 +200,16 @@ describe('JobCardV20', () => {
     expect(screen.getByTestId('job-card-main')).toBeInTheDocument()
   })
 
+  it('uses a translucent white background when the advertisement is ended', () => {
+    renderJobCard({ advertisements: [ended] })
+
+    expect(screen.getByTestId('job-card').className).toContain('!tm-bg-white/70')
+  })
+
   it('marks every portal as ended for an unpublished job', () => {
     renderJobCard({ status: 'unpublished' })
 
+    expect(screen.getByTestId('job-card').className).toContain('!tm-bg-white/70')
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'ended')
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Ukončeno')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
@@ -210,7 +231,27 @@ describe('JobCardV20', () => {
     expect(advertisement).toHaveAttribute('data-kind', 'endingSoon')
     expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
     expect(advertisement.className).not.toMatch(/tm-bg-/)
-    expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveTextContent(
+      'Naplánovat prodloužení',
+    )
+    expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveClass(
+      'tm-bg-action-primary-default',
+      'tm-min-h-8',
+    )
+    expect(
+      screen.getByTestId('job-card-advertisement-publications').compareDocumentPosition(
+        screen.getByTestId('job-card-disappearance-prolong'),
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('calls onExtendAndRepublish from Naplánovat prodloužení when the advertisement ends soon', async () => {
+    const user = userEvent.setup()
+    const onExtendAndRepublish = vi.fn()
+    renderJobCard({ advertisements: [endingSoon], onExtendAndRepublish })
+
+    await user.click(screen.getByTestId('job-card-disappearance-prolong'))
+    expect(onExtendAndRepublish).toHaveBeenCalledOnce()
   })
 
   it('offers creating an advertisement when the job has none', async () => {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { AdvertisementWidget } from './AdvertisementWidget'
 import {
   endedSame,
@@ -15,6 +16,7 @@ const meta = {
   component: AdvertisementWidget,
   args: {
     advertisement: runningSame,
+    onProlong: fn(),
   },
   decorators: [
     (Story) => (

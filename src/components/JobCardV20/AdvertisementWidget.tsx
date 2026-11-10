@@ -18,7 +18,7 @@ export interface AdvertisementWidgetProps extends StyleProps {
 
 /**
  * Compact advertisement block for the job-card right column:
- * status, dates and portals. No Detail / Prodloužit / views.
+ * status, dates and portals.
  */
 export function AdvertisementWidget({
   advertisement,

@@ -293,8 +293,10 @@ export {
 export {
   JobCardV20,
   AdvertisementWidget as JobCardV20AdvertisementWidget,
+  AdvertisementStats as JobCardV20AdvertisementStats,
   type JobCardV20Props,
   type AdvertisementWidgetProps as JobCardV20AdvertisementWidgetProps,
+  type AdvertisementStatsProps as JobCardV20AdvertisementStatsProps,
   type JobCardCandidates as JobCardV20Candidates,
   type JobCandidateStat as JobCardV20CandidateStat,
   type JobCardNote as JobCardV20Note,

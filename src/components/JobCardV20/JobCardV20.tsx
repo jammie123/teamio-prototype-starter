@@ -3,8 +3,10 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
 import { Link } from '../Link'
+import { AdvertisementStats } from './AdvertisementStats'
 import { AdvertisementWidget } from './AdvertisementWidget'
 import { JobAssignee } from './JobAssignee'
+import { buildAdvertisementModel } from './lib/advertisementModel'
 import { JobCardActions } from './JobCardActions'
 import { buildJobCardMenuSections, type JobCardMenuHandlers } from './jobCardMenu'
 import { JobNote } from './JobNote'
@@ -38,6 +40,8 @@ export interface JobCardV20Props
   actions?: JobCardAction[]
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
+  onViewStatisticsClick?: () => void
+  onAdvertisementDetailClick?: () => void
 }
 
 /** An unpublished job keeps its advertisements, but every portal counts as ended. */
@@ -81,6 +85,8 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
     onEndPublication,
     onHighlightAdvertisement,
     onTopAdvertisement,
+    onViewStatisticsClick,
+    onAdvertisementDetailClick,
     now,
     className,
     ...rest
@@ -111,6 +117,10 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
     ? shownAdvertisements.slice(0, 1)
     : shownAdvertisements
   const additionalAdvertisementsCount = shownAdvertisements.length - 1
+  const statsAdvertisement = visibleAdvertisements[0]
+  const statsModel = statsAdvertisement
+    ? buildAdvertisementModel(statsAdvertisement, now)
+    : undefined
 
   return (
     <Card
@@ -136,7 +146,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
           ) : null}
           <div
             data-testid="job-card-main"
-            className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-2"
+            className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-6"
           >
             <div
               data-testid="job-card-title-heading-row"
@@ -200,6 +210,14 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                   >
                     {`Zobrazit další inzeráty (${additionalAdvertisementsCount})`}
                   </Link>
+                ) : null}
+                {statsModel ? (
+                  <AdvertisementStats
+                    viewCount={statsModel.viewCount}
+                    onStatistics={onViewStatisticsClick}
+                    onDetail={onAdvertisementDetailClick}
+                    className="tm-mt-auto tm-pt-2"
+                  />
                 ) : null}
               </>
             )}

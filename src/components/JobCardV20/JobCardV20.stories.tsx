@@ -38,6 +38,8 @@ const meta = {
     advertisements: [runningSame],
     note: recruitmentNote,
     onExpandNote: fn(),
+    onViewStatisticsClick: fn(),
+    onAdvertisementDetailClick: fn(),
     ...menuHandlers,
   },
   decorators: [

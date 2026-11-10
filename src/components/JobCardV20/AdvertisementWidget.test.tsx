@@ -32,7 +32,7 @@ function renderWidget(advertisement: JobAdvertisement, props = {}) {
 }
 
 describe('AdvertisementWidget', () => {
-  it('renders status and portals without advertisement actions', () => {
+  it('renders status and portals without AdvertisementStats', () => {
     renderWidget(runningSame)
 
     const advertisement = screen.getByTestId('job-card-advertisement')
@@ -47,6 +47,7 @@ describe('AdvertisementWidget', () => {
     expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
+    expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-action')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-top')).not.toBeInTheDocument()
   })

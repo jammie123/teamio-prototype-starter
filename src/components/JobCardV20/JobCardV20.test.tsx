@@ -77,6 +77,7 @@ describe('JobCardV20', () => {
     expect(layoutRow).toContainElement(actions)
     expect(layoutRow).toContainElement(main)
     expect(layoutRow).toContainElement(advertisements)
+    expect(main.className).toContain('tm-gap-6')
     expect(main).toContainElement(headingRow)
     expect(main).toContainElement(pipeline)
     expect(main).not.toContainElement(advertisements)
@@ -156,6 +157,13 @@ describe('JobCardV20', () => {
       'Běží 1. 1. – 1. 2. 2026',
     )
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
+    const stats = within(column).getByTestId('job-card-advertisement-stats')
+    expect(advertisement).not.toContainElement(stats)
+    expect(stats.className).toContain('tm-mt-auto')
+    expect(stats).toHaveTextContent('Detail')
+    expect(
+      advertisement.compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(screen.queryByTestId('job-card-advertisement-action')).not.toBeInTheDocument()
   })
 
@@ -224,5 +232,18 @@ describe('JobCardV20', () => {
 
     await user.click(link)
     expect(onAdditionalAdvertisementsClick).toHaveBeenCalledOnce()
+  })
+
+  it('forwards statistics and detail clicks from AdvertisementStats', async () => {
+    const user = userEvent.setup()
+    const onViewStatisticsClick = vi.fn()
+    const onAdvertisementDetailClick = vi.fn()
+    renderJobCard({ onViewStatisticsClick, onAdvertisementDetailClick })
+
+    await user.click(screen.getByTestId('job-card-advertisement-aggregate-views'))
+    await user.click(screen.getByTestId('job-card-advertisement-detail-action'))
+
+    expect(onViewStatisticsClick).toHaveBeenCalledOnce()
+    expect(onAdvertisementDetailClick).toHaveBeenCalledOnce()
   })
 })

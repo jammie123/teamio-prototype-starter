@@ -8,18 +8,21 @@ import {
 
 export interface JobDetailStatsPeriodHeaderProps {
   period: JobDetailStatsPeriod
+  /** Formatted from–to dates for the selected period. */
+  periodRangeLabel: string
   onPeriodChange: (period: JobDetailStatsPeriod) => void
   isDisabled?: boolean
 }
 
 export function JobDetailStatsPeriodHeader({
   period,
+  periodRangeLabel,
   onPeriodChange,
   isDisabled = false,
 }: JobDetailStatsPeriodHeaderProps) {
   return (
     <div
-      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm"
+      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-pb-8 tm-text-sm"
       data-testid="job-detail-stats-period-header"
     >
       <span className="tm-text-secondary-default">{JOB_DETAIL_STATS_COPY.periodLabel}:</span>
@@ -27,7 +30,7 @@ export function JobDetailStatsPeriodHeader({
         className="tm-font-medium tm-text-primary-default"
         data-testid="job-detail-stats-period-label"
       >
-        {JOB_DETAIL_STATS_PERIOD_LABELS[period]}
+        {periodRangeLabel}
       </span>
       <Dropdown strategy="fixed" placement="bottom-start" className="tm-inline-flex">
         <DropdownToggle

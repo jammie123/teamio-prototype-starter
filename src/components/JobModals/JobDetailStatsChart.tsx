@@ -12,9 +12,10 @@ export const JOB_DETAIL_STATS_CHART_STROKE = {
   reactions: '#0087d6',
 } as const
 
-const VIEWBOX = { width: 800, height: 216 }
-const PLOT = { left: 44, right: 744, top: 16, bottom: 180 }
-const GRID_YS = [16, 57, 98, 139]
+const VIEWBOX = { width: 800, height: 152 }
+const PLOT = { left: 44, right: 744, top: 8, bottom: 128 }
+const GRID_YS = [8, 38, 68, 98]
+const X_LABEL_Y = 144
 
 export type JobDetailStatsSeriesKey = 'views' | 'reactions'
 
@@ -189,7 +190,7 @@ export function JobDetailStatsChart({
   const crosshairX = tooltip != null ? indexToPlotX(tooltip.index, series.length) : null
 
   return (
-    <div className={cn('tm-flex tm-flex-col tm-gap-4', className)}>
+    <div className={cn('tm-flex tm-flex-col tm-gap-2', className)}>
       <div
         id={legendId}
         className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-6 tm-gap-y-2"
@@ -266,7 +267,7 @@ export function JobDetailStatsChart({
               const lastIndex = Math.max(series.length - 1, 1)
               const x = PLOT.left + (index / lastIndex) * width
               return (
-                <text key={series[index]?.date ?? index} x={x} y={204}>
+                <text key={series[index]?.date ?? index} x={x} y={X_LABEL_Y}>
                   {formatJobDetailStatsChartDate(series[index].date)}
                 </text>
               )

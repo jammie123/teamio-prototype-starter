@@ -22,10 +22,11 @@ import {
   type JobDetailStatsHiddenSeries,
   type JobDetailStatsSeriesKey,
 } from './JobDetailStatsChart'
-import { JOB_DETAIL_STATS_COPY } from './jobDetailStatsCopy'
+import { JOB_DETAIL_STATS_COPY, JOB_DETAIL_STATS_PERIOD_LABELS } from './jobDetailStatsCopy'
 import { JOB_MODAL_CLOSE_ARIA_LABEL } from './JobModalFrame'
 import { JobDetailStatsPeriodHeader } from './JobDetailStatsPeriodHeader'
 import {
+  formatJobDetailStatsPublicationRange,
   sumJobDetailStatsPlaces,
   type JobDetailStatsPeriod,
   type JobDetailStatsSummary,
@@ -55,6 +56,20 @@ export interface JobDetailStatsModalProps extends StyleProps {
 const DEFAULT_HIDDEN_SERIES: JobDetailStatsHiddenSeries = {
   views: false,
   reactions: false,
+}
+
+function resolvePeriodRangeLabel(
+  period: JobDetailStatsPeriod,
+  summary?: JobDetailStatsSummary,
+  series: JobDetailStatsTimeSeriesPoint[] = [],
+): string {
+  if (summary?.periodStartDate && summary.periodEndDate) {
+    return formatJobDetailStatsPublicationRange(summary.periodStartDate, summary.periodEndDate)
+  }
+  if (series.length > 0) {
+    return formatJobDetailStatsPublicationRange(series[0].date, series[series.length - 1].date)
+  }
+  return JOB_DETAIL_STATS_PERIOD_LABELS[period]
 }
 
 export function JobDetailStatsModal({
@@ -117,20 +132,24 @@ export function JobDetailStatsModal({
     <Modal open={open} defaultOpen={defaultOpen} onOpenChange={handleOpenChange}>
       {trigger ? <ModalTrigger asChild>{trigger}</ModalTrigger> : null}
       <ModalContent size="wide" className={className} data-testid="job-detail-stats-modal">
-        <ModalTitle className="tm-pb-2 tm-text-2xl">{JOB_DETAIL_STATS_COPY.title}</ModalTitle>
-        <div className="tm-px-6 tm-pr-14 tm-pb-4">
-          <JobDetailStatsPeriodHeader period={period} onPeriodChange={handlePeriodChange} />
+        <ModalTitle className="tm-pb-0 tm-text-2xl">{JOB_DETAIL_STATS_COPY.title}</ModalTitle>
+        <div className="-tm-mt-6 tm-px-6 tm-pr-14">
+          <JobDetailStatsPeriodHeader
+            period={period}
+            periodRangeLabel={resolvePeriodRangeLabel(period, summary, series)}
+            onPeriodChange={handlePeriodChange}
+          />
         </div>
         <ModalClose aria-label={JOB_MODAL_CLOSE_ARIA_LABEL} />
         <ModalBody
-          className="tm-flex tm-min-h-0 tm-flex-col tm-gap-8 tm-pb-8"
+          className="tm-flex tm-min-h-0 tm-flex-col tm-gap-6 tm-pb-8"
           data-job-id={jobId}
         >
           <section
             aria-label="Statistický widget"
-            className="tm-flex tm-flex-col tm-gap-4 tm-rounded-lg tm-border tm-border-secondary tm-p-4 md:tm-p-5"
+            className="tm-flex tm-flex-col tm-rounded-lg tm-border tm-border-secondary tm-px-3 tm-py-8"
           >
-            <div className="tm-relative tm-min-h-[220px] tm-overflow-visible">
+            <div className="tm-relative tm-min-h-[152px] tm-overflow-visible">
               {showError ? (
                 <Alert variant="error">
                   <p className="tm-m-0">{JOB_DETAIL_STATS_COPY.error}</p>
@@ -143,12 +162,12 @@ export function JobDetailStatsModal({
               ) : null}
 
               {showInitialLoading ? (
-                <Skeleton variant="light" width="100%" height={220} className="tm-block" />
+                <Skeleton variant="light" width="100%" height={152} className="tm-block" />
               ) : null}
 
               {!showError && !showInitialLoading && isEmpty ? (
                 <p
-                  className="tm-m-0 tm-py-12 tm-text-center tm-text-secondary-default"
+                  className="tm-m-0 tm-py-8 tm-text-center tm-text-secondary-default"
                   data-testid="job-detail-stats-empty"
                 >
                   {JOB_DETAIL_STATS_COPY.empty}

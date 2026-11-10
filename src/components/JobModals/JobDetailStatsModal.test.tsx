@@ -6,6 +6,7 @@ import { JobDetailStatsModal } from './JobDetailStatsModal'
 import { JOB_DETAIL_STATS_COPY, JOB_DETAIL_STATS_PERIOD_LABELS } from './jobDetailStatsCopy'
 import {
   filterSeriesByRange,
+  formatJobDetailStatsPublicationRange,
   resolvePeriodRange,
   toDateOnlyIso,
 } from './jobDetailStatsPeriod'
@@ -41,6 +42,12 @@ describe('jobDetailStatsPeriod', () => {
     const filtered = filterSeriesByRange(series, range)
     expect(filtered.length).toBeGreaterThan(0)
     expect(filtered.every((point) => point.date >= toDateOnlyIso(range.start))).toBe(true)
+  })
+
+  it('formats a real from–to period for the header', () => {
+    expect(formatJobDetailStatsPublicationRange('2026-08-01', '2026-11-04')).toBe(
+      '1. 8. 2026 – 4. 11. 2026',
+    )
   })
 })
 
@@ -139,8 +146,70 @@ describe('JobDetailStatsModal', () => {
     await user.click(screen.getByRole('button', { name: 'Otevřít statistiky' }))
     expect(onPeriodChange).toHaveBeenCalledWith('sincePublication')
     expect(screen.getByTestId('job-detail-stats-period-label')).toHaveTextContent(
+      formatJobDetailStatsPublicationRange(
+        readyFixture.summary.periodStartDate,
+        readyFixture.summary.periodEndDate,
+      ),
+    )
+  })
+
+  it('shows the resolved from–to dates next to Období', () => {
+    render(
+      <JobDetailStatsModal
+        jobId="job-1"
+        defaultOpen
+        status="ready"
+        series={readyFixture.series}
+        summary={readyFixture.summary}
+      />,
+    )
+    expect(screen.getByTestId('job-detail-stats-period-label')).toHaveTextContent(
+      formatJobDetailStatsPublicationRange(
+        readyFixture.summary.periodStartDate,
+        readyFixture.summary.periodEndDate,
+      ),
+    )
+    expect(screen.getByTestId('job-detail-stats-period-label')).not.toHaveTextContent(
       JOB_DETAIL_STATS_PERIOD_LABELS.sincePublication,
     )
+    expect(screen.getByTestId('job-detail-stats-period-header')).toHaveClass('tm-pb-8')
+    expect(screen.getByRole('region', { name: 'Statistický widget' })).toHaveClass('tm-py-8')
+  })
+
+  it('falls back to the period preset when no dates are available', () => {
+    render(<JobDetailStatsModal jobId="job-1" defaultOpen status="loading" />)
+    expect(screen.getByTestId('job-detail-stats-period-label')).toHaveTextContent(
+      JOB_DETAIL_STATS_PERIOD_LABELS.sincePublication,
+    )
+  })
+
+  it('keeps title padding-bottom at 0', async () => {
+    render(
+      <JobDetailStatsModal
+        jobId="job-1"
+        defaultOpen
+        status="ready"
+        series={readyFixture.series}
+        summary={readyFixture.summary}
+      />,
+    )
+    const title = await screen.findByRole('heading', { name: JOB_DETAIL_STATS_COPY.title })
+    expect(title).toHaveClass('tm-pb-0')
+    expect(title).not.toHaveClass('tm-pb-2')
+  })
+
+  it('renders a shorter stats chart', () => {
+    render(
+      <JobDetailStatsModal
+        jobId="job-1"
+        defaultOpen
+        status="ready"
+        series={readyFixture.series}
+        summary={readyFixture.summary}
+      />,
+    )
+    const chart = screen.getByRole('img', { name: JOB_DETAIL_STATS_COPY.chartAriaLabel })
+    expect(chart).toHaveAttribute('viewBox', '0 0 800 152')
   })
 
   it('shows empty copy when there is no data', () => {

@@ -83,7 +83,9 @@ describe('JobCardV20', () => {
     expect(headingRow).toContainElement(title)
     expect(headingRow).toContainElement(people)
     expect(headingRow).not.toContainElement(pipeline)
-    expect(headingRow.className).toContain('tm-flex-col')
+    expect(headingRow.className).toContain('tm-items-start')
+    expect(headingRow.className).not.toContain('tm-flex-col')
+    expect(people.parentElement?.className).toContain('tm-ml-auto')
     expect(pipeline.className).not.toContain('tm-ml-auto')
     expect(title.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(people.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -144,7 +146,9 @@ describe('JobCardV20', () => {
     expect(layoutRow).toContainElement(column)
     expect(main).not.toContainElement(column)
     expect(column.className).toContain('tm-border-l')
-    expect(column.className).toContain('tm-w-80')
+    expect(column.className).toContain('tm-w-[300px]')
+    expect(column.className).toContain('tm-px-6')
+    expect(column.className).not.toContain('tm-w-80')
     expect(column).toContainElement(advertisement)
     expect(advertisement.className).not.toContain('tm-pl-14')
     expect(advertisement.className).not.toContain('tm-border-t')
@@ -177,15 +181,16 @@ describe('JobCardV20', () => {
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
   })
 
-  it('keeps the ending-soon warning background on the compact widget', () => {
+  it('shows ending-soon status without a warning background', () => {
     renderJobCard({ advertisements: [endingSoon] })
 
+    const advertisement = screen.getByTestId('job-card-advertisement')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Končí za 3 dny 1. 9. – 30. 9. 2026',
     )
-    expect(screen.getByTestId('job-card-advertisement').className).toContain(
-      'tm-bg-emotion-warning-background/80',
-    )
+    expect(advertisement).toHaveAttribute('data-kind', 'endingSoon')
+    expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
+    expect(advertisement.className).not.toMatch(/tm-bg-/)
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
   })
 

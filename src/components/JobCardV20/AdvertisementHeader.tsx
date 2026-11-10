@@ -30,11 +30,12 @@ export function AdvertisementHeader({
       data-tone={tone}
       className={cn(
         'tm-flex',
+        'tm-w-full',
         'tm-min-w-0',
         'tm-flex-row',
         'tm-flex-wrap',
         'tm-items-baseline',
-        'tm-gap-5',
+        'tm-justify-between',
         'tm-whitespace-normal',
         'tm-text-sm',
         'tm-font-medium',

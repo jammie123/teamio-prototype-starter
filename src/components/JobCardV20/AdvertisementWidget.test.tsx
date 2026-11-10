@@ -128,7 +128,9 @@ describe('AdvertisementWidget', () => {
 
     expect(heading).toHaveTextContent('Končí za 3 dny 1. 9. – 30. 9. 2026')
     expect(heading.className).toContain('tm-text-emotion-warning-emphasis')
-    expect(advertisement.className).toContain('tm-bg-emotion-warning-background/80')
+    expect(advertisement).toHaveAttribute('data-kind', 'endingSoon')
+    expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
+    expect(advertisement.className).not.toMatch(/tm-bg-/)
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
   })
 

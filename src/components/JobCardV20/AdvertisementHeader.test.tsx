@@ -12,8 +12,10 @@ describe('AdvertisementHeader', () => {
 
     expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
     expect(heading.className).toContain('tm-flex-row')
+    expect(heading.className).toContain('tm-w-full')
+    expect(heading.className).toContain('tm-justify-between')
     expect(heading.className).toContain('tm-items-baseline')
-    expect(heading.className).toContain('tm-gap-5')
+    expect(heading.className).not.toContain('tm-gap-5')
     expect(heading.className).toContain('tm-text-emotion-success-emphasis')
     expect(label).toHaveTextContent('Běží')
     expect(label.className).toContain('tm-text-base')

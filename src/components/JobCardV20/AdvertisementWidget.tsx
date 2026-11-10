@@ -29,7 +29,6 @@ export function AdvertisementWidget({
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now)
   const isNotPublished = model.kind === 'notPublished'
-  const isEndingSoon = model.kind === 'endingSoon'
 
   return (
     <div
@@ -45,7 +44,6 @@ export function AdvertisementWidget({
         'tm-border-solid',
         'tm-border-secondary',
         !hideTopBorder && 'tm-border-t tm-pt-4',
-        isEndingSoon && 'tm-bg-emotion-warning-background/80',
         className,
       )}
     >
@@ -64,7 +62,7 @@ export function AdvertisementWidget({
           <AdvertisementHeader {...model.header} />
           <div
             data-testid="job-card-advertisement-publications"
-            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-center tm-gap-4 tm-p-0"
+            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-center tm-gap-2 tm-p-0"
           >
             {model.publications.map((item) => (
               <Fragment key={item.publication.id}>

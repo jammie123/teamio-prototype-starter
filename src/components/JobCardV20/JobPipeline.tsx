@@ -69,10 +69,9 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
           'tm-items-start',
           'tm-justify-center',
           'tm-gap-0.5',
-          'tm-px-4',
-          'tm-py-2',
+          key === 'total' ? 'tm-pl-4' : 'tm-p-0',
           'tm-text-left',
-          index > 0 && 'tm-border-0 tm-border-l tm-border-solid tm-border-secondary',
+          key === 'total' && 'tm-border-0 tm-border-l tm-border-solid tm-border-secondary',
         )
 
         const content = (

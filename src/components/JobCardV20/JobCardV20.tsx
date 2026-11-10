@@ -140,21 +140,20 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
           >
             <div
               data-testid="job-card-title-heading-row"
-              className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5"
+              className="tm-flex tm-min-w-0 tm-w-full tm-items-start tm-gap-3"
             >
               <h3
                 data-testid="job-card-title"
-                className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-medium tm-leading-tight tm-text-teamio-blue"
+                className="tm-mb-0 tm-min-w-0 tm-flex-1 tm-text-lg tm-font-medium tm-leading-tight tm-text-teamio-blue"
               >
                 {title}
               </h3>
-              <div className="tm-min-w-0">
-                <JobAssignee
-                  owner={owner}
-                  hiringManagers={hiringManagers}
-                  onInviteMore={onInviteColleagues}
-                />
-              </div>
+              <JobAssignee
+                owner={owner}
+                hiringManagers={hiringManagers}
+                onInviteMore={onInviteColleagues}
+                className="tm-ml-auto tm-shrink-0"
+              />
             </div>
             {candidates ? (
               <div data-testid="job-card-pipeline" className="tm-shrink-0">
@@ -168,7 +167,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
         {showAdvertisements ? (
           <div
             data-testid="job-card-advertisements"
-            className="tm-flex tm-w-80 tm-shrink-0 tm-flex-col tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-px-4 tm-py-6"
+            className="tm-flex tm-w-[300px] tm-shrink-0 tm-flex-col tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-px-6 tm-py-6"
           >
             {shownAdvertisements.length === 0 ? (
               <div

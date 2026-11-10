@@ -44,8 +44,12 @@ describe('AdvertisementWidget', () => {
     const heading = within(advertisement).getByTestId('job-card-advertisement-heading')
     const channels = within(advertisement).getByTestId('job-card-advertisement-publications')
 
-    expect(heading).toHaveTextContent('Běží 1. 1. – 1. 2. 2026')
+    expect(heading).toHaveTextContent('1. 1. – 1. 2. 2026')
+    expect(within(heading).queryByTestId('job-card-advertisement-heading-label')).not.toBeInTheDocument()
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(channels.className).toContain('tm-flex-col')
+    expect(channels.className).toContain('tm-gap-1')
+    expect(channels.className).not.toContain('tm-flex-row')
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
     expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-action')).not.toBeInTheDocument()
@@ -115,8 +119,11 @@ describe('AdvertisementWidget', () => {
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(within(advertisement).getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      'Běží 30. 10.',
+      '1. 9. – 30. 10. 2026',
     )
+    expect(
+      within(advertisement).getByTestId('job-card-advertisement-heading-date'),
+    ).toHaveTextContent('1. 9. – 30. 10. 2026')
     expect(within(advertisement).getByText('ukončeno 15. 8.')).toBeInTheDocument()
     expect(screen.getAllByTestId('job-card-publication-dot')).toHaveLength(3)
   })
@@ -156,6 +163,8 @@ describe('AdvertisementWidget', () => {
       ],
     })
 
+    expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'ended')
+    expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Ukončeno')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Ukončeno 1. 8. – 15. 8. 2026',
     )
@@ -195,5 +204,11 @@ describe('AdvertisementWidget', () => {
     renderWidget({ ...runningSame, title: 'Hlavní inzerát' }, { showTitle: true })
 
     expect(screen.getByTestId('job-card-advertisement-title')).toHaveTextContent('Hlavní inzerát')
+  })
+
+  it('shows the heading label when requested', () => {
+    renderWidget(runningSame, { showHeadingLabel: true })
+
+    expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Běží')
   })
 })

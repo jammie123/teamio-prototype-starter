@@ -6,8 +6,10 @@ export interface AdvertisementHeaderProps extends StyleProps {
   /** success = Běží, warning = Brzy končí, ended = Ukončeno, neutral = Zatím nevystavený. */
   tone: AdvertisementTone
   label: string
-  /** Date range or single date next to the label. */
+  /** From–to range next to the label (`1. 9. – 30. 9. 2026`). */
   dateInfo?: string
+  /** Show the status label. Warning and ended tones always show it. */
+  showLabel?: boolean
 }
 
 const LABEL_CLASS: Record<AdvertisementTone, string> = {
@@ -22,8 +24,11 @@ export function AdvertisementHeader({
   tone,
   label,
   dateInfo,
+  showLabel = false,
   className,
 }: AdvertisementHeaderProps) {
+  const showHeadingLabel = showLabel || tone === 'warning' || tone === 'ended' || !dateInfo
+
   return (
     <div
       data-testid="job-card-advertisement-heading"
@@ -35,7 +40,7 @@ export function AdvertisementHeader({
         'tm-flex-row',
         'tm-flex-wrap',
         'tm-items-baseline',
-        'tm-justify-between',
+        showHeadingLabel && dateInfo && 'tm-justify-between',
         'tm-whitespace-normal',
         'tm-text-sm',
         'tm-font-medium',
@@ -43,13 +48,15 @@ export function AdvertisementHeader({
         className,
       )}
     >
-      <span data-testid="job-card-advertisement-heading-label" className="tm-text-base">
-        {label}
-      </span>
+      {showHeadingLabel ? (
+        <span data-testid="job-card-advertisement-heading-label" className="tm-text-base">
+          {label}
+        </span>
+      ) : null}
       {dateInfo ? (
         <span
           data-testid="job-card-advertisement-heading-date"
-          className="tm-font-normal tm-text-secondary-default"
+          className="tm-text-base tm-font-normal tm-text-secondary-default"
         >
           {' '}
           {dateInfo}

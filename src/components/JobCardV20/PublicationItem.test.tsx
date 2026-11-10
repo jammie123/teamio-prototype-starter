@@ -17,6 +17,7 @@ describe('PublicationItem', () => {
 
     const item = screen.getByTestId('job-card-publication')
     expect(item).toHaveAttribute('data-status', 'active')
+    expect(item.className).toContain('tm-px-2')
     expect(item.className).not.toContain('tm-border-secondary')
     expect(item.className).not.toContain('tm-rounded-full')
     const channel = screen.getByTestId('job-card-publication-channel')

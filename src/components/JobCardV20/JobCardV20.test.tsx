@@ -77,7 +77,7 @@ describe('JobCardV20', () => {
     expect(layoutRow).toContainElement(actions)
     expect(layoutRow).toContainElement(main)
     expect(layoutRow).toContainElement(advertisements)
-    expect(main.className).toContain('tm-gap-6')
+    expect(main.className).toContain('tm-gap-4')
     expect(main).toContainElement(headingRow)
     expect(main).toContainElement(pipeline)
     expect(main).not.toContainElement(advertisements)
@@ -147,20 +147,24 @@ describe('JobCardV20', () => {
     expect(layoutRow).toContainElement(column)
     expect(main).not.toContainElement(column)
     expect(column.className).toContain('tm-border-l')
-    expect(column.className).toContain('tm-w-[300px]')
+    expect(column.className).toContain('tm-w-[350px]')
+    expect(column.className).not.toContain('tm-w-[300px]')
     expect(column.className).toContain('tm-px-6')
     expect(column.className).not.toContain('tm-w-80')
     expect(column).toContainElement(advertisement)
     expect(advertisement.className).not.toContain('tm-pl-14')
     expect(advertisement.className).not.toContain('tm-border-t')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      'Běží 1. 1. – 1. 2. 2026',
+      '1. 1. – 1. 2. 2026',
     )
+    expect(screen.queryByTestId('job-card-advertisement-heading-label')).not.toBeInTheDocument()
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
     const stats = within(column).getByTestId('job-card-advertisement-stats')
     expect(advertisement).not.toContainElement(stats)
     expect(stats.className).toContain('tm-mt-auto')
-    expect(stats).toHaveTextContent('Detail')
+    expect(stats.className).toContain('tm-pt-4')
+    expect(stats.className).not.toContain('tm-pt-2')
+    expect(stats).toHaveTextContent('Detailní statistiky')
     expect(
       advertisement.compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
@@ -185,7 +189,11 @@ describe('JobCardV20', () => {
   it('marks every portal as ended for an unpublished job', () => {
     renderJobCard({ status: 'unpublished' })
 
-    expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent('Ukončeno')
+    expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'ended')
+    expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Ukončeno')
+    expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
+      'Ukončeno 1. 1. – 1. 2. 2026',
+    )
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
   })
 
@@ -193,6 +201,9 @@ describe('JobCardV20', () => {
     renderJobCard({ advertisements: [endingSoon] })
 
     const advertisement = screen.getByTestId('job-card-advertisement')
+    expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent(
+      'Končí za 3 dny',
+    )
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
       'Končí za 3 dny 1. 9. – 30. 9. 2026',
     )
@@ -232,6 +243,12 @@ describe('JobCardV20', () => {
 
     await user.click(link)
     expect(onAdditionalAdvertisementsClick).toHaveBeenCalledOnce()
+  })
+
+  it('shows the advertisement heading label when requested', () => {
+    renderJobCard({ showAdvertisementHeadingLabel: true })
+
+    expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Běží')
   })
 
   it('forwards statistics and detail clicks from AdvertisementStats', async () => {

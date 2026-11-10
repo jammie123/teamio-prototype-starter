@@ -37,7 +37,8 @@ describe('JobPipeline', () => {
     expect(total.className).toContain('tm-pl-4')
     expect(total.className).not.toContain('tm-px-4')
     expect(total.className).not.toContain('tm-py-2')
-    expect(within(unassessed).getByText('14').className).toContain('tm-text-2xl')
+    expect(within(unassessed).getByText('14').className).toContain('tm-text-xl')
+    expect(within(unassessed).getByText('14').className).not.toContain('tm-text-2xl')
     expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-flex-row')
     expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-items-center')
     expect(within(unassessed).getByText('14').parentElement?.className).not.toContain(

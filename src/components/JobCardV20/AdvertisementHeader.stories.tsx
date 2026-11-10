@@ -8,6 +8,7 @@ const meta = {
     tone: 'success',
     label: 'Běží',
     dateInfo: '1. 9. – 30. 9. 2026',
+    showLabel: true,
   },
   decorators: [
     (Story) => (
@@ -31,8 +32,8 @@ export const RunningDifferentPeriods: Story = {
 }
 
 export const RunningWithEndedPortal: Story = {
-  name: 'Běží do (část portálů skončila)',
-  args: { label: 'Běží', dateInfo: '30. 9.' },
+  name: 'Běží od–do (část portálů skončila)',
+  args: { label: 'Běží', dateInfo: '1. 9. – 30. 9. 2026' },
 }
 
 export const EndingSoon: Story = {
@@ -54,10 +55,10 @@ export const Overview: Story = {
   name: 'Přehled stavů',
   render: () => (
     <div className="tm-flex tm-flex-col tm-gap-4">
-      <AdvertisementHeader tone="success" label="Běží" dateInfo="1. 9. – 30. 9. 2026" />
-      <AdvertisementHeader tone="success" label="Běží v různých obdobích" />
+      <AdvertisementHeader showLabel tone="success" label="Běží" dateInfo="1. 9. – 30. 9. 2026" />
+      <AdvertisementHeader showLabel tone="success" label="Běží v různých obdobích" />
       <AdvertisementHeader tone="warning" label="Končí za 3 dny" dateInfo="1. 9. – 30. 9. 2026" />
-      <AdvertisementHeader tone="ended" label="Ukončeno" dateInfo="1. 8. – 15. 8. 2026" />
+      <AdvertisementHeader showLabel tone="ended" label="Ukončeno" dateInfo="1. 8. – 15. 8. 2026" />
       <AdvertisementHeader tone="neutral" label="Zatím nevystavený inzerát" />
     </div>
   ),

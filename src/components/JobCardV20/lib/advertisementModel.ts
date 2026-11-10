@@ -27,7 +27,7 @@ export type AdvertisementKind =
 export interface AdvertisementHeaderModel {
   tone: AdvertisementTone
   label: string
-  /** Date range or single date shown under (or next to) the label. */
+  /** From–to range shown next to the label (`1. 9. – 30. 9. 2026`). */
   dateInfo?: string
 }
 
@@ -128,15 +128,44 @@ function sortPublications(publications: JobPublication[], now: Date) {
   })
 }
 
-function soonestEndDate(publications: JobPublication[], now: Date) {
-  return publications.reduce<{ label: string; days: number } | undefined>((current, publication) => {
+function soonestPublication(publications: JobPublication[], now: Date) {
+  return publications.reduce<JobPublication | undefined>((current, publication) => {
     if (!publication.endDate) {
       return current
     }
 
-    const candidate = { label: publication.endDate, days: remainingDays(publication, now) }
-    return !current || candidate.days < current.days ? candidate : current
+    if (!current?.endDate) {
+      return publication
+    }
+
+    return remainingDays(publication, now) < remainingDays(current, now) ? publication : current
   }, undefined)
+}
+
+/** Shared from–to for the heading; omitted when portals do not share one period. */
+function headingDateRange(publications: JobPublication[]): string | undefined {
+  if (publications.length === 0) {
+    return undefined
+  }
+
+  if (!shareSameStartDate(publications) || !shareSameEndDate(publications)) {
+    return undefined
+  }
+
+  const startDate = richestDateLabel(publications.map((publication) => publication.startDate))
+  const endDate = richestDateLabel(endDates(publications))
+
+  if (!startDate || !endDate) {
+    return undefined
+  }
+
+  return formatCompactDateRange(startDate, endDate)
+}
+
+function publicationDateRange(publication: JobPublication): string | undefined {
+  return publication.endDate
+    ? formatCompactDateRange(publication.startDate, publication.endDate)
+    : undefined
 }
 
 function formatEndingSoonLabel(endDate: string, now: Date) {
@@ -237,22 +266,13 @@ export function buildAdvertisementModel(
   }
 
   if (remaining.length === 0) {
-    const sameEnd = shareSameEndDate(expired)
-    const endDate = sameEnd ? richestDateLabel(endDates(expired)) : undefined
-    const startDate = shareSameStartDate(expired)
-      ? richestDateLabel(expired.map((publication) => publication.startDate))
-      : undefined
-    const dateInfo = endDate
-      ? startDate
-        ? formatCompactDateRange(startDate, endDate)
-        : endDate
-      : undefined
+    const dateInfo = headingDateRange(expired)
 
     return finish(
       'ended',
       { tone: 'ended', label: 'Ukončeno', dateInfo },
       'active',
-      { showLiveDates: false, showEndedDates: !sameEnd },
+      { showLiveDates: false, showEndedDates: !dateInfo },
     )
   }
 
@@ -261,22 +281,18 @@ export function buildAdvertisementModel(
     remainingDated.every((publication) => isPublicationEndingSoon(publication, now))
 
   if (allRemainingDatedEndingSoon) {
-    const soonest = soonestEndDate(remainingDated, now)
+    const soonest = soonestPublication(remainingDated, now)
     const liveDated = remaining.filter(
       (publication) => publication.startDate && publication.endDate,
     )
-    const samePeriod = shareSameStartDate(liveDated) && shareSameEndDate(liveDated)
-    const dateInfo = samePeriod
-      ? formatCompactDateRange(liveDated[0].startDate, liveDated[0].endDate as string)
-      : soonest
-        ? stripYear(soonest.label)
-        : undefined
+    const dateInfo =
+      headingDateRange(liveDated) ?? (soonest ? publicationDateRange(soonest) : undefined)
 
     return finish(
       'endingSoon',
       {
         tone: 'warning',
-        label: soonest ? formatEndingSoonLabel(soonest.label, now) : 'Končí brzy',
+        label: soonest?.endDate ? formatEndingSoonLabel(soonest.endDate, now) : 'Končí brzy',
         dateInfo,
       },
       'endingSoon',
@@ -286,28 +302,24 @@ export function buildAdvertisementModel(
   }
 
   if (expired.length > 0) {
-    const remainingEnd = shareSameEndDate(remainingDated)
-      ? richestDateLabel(endDates(remainingDated))
-      : undefined
+    const remainingRange = headingDateRange(remainingDated)
 
     return finish(
       'runningMixed',
-      remainingEnd
-        ? { tone: 'success', label: 'Běží', dateInfo: stripYear(remainingEnd) }
+      remainingRange
+        ? { tone: 'success', label: 'Běží', dateInfo: remainingRange }
         : { tone: 'success', label: 'Běží v různých obdobích' },
       'active',
-      { showLiveDates: !remainingEnd, showEndedDates: true },
+      { showLiveDates: !remainingRange, showEndedDates: true },
     )
   }
 
-  const samePeriod = shareSameStartDate(remaining) && shareSameEndDate(remaining)
-  const startDate = remaining[0]?.startDate
-  const endDate = samePeriod ? richestDateLabel(endDates(remaining)) : undefined
+  const runningRange = headingDateRange(remaining)
 
-  if (samePeriod && startDate && endDate) {
+  if (runningRange) {
     return finish(
       'running',
-      { tone: 'success', label: 'Běží', dateInfo: formatCompactDateRange(startDate, endDate) },
+      { tone: 'success', label: 'Běží', dateInfo: runningRange },
       'active',
       { showLiveDates: false, showEndedDates: false },
     )

@@ -11,7 +11,7 @@ export interface AdvertisementStatsProps extends StyleProps {
 }
 
 /**
- * Compact advertisement footer: aggregated views and a Detail action.
+ * Compact advertisement footer: aggregated views and a Detailní statistiky action.
  */
 export function AdvertisementStats({
   viewCount,
@@ -24,7 +24,7 @@ export function AdvertisementStats({
   return (
     <div
       data-testid="job-card-advertisement-stats"
-      className={cn('tm-flex tm-w-full tm-items-center tm-gap-2', className)}
+      className={cn('tm-flex tm-w-full tm-items-center tm-gap-2 tm-pt-4', className)}
     >
       {formattedViews !== undefined ? (
         <>
@@ -53,7 +53,7 @@ export function AdvertisementStats({
       <Link
         underlined="never"
         variant="secondary"
-        aria-label="Zobrazit detail inzerce"
+        aria-label="Detailní statistiky"
         data-testid="job-card-advertisement-detail-action"
         className="tm-inline-flex tm-items-center tm-gap-1 tm-text-sm tm-font-normal"
         onClick={(event) => {
@@ -62,8 +62,8 @@ export function AdvertisementStats({
           onDetail?.()
         }}
       >
-        Detail
-        <Icon name="external-link" size={16} aria-hidden />
+        Detailní statistiky
+        <Icon name="chevron-right" className="tm-text-base tm-leading-none" aria-hidden />
       </Link>
     </div>
   )

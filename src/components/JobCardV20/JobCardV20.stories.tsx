@@ -142,3 +142,8 @@ export const Unpublished: Story = {
   name: 'Nezveřejněný nábor',
   args: { status: 'unpublished', advertisements: [runningSame] },
 }
+
+export const WithHeadingLabel: Story = {
+  name: 'Se stavovým labelem inzerátu',
+  args: { showAdvertisementHeadingLabel: true },
+}

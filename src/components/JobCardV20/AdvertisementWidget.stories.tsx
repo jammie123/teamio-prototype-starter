@@ -67,6 +67,11 @@ export const WithTitle: Story = {
   args: { advertisement: { ...runningSame, title: 'Řidič/ka sk. C – hlavní inzerát' }, showTitle: true },
 }
 
+export const WithHeadingLabel: Story = {
+  name: 'Se stavovým labelem',
+  args: { showHeadingLabel: true },
+}
+
 export const Overview: Story = {
   name: 'Přehled stavů',
   render: (args) => (

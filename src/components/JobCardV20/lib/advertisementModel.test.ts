@@ -73,7 +73,11 @@ describe('buildAdvertisementModel', () => {
     )
 
     expect(model.kind).toBe('runningMixed')
-    expect(model.header).toEqual({ tone: 'success', label: 'Běží', dateInfo: '30. 10.' })
+    expect(model.header).toEqual({
+      tone: 'success',
+      label: 'Běží',
+      dateInfo: '1. 9. – 30. 10. 2026',
+    })
     expect(model.publications.map((item) => [item.publication.id, item.status, item.dateLabel])).toEqual([
       ['2', 'active', undefined],
       ['1', 'expired', 'ukončeno 15. 8.'],
@@ -112,7 +116,7 @@ describe('buildAdvertisementModel', () => {
     expect(model.header.label).toBe('Končí dnes')
   })
 
-  it('shows only the soonest end date when ending portals have different periods', () => {
+  it('uses the soonest portal from–to range when ending portals have different periods', () => {
     const model = buildAdvertisementModel(
       {
         id: 'a',
@@ -124,7 +128,10 @@ describe('buildAdvertisementModel', () => {
       now,
     )
 
-    expect(model.header).toMatchObject({ label: 'Končí za 3 dny', dateInfo: '30. 9.' })
+    expect(model.header).toMatchObject({
+      label: 'Končí za 3 dny',
+      dateInfo: '1. 9. – 30. 9. 2026',
+    })
     expect(model.publications.map((item) => item.dateLabel)).toEqual(['do 30. 9.', 'do 2. 10.'])
   })
 

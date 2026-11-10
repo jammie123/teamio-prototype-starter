@@ -34,6 +34,8 @@ export interface JobCardV20Props
   showAdditionalAdvertisementsLink?: boolean
   onAdditionalAdvertisementsClick?: () => void
   showAdvertisementTitle?: boolean
+  /** Show the advertisement status label. Warning and ended always show it. */
+  showAdvertisementHeadingLabel?: boolean
   /** Poznámka k náboru, pod pipeline v levém sloupci. */
   note?: JobCardNote
   onExpandNote?: () => void
@@ -71,6 +73,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
     showAdditionalAdvertisementsLink = false,
     onAdditionalAdvertisementsClick,
     showAdvertisementTitle = false,
+    showAdvertisementHeadingLabel = false,
     note,
     onExpandNote,
     actions,
@@ -146,7 +149,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
           ) : null}
           <div
             data-testid="job-card-main"
-            className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-6"
+            className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-4"
           >
             <div
               data-testid="job-card-title-heading-row"
@@ -177,7 +180,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
         {showAdvertisements ? (
           <div
             data-testid="job-card-advertisements"
-            className="tm-flex tm-w-[300px] tm-shrink-0 tm-flex-col tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-px-6 tm-py-6"
+            className="tm-flex tm-w-[350px] tm-shrink-0 tm-flex-col tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-px-6 tm-py-6"
           >
             {shownAdvertisements.length === 0 ? (
               <div
@@ -198,6 +201,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                     key={`${advertisement.id}-${status}`}
                     advertisement={advertisement}
                     showTitle={showAdvertisementTitle}
+                    showHeadingLabel={showAdvertisementHeadingLabel}
                     now={now}
                     hideTopBorder={index === 0}
                   />
@@ -216,7 +220,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                     viewCount={statsModel.viewCount}
                     onStatistics={onViewStatisticsClick}
                     onDetail={onAdvertisementDetailClick}
-                    className="tm-mt-auto tm-pt-2"
+                    className="tm-mt-auto"
                   />
                 ) : null}
               </>

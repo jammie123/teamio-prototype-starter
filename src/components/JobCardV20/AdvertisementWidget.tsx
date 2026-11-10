@@ -10,6 +10,8 @@ export interface AdvertisementWidgetProps extends StyleProps {
   advertisement: JobAdvertisement
   /** Show the advertisement title above the status. */
   showTitle?: boolean
+  /** Show the status label (Běží, Ukončeno, …). Warning and ended always show it. */
+  showHeadingLabel?: boolean
   /** Reference date for "Brzy končí"; defaults to today. */
   now?: Date
   /** Drop the top divider. Defaults to true for the compact right column. */
@@ -23,6 +25,7 @@ export interface AdvertisementWidgetProps extends StyleProps {
 export function AdvertisementWidget({
   advertisement,
   showTitle = false,
+  showHeadingLabel = false,
   now,
   hideTopBorder = true,
   className,
@@ -48,7 +51,7 @@ export function AdvertisementWidget({
       )}
     >
       {isNotPublished ? (
-        <AdvertisementHeader {...model.header} />
+        <AdvertisementHeader {...model.header} showLabel={showHeadingLabel} />
       ) : (
         <>
           {showTitle && advertisement.title ? (
@@ -59,10 +62,10 @@ export function AdvertisementWidget({
               {advertisement.title}
             </span>
           ) : null}
-          <AdvertisementHeader {...model.header} />
+          <AdvertisementHeader {...model.header} showLabel={showHeadingLabel} />
           <div
             data-testid="job-card-advertisement-publications"
-            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-center tm-gap-2 tm-p-0"
+            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-col tm-items-start tm-gap-1 tm-p-0"
           >
             {model.publications.map((item) => (
               <Fragment key={item.publication.id}>

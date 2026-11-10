@@ -53,10 +53,9 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
       data-testid="job-card-stats"
       className={cn('tm-flex', 'tm-shrink-0', 'tm-items-stretch', 'tm-gap-0', className)}
     >
-      {items.map((key, index) => {
+      {items.map((key) => {
         const count = candidates[key] as number
         const label = STAT_LABELS[key]
-        const isFirst = index === 0
         const newCount = key === 'unassessed' ? highlightCount(candidates.new) : undefined
         const newOpalcovaniCount =
           key === 'inProgress' ? highlightCount(candidates.newOpalcovani) : undefined
@@ -79,7 +78,7 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
             <span className="tm-inline-flex tm-flex-row tm-flex-wrap tm-items-center tm-gap-2">
               <span
                 className={cn(
-                  isFirst ? 'tm-text-2xl' : 'tm-text-xl',
+                  'tm-text-xl',
                   'tm-font-normal',
                   'tm-leading-tight',
                   'tm-text-primary-default',

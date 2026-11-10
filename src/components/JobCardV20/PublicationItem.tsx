@@ -43,6 +43,7 @@ export function PublicationItem({
         'tm-inline-flex',
         'tm-items-center',
         'tm-gap-1.5',
+        'tm-px-2',
         'tm-text-sm',
         'tm-font-normal',
         className,

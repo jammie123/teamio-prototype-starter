@@ -34,24 +34,36 @@ describe('PublicationDetails', () => {
 })
 
 describe('PublicationDetails with highlights', () => {
-  it('lists each Jobstip placement as a row under the portal and the summary stats last', () => {
+  it('lists Jobstip and Topováno as compact name/date rows without repeating the portal logo', () => {
     render(
       <PublicationDetails
         publication={publication}
-        highlights={[{ id: 'jobstip', name: 'Jobstip', startDate: '8. 9.', endDate: '30. 9. 2026' }]}
+        highlights={[
+          { id: 'jobstip', name: 'Jobstip', startDate: '8. 6.', endDate: '30. 9. 2026' },
+          { id: 'top', name: 'Topováno', startDate: '22. 6.', endDate: '30. 9. 2026' },
+        ]}
         onViewAdvertisement={vi.fn()}
       />,
     )
 
-    const period = screen.getByTestId('job-card-publication-highlight-period')
-    expect(period).toHaveTextContent('8. 9. – 30. 9. 2026')
-    expect(screen.getByText('Jobstip')).toBeInTheDocument()
+    expect(screen.getAllByTestId('job-portal-logo')).toHaveLength(1)
+
+    const rows = screen.getAllByTestId('job-card-publication-highlight-row')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveClass('tm-justify-between')
+    expect(within(rows[0]).queryByTestId('job-portal-logo')).not.toBeInTheDocument()
+    expect(within(rows[0]).getByText('Jobstip')).toHaveClass('tm-text-teamio-pink')
+    expect(within(rows[1]).getByText('Topováno')).toHaveClass('tm-text-teamio-pink')
+
+    const periods = screen.getAllByTestId('job-card-publication-highlight-period')
+    expect(periods[0]).toHaveTextContent('8. 6. – 30. 9. 2026')
+    expect(periods[1]).toHaveTextContent('22. 6. – 30. 9. 2026')
     expect(screen.queryByTestId('job-card-publication-highlight-view-advertisement')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Zobrazit inzerát' })).toHaveLength(1)
 
     const stats = screen.getByTestId('job-card-publication-stats')
-    expect(period.compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(screen.getByTestId('job-card-publication-dropdown-period').compareDocumentPosition(period)).toBe(
+    expect(periods[1].compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByTestId('job-card-publication-dropdown-period').compareDocumentPosition(periods[0])).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
   })

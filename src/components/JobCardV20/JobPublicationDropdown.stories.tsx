@@ -7,8 +7,8 @@ import type { JobPublication, JobPublicationHighlight } from './types'
 const jobsCz: JobPublication = {
   id: 'jobs',
   channel: 'Jobs.cz',
-  startDate: '1. 9. 2026',
-  endDate: '30. 9. 2026',
+  startDate: '1. 1. 2026',
+  endDate: '1. 2. 2026',
   viewCount: 1840,
   reactionCount: 34,
 }
@@ -16,14 +16,25 @@ const jobsCz: JobPublication = {
 const jobstip: JobPublicationHighlight = {
   id: 'jobstip',
   name: 'Jobstip',
-  startDate: '8. 9.',
+  startDate: '8. 6.',
   endDate: '30. 9. 2026',
   viewCount: 699,
   reactionCount: 13,
 }
 
+const topovano: JobPublicationHighlight = {
+  id: 'top',
+  name: 'Topováno',
+  startDate: '22. 6.',
+  endDate: '30. 9. 2026',
+  viewCount: 331,
+  reactionCount: 6,
+}
+
+const highlights = [jobstip, topovano]
+
 const meta = {
-  title: 'Jobs/JobPublicationDropdown',
+  title: 'Jobs/Job Cards Variant/JobCardV20/Publication hover',
   component: PublicationHoverCard,
   parameters: {
     layout: 'padded',
@@ -81,7 +92,7 @@ export const RunningPortal: Story = {
   },
 }
 
-/** Portál s běžícím zvýrazněním (Jobstip) – karta ukazuje portál a Jobstip pod sebou a souhrnné statistiky. */
+/** Portál s Jobstip a Topováno – kompaktní řádky názvu a data, souhrnné statistiky a Zvýraznit. */
 export const RunningPortalWithRunningHighlight: Story = {
   name: 'Běžící portál s běžícím zvýrazněním',
   render: () => (
@@ -89,27 +100,29 @@ export const RunningPortalWithRunningHighlight: Story = {
       <PublicationItem
         publication={jobsCz}
         status="active"
-        dateLabel="do 30. 9."
-        showHighlight={false}
+        dateLabel="do 1. 2."
+        highlights={highlights}
+        showHighlight
         onViewAdvertisement={onViewAdvertisement}
+        onHighlight={onHighlight}
       />
       <PublicationHighlights
         publication={jobsCz}
-        highlights={[jobstip]}
-        showHighlight={false}
+        highlights={highlights}
+        showHighlight
         onViewAdvertisement={onViewAdvertisement}
+        onHighlight={onHighlight}
       />
     </span>
   ),
   play: async ({ canvasElement }) => {
-    const dropdown = await openDropdown(
-      canvasElement,
-      'job-card-publication-highlight-name',
-      'job-card-publication-highlight-dropdown',
-    )
+    const canvas = within(canvasElement)
+    await userEvent.hover(canvas.getAllByTestId('job-card-publication-highlight-name')[0])
+    const dropdown = await canvas.findByTestId('job-card-publication-highlight-dropdown')
     await expect(dropdown).toBeVisible()
-    await expect(within(dropdown).getByTestId('job-card-publication-highlight-period')).toBeVisible()
+    await expect(within(dropdown).getAllByTestId('job-card-publication-highlight-period')).toHaveLength(2)
     await expect(within(dropdown).getByTestId('job-card-publication-stats')).toBeVisible()
+    await expect(within(dropdown).getByRole('button', { name: 'Zvýraznit' })).toBeVisible()
   },
 }
 

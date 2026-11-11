@@ -1,5 +1,4 @@
 import type { MouseEvent, ReactNode } from 'react'
-import { cn } from '../../lib/cn'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -31,19 +30,17 @@ export function PlacementStats({
         const value = stat.key === 'viewCount' ? viewCount : reactionCount
 
         return (
-          <div key={stat.key} className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
-            <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">
-              {stat.label}
-            </dt>
-            <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
+          <div key={stat.key} className="tm-flex tm-min-w-0 tm-flex-col tm-gap-1">
+            <dt className="tm-text-xs tm-leading-tight tm-text-secondary-default">{stat.label}</dt>
+            <dd className="tm-m-0 tm-text-sm tm-font-medium tm-leading-none tm-tabular-nums tm-text-primary-default">
               {value === undefined ? '–' : formatCount(value)}
             </dd>
           </div>
         )
       })}
-      <div className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
-        <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">Míra reakce</dt>
-        <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
+      <div className="tm-flex tm-min-w-0 tm-flex-col tm-gap-1">
+        <dt className="tm-text-xs tm-leading-tight tm-text-secondary-default">Míra reakce</dt>
+        <dd className="tm-m-0 tm-text-sm tm-font-medium tm-leading-none tm-tabular-nums tm-text-primary-default">
           {conversion ?? '–'}
         </dd>
       </div>
@@ -64,11 +61,9 @@ export function AdvertisementDetailLink({ onClick }: { onClick?: () => void }) {
   )
 }
 
-/** One placement: portal logo, name and period, with an external-link button when `viewTestId` is set. */
+/** Portal logo, name and period, with an external-link button when `viewTestId` is set. */
 function PublicationRow({
   channel,
-  name,
-  nameClassName,
   startDate,
   endDate,
   periodTestId,
@@ -76,21 +71,18 @@ function PublicationRow({
   onViewAdvertisement,
 }: {
   channel: string
-  name: string
-  nameClassName: string
   startDate: string
   endDate?: string
   periodTestId: string
-  /** Set only for the portal row – a placement opens the same advertisement, so it gets no button. */
   viewTestId?: string
   onViewAdvertisement?: () => void
 }) {
   return (
-    <div className="tm-flex tm-min-w-0 tm-items-center tm-gap-2">
-      <JobPortalLogo type={jobPortalLogoTypeFromChannel(channel)} title="" className="tm-size-8" />
-      <div className="tm-min-w-0 tm-flex-1">
-        <div className={cn('tm-text-sm', nameClassName)}>{name}</div>
-        <div data-testid={periodTestId} className="tm-text-13 tm-tabular-nums tm-text-secondary-default">
+    <div className="tm-flex tm-min-w-0 tm-items-center tm-gap-3">
+      <JobPortalLogo type={jobPortalLogoTypeFromChannel(channel)} title="" className="tm-size-10" />
+      <div className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-0.5 tm-leading-tight">
+        <div className="tm-text-sm tm-font-medium tm-text-primary-default">{channel}</div>
+        <div data-testid={periodTestId} className="tm-text-sm tm-tabular-nums tm-text-secondary-default">
           {formatPublicationRange(startDate, endDate)}
         </div>
       </div>
@@ -110,9 +102,35 @@ function PublicationRow({
   )
 }
 
+/** Paid placement (Jobstip, Topováno): pink name on the left, period on the right. No logo. */
+function HighlightRow({
+  name,
+  startDate,
+  endDate,
+}: {
+  name: string
+  startDate: string
+  endDate?: string
+}) {
+  return (
+    <div
+      data-testid="job-card-publication-highlight-row"
+      className="tm-flex tm-min-w-0 tm-items-center tm-justify-between tm-gap-3"
+    >
+      <span className="tm-min-w-0 tm-truncate tm-text-sm tm-font-medium tm-text-teamio-pink">{name}</span>
+      <span
+        data-testid="job-card-publication-highlight-period"
+        className="tm-shrink-0 tm-text-sm tm-tabular-nums tm-text-secondary-default"
+      >
+        {formatPublicationRange(startDate, endDate)}
+      </span>
+    </div>
+  )
+}
+
 /**
- * Body of the hover card of a publication: the portal row, one row per Jobstip placement
- * underneath, and the summary stats of the publication at the bottom.
+ * Body of the hover card of a publication: the portal row, one compact row per
+ * Jobstip / Topováno placement, and the summary stats of the publication at the bottom.
  */
 export function PublicationDetails({
   publication,
@@ -125,11 +143,9 @@ export function PublicationDetails({
 }) {
   return (
     <div className="tm-flex tm-min-w-0 tm-flex-col">
-      <div className="tm-pb-3">
+      <div className="tm-pb-4">
         <PublicationRow
           channel={publication.channel}
-          name={publication.channel}
-          nameClassName="tm-font-normal tm-text-primary-default"
           startDate={publication.startDate}
           endDate={publication.endDate}
           periodTestId="job-card-publication-dropdown-period"
@@ -137,19 +153,22 @@ export function PublicationDetails({
           onViewAdvertisement={onViewAdvertisement}
         />
       </div>
-      {highlights.map((highlight) => (
-        <div key={highlight.id} className="tm-border-t tm-border-solid tm-border-secondary tm-py-3">
-          <PublicationRow
-            channel={publication.channel}
-            name={highlight.name}
-            nameClassName="tm-font-medium tm-text-teamio-pink"
-            startDate={highlight.startDate}
-            endDate={highlight.endDate}
-            periodTestId="job-card-publication-highlight-period"
-          />
+      {highlights.length > 0 ? (
+        <div
+          data-testid="job-card-publication-highlights"
+          className="tm-flex tm-flex-col tm-gap-2 tm-border-t tm-border-solid tm-border-secondary tm-py-4"
+        >
+          {highlights.map((highlight) => (
+            <HighlightRow
+              key={highlight.id}
+              name={highlight.name}
+              startDate={highlight.startDate}
+              endDate={highlight.endDate}
+            />
+          ))}
         </div>
-      ))}
-      <div className="tm-border-t tm-border-solid tm-border-secondary tm-pt-3">
+      ) : null}
+      <div className="tm-border-t tm-border-solid tm-border-secondary tm-pt-4">
         <PlacementStats
           viewCount={publication.viewCount}
           reactionCount={publication.reactionCount}
@@ -207,9 +226,9 @@ export function PublicationHoverCard({
         data-testid={dropdownTestId}
         overflow="visible"
         initialFocus={-1}
-        className="tm-p-3 !tm-w-[300px] !tm-max-w-none"
+        className="tm-p-4 !tm-w-[300px] !tm-max-w-none !tm-rounded-xl"
       >
-        <div className="tm-flex tm-w-full tm-flex-col tm-gap-3">
+        <div className="tm-flex tm-w-full tm-flex-col tm-gap-4">
           {children}
           {showActions ? (
             <div

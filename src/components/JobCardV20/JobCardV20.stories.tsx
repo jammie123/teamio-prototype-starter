@@ -121,20 +121,6 @@ export const WithoutNote: Story = {
   args: { note: undefined },
 }
 
-export const MultipleAdvertisements: Story = {
-  name: 'Více inzerátů',
-  args: { advertisements: [runningSame, mixedEndedPortal, endedSame] },
-}
-
-export const AdditionalAdvertisements: Story = {
-  name: 'Zobrazit další inzeráty',
-  args: {
-    advertisements: [runningSame, mixedEndedPortal, endedSame],
-    showAdditionalAdvertisementsLink: true,
-    onAdditionalAdvertisementsClick: fn(),
-  },
-}
-
 export const NoAdvertisement: Story = {
   name: 'Nábor bez inzerátu',
   args: { advertisements: [], onCreateAdvertisement: fn() },

@@ -53,7 +53,7 @@ export function AdvertisementHeader({
       )}
     >
       {showHeadingLabel ? (
-        <span data-testid="job-card-advertisement-heading-label" className="tm-text-sm tm-font-semibold">
+        <span data-testid="job-card-advertisement-heading-label" className="tm-text-sm tm-font-medium">
           {label}
         </span>
       ) : null}

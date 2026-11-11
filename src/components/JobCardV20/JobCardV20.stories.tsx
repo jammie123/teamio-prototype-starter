@@ -160,11 +160,6 @@ export const Draft: Story = {
   },
 }
 
-export const WithHeadingLabel: Story = {
-  name: 'Se stavovým labelem inzerátu',
-  args: { showAdvertisementHeadingLabel: true },
-}
-
 export const PresentationUnit: Story = {
   name: 'Prezentační jednotka',
   args: { department: 'České Budějovice' },

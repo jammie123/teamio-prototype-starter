@@ -252,10 +252,16 @@ describe('JobCardV20', () => {
     expect(advertisement.className).toContain('tm-w-full')
     expect(advertisement.className).not.toContain('tm-pl-14')
     expect(advertisement.className).not.toContain('tm-border-t')
-    expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      '1. 1. – 1. 2. 2026',
+    expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Běží')
+    expect(screen.getByTestId('job-card-advertisement-heading-label').className).toContain(
+      'tm-font-medium',
     )
-    expect(screen.queryByTestId('job-card-advertisement-heading-label')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-advertisement-heading-label').className).not.toContain(
+      'tm-font-semibold',
+    )
+    expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
+      'Běží 1. 1. – 1. 2. 2026',
+    )
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
     const stats = within(column).getByTestId('job-card-advertisement-stats')
     expect(advertisement).not.toContainElement(stats)
@@ -460,8 +466,8 @@ describe('JobCardV20', () => {
     expect(onAdditionalAdvertisementsClick).toHaveBeenCalledOnce()
   })
 
-  it('shows the advertisement heading label when requested', () => {
-    renderJobCard({ showAdvertisementHeadingLabel: true })
+  it('always shows the advertisement heading label', () => {
+    renderJobCard()
 
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Běží')
   })

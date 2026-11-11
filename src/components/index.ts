@@ -301,6 +301,17 @@ export {
   type JobCandidateStat as JobCardV20CandidateStat,
   type JobCardNote as JobCardV20Note,
 } from './JobCardV20'
+export {
+  JobCardV21,
+  AdvertisementWidget as JobCardV21AdvertisementWidget,
+  AdvertisementStats as JobCardV21AdvertisementStats,
+  type JobCardV21Props,
+  type AdvertisementWidgetProps as JobCardV21AdvertisementWidgetProps,
+  type AdvertisementStatsProps as JobCardV21AdvertisementStatsProps,
+  type JobCardCandidates as JobCardV21Candidates,
+  type JobCandidateStat as JobCardV21CandidateStat,
+  type JobCardNote as JobCardV21Note,
+} from './JobCardV21'
 export { JobAssigneePeople, type JobAssigneePeopleProps } from './JobAssigneePeople/JobAssigneePeople'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'

@@ -38,8 +38,6 @@ export interface JobCardV20Props
   showAdditionalAdvertisementsLink?: boolean
   onAdditionalAdvertisementsClick?: () => void
   showAdvertisementTitle?: boolean
-  /** Show the advertisement status label. Warning and ended always show it. */
-  showAdvertisementHeadingLabel?: boolean
   /** Poznámka k náboru, pod pipeline v levém sloupci. */
   note?: JobCardNote
   onExpandNote?: () => void
@@ -82,7 +80,6 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
     showAdditionalAdvertisementsLink = false,
     onAdditionalAdvertisementsClick,
     showAdvertisementTitle = false,
-    showAdvertisementHeadingLabel = false,
     note,
     onExpandNote,
     actions,
@@ -283,7 +280,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                       key={`${advertisement.id}-${status}`}
                       advertisement={advertisement}
                       showTitle={showAdvertisementTitle}
-                      showHeadingLabel={showAdvertisementHeadingLabel}
+                      showHeadingLabel
                       now={now}
                       hideTopBorder={index === 0}
                       onProlong={onExtendAndRepublish}

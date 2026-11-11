@@ -7,6 +7,7 @@ import { JOB_DETAIL_STATS_COPY, JOB_DETAIL_STATS_PERIOD_LABELS } from './jobDeta
 import {
   filterSeriesByRange,
   formatJobDetailStatsPublicationRange,
+  formatJobDetailStatsReactionRate,
   resolvePeriodRange,
   toDateOnlyIso,
 } from './jobDetailStatsPeriod'
@@ -48,6 +49,12 @@ describe('jobDetailStatsPeriod', () => {
     expect(formatJobDetailStatsPublicationRange('2026-08-01', '2026-11-04')).toBe(
       '1. 8. 2026 – 4. 11. 2026',
     )
+  })
+
+  it('formats reaction rate as reactions divided by views', () => {
+    expect(formatJobDetailStatsReactionRate(100, 10)).toBe('10 %')
+    expect(formatJobDetailStatsReactionRate(200, 5)).toBe('2,5 %')
+    expect(formatJobDetailStatsReactionRate(0, 5)).toBe('–')
   })
 })
 
@@ -250,8 +257,63 @@ describe('JobDetailStatsModal', () => {
     const table = screen.getByRole('table', { name: JOB_DETAIL_STATS_COPY.tableAriaLabel })
     expect(within(table).getByText('Jobs.cz')).toBeInTheDocument()
     expect(within(table).getByText('Práce.cz')).toBeInTheDocument()
+    expect(within(table).getByText('Jobs.cz')).toHaveClass('tm-font-normal')
+    expect(within(table).getByText('Jobs.cz')).not.toHaveClass('tm-font-medium')
     expect(within(table).getAllByTestId('job-portal-logo')).toHaveLength(2)
     expect(within(table).getByTestId('job-detail-stats-table-total')).toBeInTheDocument()
+  })
+
+  it('shows the publication period as the second Vystaveno column', () => {
+    render(
+      <JobDetailStatsModal
+        jobId="job-1"
+        defaultOpen
+        status="ready"
+        series={readyFixture.series}
+        summary={{
+          periodStartDate: '2026-08-01',
+          periodEndDate: '2026-11-04',
+          places: [
+            {
+              id: 'jobs-cz',
+              placeName: 'Jobs.cz',
+              logoType: 'jobs-cz',
+              views: 100,
+              reactions: 10,
+              startDate: '2026-08-01',
+              endDate: '2026-11-04',
+            },
+            {
+              id: 'prace-cz',
+              placeName: 'Práce.cz',
+              logoType: 'prace-cz',
+              views: 50,
+              reactions: 5,
+              startDate: '2026-08-15',
+              endDate: '2026-11-04',
+            },
+          ],
+        }}
+      />,
+    )
+    const table = screen.getByRole('table', { name: JOB_DETAIL_STATS_COPY.tableAriaLabel })
+    expect(within(table).getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      JOB_DETAIL_STATS_COPY.columns.place,
+      'Vystaveno',
+      JOB_DETAIL_STATS_COPY.columns.views,
+      JOB_DETAIL_STATS_COPY.columns.reactions,
+      'Míra reakce',
+    ])
+    const jobsRow = within(table).getByText('Jobs.cz').closest('tr')
+    const praceRow = within(table).getByText('Práce.cz').closest('tr')
+    expect(jobsRow).toHaveTextContent('1. 8. 2026 – 4. 11. 2026')
+    expect(praceRow).toHaveTextContent('15. 8. 2026 – 4. 11. 2026')
+    expect(jobsRow).toHaveTextContent('10 %')
+    expect(praceRow).toHaveTextContent('10 %')
+    expect(within(table).getByTestId('job-detail-stats-table-total')).toHaveTextContent('10 %')
+    expect(within(table).getByTestId('job-detail-stats-table-total').querySelectorAll('td')).toHaveLength(
+      5,
+    )
   })
 
   it('shows job title only when jobTitle prop is set', () => {

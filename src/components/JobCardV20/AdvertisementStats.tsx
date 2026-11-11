@@ -11,7 +11,7 @@ export interface AdvertisementStatsProps extends StyleProps {
 }
 
 /**
- * Compact advertisement footer: aggregated views and a Detailní statistiky action.
+ * Compact advertisement footer: aggregated views and a Detailní přehled action.
  */
 export function AdvertisementStats({
   viewCount,
@@ -24,7 +24,10 @@ export function AdvertisementStats({
   return (
     <div
       data-testid="job-card-advertisement-stats"
-      className={cn('tm-flex tm-w-full tm-items-center tm-gap-2 tm-pt-4', className)}
+      className={cn(
+        'tm-mt-0 tm-flex tm-w-auto tm-shrink-0 tm-items-center tm-gap-2 tm-self-start tm-pt-0 md:tm-mt-auto md:tm-w-full md:tm-pt-4',
+        className,
+      )}
     >
       {formattedViews !== undefined ? (
         <>
@@ -40,7 +43,7 @@ export function AdvertisementStats({
               onStatistics?.()
             }}
           >
-            <Icon name="eye" size={20} aria-hidden />
+            <Icon name="eye" size={20} strokeWidth={1.5} aria-hidden />
             {formattedViews}
           </Link>
           <div
@@ -53,7 +56,7 @@ export function AdvertisementStats({
       <Link
         underlined="never"
         variant="secondary"
-        aria-label="Detailní statistiky"
+        aria-label="Detailní přehled"
         data-testid="job-card-advertisement-detail-action"
         className="tm-inline-flex tm-items-center tm-gap-1 tm-text-sm tm-font-normal"
         onClick={(event) => {
@@ -62,7 +65,7 @@ export function AdvertisementStats({
           onDetail?.()
         }}
       >
-        Detailní statistiky
+        Detailní přehled
         <Icon name="chevron-right" className="tm-text-base tm-leading-none" aria-hidden />
       </Link>
     </div>

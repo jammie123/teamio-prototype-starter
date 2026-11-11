@@ -5,21 +5,25 @@ import { AdvertisementStats } from './AdvertisementStats'
 import { formatCount } from './lib/format'
 
 describe('AdvertisementStats', () => {
-  it('shows view count and a Detailní statistiky action on one row', () => {
+  it('shows view count and a Detailní přehled action on one row', () => {
     render(<AdvertisementStats viewCount={2610} onStatistics={vi.fn()} onDetail={vi.fn()} />)
 
     const root = screen.getByTestId('job-card-advertisement-stats')
     const views = screen.getByTestId('job-card-advertisement-aggregate-views')
     const detail = screen.getByTestId('job-card-advertisement-detail-action')
 
-    expect(root.className).toContain('tm-w-full')
+    expect(root.className).toContain('tm-w-auto')
+    expect(root.className).toContain('md:tm-w-full')
     expect(root.className).toContain('tm-items-center')
-    expect(root.className).toContain('tm-pt-4')
+    expect(root.className).toContain('tm-mt-0')
+    expect(root.className).toContain('tm-pt-0')
+    expect(root.className).toContain('md:tm-mt-auto')
+    expect(root.className).toContain('md:tm-pt-4')
     expect(views).toHaveTextContent(/2\s*610/)
     expect(views).toHaveAccessibleName(`${formatCount(2610)} zhlédnutí`)
     expect(within(views).getByTestId('icon')).toHaveAttribute('data-icon-name', 'eye')
-    expect(detail).toHaveTextContent('Detailní statistiky')
-    expect(detail).toHaveAccessibleName('Detailní statistiky')
+    expect(detail).toHaveTextContent('Detailní přehled')
+    expect(detail).toHaveAccessibleName('Detailní přehled')
     expect(within(detail).getByTestId('icon')).toHaveAttribute('data-icon-name', 'chevron-right')
     expect(views.className).toContain('tm-text-action-link-secondary-default')
     expect(views.className).toContain('tm-font-normal')

@@ -39,8 +39,12 @@ export function AdvertisementHeader({
         'tm-min-w-0',
         'tm-flex-row',
         'tm-flex-wrap',
-        'tm-items-baseline',
-        showHeadingLabel && dateInfo && 'tm-justify-between',
+        'tm-items-start',
+        'tm-justify-start',
+        'tm-gap-8',
+        'md:tm-items-baseline',
+        'md:tm-gap-0',
+        showHeadingLabel && dateInfo && 'md:tm-justify-between',
         'tm-whitespace-normal',
         'tm-text-sm',
         'tm-font-medium',
@@ -56,7 +60,7 @@ export function AdvertisementHeader({
       {dateInfo ? (
         <span
           data-testid="job-card-advertisement-heading-date"
-          className="tm-text-base tm-font-normal tm-text-secondary-default"
+          className="tm-text-sm tm-font-normal tm-text-secondary-default"
         >
           {' '}
           {dateInfo}

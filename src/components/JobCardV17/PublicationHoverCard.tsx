@@ -119,9 +119,9 @@ export function PublicationHoverCard({
         data-testid={dropdownTestId}
         overflow="visible"
         initialFocus={-1}
-        className="tm-p-3"
+        className="!tm-max-w-none tm-p-3"
       >
-        <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">{children}</div>
+        <div className="tm-flex tm-w-[280px] tm-flex-col tm-gap-3">{children}</div>
       </DropdownBody>
     </Dropdown>
   )

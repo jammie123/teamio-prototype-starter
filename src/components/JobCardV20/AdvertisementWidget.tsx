@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
+import { AdvertisementEmptyState } from './AdvertisementEmptyState'
 import { AdvertisementHeader } from './AdvertisementHeader'
 import { buildAdvertisementModel } from './lib/advertisementModel'
 import { PublicationHighlights, PublicationItem } from './PublicationItem'
@@ -19,6 +20,9 @@ export interface AdvertisementWidgetProps extends StyleProps {
   hideTopBorder?: boolean
   /** Called from Naplánovat prodloužení when the advertisement is ending soon. */
   onProlong?: () => void
+  onAdvertisementPreviewClick?: () => void
+  onHighlightAdvertisement?: () => void
+  onCreateAdvertisement?: () => void
 }
 
 /**
@@ -32,6 +36,9 @@ export function AdvertisementWidget({
   now,
   hideTopBorder = true,
   onProlong,
+  onAdvertisementPreviewClick,
+  onHighlightAdvertisement,
+  onCreateAdvertisement,
   className,
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now)
@@ -46,6 +53,7 @@ export function AdvertisementWidget({
         'tm-w-full',
         'tm-flex-col',
         'tm-items-start',
+        'md:tm-items-stretch',
         'tm-gap-2',
         'tm-border-0',
         'tm-border-solid',
@@ -55,7 +63,7 @@ export function AdvertisementWidget({
       )}
     >
       {isNotPublished ? (
-        <AdvertisementHeader {...model.header} showLabel={showHeadingLabel} />
+        <AdvertisementEmptyState onCreateAdvertisement={onCreateAdvertisement} />
       ) : (
         <>
           {showTitle && advertisement.title ? (
@@ -69,7 +77,7 @@ export function AdvertisementWidget({
           <AdvertisementHeader {...model.header} showLabel={showHeadingLabel} />
           <div
             data-testid="job-card-advertisement-publications"
-            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-col tm-items-start tm-gap-1 tm-p-0"
+            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-start tm-gap-1 tm-p-0 md:tm-flex-col"
           >
             {model.publications.map((item) => (
               <Fragment key={item.publication.id}>
@@ -78,10 +86,17 @@ export function AdvertisementWidget({
                   status={item.status}
                   dateLabel={item.dateLabel}
                   showStatusDot
+                  onViewAdvertisement={onAdvertisementPreviewClick}
+                  onProlong={onProlong}
+                  onHighlight={onHighlightAdvertisement}
+                  onRepublish={onProlong}
                 />
                 <PublicationHighlights
                   publication={item.publication}
                   highlights={item.highlights}
+                  onViewAdvertisement={onAdvertisementPreviewClick}
+                  onProlong={onProlong}
+                  onHighlight={onHighlightAdvertisement}
                 />
               </Fragment>
             ))}

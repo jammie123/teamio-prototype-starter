@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { PublicationDetails } from './PublicationHoverCard'
+import { fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
+import { PublicationDetails, PublicationHoverCard } from './PublicationHoverCard'
 import type { JobPublication } from './types'
 
 const publication: JobPublication = {
@@ -17,6 +18,31 @@ describe('PublicationDetails', () => {
     render(<PublicationDetails publication={publication} />)
 
     expect(screen.getByTestId('job-card-publication-stats')).toBeInTheDocument()
+    expect(screen.getByText('Míra reakce')).toBeInTheDocument()
+    expect(screen.queryByText('Konverze')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-detail-link')).not.toBeInTheDocument()
+  })
+})
+
+describe('PublicationHoverCard', () => {
+  it('shows a secondary Zobrazit inzerát button at the bottom', async () => {
+    const user = userEvent.setup()
+    const onViewAdvertisement = vi.fn()
+    render(
+      <PublicationHoverCard
+        dropdownTestId="job-card-publication-dropdown"
+        trigger={<span>Jobs.cz</span>}
+        onViewAdvertisement={onViewAdvertisement}
+      >
+        <PublicationDetails publication={publication} />
+      </PublicationHoverCard>,
+    )
+
+    await user.hover(screen.getByText('Jobs.cz'))
+    const button = await screen.findByRole('button', { name: 'Zobrazit inzerát' })
+    expect(button).toHaveClass('tm-bg-basic')
+    expect(button).toHaveClass('tm-border-action-secondary-default')
+    fireEvent.click(button)
+    expect(onViewAdvertisement).toHaveBeenCalledOnce()
   })
 })

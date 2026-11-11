@@ -17,6 +17,9 @@ const meta = {
   args: {
     advertisement: runningSame,
     onProlong: fn(),
+    onAdvertisementPreviewClick: fn(),
+    onHighlightAdvertisement: fn(),
+    onCreateAdvertisement: fn(),
   },
   decorators: [
     (Story) => (

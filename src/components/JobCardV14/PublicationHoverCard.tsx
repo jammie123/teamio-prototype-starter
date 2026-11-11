@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
@@ -40,7 +41,7 @@ export function PlacementStats({
         )
       })}
       <div className="tm-flex tm-min-w-0 tm-flex-col tm-gap-0.5">
-        <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">Konverze</dt>
+        <dt className="tm-text-[11px] tm-leading-tight tm-text-secondary-default">Míra reakce</dt>
         <dd className="tm-m-0 tm-text-sm tm-font-medium tm-tabular-nums tm-text-primary-default">
           {conversion ?? '–'}
         </dd>
@@ -97,10 +98,12 @@ export function PublicationDetails({ publication }: { publication: JobPublicatio
 export function PublicationHoverCard({
   trigger,
   dropdownTestId,
+  onViewAdvertisement,
   children,
 }: {
   trigger: ReactNode
   dropdownTestId: string
+  onViewAdvertisement?: () => void
   children: ReactNode
 }) {
   return (
@@ -121,7 +124,22 @@ export function PublicationHoverCard({
         initialFocus={-1}
         className="tm-p-3"
       >
-        <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">{children}</div>
+        <div className="tm-flex tm-w-[200px] tm-flex-col tm-gap-3">
+          {children}
+          <Button
+            variant="secondary"
+            size="small"
+            isBlock
+            data-testid="job-card-publication-view-advertisement"
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              onViewAdvertisement?.()
+            }}
+          >
+            Zobrazit inzerát
+          </Button>
+        </div>
       </DropdownBody>
     </Dropdown>
   )

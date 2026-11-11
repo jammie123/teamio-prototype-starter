@@ -4,6 +4,10 @@ export { JobAssignee, type JobAssigneeProps } from './JobAssignee'
 export { JobNote, type JobNoteProps } from './JobNote'
 export { AdvertisementWidget, type AdvertisementWidgetProps } from './AdvertisementWidget'
 export { AdvertisementStats, type AdvertisementStatsProps } from './AdvertisementStats'
+export {
+  AdvertisementEmptyState,
+  type AdvertisementEmptyStateProps,
+} from './AdvertisementEmptyState'
 export { AdvertisementHeader, type AdvertisementHeaderProps } from './AdvertisementHeader'
 export {
   PublicationItem,

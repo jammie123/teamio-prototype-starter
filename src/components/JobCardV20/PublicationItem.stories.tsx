@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 import { PublicationHighlights, PublicationItem } from './PublicationItem'
 import type { JobPublication } from './types'
 
@@ -17,6 +18,10 @@ const meta = {
   args: {
     publication: jobsCz,
     status: 'active',
+    onViewAdvertisement: fn(),
+    onProlong: fn(),
+    onHighlight: fn(),
+    onRepublish: fn(),
   },
   decorators: [
     (Story) => (
@@ -50,7 +55,7 @@ export const Ended: Story = {
 
 export const EndingSoon: Story = {
   name: 'Brzy končí',
-  args: { status: 'endingSoon', dateLabel: 'do 30. 9.' },
+  args: { status: 'endingSoon', dateLabel: 'do 30. 9.', showProlong: true },
 }
 
 export const WithoutDot: Story = {
@@ -63,7 +68,7 @@ export const Overview: Story = {
   render: (args) => (
     <div className="tm-flex tm-flex-wrap tm-items-center tm-gap-2">
       <PublicationItem {...args} status="active" dateLabel="do 30. 9." />
-      <PublicationItem {...args} status="endingSoon" dateLabel="do 30. 9." />
+      <PublicationItem {...args} status="endingSoon" dateLabel="do 30. 9." showProlong />
       <PublicationItem {...args} status="expired" dateLabel="ukončeno 15. 8." />
       <PublicationHighlights
         publication={jobsCz}
@@ -77,6 +82,9 @@ export const Overview: Story = {
             reactionCount: 13,
           },
         ]}
+        onViewAdvertisement={args.onViewAdvertisement}
+        onProlong={args.onProlong}
+        onHighlight={args.onHighlight}
       />
     </div>
   ),

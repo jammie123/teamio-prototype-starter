@@ -23,6 +23,10 @@ export interface JobDetailStatsPublicationRow {
   views: number
   reactions: number
   logoType?: JobPortalLogoType
+  /** ISO date-only (`YYYY-MM-DD`) start of publication on this place. */
+  startDate?: string
+  /** ISO date-only (`YYYY-MM-DD`) end of publication on this place. */
+  endDate?: string
 }
 
 export interface JobDetailStatsSummary {
@@ -144,4 +148,18 @@ export function formatJobDetailStatsPublicationRange(startDate: string, endDate:
     return start
   }
   return `${start} – ${end}`
+}
+
+const reactionRateFormat = new Intl.NumberFormat('cs-CZ', {
+  maximumFractionDigits: 1,
+  minimumFractionDigits: 0,
+})
+
+/** Reaction rate = reactions / views, shown as a Czech percent. */
+export function formatJobDetailStatsReactionRate(views: number, reactions: number): string {
+  if (views <= 0) {
+    return '–'
+  }
+
+  return `${reactionRateFormat.format((reactions / views) * 100)} %`
 }

@@ -92,10 +92,12 @@ export function AdvertisementWidget({
                     status={item.status}
                     dateLabel={item.dateLabel}
                     showStatusDot
+                    onViewAdvertisement={onAdvertisementPreviewClick}
                   />
                   <PublicationHighlights
                     publication={item.publication}
                     highlights={item.highlights}
+                    onViewAdvertisement={onAdvertisementPreviewClick}
                   />
                 </Fragment>
               ))}

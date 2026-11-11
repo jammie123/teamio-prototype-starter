@@ -13,8 +13,10 @@ export const JOB_DETAIL_STATS_COPY = {
   },
   columns: {
     place: 'Místo vystavení',
+    published: 'Vystaveno',
     views: 'Zobrazení',
     reactions: 'Reakce',
+    reactionRate: 'Míra reakce',
     total: 'Celkem',
   },
   tooltip: {

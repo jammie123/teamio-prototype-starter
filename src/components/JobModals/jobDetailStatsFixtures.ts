@@ -1,5 +1,6 @@
 import {
   filterSeriesByRange,
+  parseDateOnly,
   resolvePeriodRange,
   toDateOnlyIso,
   type JobDetailStatsPeriod,
@@ -16,8 +17,20 @@ function seededValue(seed: number, min: number, max: number): number {
 }
 
 const SAMPLE_PLACE_DEFINITIONS = [
-  { id: 'jobs-cz', placeName: 'Jobs.cz', logoType: 'jobs-cz' as const, share: 0.67 },
-  { id: 'prace-cz', placeName: 'Práce.cz', logoType: 'prace-cz' as const, share: 0.33 },
+  {
+    id: 'jobs-cz',
+    placeName: 'Jobs.cz',
+    logoType: 'jobs-cz' as const,
+    share: 0.67,
+    startOffsetDays: 0,
+  },
+  {
+    id: 'prace-cz',
+    placeName: 'Práce.cz',
+    logoType: 'prace-cz' as const,
+    share: 0.33,
+    startOffsetDays: 14,
+  },
 ] as const
 
 function splitTotalsByPlace(
@@ -72,28 +85,49 @@ export function buildDailySeries(
   return points
 }
 
+function clipPlaceStartDate(publishedAt: string, startOffsetDays: number, today: Date): string {
+  const start = parseDateOnly(publishedAt)
+  start.setDate(start.getDate() + startOffsetDays)
+  const end = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return toDateOnlyIso(start > end ? end : start)
+}
+
 export function buildPlaceRowsFromTotals(
   totalViews: number,
   totalReactions: number,
+  publication?: { publishedAt: string; today: Date },
 ): JobDetailStatsPublicationRow[] {
-  return splitTotalsByPlace(totalViews, totalReactions).map((place) => ({
-    id: place.placeId,
-    placeName: place.placeName,
-    logoType: place.logoType,
-    views: place.views,
-    reactions: place.reactions,
-  }))
+  return splitTotalsByPlace(totalViews, totalReactions).map((place) => {
+    const startOffsetDays =
+      SAMPLE_PLACE_DEFINITIONS.find((definition) => definition.id === place.placeId)
+        ?.startOffsetDays ?? 0
+    const startDate = publication
+      ? clipPlaceStartDate(publication.publishedAt, startOffsetDays, publication.today)
+      : undefined
+    const endDate = publication ? toDateOnlyIso(publication.today) : undefined
+
+    return {
+      id: place.placeId,
+      placeName: place.placeName,
+      logoType: place.logoType,
+      views: place.views,
+      reactions: place.reactions,
+      startDate,
+      endDate,
+    }
+  })
 }
 
 export function summarizeSeries(
   series: JobDetailStatsTimeSeriesPoint[],
   period: { periodStartDate: string; periodEndDate: string },
+  publication?: { publishedAt: string; today: Date },
 ): JobDetailStatsSummary {
   const totalViews = series.reduce((sum, point) => sum + point.views, 0)
   const totalReactions = series.reduce((sum, point) => sum + point.reactions, 0)
   return {
     ...period,
-    places: buildPlaceRowsFromTotals(totalViews, totalReactions),
+    places: buildPlaceRowsFromTotals(totalViews, totalReactions, publication),
   }
 }
 
@@ -107,10 +141,14 @@ export function jobDetailStatsFixtureForPeriod(
   const series = filterSeriesByRange(fullSeries, range)
   return {
     series,
-    summary: summarizeSeries(series, {
-      periodStartDate: toDateOnlyIso(range.start),
-      periodEndDate: toDateOnlyIso(range.end),
-    }),
+    summary: summarizeSeries(
+      series,
+      {
+        periodStartDate: toDateOnlyIso(range.start),
+        periodEndDate: toDateOnlyIso(range.end),
+      },
+      { publishedAt, today },
+    ),
   }
 }
 

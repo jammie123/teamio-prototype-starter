@@ -13,6 +13,7 @@ export interface PublicationItemProps extends StyleProps {
   dateLabel?: string
   /** Status dot before the portal name. */
   showStatusDot?: boolean
+  onViewAdvertisement?: () => void
 }
 
 const DOT_CLASS: Record<JobPublicationStatus, string> = {
@@ -33,6 +34,7 @@ export function PublicationItem({
   status,
   dateLabel,
   showStatusDot = true,
+  onViewAdvertisement,
   className,
 }: PublicationItemProps) {
   return (
@@ -56,6 +58,7 @@ export function PublicationItem({
       ) : null}
       <PublicationHoverCard
         dropdownTestId="job-card-publication-dropdown"
+        onViewAdvertisement={onViewAdvertisement}
         trigger={
           <span
             data-testid="job-card-publication-channel"
@@ -91,18 +94,22 @@ PublicationItem.displayName = 'PublicationItem'
 export interface PublicationHighlightsProps extends StyleProps {
   publication: JobPublication
   highlights: JobPublicationHighlight[]
+  onViewAdvertisement?: () => void
 }
 
 function PublicationHighlightName({
   publication,
   highlight,
+  onViewAdvertisement,
 }: {
   publication: JobPublication
   highlight: JobPublicationHighlight
+  onViewAdvertisement?: () => void
 }) {
   return (
     <PublicationHoverCard
       dropdownTestId="job-card-publication-highlight-dropdown"
+      onViewAdvertisement={onViewAdvertisement}
       trigger={
         <span
           data-testid="job-card-publication-highlight-name"
@@ -144,6 +151,7 @@ function PublicationHighlightName({
 export function PublicationHighlights({
   publication,
   highlights,
+  onViewAdvertisement,
   className,
 }: PublicationHighlightsProps) {
   if (highlights.length === 0) {
@@ -173,7 +181,11 @@ export function PublicationHighlights({
               {', '}
             </span>
           ) : null}
-          <PublicationHighlightName publication={publication} highlight={highlight} />
+          <PublicationHighlightName
+            publication={publication}
+            highlight={highlight}
+            onViewAdvertisement={onViewAdvertisement}
+          />
         </Fragment>
       ))}
     </span>

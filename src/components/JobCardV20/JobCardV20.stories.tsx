@@ -40,6 +40,8 @@ const meta = {
     onExpandNote: fn(),
     onViewStatisticsClick: fn(),
     onAdvertisementDetailClick: fn(),
+    onAdvertisementPreviewClick: fn(),
+    onCreateAdvertisement: fn(),
     ...menuHandlers,
   },
   decorators: [
@@ -146,4 +148,9 @@ export const Unpublished: Story = {
 export const WithHeadingLabel: Story = {
   name: 'Se stavovým labelem inzerátu',
   args: { showAdvertisementHeadingLabel: true },
+}
+
+export const PresentationUnit: Story = {
+  name: 'Prezentační jednotka',
+  args: { department: 'České Budějovice' },
 }

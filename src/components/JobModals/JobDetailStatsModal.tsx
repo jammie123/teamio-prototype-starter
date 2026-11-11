@@ -27,6 +27,7 @@ import { JOB_MODAL_CLOSE_ARIA_LABEL } from './JobModalFrame'
 import { JobDetailStatsPeriodHeader } from './JobDetailStatsPeriodHeader'
 import {
   formatJobDetailStatsPublicationRange,
+  formatJobDetailStatsReactionRate,
   sumJobDetailStatsPlaces,
   type JobDetailStatsPeriod,
   type JobDetailStatsSummary,
@@ -70,6 +71,15 @@ function resolvePeriodRangeLabel(
     return formatJobDetailStatsPublicationRange(series[0].date, series[series.length - 1].date)
   }
   return JOB_DETAIL_STATS_PERIOD_LABELS[period]
+}
+
+function formatPlacePublishedRange(
+  place: { startDate?: string; endDate?: string },
+  summary: JobDetailStatsSummary,
+): string {
+  const start = place.startDate ?? summary.periodStartDate
+  const end = place.endDate ?? summary.periodEndDate
+  return formatJobDetailStatsPublicationRange(start, end)
 }
 
 export function JobDetailStatsModal({
@@ -226,9 +236,11 @@ export function JobDetailStatsModal({
                   className="tm-w-full tm-table-fixed tm-text-sm"
                 >
                   <colgroup>
-                    <col className="tm-w-[44%]" />
-                    <col className="tm-w-[28%]" />
-                    <col className="tm-w-[28%]" />
+                    <col className="tm-w-[24%]" />
+                    <col className="tm-w-[26%]" />
+                    <col className="tm-w-[14%]" />
+                    <col className="tm-w-[14%]" />
+                    <col className="tm-w-[22%]" />
                   </colgroup>
                   <TableHead>
                     <TableRow>
@@ -237,6 +249,12 @@ export function JobDetailStatsModal({
                         className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium !tm-border-b-0"
                       >
                         {JOB_DETAIL_STATS_COPY.columns.place}
+                      </TableHeader>
+                      <TableHeader
+                        scope="col"
+                        className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium !tm-border-b-0 tm-whitespace-nowrap"
+                      >
+                        {JOB_DETAIL_STATS_COPY.columns.published}
                       </TableHeader>
                       <TableHeader
                         scope="col"
@@ -249,6 +267,12 @@ export function JobDetailStatsModal({
                         className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium !tm-border-b-0 tm-text-right"
                       >
                         {JOB_DETAIL_STATS_COPY.columns.reactions}
+                      </TableHeader>
+                      <TableHeader
+                        scope="col"
+                        className="tm-px-2 tm-py-1.5 tm-text-13 tm-font-medium !tm-border-b-0 tm-text-right tm-whitespace-nowrap"
+                      >
+                        {JOB_DETAIL_STATS_COPY.columns.reactionRate}
                       </TableHeader>
                     </TableRow>
                   </TableHead>
@@ -264,16 +288,22 @@ export function JobDetailStatsModal({
                               title=""
                               className="tm-size-5 tm-shrink-0"
                             />
-                            <span className="tm-min-w-0 tm-truncate tm-text-sm tm-font-medium tm-leading-tight tm-text-primary-default">
+                            <span className="tm-min-w-0 tm-truncate tm-text-sm tm-font-normal tm-leading-tight tm-text-primary-default">
                               {place.placeName}
                             </span>
                           </span>
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-whitespace-nowrap tm-text-primary-default">
+                          {formatPlacePublishedRange(place, summary)}
                         </TableCell>
                         <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default">
                           {formatCount(place.views)}
                         </TableCell>
                         <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default">
                           {formatCount(place.reactions)}
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-tabular-nums tm-text-right tm-text-primary-default">
+                          {formatJobDetailStatsReactionRate(place.views, place.reactions)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -282,11 +312,15 @@ export function JobDetailStatsModal({
                         <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-sm tm-font-semibold tm-text-primary-default">
                           {JOB_DETAIL_STATS_COPY.columns.total}
                         </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0" />
                         <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-13 tm-font-semibold tm-tabular-nums tm-text-right tm-text-primary-default">
                           {formatCount(tableTotals.views)}
                         </TableCell>
                         <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-13 tm-font-semibold tm-tabular-nums tm-text-right tm-text-primary-default">
                           {formatCount(tableTotals.reactions)}
+                        </TableCell>
+                        <TableCell className="tm-px-2 tm-py-1.5 !tm-border-b-0 tm-text-13 tm-font-semibold tm-tabular-nums tm-text-right tm-text-primary-default">
+                          {formatJobDetailStatsReactionRate(tableTotals.views, tableTotals.reactions)}
                         </TableCell>
                       </TableRow>
                     ) : null}

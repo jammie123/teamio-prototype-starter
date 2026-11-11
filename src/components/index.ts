@@ -531,6 +531,7 @@ export {
   formatJobDetailStatsChartDate,
   formatJobDetailStatsPublicationRange,
   formatJobDetailStatsPublishedDate,
+  formatJobDetailStatsReactionRate,
   jobDetailStatsFixtureForPeriod,
   parseDateOnly,
   resolvePeriodRange,

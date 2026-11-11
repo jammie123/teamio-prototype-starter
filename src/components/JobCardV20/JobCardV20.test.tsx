@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobCardV20, type JobCardV20Props } from './JobCardV20'
@@ -75,6 +75,34 @@ describe('JobCardV20', () => {
     expect(title.className).not.toContain('tm-font-semibold')
   })
 
+  it('renders department after the job title in a secondary-color span', () => {
+    renderJobCard({ department: 'České Budějovice' })
+
+    const title = screen.getByTestId('job-card-title')
+    const separator = screen.getByTestId('job-card-department-separator')
+    const department = screen.getByTestId('job-card-department')
+
+    expect(department.tagName).toBe('SPAN')
+    expect(department).toHaveTextContent('České Budějovice')
+    expect(department.className).toContain('tm-text-secondary-default')
+    expect(separator).toHaveTextContent('·')
+    expect(separator).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByTestId('job-card-title-heading-row')).toContainElement(department)
+    expect(
+      title.compareDocumentPosition(separator) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      separator.compareDocumentPosition(department) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('omits department when it is not provided', () => {
+    renderJobCard()
+
+    expect(screen.queryByTestId('job-card-department')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-department-separator')).not.toBeInTheDocument()
+  })
+
   it('puts the menu, title, assignee and pipeline in the left column', () => {
     renderJobCard()
 
@@ -90,6 +118,8 @@ describe('JobCardV20', () => {
     expect(layoutRow).toContainElement(actions)
     expect(layoutRow).toContainElement(main)
     expect(layoutRow).toContainElement(advertisements)
+    expect(layoutRow.className).toContain('tm-flex-col')
+    expect(layoutRow.className).toContain('md:tm-flex-row')
     expect(main.className).toContain('tm-gap-4')
     expect(main).toContainElement(headingRow)
     expect(main).toContainElement(pipeline)
@@ -103,6 +133,37 @@ describe('JobCardV20', () => {
     expect(pipeline.className).not.toContain('tm-ml-auto')
     expect(title.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(people.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('places the actions menu to the right of assignees below md and left of the title from md up', () => {
+    renderJobCard()
+
+    const main = screen.getByTestId('job-card-main')
+    const headingRow = screen.getByTestId('job-card-title-heading-row')
+    const actions = screen.getByTestId('job-card-actions-toggle')
+    const people = screen.getByTestId('job-card-people')
+    const cluster = main.parentElement
+    const menu = actions.parentElement
+
+    expect(headingRow).toContainElement(people)
+    expect(headingRow).not.toContainElement(actions)
+    expect(cluster).toContainElement(actions)
+    expect(cluster).toContainElement(main)
+    expect(cluster?.className).toContain('tm-grid')
+    expect(cluster?.className).toContain('tm-grid-cols-[minmax(0,1fr)_auto]')
+    expect(cluster?.className).toContain('tm-gap-3')
+    expect(cluster?.className).toContain('tm-px-6')
+    expect(cluster?.className).toContain('md:tm-gap-2')
+    expect(cluster?.className).toContain('md:tm-px-4')
+    expect(cluster?.className).toContain('md:tm-flex')
+    expect(main.className).toContain('tm-col-start-1')
+    expect(menu?.className).toContain('tm-col-start-2')
+    expect(menu?.className).toContain('tm-self-start')
+    expect(menu?.className).toContain('tm-border-l')
+    expect(menu?.className).toContain('tm-pl-3')
+    expect(menu?.className).toContain('md:tm-border-l-0')
+    expect(menu?.className).toContain('md:tm-pl-0')
+    expect(menu?.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('renders the pipeline stats via JobPipeline', () => {
@@ -137,6 +198,9 @@ describe('JobCardV20', () => {
       `PN · ${note.addedAt}`,
     )
     expect(pipeline.compareDocumentPosition(recruitmentNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      recruitmentNote.compareDocumentPosition(advertisements) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('hides the note when its text is empty', () => {
@@ -160,12 +224,21 @@ describe('JobCardV20', () => {
     expect(card.className).not.toContain('tm-bg-white/70')
     expect(layoutRow).toContainElement(column)
     expect(main).not.toContainElement(column)
-    expect(column.className).toContain('tm-border-l')
-    expect(column.className).toContain('tm-w-[350px]')
+    expect(column.className).toContain('tm-w-full')
+    expect(column.className).toContain('tm-flex-row')
+    expect(column.className).toContain('tm-items-start')
+    expect(column.className).toContain('md:tm-items-stretch')
+    expect(column.className).toContain('md:tm-flex-col')
+    expect(column.className).toContain('md:tm-w-[350px]')
+    expect(column.className).toContain('tm-border-t')
+    expect(column.className).toContain('md:tm-border-t-0')
+    expect(column.className).toContain('md:tm-border-l')
     expect(column.className).not.toContain('tm-w-[300px]')
     expect(column.className).toContain('tm-px-6')
     expect(column.className).not.toContain('tm-w-80')
+    expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(column).toContainElement(advertisement)
+    expect(advertisement.className).toContain('tm-w-full')
     expect(advertisement.className).not.toContain('tm-pl-14')
     expect(advertisement.className).not.toContain('tm-border-t')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
@@ -175,10 +248,12 @@ describe('JobCardV20', () => {
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
     const stats = within(column).getByTestId('job-card-advertisement-stats')
     expect(advertisement).not.toContainElement(stats)
-    expect(stats.className).toContain('tm-mt-auto')
-    expect(stats.className).toContain('tm-pt-4')
+    expect(stats.className).toContain('tm-mt-0')
+    expect(stats.className).toContain('tm-pt-0')
+    expect(stats.className).toContain('md:tm-mt-auto')
+    expect(stats.className).toContain('md:tm-pt-4')
     expect(stats.className).not.toContain('tm-pt-2')
-    expect(stats).toHaveTextContent('Detailní statistiky')
+    expect(stats).toHaveTextContent('Detailní přehled')
     expect(
       advertisement.compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
@@ -260,11 +335,37 @@ describe('JobCardV20', () => {
     renderJobCard({ advertisements: [], onCreateAdvertisement })
 
     const column = screen.getByTestId('job-card-advertisements')
-    expect(within(column).getByTestId('job-card-no-advertisement')).toHaveTextContent(
-      'Nábor nemá žádný inzerát.',
+    const empty = within(column).getByTestId('job-card-no-advertisement')
+
+    expect(column.className).toContain('tm-bg-emotion-info-background')
+    expect(empty).not.toHaveTextContent('Zatím nevystavený inzerát')
+    expect(empty).toHaveTextContent('Zatím neinzerujete')
+    expect(empty).toHaveTextContent(
+      'Relevantní kandidáti z našich portálů se na inzerát ozvou rychle.',
     )
-    await user.click(screen.getByText('Vytvořit inzerát'))
+    expect(screen.queryByText('Nábor nemá žádný inzerát.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Vytvořit inzerát')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
+    expect(screen.queryByText('Detailní přehled')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Vystavit inzerát' }))
     expect(onCreateAdvertisement).toHaveBeenCalledOnce()
+  })
+
+  it('shows the unpublished advertisement promo without stats', () => {
+    renderJobCard({
+      advertisements: [{ id: 'ad-empty', publications: [] }],
+      onCreateAdvertisement: vi.fn(),
+    })
+
+    const column = screen.getByTestId('job-card-advertisements')
+    expect(column.className).toContain('tm-bg-emotion-info-background')
+    expect(within(column).getByTestId('job-card-no-advertisement')).toHaveTextContent(
+      'Zatím neinzerujete',
+    )
+    expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'notPublished')
+    expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
+    expect(screen.queryByText('Detailní přehled')).not.toBeInTheDocument()
   })
 
   it('collapses to the first advertisement behind a "show more" link', async () => {
@@ -303,5 +404,25 @@ describe('JobCardV20', () => {
 
     expect(onViewStatisticsClick).toHaveBeenCalledOnce()
     expect(onAdvertisementDetailClick).toHaveBeenCalledOnce()
+  })
+
+  it('forwards Inzerát and Zvýraznit from the portal hover card while running', async () => {
+    const user = userEvent.setup()
+    const onAdvertisementPreviewClick = vi.fn()
+    const onHighlightAdvertisement = vi.fn()
+    renderJobCard({
+      onAdvertisementPreviewClick,
+      onHighlightAdvertisement,
+    })
+
+    await user.hover(screen.getAllByTestId('job-card-publication-channel')[0])
+    const dropdown = await screen.findByTestId('job-card-publication-dropdown')
+    const actions = within(dropdown).getByTestId('job-card-publication-actions')
+
+    expect(within(actions).queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
+    fireEvent.click(within(dropdown).getByTestId('job-card-publication-view-advertisement'))
+    fireEvent.click(within(actions).getByRole('button', { name: 'Zvýraznit' }))
+    expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
+    expect(onHighlightAdvertisement).toHaveBeenCalledOnce()
   })
 })

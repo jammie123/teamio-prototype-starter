@@ -51,6 +51,7 @@ import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import {
+  AdvertisementIcon,
   AdvertisementPreviewIcon,
   AlertTriangleOutlineIcon,
   CalendarClockIcon,
@@ -115,6 +116,7 @@ const iconMap = {
 } as const satisfies Record<string, LucideIcon>
 
 const customIconMap = {
+  advertisement: AdvertisementIcon,
   'advertisement-preview': AdvertisementPreviewIcon,
   'alert-triangle-outline': AlertTriangleOutlineIcon,
   clock: ClockIcon,

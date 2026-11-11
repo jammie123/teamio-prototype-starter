@@ -43,6 +43,7 @@ export {
   formatJobDetailStatsChartDate,
   formatJobDetailStatsPublicationRange,
   formatJobDetailStatsPublishedDate,
+  formatJobDetailStatsReactionRate,
   parseDateOnly,
   resolvePeriodRange,
   sumJobDetailStatsPlaces,

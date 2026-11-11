@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { AdvertisementWidget } from './AdvertisementWidget'
@@ -38,6 +38,7 @@ describe('AdvertisementWidget', () => {
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(advertisement.className).not.toContain('tm-border-t')
+    expect(advertisement.className).toContain('tm-w-full')
     expect(advertisement.className).toContain('tm-flex-col')
     expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
     expect(advertisement.className).not.toMatch(/tm-bg-/)
@@ -48,9 +49,10 @@ describe('AdvertisementWidget', () => {
     expect(heading).toHaveTextContent('1. 1. – 1. 2. 2026')
     expect(within(heading).queryByTestId('job-card-advertisement-heading-label')).not.toBeInTheDocument()
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(channels.className).toContain('tm-flex-col')
+    expect(channels.className).toContain('tm-flex-row')
+    expect(channels.className).toContain('md:tm-flex-col')
     expect(channels.className).toContain('tm-gap-1')
-    expect(channels.className).not.toContain('tm-flex-row')
+    expect(channels.className).not.toMatch(/(?:^|\s)tm-flex-col(?:\s|$)/)
     expect(within(channels).getAllByTestId('job-card-publication')).toHaveLength(3)
     expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
@@ -186,14 +188,27 @@ describe('AdvertisementWidget', () => {
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
   })
 
-  it('shows "Zatím nevystavený inzerát" without portals or views', () => {
-    renderWidget({ id: 'ad-empty', publications: [] })
+  it('shows the unpublished advertisement promo without portals or views', async () => {
+    const user = userEvent.setup()
+    const onCreateAdvertisement = vi.fn()
+    renderWidget({ id: 'ad-empty', publications: [] }, { onCreateAdvertisement })
 
-    expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      'Zatím nevystavený inzerát',
+    const advertisement = screen.getByTestId('job-card-advertisement')
+    const empty = within(advertisement).getByTestId('job-card-no-advertisement')
+
+    expect(advertisement).toHaveAttribute('data-kind', 'notPublished')
+    expect(empty).not.toHaveTextContent('Zatím nevystavený inzerát')
+    expect(empty).toHaveTextContent('Zatím neinzerujete')
+    expect(empty).toHaveTextContent(
+      'Relevantní kandidáti z našich portálů se na inzerát ozvou rychle.',
     )
+    expect(screen.queryByTestId('job-card-advertisement-heading')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-publications')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-aggregate-views')).not.toBeInTheDocument()
+    expect(screen.queryByText('Jobs.cz')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Vystavit inzerát' }))
+    expect(onCreateAdvertisement).toHaveBeenCalledOnce()
   })
 
   it('renders Jobstip and Topováno highlights after their portal', () => {
@@ -225,5 +240,25 @@ describe('AdvertisementWidget', () => {
     renderWidget(runningSame, { showHeadingLabel: true })
 
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Běží')
+  })
+
+  it('forwards Inzerát and Zvýraznit from the portal hover card while running', async () => {
+    const user = userEvent.setup()
+    const onAdvertisementPreviewClick = vi.fn()
+    const onHighlightAdvertisement = vi.fn()
+    renderWidget(runningSame, {
+      onAdvertisementPreviewClick,
+      onHighlightAdvertisement,
+    })
+
+    await user.hover(screen.getAllByTestId('job-card-publication-channel')[0])
+    const dropdown = await screen.findByTestId('job-card-publication-dropdown')
+    const actions = within(dropdown).getByTestId('job-card-publication-actions')
+
+    expect(within(actions).queryByRole('button', { name: 'Prodloužit' })).not.toBeInTheDocument()
+    fireEvent.click(within(dropdown).getByTestId('job-card-publication-view-advertisement'))
+    fireEvent.click(within(actions).getByRole('button', { name: 'Zvýraznit' }))
+    expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
+    expect(onHighlightAdvertisement).toHaveBeenCalledOnce()
   })
 })

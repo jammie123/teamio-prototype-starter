@@ -189,7 +189,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
             <div
               data-testid="job-card-title-heading-row"
               className={cn(
-                'tm-flex tm-min-w-0 tm-w-full tm-gap-3 tm-pr-6',
+                'tm-flex tm-min-w-0 tm-w-full tm-gap-3',
                 isDraft ? 'tm-flex-1 tm-items-center' : 'tm-items-start',
               )}
             >
@@ -228,7 +228,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
             {isDraft ? (
               <div
                 data-testid="job-card-draft-meta"
-                className="tm-flex tm-w-full tm-shrink-0 tm-items-center tm-justify-between tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3 md:tm-w-[350px] md:tm-border-t-0 md:tm-border-l md:tm-pt-0 md:tm-pl-4"
+                className="tm-ml-4 tm-flex tm-w-full tm-shrink-0 tm-items-center tm-justify-between tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3 md:tm-w-[350px] md:tm-border-t-0 md:tm-border-l md:tm-pt-0 md:tm-pl-4"
               >
                 {lastChanged ? (
                   <span

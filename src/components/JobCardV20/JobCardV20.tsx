@@ -159,7 +159,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
               sections={menuSections}
               label="Akce nad náborem a inzerátem"
               testId="job-card-actions-toggle"
-              className="tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-self-start tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0"
+              className="tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-self-start tm--top-1 tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0"
             />
           ) : null}
           <div

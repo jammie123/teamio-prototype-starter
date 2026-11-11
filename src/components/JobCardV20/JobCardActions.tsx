@@ -46,7 +46,7 @@ export function JobCardActions({ sections, label, testId, className }: JobCardAc
   return (
     <Dropdown placement="bottom-end" className={cn('tm-flex-none', className)}>
       <DropdownToggle variant="button-tertiary-circle" aria-label={label} data-testid={testId}>
-        <Icon name="more-vertical" />
+        <Icon name="more-horizontal" />
       </DropdownToggle>
       <DropdownBody overflow={hasSubmenu ? 'visible' : undefined}>
         <OptionList>

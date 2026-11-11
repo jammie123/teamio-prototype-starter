@@ -24,6 +24,7 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   edit: 'Editovat',
   menu: 'Menu',
   'more-vertical': 'Další akce',
+  'more-horizontal': 'Další akce (vodorovně)',
   home: 'Přehled',
   'file-text': 'Nábory',
   user: 'Uchazeči',

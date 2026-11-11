@@ -60,7 +60,7 @@ export function AdvertisementHeader({
       {dateInfo ? (
         <span
           data-testid="job-card-advertisement-heading-date"
-          className="tm-text-sm tm-font-normal tm-text-secondary-default"
+          className="tm-text-base tm-font-normal tm-text-secondary-default"
         >
           {' '}
           {dateInfo}

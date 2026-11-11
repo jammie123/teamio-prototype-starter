@@ -14,7 +14,7 @@ const publication: JobPublication = {
 }
 
 describe('PublicationDetails', () => {
-  it('renders a vertical divider and an external-link icon button beside the portal title', () => {
+  it('renders an external-link icon button beside the portal title and no vertical divider', () => {
     const onViewAdvertisement = vi.fn()
     render(<PublicationDetails publication={publication} onViewAdvertisement={onViewAdvertisement} />)
 
@@ -23,15 +23,37 @@ describe('PublicationDetails', () => {
     expect(screen.queryByText('Konverze')).not.toBeInTheDocument()
     expect(screen.queryByText('Inzerát')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-detail-link')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-publication-view-divider')).not.toBeInTheDocument()
 
-    const divider = screen.getByTestId('job-card-publication-view-divider')
-    expect(divider).toHaveAttribute('role', 'separator')
-    expect(divider.className).toContain('tm-border-l')
     const button = screen.getByRole('button', { name: 'Zobrazit inzerát' })
     expect(button).toHaveClass('tm-size-8')
     expect(within(button).getByTestId('icon')).toHaveAttribute('data-icon-name', 'external-link')
     fireEvent.click(button)
     expect(onViewAdvertisement).toHaveBeenCalledOnce()
+  })
+})
+
+describe('PublicationDetails with highlights', () => {
+  it('lists each Jobstip placement as a row under the portal and the summary stats last', () => {
+    render(
+      <PublicationDetails
+        publication={publication}
+        highlights={[{ id: 'jobstip', name: 'Jobstip', startDate: '8. 9.', endDate: '30. 9. 2026' }]}
+        onViewAdvertisement={vi.fn()}
+      />,
+    )
+
+    const period = screen.getByTestId('job-card-publication-highlight-period')
+    expect(period).toHaveTextContent('8. 9. – 30. 9. 2026')
+    expect(screen.getByText('Jobstip')).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-publication-highlight-view-advertisement')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Zobrazit inzerát' })).toHaveLength(1)
+
+    const stats = screen.getByTestId('job-card-publication-stats')
+    expect(period.compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByTestId('job-card-publication-dropdown-period').compareDocumentPosition(period)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
   })
 })
 

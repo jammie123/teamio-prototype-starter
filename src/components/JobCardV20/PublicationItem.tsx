@@ -1,9 +1,8 @@
 import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { formatPublicationRange } from './lib/dates'
 import { publicationSupportsHighlight } from './lib/publicationActions'
-import { PlacementStats, PublicationDetails, PublicationHoverCard } from './PublicationHoverCard'
+import { PublicationDetails, PublicationHoverCard } from './PublicationHoverCard'
 import type { JobPublication, JobPublicationHighlight, JobPublicationStatus } from './types'
 
 export interface PublicationItemProps extends StyleProps {
@@ -23,6 +22,8 @@ export interface PublicationItemProps extends StyleProps {
   onHighlight?: () => void
   /** Znovuvystavit inzerát, offered on ended (expired) publications. */
   onRepublish?: () => void
+  /** Placements shown as rows in the hover card (e.g. Jobstip). */
+  highlights?: JobPublicationHighlight[]
 }
 
 const DOT_CLASS: Record<JobPublicationStatus, string> = {
@@ -49,6 +50,7 @@ export function PublicationItem({
   showHighlight = publicationSupportsHighlight(publication),
   onHighlight,
   onRepublish,
+  highlights = [],
   className,
 }: PublicationItemProps) {
   return (
@@ -95,7 +97,11 @@ export function PublicationItem({
           </span>
         }
       >
-        <PublicationDetails publication={publication} onViewAdvertisement={onViewAdvertisement} />
+        <PublicationDetails
+          publication={publication}
+          highlights={highlights}
+          onViewAdvertisement={onViewAdvertisement}
+        />
       </PublicationHoverCard>
       {dateLabel ? (
         <span
@@ -124,6 +130,7 @@ export interface PublicationHighlightsProps extends StyleProps {
 function PublicationHighlightName({
   publication,
   highlight,
+  highlights,
   onViewAdvertisement,
   showProlong = false,
   onProlong,
@@ -132,6 +139,7 @@ function PublicationHighlightName({
 }: {
   publication: JobPublication
   highlight: JobPublicationHighlight
+  highlights: JobPublicationHighlight[]
   onViewAdvertisement?: () => void
   showProlong?: boolean
   onProlong?: () => void
@@ -161,23 +169,11 @@ function PublicationHighlightName({
         </span>
       }
     >
-      <PublicationDetails publication={publication} onViewAdvertisement={onViewAdvertisement} />
-      <div className="tm-flex tm-flex-col tm-gap-3">
-        <div>
-          <div className="tm-text-sm tm-font-medium tm-text-teamio-pink">{highlight.name}</div>
-          <div
-            data-testid="job-card-publication-highlight-period"
-            className="tm-text-13 tm-tabular-nums tm-text-secondary-default"
-          >
-            {formatPublicationRange(highlight.startDate, highlight.endDate)}
-          </div>
-        </div>
-        <PlacementStats
-          viewCount={highlight.viewCount}
-          reactionCount={highlight.reactionCount}
-          testId="job-card-publication-highlight-stats"
-        />
-      </div>
+      <PublicationDetails
+        publication={publication}
+        highlights={highlights}
+        onViewAdvertisement={onViewAdvertisement}
+      />
     </PublicationHoverCard>
   )
 }
@@ -223,6 +219,7 @@ export function PublicationHighlights({
           <PublicationHighlightName
             publication={publication}
             highlight={highlight}
+            highlights={highlights}
             onViewAdvertisement={onViewAdvertisement}
             showProlong={showProlong}
             onProlong={onProlong}

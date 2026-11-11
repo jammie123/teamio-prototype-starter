@@ -79,6 +79,7 @@ describe('Icon', () => {
     'refresh-cw',
     'message-square',
     'sliders-horizontal',
+    'more-horizontal',
     'columns-3',
     'grip-vertical',
   ])(

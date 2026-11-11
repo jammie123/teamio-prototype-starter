@@ -103,6 +103,15 @@ describe('JobCardV20', () => {
     expect(screen.queryByTestId('job-card-department-separator')).not.toBeInTheDocument()
   })
 
+  it('uses a horizontal dots icon for the actions toggle', () => {
+    renderJobCard()
+
+    expect(within(screen.getByTestId('job-card-actions-toggle')).getByTestId('icon')).toHaveAttribute(
+      'data-icon-name',
+      'more-horizontal',
+    )
+  })
+
   it('puts the menu, title, assignee and pipeline in the left column', () => {
     renderJobCard()
 
@@ -159,6 +168,7 @@ describe('JobCardV20', () => {
     expect(main.className).toContain('tm-col-start-1')
     expect(menu?.className).toContain('tm-col-start-2')
     expect(menu?.className).toContain('tm-self-start')
+    expect(menu?.className).toContain('tm--top-2')
     expect(menu?.className).toContain('tm-border-l')
     expect(menu?.className).toContain('tm-pl-3')
     expect(menu?.className).toContain('md:tm-border-l-0')

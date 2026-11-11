@@ -1,4 +1,5 @@
 import type { MouseEvent, ReactNode } from 'react'
+import { cn } from '../../lib/cn'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -6,7 +7,7 @@ import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { Link } from '../Link'
 import { formatConversionRate, formatCount } from './lib/format'
 import { formatPublicationRange } from './lib/dates'
-import type { JobPublication } from './types'
+import type { JobPublication, JobPublicationHighlight } from './types'
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
   { key: 'viewCount', label: 'Zhlédnutí' },
@@ -63,56 +64,99 @@ export function AdvertisementDetailLink({ onClick }: { onClick?: () => void }) {
   )
 }
 
-/** Portal logo, name, period and stats – the body of the hover card of a publication. */
-export function PublicationDetails({
-  publication,
+/** One placement: portal logo, name and period, with an external-link button when `viewTestId` is set. */
+function PublicationRow({
+  channel,
+  name,
+  nameClassName,
+  startDate,
+  endDate,
+  periodTestId,
+  viewTestId,
   onViewAdvertisement,
 }: {
-  publication: JobPublication
+  channel: string
+  name: string
+  nameClassName: string
+  startDate: string
+  endDate?: string
+  periodTestId: string
+  /** Set only for the portal row – a placement opens the same advertisement, so it gets no button. */
+  viewTestId?: string
   onViewAdvertisement?: () => void
 }) {
   return (
-    <>
-      <div className="tm-flex tm-min-w-0 tm-items-stretch tm-gap-2">
-        <JobPortalLogo
-          type={jobPortalLogoTypeFromChannel(publication.channel)}
-          title=""
-          className="tm-size-8"
-        />
-        <div className="tm-min-w-0 tm-flex-1">
-          <div className="tm-text-sm tm-font-normal tm-text-primary-default">
-            {publication.channel}
-          </div>
-          <div
-            data-testid="job-card-publication-dropdown-period"
-            className="tm-text-13 tm-tabular-nums tm-text-secondary-default"
-          >
-            {formatPublicationRange(publication.startDate, publication.endDate)}
-          </div>
+    <div className="tm-flex tm-min-w-0 tm-items-center tm-gap-2">
+      <JobPortalLogo type={jobPortalLogoTypeFromChannel(channel)} title="" className="tm-size-8" />
+      <div className="tm-min-w-0 tm-flex-1">
+        <div className={cn('tm-text-sm', nameClassName)}>{name}</div>
+        <div data-testid={periodTestId} className="tm-text-13 tm-tabular-nums tm-text-secondary-default">
+          {formatPublicationRange(startDate, endDate)}
         </div>
-        <div
-          role="separator"
-          aria-hidden
-          data-testid="job-card-publication-view-divider"
-          className="tm-self-stretch tm-border-0 tm-border-l tm-border-solid tm-border-secondary"
-        />
+      </div>
+      {viewTestId ? (
         <Button
           variant="tertiary"
           isCircle
           aria-label="Zobrazit inzerát"
           className="tm-shrink-0"
-          data-testid="job-card-publication-view-advertisement"
+          data-testid={viewTestId}
           onClick={(event) => handlePublicationActionClick(event, onViewAdvertisement)}
         >
           <Icon name="external-link" />
         </Button>
+      ) : null}
+    </div>
+  )
+}
+
+/**
+ * Body of the hover card of a publication: the portal row, one row per Jobstip placement
+ * underneath, and the summary stats of the publication at the bottom.
+ */
+export function PublicationDetails({
+  publication,
+  highlights = [],
+  onViewAdvertisement,
+}: {
+  publication: JobPublication
+  highlights?: JobPublicationHighlight[]
+  onViewAdvertisement?: () => void
+}) {
+  return (
+    <div className="tm-flex tm-min-w-0 tm-flex-col">
+      <div className="tm-pb-3">
+        <PublicationRow
+          channel={publication.channel}
+          name={publication.channel}
+          nameClassName="tm-font-normal tm-text-primary-default"
+          startDate={publication.startDate}
+          endDate={publication.endDate}
+          periodTestId="job-card-publication-dropdown-period"
+          viewTestId="job-card-publication-view-advertisement"
+          onViewAdvertisement={onViewAdvertisement}
+        />
       </div>
-      <PlacementStats
-        viewCount={publication.viewCount}
-        reactionCount={publication.reactionCount}
-        testId="job-card-publication-stats"
-      />
-    </>
+      {highlights.map((highlight) => (
+        <div key={highlight.id} className="tm-border-t tm-border-solid tm-border-secondary tm-py-3">
+          <PublicationRow
+            channel={publication.channel}
+            name={highlight.name}
+            nameClassName="tm-font-medium tm-text-teamio-pink"
+            startDate={highlight.startDate}
+            endDate={highlight.endDate}
+            periodTestId="job-card-publication-highlight-period"
+          />
+        </div>
+      ))}
+      <div className="tm-border-t tm-border-solid tm-border-secondary tm-pt-3">
+        <PlacementStats
+          viewCount={publication.viewCount}
+          reactionCount={publication.reactionCount}
+          testId="job-card-publication-stats"
+        />
+      </div>
+    </div>
   )
 }
 

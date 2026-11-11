@@ -81,7 +81,7 @@ export const RunningPortal: Story = {
   },
 }
 
-/** Portál s běžícím zvýrazněním (Jobstip) – karta zvýraznění ukazuje detail portálu i vlastní statistiky. */
+/** Portál s běžícím zvýrazněním (Jobstip) – karta ukazuje portál a Jobstip pod sebou a souhrnné statistiky. */
 export const RunningPortalWithRunningHighlight: Story = {
   name: 'Běžící portál s běžícím zvýrazněním',
   render: () => (
@@ -108,8 +108,8 @@ export const RunningPortalWithRunningHighlight: Story = {
       'job-card-publication-highlight-dropdown',
     )
     await expect(dropdown).toBeVisible()
-    await expect(within(dropdown).getByTestId('job-card-publication-highlight-stats')).toBeVisible()
     await expect(within(dropdown).getByTestId('job-card-publication-highlight-period')).toBeVisible()
+    await expect(within(dropdown).getByTestId('job-card-publication-stats')).toBeVisible()
   },
 }
 

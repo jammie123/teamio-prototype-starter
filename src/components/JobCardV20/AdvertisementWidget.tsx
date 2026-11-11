@@ -90,6 +90,7 @@ export function AdvertisementWidget({
                   onProlong={onProlong}
                   onHighlight={onHighlightAdvertisement}
                   onRepublish={onProlong}
+                  highlights={item.highlights}
                 />
                 <PublicationHighlights
                   publication={item.publication}

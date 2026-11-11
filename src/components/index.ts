@@ -301,6 +301,7 @@ export {
   type JobCandidateStat as JobCardV20CandidateStat,
   type JobCardNote as JobCardV20Note,
 } from './JobCardV20'
+export { JobAssigneePeople, type JobAssigneePeopleProps } from './JobAssigneePeople/JobAssigneePeople'
 export { JobCardOld, type JobCardOldProps } from './JobCardOld'
 export { JobCardNew, type JobCardNewProps } from './JobCardNew'
 export { JobCardSynteza, type JobCardSyntezaProps } from './JobCardSynteza'

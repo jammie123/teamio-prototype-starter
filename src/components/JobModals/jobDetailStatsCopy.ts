@@ -22,6 +22,7 @@ export const JOB_DETAIL_STATS_COPY = {
   tooltip: {
     total: 'Celkem',
   },
+  openPlace: 'Otevřít na portálu',
   tableAriaLabel: 'Souhrn statistik inzerátu',
   chartAriaLabel: 'Čárový graf zobrazení a reakcí inzerátu',
   periodLoading: 'Načítání statistik',

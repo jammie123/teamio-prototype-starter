@@ -28,8 +28,53 @@ export interface JobDetailStatsChartProps {
   series: JobDetailStatsTimeSeriesPoint[]
   hiddenSeries: JobDetailStatsHiddenSeries
   onToggleSeries: (key: JobDetailStatsSeriesKey) => void
+  /** Render the legend above the chart. Set to `false` when placing `JobDetailStatsLegend` elsewhere. */
+  showLegend?: boolean
   ariaLabel?: string
   className?: string
+}
+
+export interface JobDetailStatsLegendProps {
+  hiddenSeries: JobDetailStatsHiddenSeries
+  onToggleSeries: (key: JobDetailStatsSeriesKey) => void
+  className?: string
+}
+
+export function JobDetailStatsLegend({
+  hiddenSeries,
+  onToggleSeries,
+  className,
+}: JobDetailStatsLegendProps) {
+  const legendId = useId()
+
+  return (
+    <div
+      id={legendId}
+      className={cn(
+        'tm-flex tm-flex-wrap tm-items-center tm-gap-x-6 tm-gap-y-2',
+        className,
+      )}
+      role="group"
+      aria-label="Legenda grafu"
+    >
+      <LegendToggle
+        seriesKey="views"
+        label={JOB_DETAIL_STATS_COPY.legend.views}
+        color={JOB_DETAIL_STATS_CHART_STROKE.views}
+        dashed={false}
+        hidden={hiddenSeries.views}
+        onToggle={() => onToggleSeries('views')}
+      />
+      <LegendToggle
+        seriesKey="reactions"
+        label={JOB_DETAIL_STATS_COPY.legend.reactions}
+        color={JOB_DETAIL_STATS_CHART_STROKE.reactions}
+        dashed
+        hidden={hiddenSeries.reactions}
+        onToggle={() => onToggleSeries('reactions')}
+      />
+    </div>
+  )
 }
 
 function niceCeil(value: number): number {
@@ -125,10 +170,10 @@ export function JobDetailStatsChart({
   series,
   hiddenSeries,
   onToggleSeries,
+  showLegend = true,
   ariaLabel = JOB_DETAIL_STATS_COPY.chartAriaLabel,
   className,
 }: JobDetailStatsChartProps) {
-  const legendId = useId()
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
   const maxViews = useMemo(
@@ -191,29 +236,9 @@ export function JobDetailStatsChart({
 
   return (
     <div className={cn('tm-flex tm-flex-col tm-gap-2', className)}>
-      <div
-        id={legendId}
-        className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-6 tm-gap-y-2"
-        role="group"
-        aria-label="Legenda grafu"
-      >
-        <LegendToggle
-          seriesKey="views"
-          label={JOB_DETAIL_STATS_COPY.legend.views}
-          color={JOB_DETAIL_STATS_CHART_STROKE.views}
-          dashed={false}
-          hidden={hiddenSeries.views}
-          onToggle={() => onToggleSeries('views')}
-        />
-        <LegendToggle
-          seriesKey="reactions"
-          label={JOB_DETAIL_STATS_COPY.legend.reactions}
-          color={JOB_DETAIL_STATS_CHART_STROKE.reactions}
-          dashed
-          hidden={hiddenSeries.reactions}
-          onToggle={() => onToggleSeries('reactions')}
-        />
-      </div>
+      {showLegend ? (
+        <JobDetailStatsLegend hiddenSeries={hiddenSeries} onToggleSeries={onToggleSeries} />
+      ) : null}
 
       <div className="tm-relative tm-w-full tm-overflow-visible">
         <svg

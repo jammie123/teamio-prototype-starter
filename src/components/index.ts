@@ -642,6 +642,11 @@ export {
   type JobPageHeaderProps,
 } from './JobPageHeader'
 export {
+  EmptyJobSearch,
+  EMPTY_JOB_SEARCH_COPY,
+  type EmptyJobSearchProps,
+} from './EmptyJobSearch'
+export {
   BulkAction,
   CandidateActionsMenu,
   CandidateItem,

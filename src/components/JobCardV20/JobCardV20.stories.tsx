@@ -145,6 +145,21 @@ export const Unpublished: Story = {
   args: { status: 'unpublished', advertisements: [runningSame] },
 }
 
+export const Draft: Story = {
+  name: 'Rozpracovaný nábor',
+  args: {
+    title: 'Řidič/ka sk. C ČB turnusový režim PO–NE',
+    owner: 'Martina Nováková',
+    hiringManagers: ['Lukáš Procházka'],
+    status: 'draft',
+    lastChanged: '22. 8. 2026',
+    onCompleteDraft: fn(),
+    candidates: undefined,
+    advertisements: [],
+    note: undefined,
+  },
+}
+
 export const WithHeadingLabel: Story = {
   name: 'Se stavovým labelem inzerátu',
   args: { showAdvertisementHeadingLabel: true },

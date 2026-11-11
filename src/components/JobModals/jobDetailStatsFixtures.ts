@@ -21,6 +21,7 @@ const SAMPLE_PLACE_DEFINITIONS = [
     id: 'jobs-cz',
     placeName: 'Jobs.cz',
     logoType: 'jobs-cz' as const,
+    url: 'https://www.jobs.cz',
     share: 0.67,
     startOffsetDays: 0,
   },
@@ -28,6 +29,7 @@ const SAMPLE_PLACE_DEFINITIONS = [
     id: 'prace-cz',
     placeName: 'Práce.cz',
     logoType: 'prace-cz' as const,
+    url: 'https://www.prace.cz',
     share: 0.33,
     startOffsetDays: 14,
   },
@@ -98,9 +100,8 @@ export function buildPlaceRowsFromTotals(
   publication?: { publishedAt: string; today: Date },
 ): JobDetailStatsPublicationRow[] {
   return splitTotalsByPlace(totalViews, totalReactions).map((place) => {
-    const startOffsetDays =
-      SAMPLE_PLACE_DEFINITIONS.find((definition) => definition.id === place.placeId)
-        ?.startOffsetDays ?? 0
+    const definition = SAMPLE_PLACE_DEFINITIONS.find((item) => item.id === place.placeId)
+    const startOffsetDays = definition?.startOffsetDays ?? 0
     const startDate = publication
       ? clipPlaceStartDate(publication.publishedAt, startOffsetDays, publication.today)
       : undefined
@@ -110,6 +111,7 @@ export function buildPlaceRowsFromTotals(
       id: place.placeId,
       placeName: place.placeName,
       logoType: place.logoType,
+      url: definition?.url,
       views: place.views,
       reactions: place.reactions,
       startDate,

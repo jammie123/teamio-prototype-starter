@@ -1,6 +1,7 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Button } from '../Button'
 import { Card } from '../Card'
 import { Link } from '../Link'
 import { AdvertisementEmptyState } from './AdvertisementEmptyState'
@@ -48,6 +49,9 @@ export interface JobCardV20Props
   onViewStatisticsClick?: () => void
   onAdvertisementDetailClick?: () => void
   onAdvertisementPreviewClick?: () => void
+  /** Pre-formatted Czech date shown on a draft (`3. 11. 2026`). */
+  lastChanged?: string
+  onCompleteDraft?: () => void
 }
 
 /** An unpublished job keeps its advertisements, but every portal counts as ended. */
@@ -96,13 +100,17 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
     onViewStatisticsClick,
     onAdvertisementDetailClick,
     onAdvertisementPreviewClick,
+    lastChanged,
+    onCompleteDraft,
     now,
     className,
     ...rest
   },
   ref,
 ) {
+  const isDraft = status === 'draft'
   const menuSections = buildJobCardMenuSections({
+    status,
     advertisements,
     actions,
     onEditJob,
@@ -130,8 +138,6 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
   const statsModel = statsAdvertisement
     ? buildAdvertisementModel(statsAdvertisement, now)
     : undefined
-  const isUnpublishedPromo =
-    shownAdvertisements.length === 0 || statsModel?.kind === 'notPublished'
   const isMuted = status === 'unpublished' || statsModel?.kind === 'ended'
 
   return (
@@ -144,7 +150,8 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
         'tm-flex',
         'tm-flex-col',
         '!tm-p-0',
-        isMuted && '!tm-bg-white/70',
+        isMuted && '!tm-bg-basic/50',
+        isMuted && '!tm-shadow-none',
         className,
       )}
       {...rest}
@@ -153,22 +160,38 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
         data-testid="job-card-layout-row"
         className="tm-flex tm-w-full tm-flex-col tm-items-stretch md:tm-flex-row"
       >
-        <div className="tm-grid tm-min-w-0 tm-flex-1 tm-grid-cols-[minmax(0,1fr)_auto] tm-gap-3 tm-px-6 tm-py-6 md:tm-flex md:tm-gap-2 md:tm-px-4">
+        <div
+          className={cn(
+            'tm-grid tm-min-w-0 tm-flex-1 tm-grid-cols-[minmax(0,1fr)_auto] tm-gap-3 tm-px-6 md:tm-flex md:tm-gap-2 md:tm-px-4',
+            isDraft ? 'tm-items-center tm-py-3' : 'tm-py-6',
+          )}
+        >
           {menuSections.length ? (
             <JobCardActions
               sections={menuSections}
               label="Akce nad náborem a inzerátem"
               testId="job-card-actions-toggle"
-              className="tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-self-start tm--top-1 tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0"
+              className={cn(
+                'tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0',
+                isDraft ? 'tm-self-center' : 'tm-self-start tm--top-1',
+              )}
             />
           ) : null}
           <div
             data-testid="job-card-main"
-            className="tm-col-start-1 tm-row-start-1 tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-4"
+            className={cn(
+              'tm-col-start-1 tm-row-start-1 tm-flex tm-min-w-0 tm-flex-1',
+              isDraft
+                ? 'tm-flex-col tm-items-stretch md:tm-flex-row md:tm-items-center'
+                : 'tm-flex-col tm-gap-4',
+            )}
           >
             <div
               data-testid="job-card-title-heading-row"
-              className="tm-flex tm-min-w-0 tm-w-full tm-items-start tm-gap-3"
+              className={cn(
+                'tm-flex tm-min-w-0 tm-w-full tm-gap-3 tm-pr-6',
+                isDraft ? 'tm-flex-1 tm-items-center' : 'tm-items-start',
+              )}
             >
               <div className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-wrap tm-items-baseline tm-gap-x-2">
                 <h3
@@ -202,12 +225,41 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                 className="tm-ml-auto tm-shrink-0"
               />
             </div>
-            {candidates ? (
+            {isDraft ? (
+              <div
+                data-testid="job-card-draft-meta"
+                className="tm-flex tm-w-full tm-shrink-0 tm-items-center tm-justify-between tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-pt-3 md:tm-w-[350px] md:tm-border-t-0 md:tm-border-l md:tm-pt-0 md:tm-pl-4"
+              >
+                {lastChanged ? (
+                  <span
+                    data-testid="job-card-last-changed"
+                    className="tm-flex tm-flex-col tm-whitespace-nowrap tm-text-sm tm-leading-tight tm-text-secondary-default"
+                  >
+                    <span>Poslední změna</span>
+                    <span>{lastChanged}</span>
+                  </span>
+                ) : null}
+                <Button
+                  variant="primary"
+                  data-testid="job-card-complete-draft"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onCompleteDraft?.()
+                  }}
+                >
+                  Dokončit
+                </Button>
+              </div>
+            ) : null}
+            {!isDraft && candidates ? (
               <div data-testid="job-card-pipeline" className="tm-shrink-0">
                 <JobPipeline candidates={candidates} onStatClick={onCandidatesClick} />
               </div>
             ) : null}
-            {note ? <JobNote note={note} onExpand={onExpandNote} className="tm-w-full" /> : null}
+            {!isDraft && note ? (
+              <JobNote note={note} onExpand={onExpandNote} className="tm-w-full" />
+            ) : null}
           </div>
         </div>
 
@@ -215,12 +267,14 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
           <div
             data-testid="job-card-advertisements"
             className={cn(
-              'tm-flex tm-w-full tm-shrink-0 tm-flex-row tm-items-start tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-px-6 tm-py-6 md:tm-w-[350px] md:tm-flex-col md:tm-items-stretch md:tm-border-t-0 md:tm-border-l',
-              isUnpublishedPromo && 'tm-bg-emotion-info-background',
+              'tm-flex tm-w-full tm-shrink-0 tm-flex-row tm-items-start tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-bg-none tm-px-6 tm-py-6 md:tm-w-[350px] md:tm-flex-col md:tm-items-stretch md:tm-border-t-0 md:tm-border-l',
             )}
           >
             {shownAdvertisements.length === 0 ? (
-              <AdvertisementEmptyState onCreateAdvertisement={onCreateAdvertisement} />
+              <AdvertisementEmptyState
+                onCreateAdvertisement={onCreateAdvertisement}
+                onAdvertisementPreviewClick={onAdvertisementPreviewClick}
+              />
             ) : (
               <>
                 <div className="tm-flex tm-min-w-0 tm-w-full tm-flex-1 tm-flex-col">
@@ -251,6 +305,10 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
                 {statsModel && statsModel.kind !== 'notPublished' ? (
                   <AdvertisementStats
                     viewCount={statsModel.viewCount}
+                    showProlong={statsModel.canProlong}
+                    onProlong={onExtendAndRepublish}
+                    showRepublish={statsModel.kind === 'ended'}
+                    onRepublish={onExtendAndRepublish}
                     onStatistics={onViewStatisticsClick}
                     onDetail={onAdvertisementDetailClick}
                   />

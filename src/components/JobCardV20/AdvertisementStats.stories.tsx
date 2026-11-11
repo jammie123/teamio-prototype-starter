@@ -23,10 +23,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const WithViews: Story = {
-  name: 'Zhlédnutí a Detailní přehled',
+  name: 'Zhlédnutí a Přehled',
 }
 
 export const WithoutViews: Story = {
-  name: 'Jen Detailní přehled',
+  name: 'Jen Přehled',
   args: { viewCount: undefined },
 }

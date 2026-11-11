@@ -123,6 +123,8 @@ describe('components barrel', () => {
     expect(components.JobCardSyntezaMoreAds).toBeTypeOf('object')
     expect(components.JobMenu).toBeTypeOf('function')
     expect(components.JobPageHeader).toBeTypeOf('object')
+    expect(components.EmptyJobSearch).toBeTypeOf('function')
+    expect(components.EMPTY_JOB_SEARCH_COPY).toBeTypeOf('object')
     expect(components.JobResponseRateBadge).toBeTypeOf('function')
     expect(components.JobResponseRateBadgeV2).toBeTypeOf('function')
     expect(components.JobPublicationPlaceCard).toBeTypeOf('function')

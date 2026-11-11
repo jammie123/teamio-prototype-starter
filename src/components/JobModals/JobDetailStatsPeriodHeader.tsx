@@ -22,7 +22,7 @@ export function JobDetailStatsPeriodHeader({
 }: JobDetailStatsPeriodHeaderProps) {
   return (
     <div
-      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-pb-8 tm-text-sm"
+      className="tm-flex tm-flex-wrap tm-items-center tm-gap-x-2 tm-gap-y-1 tm-text-sm"
       data-testid="job-detail-stats-period-header"
     >
       <span className="tm-text-secondary-default">{JOB_DETAIL_STATS_COPY.periodLabel}:</span>

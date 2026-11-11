@@ -4,14 +4,16 @@ import { Button } from '../Button'
 
 export interface AdvertisementEmptyStateProps extends StyleProps {
   onCreateAdvertisement?: () => void
+  onAdvertisementPreviewClick?: () => void
 }
 
 /**
  * Promotional empty state for a job that has no published advertisement yet.
- * Below md the CTA sits to the right of the copy; from md the button is full width.
+ * Below md the CTAs sit to the right of the copy; from md they sit in a row under it.
  */
 export function AdvertisementEmptyState({
   onCreateAdvertisement,
+  onAdvertisementPreviewClick,
   className,
 }: AdvertisementEmptyStateProps) {
   return (
@@ -25,7 +27,7 @@ export function AdvertisementEmptyState({
         'tm-gap-x-3',
         'tm-gap-y-1',
         'tm-rounded-xl',
-        'tm-bg-emotion-info-background',
+        'tm-bg-none',
         'md:tm-grid-cols-1',
         'md:tm-items-start',
         'md:tm-gap-4',
@@ -42,22 +44,37 @@ export function AdvertisementEmptyState({
         data-testid="job-card-advertisement-empty-body"
         className="tm-col-start-1 tm-row-start-2 tm-m-0 tm-min-w-0 tm-text-sm tm-text-primary-default"
       >
-        Relevantní kandidáti z našich portálů se na inzerát ozvou rychle.
+        Zkontrolujte náhled a publikujte. Kandidáti se ozvou rychle.
       </p>
-      {onCreateAdvertisement ? (
+      <div
+        data-testid="job-card-advertisement-empty-actions"
+        className="tm-col-start-2 tm-row-start-1 tm-row-span-2 tm-flex tm-shrink-0 tm-flex-row tm-gap-2 tm-self-center md:tm-col-start-1 md:tm-row-start-3 md:tm-row-span-1 md:tm-w-full"
+      >
         <Button
-          variant="primary"
-          data-testid="job-card-advertisement-empty-publish"
-          className="tm-col-start-2 tm-row-start-1 tm-row-span-2 tm-shrink-0 tm-self-center tm-whitespace-nowrap md:tm-col-start-1 md:tm-row-start-3 md:tm-row-span-1 md:tm-w-full"
+          variant="secondary"
+          data-testid="job-card-advertisement-empty-preview"
+          className="tm-whitespace-nowrap"
           onClick={(event) => {
             event.preventDefault()
             event.stopPropagation()
-            onCreateAdvertisement()
+            onAdvertisementPreviewClick?.()
           }}
         >
-          Vystavit inzerát
+          Zobrazit náhled
         </Button>
-      ) : null}
+        <Button
+          variant="primary"
+          data-testid="job-card-advertisement-empty-publish"
+          className="tm-whitespace-nowrap"
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            onCreateAdvertisement?.()
+          }}
+        >
+          Publikovat
+        </Button>
+      </div>
     </div>
   )
 }

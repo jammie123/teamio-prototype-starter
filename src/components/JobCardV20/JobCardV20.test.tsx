@@ -168,7 +168,7 @@ describe('JobCardV20', () => {
     expect(main.className).toContain('tm-col-start-1')
     expect(menu?.className).toContain('tm-col-start-2')
     expect(menu?.className).toContain('tm-self-start')
-    expect(menu?.className).toContain('tm--top-2')
+    expect(menu?.className).toContain('tm--top-1')
     expect(menu?.className).toContain('tm-border-l')
     expect(menu?.className).toContain('tm-pl-3')
     expect(menu?.className).toContain('md:tm-border-l-0')
@@ -231,7 +231,7 @@ describe('JobCardV20', () => {
 
     expect(card).toHaveAttribute('data-variant', 'v20')
     expect(card.className).toContain('!tm-p-0')
-    expect(card.className).not.toContain('tm-bg-white/70')
+    expect(card.className).not.toContain('!tm-bg-basic/50')
     expect(layoutRow).toContainElement(column)
     expect(main).not.toContainElement(column)
     expect(column.className).toContain('tm-w-full')
@@ -246,6 +246,7 @@ describe('JobCardV20', () => {
     expect(column.className).not.toContain('tm-w-[300px]')
     expect(column.className).toContain('tm-px-6')
     expect(column.className).not.toContain('tm-w-80')
+    expect(column.className).toContain('tm-bg-none')
     expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(column).toContainElement(advertisement)
     expect(advertisement.className).toContain('tm-w-full')
@@ -263,7 +264,7 @@ describe('JobCardV20', () => {
     expect(stats.className).toContain('md:tm-mt-auto')
     expect(stats.className).toContain('md:tm-pt-4')
     expect(stats.className).not.toContain('tm-pt-2')
-    expect(stats).toHaveTextContent('Detailní přehled')
+    expect(stats).toHaveTextContent('Přehled')
     expect(
       advertisement.compareDocumentPosition(stats) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
@@ -278,23 +279,84 @@ describe('JobCardV20', () => {
     expect(advertisements[1].className).toContain('tm-border-t')
   })
 
-  it('hides the right column for drafts', () => {
-    renderJobCard({ status: 'draft' })
+  it('renders a compact draft row with last change and a primary Dokončit button', async () => {
+    const user = userEvent.setup()
+    const onCompleteDraft = vi.fn()
+    renderJobCard({
+      status: 'draft',
+      lastChanged: '22. 8. 2026',
+      onCompleteDraft,
+    })
+
+    const cluster = screen.getByTestId('job-card-main').parentElement
+    const headingRow = screen.getByTestId('job-card-title-heading-row')
+    const lastChanged = screen.getByTestId('job-card-last-changed')
+    const complete = screen.getByTestId('job-card-complete-draft')
+    const people = screen.getByTestId('job-card-people')
+    const meta = screen.getByTestId('job-card-draft-meta')
 
     expect(screen.queryByTestId('job-card-advertisements')).not.toBeInTheDocument()
-    expect(screen.getByTestId('job-card-main')).toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-pipeline')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
+    expect(cluster?.className).toContain('tm-py-3')
+    expect(cluster?.className).toContain('tm-items-center')
+    expect(cluster?.className).not.toContain('tm-py-6')
+    expect(headingRow.className).toContain('tm-items-center')
+    expect(headingRow.className).toContain('tm-pr-6')
+    expect(headingRow).toContainElement(people)
+    expect(headingRow).not.toContainElement(meta)
+    expect(lastChanged).toHaveTextContent('Poslední změna')
+    expect(lastChanged).toHaveTextContent('22. 8. 2026')
+    expect(lastChanged).not.toHaveTextContent('Poslední změna:')
+    expect(lastChanged.className).toContain('tm-flex-col')
+    expect(lastChanged.className).toContain('tm-text-secondary-default')
+    expect(complete).toHaveTextContent('Dokončit')
+    expect(complete).not.toHaveTextContent('Dokončit nábor')
+    expect(complete).toHaveClass('tm-bg-action-primary-default')
+    expect(meta.className).toContain('tm-w-full')
+    expect(meta.className).toContain('md:tm-w-[350px]')
+    expect(meta.className).toContain('tm-justify-between')
+    expect(meta.className).toContain('tm-border-t')
+    expect(meta.className).toContain('md:tm-border-l')
+    expect(meta.className).toContain('md:tm-border-t-0')
+    expect(people.compareDocumentPosition(meta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(lastChanged.compareDocumentPosition(complete) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+
+    await user.click(complete)
+    expect(onCompleteDraft).toHaveBeenCalledOnce()
+  })
+
+  it('keeps Dokončit on a draft when lastChanged is missing', () => {
+    renderJobCard({ status: 'draft' })
+
+    expect(screen.queryByTestId('job-card-last-changed')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-complete-draft')).toHaveTextContent('Dokončit')
+  })
+
+  it('offers a primary Znovuvystavit button on an ended advertisement', async () => {
+    const user = userEvent.setup()
+    const onExtendAndRepublish = vi.fn()
+    renderJobCard({ advertisements: [ended], onExtendAndRepublish })
+
+    const republish = screen.getByTestId('job-card-advertisement-republish')
+    expect(republish).toHaveTextContent('Znovuvystavit')
+    expect(republish).toHaveClass('tm-bg-action-primary-default')
+
+    await user.click(republish)
+    expect(onExtendAndRepublish).toHaveBeenCalledOnce()
   })
 
   it('uses a translucent white background when the advertisement is ended', () => {
     renderJobCard({ advertisements: [ended] })
 
-    expect(screen.getByTestId('job-card').className).toContain('!tm-bg-white/70')
+    expect(screen.getByTestId('job-card').className).toContain('!tm-bg-basic/50')
+    expect(screen.getByTestId('job-card').className).toContain('!tm-shadow-none')
   })
 
   it('marks every portal as ended for an unpublished job', () => {
     renderJobCard({ status: 'unpublished' })
 
-    expect(screen.getByTestId('job-card').className).toContain('!tm-bg-white/70')
+    expect(screen.getByTestId('job-card').className).toContain('!tm-bg-basic/50')
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'ended')
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Ukončeno')
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
@@ -316,21 +378,16 @@ describe('JobCardV20', () => {
     expect(advertisement).toHaveAttribute('data-kind', 'endingSoon')
     expect(advertisement.className).not.toContain('tm-bg-emotion-warning-background/80')
     expect(advertisement.className).not.toMatch(/tm-bg-/)
-    expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveTextContent(
-      'Naplánovat prodloužení',
-    )
-    expect(screen.getByTestId('job-card-disappearance-prolong')).toHaveClass(
-      'tm-bg-action-primary-default',
-      'tm-min-h-8',
-    )
+    const prolong = screen.getByTestId('job-card-disappearance-prolong')
+    expect(prolong).toHaveTextContent('Prodloužit')
+    expect(prolong).toHaveClass('tm-bg-action-primary-default', '!tm-min-h-7')
     expect(
-      screen.getByTestId('job-card-advertisement-publications').compareDocumentPosition(
-        screen.getByTestId('job-card-disappearance-prolong'),
-      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      screen.getByTestId('job-card-advertisement-detail-action').compareDocumentPosition(prolong) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
   })
 
-  it('calls onExtendAndRepublish from Naplánovat prodloužení when the advertisement ends soon', async () => {
+  it('calls onExtendAndRepublish from Prodloužit in the stats footer when the advertisement ends soon', async () => {
     const user = userEvent.setup()
     const onExtendAndRepublish = vi.fn()
     renderJobCard({ advertisements: [endingSoon], onExtendAndRepublish })
@@ -342,23 +399,27 @@ describe('JobCardV20', () => {
   it('offers creating an advertisement when the job has none', async () => {
     const user = userEvent.setup()
     const onCreateAdvertisement = vi.fn()
-    renderJobCard({ advertisements: [], onCreateAdvertisement })
+    const onAdvertisementPreviewClick = vi.fn()
+    renderJobCard({ advertisements: [], onCreateAdvertisement, onAdvertisementPreviewClick })
 
     const column = screen.getByTestId('job-card-advertisements')
     const empty = within(column).getByTestId('job-card-no-advertisement')
 
-    expect(column.className).toContain('tm-bg-emotion-info-background')
+    expect(column.className).toContain('tm-bg-none')
+    expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(empty).not.toHaveTextContent('Zatím nevystavený inzerát')
     expect(empty).toHaveTextContent('Zatím neinzerujete')
     expect(empty).toHaveTextContent(
-      'Relevantní kandidáti z našich portálů se na inzerát ozvou rychle.',
+      'Zkontrolujte náhled a publikujte. Kandidáti se ozvou rychle.',
     )
     expect(screen.queryByText('Nábor nemá žádný inzerát.')).not.toBeInTheDocument()
     expect(screen.queryByText('Vytvořit inzerát')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
-    expect(screen.queryByText('Detailní přehled')).not.toBeInTheDocument()
+    expect(screen.queryByText('Přehled')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Vystavit inzerát' }))
+    await user.click(screen.getByRole('button', { name: 'Zobrazit náhled' }))
+    await user.click(screen.getByRole('button', { name: 'Publikovat' }))
+    expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
     expect(onCreateAdvertisement).toHaveBeenCalledOnce()
   })
 
@@ -369,13 +430,14 @@ describe('JobCardV20', () => {
     })
 
     const column = screen.getByTestId('job-card-advertisements')
-    expect(column.className).toContain('tm-bg-emotion-info-background')
+    expect(column.className).toContain('tm-bg-none')
+    expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(within(column).getByTestId('job-card-no-advertisement')).toHaveTextContent(
       'Zatím neinzerujete',
     )
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'notPublished')
     expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
-    expect(screen.queryByText('Detailní přehled')).not.toBeInTheDocument()
+    expect(screen.queryByText('Přehled')).not.toBeInTheDocument()
   })
 
   it('collapses to the first advertisement behind a "show more" link', async () => {

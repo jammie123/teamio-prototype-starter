@@ -49,6 +49,8 @@ export interface AdvertisementModel {
   canProlong: boolean
   /** Status dots are only useful once portals differ in status. */
   showStatusDots: boolean
+  /** All portals share the same start and end dates. Otherwise they stack in a column. */
+  sharedDates: boolean
 }
 
 const NOT_PUBLISHED_LABEL = 'Zatím nevystavený inzerát'
@@ -221,6 +223,7 @@ const NOT_PUBLISHED_MODEL: AdvertisementModel = {
   publications: [],
   canProlong: false,
   showStatusDots: false,
+  sharedDates: true,
 }
 
 /**
@@ -262,6 +265,7 @@ export function buildAdvertisementModel(
       viewCount,
       canProlong,
       showStatusDots: new Set(items.map((item) => item.status)).size > 1,
+      sharedDates: shareSameStartDate(publications) && shareSameEndDate(publications),
     }
   }
 

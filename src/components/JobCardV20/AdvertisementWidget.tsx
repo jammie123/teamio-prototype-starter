@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { Button } from '../Button'
 import { AdvertisementEmptyState } from './AdvertisementEmptyState'
 import { AdvertisementHeader } from './AdvertisementHeader'
 import { buildAdvertisementModel } from './lib/advertisementModel'
@@ -18,7 +17,7 @@ export interface AdvertisementWidgetProps extends StyleProps {
   now?: Date
   /** Drop the top divider. Defaults to true for the compact right column. */
   hideTopBorder?: boolean
-  /** Called from Naplánovat prodloužení when the advertisement is ending soon. */
+  /** Called from Prodloužit (portal hover card) when the advertisement is ending soon. */
   onProlong?: () => void
   onAdvertisementPreviewClick?: () => void
   onHighlightAdvertisement?: () => void
@@ -63,7 +62,10 @@ export function AdvertisementWidget({
       )}
     >
       {isNotPublished ? (
-        <AdvertisementEmptyState onCreateAdvertisement={onCreateAdvertisement} />
+        <AdvertisementEmptyState
+          onCreateAdvertisement={onCreateAdvertisement}
+          onAdvertisementPreviewClick={onAdvertisementPreviewClick}
+        />
       ) : (
         <>
           {showTitle && advertisement.title ? (
@@ -77,7 +79,10 @@ export function AdvertisementWidget({
           <AdvertisementHeader {...model.header} showLabel={showHeadingLabel} />
           <div
             data-testid="job-card-advertisement-publications"
-            className="tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-row tm-flex-wrap tm-items-start tm-gap-1 tm-p-0 md:tm-flex-col"
+            className={cn(
+              'tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-wrap tm-items-start tm-gap-1 tm-p-0',
+              model.sharedDates ? 'tm-flex-row' : 'tm-flex-col',
+            )}
           >
             {model.publications.map((item) => (
               <Fragment key={item.publication.id}>
@@ -98,23 +103,11 @@ export function AdvertisementWidget({
                   onViewAdvertisement={onAdvertisementPreviewClick}
                   onProlong={onProlong}
                   onHighlight={onHighlightAdvertisement}
+                  onRepublish={onProlong}
                 />
               </Fragment>
             ))}
           </div>
-          {model.canProlong ? (
-            <Button
-              variant="primary"
-              data-testid="job-card-disappearance-prolong"
-              aria-label="Naplánovat prodloužení"
-              onClick={(event) => {
-                event.stopPropagation()
-                onProlong?.()
-              }}
-            >
-              Naplánovat prodloužení
-            </Button>
-          ) : null}
         </>
       )}
     </div>

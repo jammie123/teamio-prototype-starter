@@ -14,7 +14,7 @@ export interface PublicationItemProps extends StyleProps {
   /** Status dot before the portal name. */
   showStatusDot?: boolean
   onViewAdvertisement?: () => void
-  /** Offer Prodloužit. Hidden while the advertisement is still running. */
+  /** Offer Prodloužit in the hover card. Defaults to true for an ending-soon portal. */
   showProlong?: boolean
   onProlong?: () => void
   /** Override whether Zvýraznit is offered. Defaults to Jobs.cz, Prace.cz and Atmoskop. */
@@ -45,9 +45,9 @@ export function PublicationItem({
   dateLabel,
   showStatusDot = true,
   onViewAdvertisement,
-  showProlong = false,
+  showProlong = status === 'endingSoon',
   onProlong,
-  showHighlight = publicationSupportsHighlight(publication),
+  showHighlight = publicationSupportsHighlight(publication) && status !== 'expired',
   onHighlight,
   onRepublish,
   highlights = [],
@@ -125,6 +125,7 @@ export interface PublicationHighlightsProps extends StyleProps {
   onProlong?: () => void
   showHighlight?: boolean
   onHighlight?: () => void
+  onRepublish?: () => void
 }
 
 function PublicationHighlightName({
@@ -136,6 +137,7 @@ function PublicationHighlightName({
   onProlong,
   showHighlight = publicationSupportsHighlight(publication),
   onHighlight,
+  onRepublish,
 }: {
   publication: JobPublication
   highlight: JobPublicationHighlight
@@ -145,14 +147,19 @@ function PublicationHighlightName({
   onProlong?: () => void
   showHighlight?: boolean
   onHighlight?: () => void
+  onRepublish?: () => void
 }) {
+  const isEnded = publication.status === 'expired'
+
   return (
     <PublicationHoverCard
       dropdownTestId="job-card-publication-highlight-dropdown"
       showProlong={showProlong}
-      showHighlight={showHighlight}
+      showHighlight={showHighlight && !isEnded}
+      showRepublish={isEnded}
       onProlong={onProlong}
       onHighlight={onHighlight}
+      onRepublish={onRepublish}
       trigger={
         <span
           data-testid="job-card-publication-highlight-name"
@@ -187,6 +194,7 @@ export function PublicationHighlights({
   onProlong,
   showHighlight = publicationSupportsHighlight(publication),
   onHighlight,
+  onRepublish,
   className,
 }: PublicationHighlightsProps) {
   if (highlights.length === 0) {
@@ -225,6 +233,7 @@ export function PublicationHighlights({
             onProlong={onProlong}
             showHighlight={showHighlight}
             onHighlight={onHighlight}
+            onRepublish={onRepublish}
           />
         </Fragment>
       ))}

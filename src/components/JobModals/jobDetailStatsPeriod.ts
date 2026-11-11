@@ -23,6 +23,8 @@ export interface JobDetailStatsPublicationRow {
   views: number
   reactions: number
   logoType?: JobPortalLogoType
+  /** Public URL of the advertisement on this place; opens in a new tab when set. */
+  url?: string
   /** ISO date-only (`YYYY-MM-DD`) start of publication on this place. */
   startDate?: string
   /** ISO date-only (`YYYY-MM-DD`) end of publication on this place. */

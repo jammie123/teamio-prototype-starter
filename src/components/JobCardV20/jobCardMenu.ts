@@ -3,6 +3,7 @@ import type {
   JobCardAction,
   JobCardMenuItem,
   JobCardMenuSection,
+  JobStatus,
 } from './types'
 
 export const JOB_CARD_MENU_LABELS = {
@@ -36,6 +37,7 @@ export interface JobCardMenuHandlers {
 export interface BuildJobCardMenuOptions extends JobCardMenuHandlers {
   advertisements?: JobAdvertisement[]
   actions?: JobCardAction[]
+  status?: JobStatus
 }
 
 function advertisementItems({
@@ -162,8 +164,10 @@ function jobItems({
  * left to the screen behind each action.
  */
 export function buildJobCardMenuSections(options: BuildJobCardMenuOptions): JobCardMenuSection[] {
-  return [
-    { id: 'advertisement', items: advertisementItems(options) },
-    { id: 'job', items: jobItems(options) },
-  ].filter((section) => section.items.length > 0)
+  const advertisementSection =
+    options.status === 'draft' ? [] : [{ id: 'advertisement', items: advertisementItems(options) }]
+
+  return [...advertisementSection, { id: 'job', items: jobItems(options) }].filter(
+    (section) => section.items.length > 0,
+  )
 }

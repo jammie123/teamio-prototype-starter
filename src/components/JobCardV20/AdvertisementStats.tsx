@@ -1,5 +1,6 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Button } from '../Button'
 import { Icon } from '../Icon'
 import { Link } from '../Link'
 import { formatCount } from './lib/format'
@@ -8,15 +9,25 @@ export interface AdvertisementStatsProps extends StyleProps {
   viewCount?: number
   onStatistics?: () => void
   onDetail?: () => void
+  /** Offer Prodloužit right of Přehled, for an advertisement that is ending soon. */
+  showProlong?: boolean
+  onProlong?: () => void
+  /** Offer Znovuvystavit on an ended advertisement. */
+  showRepublish?: boolean
+  onRepublish?: () => void
 }
 
 /**
- * Compact advertisement footer: aggregated views and a Detailní přehled action.
+ * Compact advertisement footer: aggregated views, a Přehled action and optionally Prodloužit.
  */
 export function AdvertisementStats({
   viewCount,
   onStatistics,
   onDetail,
+  showProlong = false,
+  onProlong,
+  showRepublish = false,
+  onRepublish,
   className,
 }: AdvertisementStatsProps) {
   const formattedViews = viewCount === undefined ? undefined : formatCount(viewCount)
@@ -56,7 +67,6 @@ export function AdvertisementStats({
       <Link
         underlined="never"
         variant="secondary"
-        aria-label="Detailní přehled"
         data-testid="job-card-advertisement-detail-action"
         className="tm-inline-flex tm-items-center tm-gap-1 tm-text-sm tm-font-normal"
         onClick={(event) => {
@@ -65,9 +75,37 @@ export function AdvertisementStats({
           onDetail?.()
         }}
       >
-        Detailní přehled
+        Přehled
         <Icon name="chevron-right" className="tm-text-base tm-leading-none" aria-hidden />
       </Link>
+      {showProlong ? (
+        <Button
+          variant="primary"
+          size="small"
+          className="tm-ml-auto !tm-min-h-7 !tm-px-3"
+          data-testid="job-card-disappearance-prolong"
+          onClick={(event) => {
+            event.stopPropagation()
+            onProlong?.()
+          }}
+        >
+          Prodloužit
+        </Button>
+      ) : null}
+      {showRepublish ? (
+        <Button
+          variant="primary"
+          size="small"
+          className="tm-ml-auto !tm-min-h-7 !tm-px-3"
+          data-testid="job-card-advertisement-republish"
+          onClick={(event) => {
+            event.stopPropagation()
+            onRepublish?.()
+          }}
+        >
+          Znovuvystavit
+        </Button>
+      ) : null}
     </div>
   )
 }

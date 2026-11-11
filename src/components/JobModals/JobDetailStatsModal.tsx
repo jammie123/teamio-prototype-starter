@@ -3,8 +3,10 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Alert } from '../Alert'
 import { Button } from '../Button'
+import { Icon } from '../Icon'
 import { formatCount } from '../JobCard/formatCount'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
+import { Link } from '../Link'
 import {
   Modal,
   ModalBody,
@@ -19,6 +21,7 @@ import { Spinner } from '../Spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table'
 import {
   JobDetailStatsChart,
+  JobDetailStatsLegend,
   type JobDetailStatsHiddenSeries,
   type JobDetailStatsSeriesKey,
 } from './JobDetailStatsChart'
@@ -143,13 +146,6 @@ export function JobDetailStatsModal({
       {trigger ? <ModalTrigger asChild>{trigger}</ModalTrigger> : null}
       <ModalContent size="wide" className={className} data-testid="job-detail-stats-modal">
         <ModalTitle className="tm-pb-0 tm-text-2xl">{JOB_DETAIL_STATS_COPY.title}</ModalTitle>
-        <div className="-tm-mt-6 tm-px-6 tm-pr-14">
-          <JobDetailStatsPeriodHeader
-            period={period}
-            periodRangeLabel={resolvePeriodRangeLabel(period, summary, series)}
-            onPeriodChange={handlePeriodChange}
-          />
-        </div>
         <ModalClose aria-label={JOB_MODAL_CLOSE_ARIA_LABEL} />
         <ModalBody
           className="tm-flex tm-min-h-0 tm-flex-col tm-gap-6 tm-pb-8"
@@ -157,8 +153,18 @@ export function JobDetailStatsModal({
         >
           <section
             aria-label="Statistický widget"
-            className="tm-flex tm-flex-col tm-rounded-lg tm-border tm-border-secondary tm-px-3 tm-py-8"
+            className="tm-flex tm-flex-col tm-gap-4 tm-rounded-lg tm-border tm-border-secondary tm-px-3 tm-py-8"
           >
+            <div className="tm-flex tm-flex-wrap tm-items-center tm-justify-between tm-gap-x-6 tm-gap-y-2">
+              <JobDetailStatsPeriodHeader
+                period={period}
+                periodRangeLabel={resolvePeriodRangeLabel(period, summary, series)}
+                onPeriodChange={handlePeriodChange}
+              />
+              {showChart ? (
+                <JobDetailStatsLegend hiddenSeries={hiddenSeries} onToggleSeries={handleToggleSeries} />
+              ) : null}
+            </div>
             <div className="tm-relative tm-min-h-[152px] tm-overflow-visible">
               {showError ? (
                 <Alert variant="error">
@@ -190,6 +196,7 @@ export function JobDetailStatsModal({
                     series={series}
                     hiddenSeries={hiddenSeries}
                     onToggleSeries={handleToggleSeries}
+                    showLegend={false}
                   />
                   {isPeriodLoading ? (
                     <div
@@ -291,6 +298,19 @@ export function JobDetailStatsModal({
                             <span className="tm-min-w-0 tm-truncate tm-text-sm tm-font-normal tm-leading-tight tm-text-primary-default">
                               {place.placeName}
                             </span>
+                            {place.url ? (
+                              <Link
+                                href={place.url}
+                                target="_blank"
+                                variant="secondary"
+                                underlined="never"
+                                aria-label={`${JOB_DETAIL_STATS_COPY.openPlace}: ${place.placeName}`}
+                                className="tm-shrink-0"
+                                data-testid="job-detail-stats-place-external-link"
+                              >
+                                <Icon name="external-link" className="tm-text-base" />
+                              </Link>
+                            ) : null}
                           </span>
                         </TableCell>
                         <TableCell className="tm-px-2 tm-py-1.5 tm-text-13 tm-whitespace-nowrap tm-text-primary-default">

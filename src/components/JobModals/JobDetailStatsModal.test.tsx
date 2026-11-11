@@ -179,8 +179,10 @@ describe('JobDetailStatsModal', () => {
     expect(screen.getByTestId('job-detail-stats-period-label')).not.toHaveTextContent(
       JOB_DETAIL_STATS_PERIOD_LABELS.sincePublication,
     )
-    expect(screen.getByTestId('job-detail-stats-period-header')).toHaveClass('tm-pb-8')
-    expect(screen.getByRole('region', { name: 'Statistický widget' })).toHaveClass('tm-py-8')
+    const widget = screen.getByRole('region', { name: 'Statistický widget' })
+    expect(widget).toHaveClass('tm-py-8')
+    expect(widget).toContainElement(screen.getByTestId('job-detail-stats-period-header'))
+    expect(widget).toContainElement(screen.getByTestId('job-detail-stats-legend-views'))
   })
 
   it('falls back to the period preset when no dates are available', () => {
@@ -260,6 +262,11 @@ describe('JobDetailStatsModal', () => {
     expect(within(table).getByText('Jobs.cz')).toHaveClass('tm-font-normal')
     expect(within(table).getByText('Jobs.cz')).not.toHaveClass('tm-font-medium')
     expect(within(table).getAllByTestId('job-portal-logo')).toHaveLength(2)
+    const externalLinks = within(table).getAllByTestId('job-detail-stats-place-external-link')
+    expect(externalLinks).toHaveLength(2)
+    expect(externalLinks[0]).toHaveAttribute('href', 'https://www.jobs.cz')
+    expect(externalLinks[0]).toHaveAttribute('target', '_blank')
+    expect(externalLinks[0]).toHaveAccessibleName('Otevřít na portálu: Jobs.cz')
     expect(within(table).getByTestId('job-detail-stats-table-total')).toBeInTheDocument()
   })
 
@@ -278,6 +285,7 @@ describe('JobDetailStatsModal', () => {
               id: 'jobs-cz',
               placeName: 'Jobs.cz',
               logoType: 'jobs-cz',
+              url: 'https://www.jobs.cz',
               views: 100,
               reactions: 10,
               startDate: '2026-08-01',
@@ -287,6 +295,7 @@ describe('JobDetailStatsModal', () => {
               id: 'prace-cz',
               placeName: 'Práce.cz',
               logoType: 'prace-cz',
+              url: 'https://www.prace.cz',
               views: 50,
               reactions: 5,
               startDate: '2026-08-15',

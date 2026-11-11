@@ -68,4 +68,27 @@ describe('buildJobCardMenuSections', () => {
 
     expect(sections[0].items.map((item) => item.label)).toEqual(['Editovat nábor', 'Další akce'])
   })
+
+  it('omits advertisement actions for a draft job', () => {
+    const sections = buildJobCardMenuSections({
+      status: 'draft',
+      advertisements: [],
+      onCreateAdvertisement: vi.fn(),
+      onEditAdvertisement: vi.fn(),
+      onEditJob: vi.fn(),
+      onDuplicateJob: vi.fn(),
+      onInviteColleagues: vi.fn(),
+      onTransferJob: vi.fn(),
+      onArchiveJob: vi.fn(),
+    })
+
+    expect(sections.map((section) => section.id)).toEqual(['job'])
+    expect(sections[0].items.map((item) => item.label)).toEqual([
+      'Editovat nábor',
+      'Duplikovat',
+      'Zapojit kolegy',
+      'Předat nábor',
+      'Archivovat',
+    ])
+  })
 })

@@ -17,6 +17,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table'
 import { EvaluationCriteriaEmptyState } from './EvaluationCriteriaEmptyState'
 import { EvaluationCriteriaGeneratingState } from './EvaluationCriteriaGeneratingState'
+import { EvaluationCriteriaReadOnlyView } from './EvaluationCriteriaReadOnlyView'
 import { EvaluationCriterionDetailModal } from './EvaluationCriterionDetailModal'
 import { EvaluationCriterionPriorityToggle } from './EvaluationCriterionPriorityToggle'
 import { sampleEvaluationCriteria } from './fixtures'
@@ -36,6 +37,8 @@ export const EVALUATION_CRITERIA_COPY = {
   deleteLabel: 'Smazat kritérium',
   add: 'Přidat kritérium',
   generate: 'Vygenerovat z pozice',
+  evaluate: 'Ohodnotit kandidáty',
+  editCriteria: 'Editovat kritéria',
   save: 'Uložit',
   cancel: 'Zrušit',
   close: 'Zavřít dialog',
@@ -63,6 +66,16 @@ export interface EvaluationCriteriaModalProps extends StyleProps {
   generateCriteria?: () => EvaluationCriterion[]
   /** Replaces the empty state with the in-progress generate-from-JD view. */
   isGenerating?: boolean
+  /**
+   * Opens the modal as a read-only summary: criteria grouped by priority with the actions
+   * "Ohodnotit kandidáty" and "Editovat kritéria". The latter switches the modal to the editor.
+   * Ignored while there are no criteria (the empty state is shown instead).
+   */
+  readOnly?: boolean
+  /** Primary action of the read-only view ("Ohodnotit kandidáty"); the modal closes afterwards. */
+  onEvaluate?: () => void
+  /** Called when the read-only view is switched to the editor ("Editovat kritéria"). */
+  onEdit?: () => void
 }
 
 function defaultGenerateCriteria(): EvaluationCriterion[] {
@@ -78,6 +91,9 @@ interface CriteriaEditorProps {
   onSave: (criteria: EvaluationCriterion[]) => void
   onClose: () => void
   isGenerating: boolean
+  readOnly: boolean
+  onEvaluate?: () => void
+  onEdit?: () => void
 }
 
 function CriteriaEditor({
@@ -86,7 +102,17 @@ function CriteriaEditor({
   onSave,
   onClose,
   isGenerating,
+  readOnly,
+  onEvaluate,
+  onEdit,
 }: CriteriaEditorProps) {
+  // Read-only is the initial mode (mounted per open); "Editovat kritéria" leaves it for good.
+  const [isReadOnly, setIsReadOnly] = useState(readOnly)
+  const [prevReadOnly, setPrevReadOnly] = useState(readOnly)
+  if (readOnly !== prevReadOnly) {
+    setPrevReadOnly(readOnly)
+    setIsReadOnly(readOnly)
+  }
   // Draft lives only while the dialog is open, so Cancel / Esc discards edits.
   const [draft, setDraft] = useState(initialCriteria)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -141,6 +167,50 @@ function CriteriaEditor({
   // list, Save must stay reachable so the deletion can be persisted.
   const hideChrome = isEmpty && initialCriteria.length === 0
 
+  const header = (
+    <>
+      <ModalTitle>{EVALUATION_CRITERIA_COPY.title}</ModalTitle>
+      <ModalDescription className="tm--mt-3 tm-pb-4">
+        {EVALUATION_CRITERIA_COPY.perex} {EVALUATION_CRITERIA_COPY.perexHelpLead}{' '}
+        <Link href={EVALUATION_CRITERIA_HELP_URL} target="_blank">
+          {EVALUATION_CRITERIA_COPY.perexHelpLink}
+        </Link>
+      </ModalDescription>
+    </>
+  )
+
+  // Nothing to summarise for an empty list - fall through to the editor / empty state.
+  if (isReadOnly && initialCriteria.length > 0) {
+    return (
+      <>
+        {header}
+        <ModalClose aria-label={EVALUATION_CRITERIA_COPY.close} />
+        <ModalBody className="tm-flex tm-min-h-0 tm-max-h-[calc(100vh-14rem)] tm-flex-col tm-py-2">
+          <EvaluationCriteriaReadOnlyView criteria={initialCriteria} />
+        </ModalBody>
+        <ModalFooter className="tm-shrink-0 tm-bg-basic">
+          <Button
+            onClick={() => {
+              onEvaluate?.()
+              onClose()
+            }}
+          >
+            {EVALUATION_CRITERIA_COPY.evaluate}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setIsReadOnly(false)
+              onEdit?.()
+            }}
+          >
+            {EVALUATION_CRITERIA_COPY.editCriteria}
+          </Button>
+        </ModalFooter>
+      </>
+    )
+  }
+
   return (
     <>
       {hideChrome ? (
@@ -149,15 +219,7 @@ function CriteriaEditor({
           <ModalTitle>{EVALUATION_CRITERIA_COPY.title}</ModalTitle>
         </div>
       ) : (
-        <>
-          <ModalTitle>{EVALUATION_CRITERIA_COPY.title}</ModalTitle>
-          <ModalDescription className="tm--mt-3 tm-pb-4">
-            {EVALUATION_CRITERIA_COPY.perex} {EVALUATION_CRITERIA_COPY.perexHelpLead}{' '}
-            <Link href={EVALUATION_CRITERIA_HELP_URL} target="_blank">
-              {EVALUATION_CRITERIA_COPY.perexHelpLink}
-            </Link>
-          </ModalDescription>
-        </>
+        header
       )}
       <ModalClose aria-label={EVALUATION_CRITERIA_COPY.close} />
       <ModalBody className="tm-flex tm-min-h-0 tm-max-h-[calc(100vh-14rem)] tm-flex-col tm-items-start tm-gap-2 tm-py-2">
@@ -293,6 +355,9 @@ export function EvaluationCriteriaModal({
   onSave,
   generateCriteria = defaultGenerateCriteria,
   isGenerating = false,
+  readOnly = false,
+  onEvaluate,
+  onEdit,
   className,
 }: EvaluationCriteriaModalProps) {
   const [openState, setOpenState] = useState(defaultOpen)
@@ -313,6 +378,9 @@ export function EvaluationCriteriaModal({
           initialCriteria={saved}
           generateCriteria={generateCriteria}
           isGenerating={isGenerating}
+          readOnly={readOnly}
+          onEvaluate={onEvaluate}
+          onEdit={onEdit}
           onSave={(next) => {
             setSavedState(next)
             onSave?.(next)

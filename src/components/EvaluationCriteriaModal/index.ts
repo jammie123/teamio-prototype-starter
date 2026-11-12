@@ -15,12 +15,18 @@ export {
 export { EVALUATION_PRIORITY_LABELS } from './priorityLabels'
 export { findEeoViolation } from './evaluationCriteriaRules'
 export type { EvaluationCriterion, EvaluationCriterionPriority } from './types'
-export { sampleEvaluationCriteria } from './fixtures'
+export { sampleEvaluationCriteria, sampleGroupedEvaluationCriteria } from './fixtures'
 export {
   EvaluationCriteriaEmptyState,
   EVALUATION_CRITERIA_EMPTY_COPY,
   type EvaluationCriteriaEmptyStateProps,
 } from './EvaluationCriteriaEmptyState'
+export {
+  EvaluationCriteriaReadOnlyView,
+  EVALUATION_CRITERIA_READ_ONLY_COPY,
+  type EvaluationCriteriaReadOnlyViewProps,
+} from './EvaluationCriteriaReadOnlyView'
+export { formatCriteriaCount } from './formatCriteriaCount'
 export { EvaluationCriteriaEmptyIllustration } from './EvaluationCriteriaEmptyIllustration'
 export {
   EvaluationCriteriaGeneratingState,

@@ -96,6 +96,28 @@ describe('JobCardV20', () => {
     ).toBeTruthy()
   })
 
+  it('shows the icon-only position preview button right after the title only when a handler is given', async () => {
+    const user = userEvent.setup()
+    const onPreviewPosition = vi.fn()
+    const { unmount } = renderJobCard({ onPreviewPosition })
+
+    const preview = screen.getByTestId('job-card-preview-position')
+    const title = screen.getByTestId('job-card-title')
+    const people = screen.getByTestId('job-card-people')
+
+    expect(screen.getByTestId('job-card-title-heading-row')).toContainElement(preview)
+    expect(title.compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(preview.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(preview.className).toContain('tm-ml-6')
+
+    await user.click(screen.getByRole('button', { name: 'Zobrazit náhled' }))
+    expect(onPreviewPosition).toHaveBeenCalledOnce()
+
+    unmount()
+    renderJobCard()
+    expect(screen.queryByTestId('job-card-preview-position')).not.toBeInTheDocument()
+  })
+
   it('omits department when it is not provided', () => {
     renderJobCard()
 

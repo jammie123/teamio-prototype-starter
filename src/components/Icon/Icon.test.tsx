@@ -61,7 +61,7 @@ describe('Icon', () => {
     expect(screen.getByRole('img', { name: 'Opalcování' })).toBeInTheDocument()
   })
 
-  it.each(['single-man-time', 'candidate-move', 'advertisement'])(
+  it.each(['single-man-time', 'candidate-move', 'advertisement', 'position-preview'])(
     'renders the custom filled %s icon',
     (name) => {
       render(<Icon name={name} title={name} />)

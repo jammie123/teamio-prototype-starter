@@ -222,6 +222,43 @@ export const AdvertisementPreviewIcon = forwardRef<SVGSVGElement, LucideProps>(
 
 AdvertisementPreviewIcon.displayName = 'AdvertisementPreviewIcon'
 
+export const PositionPreviewIcon = forwardRef<SVGSVGElement, LucideProps>(
+  function PositionPreviewIcon({ color = 'currentColor', size = 24, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...rest}
+      >
+        <path
+          d="M6.01465 22H10.0098V20.5H6.01465C4.63394 20.5 3.51465 19.3807 3.51465 18V6C3.51465 4.61929 4.63394 3.5 6.01465 3.5H16.0146C17.3954 3.5 18.5146 4.61929 18.5146 6V10H20.0146V6C20.0146 3.79086 18.2238 2 16.0146 2H6.01465C3.80551 2 2.01465 3.79086 2.01465 6V18C2.01465 20.2091 3.80551 22 6.01465 22Z"
+          fill={color}
+        />
+        <path
+          d="M6.26465 7C6.26465 6.58579 6.60043 6.25 7.01465 6.25H15.0146C15.4289 6.25 15.7646 6.58579 15.7646 7C15.7646 7.41421 15.4289 7.75 15.0146 7.75H7.01465C6.60043 7.75 6.26465 7.41421 6.26465 7Z"
+          fill={color}
+        />
+        <path
+          d="M7.01465 9.25C6.60043 9.25 6.26465 9.58579 6.26465 10C6.26465 10.4142 6.60043 10.75 7.01465 10.75H11.0146C11.4289 10.75 11.7646 10.4142 11.7646 10C11.7646 9.58579 11.4289 9.25 11.0146 9.25H7.01465Z"
+          fill={color}
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M19.3197 18.8958C19.7568 18.2021 20.0098 17.3806 20.0098 16.5C20.0098 14.0147 17.995 12 15.5098 12C13.0245 12 11.0098 14.0147 11.0098 16.5C11.0098 18.9853 13.0245 21 15.5098 21C16.3903 21 17.2117 20.7471 17.9054 20.31L20.0956 22.5001C20.4861 22.8906 21.1192 22.8906 21.5098 22.5001C21.9003 22.1096 21.9003 21.4764 21.5098 21.0859L19.3197 18.8958ZM15.5098 19.5C17.1666 19.5 18.5098 18.1569 18.5098 16.5C18.5098 14.8431 17.1666 13.5 15.5098 13.5C13.8529 13.5 12.5098 14.8431 12.5098 16.5C12.5098 18.1569 13.8529 19.5 15.5098 19.5Z"
+          fill={color}
+        />
+      </svg>
+    )
+  },
+)
+
+PositionPreviewIcon.displayName = 'PositionPreviewIcon'
+
 export const ClockIcon = forwardRef<SVGSVGElement, LucideProps>(function ClockIcon(
   { color = 'currentColor', size = 24, ...rest },
   ref,

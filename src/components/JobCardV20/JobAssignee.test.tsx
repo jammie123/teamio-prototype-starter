@@ -9,6 +9,7 @@ describe('JobAssignee', () => {
     expect(screen.getByTestId('job-card-owner')).toHaveTextContent('PN')
     expect(screen.getByTestId('job-card-owner').className).toContain('tm-font-normal')
     expect(screen.getByTestId('job-card-owner').className).not.toContain('tm-font-semibold')
+    expect(screen.getByTestId('job-card-owner').className).not.toContain('tm-border')
     expect(screen.getByTestId('job-card-hiring-manager-0')).toHaveTextContent('LP')
     expect(screen.getByTestId('job-card-hiring-manager-0').className).toContain('tm-font-normal')
     expect(screen.getByTestId('job-card-hiring-manager-0').className).not.toContain('tm-font-semibold')

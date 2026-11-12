@@ -34,6 +34,8 @@ export interface JobCardV20Props
   onViewStatisticsClick?: () => void
   onAdvertisementDetailClick?: () => void
   onAdvertisementPreviewClick?: () => void
+  /** Shows the icon-only "Zobrazit náhled" button right after the title. */
+  onPreviewPosition?: () => void
   /** Pre-formatted Czech date shown on a draft (`3. 11. 2026`). */
   lastChanged?: string
   onCompleteDraft?: () => void
@@ -70,6 +72,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
     onViewStatisticsClick,
     onAdvertisementDetailClick,
     onAdvertisementPreviewClick,
+    onPreviewPosition,
     lastChanged,
     onCompleteDraft,
     now,
@@ -146,6 +149,7 @@ export const JobCardV20 = forwardRef<HTMLElement, JobCardV20Props>(function JobC
               owner={owner}
               hiringManagers={hiringManagers}
               onInviteColleagues={onInviteColleagues}
+              onPreviewPosition={onPreviewPosition}
               isDraft={isDraft}
             />
             {isDraft ? (

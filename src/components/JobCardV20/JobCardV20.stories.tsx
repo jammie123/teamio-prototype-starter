@@ -42,6 +42,7 @@ const meta = {
     onViewStatisticsClick: fn(),
     onAdvertisementDetailClick: fn(),
     onAdvertisementPreviewClick: fn(),
+    onPreviewPosition: fn(),
     onCreateAdvertisement: fn(),
     ...menuHandlers,
   },

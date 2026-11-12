@@ -1,6 +1,7 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { JobAssignee } from './JobAssignee'
+import { PreviewPosition } from './PreviewPosition'
 
 export interface JobCardHeaderProps extends StyleProps {
   title: string
@@ -9,17 +10,20 @@ export interface JobCardHeaderProps extends StyleProps {
   owner?: string
   hiringManagers?: string[]
   onInviteColleagues?: () => void
+  /** Shows the icon-only preview button right after the title (2rem apart). */
+  onPreviewPosition?: () => void
   /** Draft rows are compact: the title is vertically centered with the assignees. */
   isDraft?: boolean
 }
 
-/** Title row of the job card: title, optional department and the assignee avatars. */
+/** Title row of the job card: title, optional department, preview button and the assignee avatars. */
 export function JobCardHeader({
   title,
   department,
   owner,
   hiringManagers,
   onInviteColleagues,
+  onPreviewPosition,
   isDraft = false,
   className,
 }: JobCardHeaderProps) {
@@ -55,6 +59,12 @@ export function JobCardHeader({
               {department}
             </span>
           </span>
+        ) : null}
+        {onPreviewPosition ? (
+          <PreviewPosition
+            onClick={onPreviewPosition}
+            className="tm-ml-3 tm-self-center tm--my-1"
+          />
         ) : null}
       </div>
       <JobAssignee

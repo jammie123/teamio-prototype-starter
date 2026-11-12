@@ -1,6 +1,7 @@
 export { JobCardV20, type JobCardV20Props } from './JobCardV20'
 export { JobPipeline, type JobPipelineProps } from './JobPipeline'
 export { JobAssignee, type JobAssigneeProps } from './JobAssignee'
+export { PreviewPosition, type PreviewPositionProps } from './PreviewPosition'
 export { JobNote, type JobNoteProps } from './JobNote'
 export { AdvertisementWidget, type AdvertisementWidgetProps } from './AdvertisementWidget'
 export {

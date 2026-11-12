@@ -1,7 +1,10 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { sampleEvaluationCriteria } from '../EvaluationCriteriaModal/fixtures'
+import {
+  sampleEvaluationCriteria,
+  sampleGroupedEvaluationCriteria,
+} from '../EvaluationCriteriaModal/fixtures'
 import { EvaluationCriteriaModalV2 } from './EvaluationCriteriaModalV2'
 
 async function openModal(props: Partial<Parameters<typeof EvaluationCriteriaModalV2>[0]> = {}) {
@@ -273,5 +276,72 @@ describe('EvaluationCriteriaModalV2', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Vygenerovat z pozice' }))
 
     expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(before)
+  })
+
+  it('shows a generating-from-JD state with a loading primary action', async () => {
+    const dialog = await openModal({ defaultCriteria: [], isGenerating: true })
+
+    const generating = within(dialog).getByTestId('evaluation-criteria-generating')
+    expect(within(generating).getByText('Navrhuji kritéria z inzerátu')).toBeInTheDocument()
+    const loadingButton = within(generating).getByRole('button', { name: 'Generujeme kritéria…' })
+    expect(loadingButton).toBeDisabled()
+    expect(loadingButton).toHaveAttribute('aria-busy', 'true')
+    expect(within(dialog).queryByTestId('evaluation-criteria-empty')).not.toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Uložit' })).not.toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Zrušit' })).not.toBeInTheDocument()
+  })
+
+  describe('readOnly', () => {
+    it('groups criteria by priority, high first, with counts and no checks or editing controls', async () => {
+      const dialog = await openModal({
+        readOnly: true,
+        defaultCriteria: sampleGroupedEvaluationCriteria,
+      })
+
+      const groups = within(dialog).getAllByTestId('evaluation-criteria-group')
+      expect(groups).toHaveLength(2)
+      expect(within(groups[0]).getByText('Vysoká priorita')).toBeInTheDocument()
+      expect(within(groups[0]).getByText('5 kritérií')).toBeInTheDocument()
+      expect(within(groups[1]).getByText('Nižší priorita')).toBeInTheDocument()
+      expect(within(groups[1]).getByText('5 kritérií')).toBeInTheDocument()
+
+      expect(within(dialog).queryByRole('checkbox')).not.toBeInTheDocument()
+      expect(within(dialog).queryByRole('table')).not.toBeInTheDocument()
+      expect(within(dialog).queryByRole('group', { name: 'Priorita' })).not.toBeInTheDocument()
+      expect(within(dialog).queryByRole('button', { name: 'Upravit kritérium' })).not.toBeInTheDocument()
+      expect(within(dialog).queryByRole('button', { name: 'Uložit' })).not.toBeInTheDocument()
+    })
+
+    it('calls onEvaluate and closes from the primary action', async () => {
+      const user = userEvent.setup()
+      const onEvaluate = vi.fn()
+      const onOpenChange = vi.fn()
+      const dialog = await openModal({ readOnly: true, onEvaluate, onOpenChange })
+
+      await user.click(within(dialog).getByRole('button', { name: 'Ohodnotit kandidáty' }))
+
+      expect(onEvaluate).toHaveBeenCalledTimes(1)
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+
+    it('switches to the editor and calls onEdit from the secondary action', async () => {
+      const user = userEvent.setup()
+      const onEdit = vi.fn()
+      const dialog = await openModal({ readOnly: true, onEdit })
+
+      await user.click(within(dialog).getByRole('button', { name: 'Editovat kritéria' }))
+
+      expect(onEdit).toHaveBeenCalledTimes(1)
+      expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(2)
+      expect(within(dialog).getByRole('button', { name: 'Uložit' })).toBeInTheDocument()
+      expect(within(dialog).queryByRole('button', { name: 'Ohodnotit kandidáty' })).not.toBeInTheDocument()
+    })
+
+    it('falls back to the empty state when there are no criteria', async () => {
+      const dialog = await openModal({ readOnly: true, defaultCriteria: [] })
+
+      expect(within(dialog).getByTestId('evaluation-criteria-empty')).toBeInTheDocument()
+      expect(within(dialog).queryByRole('button', { name: 'Ohodnotit kandidáty' })).not.toBeInTheDocument()
+    })
   })
 })

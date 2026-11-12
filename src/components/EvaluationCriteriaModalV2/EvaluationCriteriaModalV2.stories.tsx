@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { Button } from '../Button'
-import { sampleEvaluationCriteria } from '../EvaluationCriteriaModal/fixtures'
+import {
+  sampleEvaluationCriteria,
+  sampleGroupedEvaluationCriteria,
+} from '../EvaluationCriteriaModal/fixtures'
 import { EvaluationCriteriaModalV2 } from './EvaluationCriteriaModalV2'
 
 const meta = {
@@ -42,6 +45,46 @@ export const Empty: Story = {
   args: {
     defaultOpen: true,
     defaultCriteria: [],
+  },
+}
+
+export const GeneratingCriteriaFromJd: Story = {
+  name: 'generating criteria from JD',
+  args: {
+    defaultOpen: true,
+    defaultCriteria: [],
+    isGenerating: true,
+  },
+}
+
+export const ReadOnly: Story = {
+  args: {
+    defaultOpen: true,
+    readOnly: true,
+    defaultCriteria: sampleGroupedEvaluationCriteria,
+    onEvaluate: fn(),
+    onEdit: fn(),
+  },
+  play: async () => {
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Kritéria hodnocení kandidátů',
+    })
+    await expect(within(dialog).getByText('Vysoká priorita')).toBeInTheDocument()
+    await expect(within(dialog).getByText('Nižší priorita')).toBeInTheDocument()
+    await expect(within(dialog).queryByRole('checkbox')).not.toBeInTheDocument()
+  },
+}
+
+export const ReadOnlyEditSwitch: Story = {
+  args: {
+    ...ReadOnly.args,
+  },
+  play: async () => {
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Kritéria hodnocení kandidátů',
+    })
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Editovat kritéria' }))
+    await expect(await within(dialog).findByRole('button', { name: 'Uložit' })).toBeInTheDocument()
   },
 }
 

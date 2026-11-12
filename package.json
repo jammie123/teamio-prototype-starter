@@ -23,6 +23,7 @@
     "@radix-ui/react-tabs": "1.1.21",
     "@radix-ui/react-tooltip": "1.2.16",
     "clsx": "^2.1.1",
+    "lottie-react": "^3.1.2",
     "lucide-react": "^1.31.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@storybook/addon-a11y": "10.5.7",
+    "@storybook/addon-docs": "10.5.7",
     "@storybook/react-vite": "10.5.7",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",

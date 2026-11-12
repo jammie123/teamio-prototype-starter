@@ -29,7 +29,6 @@ describe('AdvertisementEmptyState', () => {
     expect(root).not.toHaveTextContent(
       'Mrkněte, jak by váš inzerát vypadal. Relevantní kandidáti z našich portálů se pak ozvou rychle.',
     )
-    expect(root.className).toContain('tm-bg-none')
     expect(root.className).not.toContain('tm-bg-emotion-info-background')
     expect(root.className).toContain('tm-grid-cols-[minmax(0,1fr)_auto]')
     expect(root.className).toContain('md:tm-grid-cols-1')

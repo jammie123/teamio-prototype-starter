@@ -17,8 +17,8 @@ export interface AdvertisementWidgetProps extends StyleProps {
   now?: Date
   /** Drop the top divider. Defaults to true for the compact right column. */
   hideTopBorder?: boolean
-  /** Called from Prodloužit (portal hover card) when the advertisement is ending soon. */
-  onProlong?: () => void
+  /** Called from Prodloužit / Znovuvystavit inzerát in the portal hover card. */
+  onExtendAndRepublish?: () => void
   onAdvertisementPreviewClick?: () => void
   onHighlightAdvertisement?: () => void
   onCreateAdvertisement?: () => void
@@ -34,7 +34,7 @@ export function AdvertisementWidget({
   showHeadingLabel = false,
   now,
   hideTopBorder = true,
-  onProlong,
+  onExtendAndRepublish,
   onAdvertisementPreviewClick,
   onHighlightAdvertisement,
   onCreateAdvertisement,
@@ -71,7 +71,7 @@ export function AdvertisementWidget({
           {showTitle && advertisement.title ? (
             <span
               data-testid="job-card-advertisement-title"
-              className="tm-max-w-48 tm-truncate tm-text-xs tm-font-normal tm-text-secondary-default"
+              className="tm-max-w-[12rem] tm-truncate tm-text-xs tm-font-normal tm-text-secondary-default"
             >
               {advertisement.title}
             </span>
@@ -90,20 +90,19 @@ export function AdvertisementWidget({
                   publication={item.publication}
                   status={item.status}
                   dateLabel={item.dateLabel}
-                  showStatusDot
                   onViewAdvertisement={onAdvertisementPreviewClick}
-                  onProlong={onProlong}
+                  onProlong={onExtendAndRepublish}
                   onHighlight={onHighlightAdvertisement}
-                  onRepublish={onProlong}
+                  onRepublish={onExtendAndRepublish}
                   highlights={item.highlights}
                 />
                 <PublicationHighlights
                   publication={item.publication}
                   highlights={item.highlights}
                   onViewAdvertisement={onAdvertisementPreviewClick}
-                  onProlong={onProlong}
+                  onProlong={onExtendAndRepublish}
                   onHighlight={onHighlightAdvertisement}
-                  onRepublish={onProlong}
+                  onRepublish={onExtendAndRepublish}
                 />
               </Fragment>
             ))}

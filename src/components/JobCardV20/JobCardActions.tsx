@@ -4,51 +4,25 @@ import type { StyleProps } from '../../lib/types'
 import { Divider } from '../Divider'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
-import { Option, OptionList, OptionSubmenu } from '../OptionList'
-import type { JobCardMenuItem, JobCardMenuSection } from './types'
+import { Option, OptionList } from '../OptionList'
+import type { JobCardMenuSection } from './types'
 
 export interface JobCardActionsProps extends StyleProps {
   sections: JobCardMenuSection[]
-  label: string
-  testId: string
 }
 
-function MenuItem({ item }: { item: JobCardMenuItem }) {
-  if (item.actions?.length) {
-    return (
-      <OptionSubmenu
-        label={item.label}
-        description={item.description}
-        count={item.count}
-        color={item.color}
-      >
-        <OptionList>
-          {item.actions.map((action) => (
-            <MenuItem key={action.id} item={action} />
-          ))}
-        </OptionList>
-      </OptionSubmenu>
-    )
-  }
-
-  return (
-    <Option color={item.color} description={item.description} onClick={item.onClick}>
-      {item.label}
-    </Option>
-  )
-}
-
-export function JobCardActions({ sections, label, testId, className }: JobCardActionsProps) {
-  const hasSubmenu = sections.some((section) =>
-    section.items.some((item) => Boolean(item.actions?.length)),
-  )
-
+/** "More" menu of the job card: sections of actions separated by dividers. */
+export function JobCardActions({ sections, className }: JobCardActionsProps) {
   return (
     <Dropdown placement="bottom-end" className={cn('tm-flex-none', className)}>
-      <DropdownToggle variant="button-tertiary-circle" aria-label={label} data-testid={testId}>
+      <DropdownToggle
+        variant="button-tertiary-circle"
+        aria-label="Akce nad náborem a inzerátem"
+        data-testid="job-card-actions-toggle"
+      >
         <Icon name="more-horizontal" />
       </DropdownToggle>
-      <DropdownBody overflow={hasSubmenu ? 'visible' : undefined}>
+      <DropdownBody>
         <OptionList>
           {sections.map((section, index) => (
             <Fragment key={section.id}>
@@ -61,7 +35,9 @@ export function JobCardActions({ sections, label, testId, className }: JobCardAc
                 />
               ) : null}
               {section.items.map((item) => (
-                <MenuItem key={item.id} item={item} />
+                <Option key={item.id} onClick={item.onClick}>
+                  {item.label}
+                </Option>
               ))}
             </Fragment>
           ))}

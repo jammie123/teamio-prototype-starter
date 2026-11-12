@@ -35,14 +35,14 @@ function renderWidget(advertisement: JobAdvertisement, props = {}) {
 describe('AdvertisementWidget', () => {
   it('offers Prodloužit in the portal hover card when the advertisement is ending soon', async () => {
     const user = userEvent.setup()
-    const onProlong = vi.fn()
-    renderWidget(endingSoon, { onProlong })
+    const onExtendAndRepublish = vi.fn()
+    renderWidget(endingSoon, { onExtendAndRepublish })
 
     await user.hover(screen.getAllByTestId('job-card-publication-channel')[0])
     const dropdown = await screen.findByTestId('job-card-publication-dropdown')
     fireEvent.click(within(dropdown).getByTestId('job-card-publication-prolong'))
 
-    expect(onProlong).toHaveBeenCalledOnce()
+    expect(onExtendAndRepublish).toHaveBeenCalledOnce()
   })
 
   it('shows only Znovuvystavit inzerát in the hover card of an ended portal', async () => {
@@ -61,7 +61,7 @@ describe('AdvertisementWidget', () => {
           }),
         ],
       },
-      { onProlong: onRepublish },
+      { onExtendAndRepublish: onRepublish },
     )
 
     await user.hover(screen.getByTestId('job-card-publication-channel'))
@@ -187,7 +187,7 @@ describe('AdvertisementWidget', () => {
   })
 
   it('leaves the prolong action to the stats footer when ending soon', () => {
-    renderWidget(endingSoon, { onProlong: vi.fn() })
+    renderWidget(endingSoon, { onExtendAndRepublish: vi.fn() })
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     const heading = within(advertisement).getByTestId('job-card-advertisement-heading')

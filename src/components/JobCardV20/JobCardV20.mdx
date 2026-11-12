@@ -1,0 +1,15 @@
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks'
+import * as JobCardV20Stories from './JobCardV20.stories'
+
+<Meta of={JobCardV20Stories} />
+
+# JobCardV20
+
+Karta náboru ve výpisu.
+
+- **Levý sloupec:** název, vlastníci, pipeline kandidátů, volitelná poznámka
+- **Pravý sloupec:** inzerát (období, portály, statistiky, hover karta)
+
+<Canvas of={JobCardV20Stories.Running} />
+
+<Controls />

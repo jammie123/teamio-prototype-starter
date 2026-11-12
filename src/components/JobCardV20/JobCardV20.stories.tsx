@@ -28,6 +28,7 @@ const menuHandlers = {
 const meta = {
   title: 'Jobs/Job Cards Variant/JobCardV20',
   component: JobCardV20,
+  tags: ['!autodocs'],
   args: {
     title: 'Řidič/ka sk. C ČB PO–PÁ',
     owner: 'Petra Nováková',

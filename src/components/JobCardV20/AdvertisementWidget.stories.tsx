@@ -16,7 +16,7 @@ const meta = {
   component: AdvertisementWidget,
   args: {
     advertisement: runningSame,
-    onProlong: fn(),
+    onExtendAndRepublish: fn(),
     onAdvertisementPreviewClick: fn(),
     onHighlightAdvertisement: fn(),
     onCreateAdvertisement: fn(),

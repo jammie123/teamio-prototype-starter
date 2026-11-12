@@ -1,6 +1,5 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { Tag } from '../Tag'
 import { formatCount } from './lib/format'
 import type { JobCandidateStat, JobCardCandidates } from './types'
 
@@ -17,9 +16,6 @@ const STAT_LABELS: Record<JobCandidateStat, string> = {
 
 const STAT_ORDER: JobCandidateStat[] = ['unassessed', 'inProgress', 'total']
 
-const BADGE_CLASS =
-  '!tm-min-h-0 !tm-h-auto !tm-gap-0 !tm-py-0.5 !tm-px-1.5 !tm-text-[10px] !tm-font-semibold !tm-leading-tight !tm-rounded-full !tm-text-primary-inverted-default !tm-bg-teamio-pink'
-
 function PipelineBadge({
   children,
   testId,
@@ -30,9 +26,13 @@ function PipelineBadge({
   ariaLabel: string
 }) {
   return (
-    <Tag color="neutral" className={BADGE_CLASS} data-testid={testId} aria-label={ariaLabel}>
+    <span
+      data-testid={testId}
+      aria-label={ariaLabel}
+      className="tm-inline-flex tm-items-center tm-rounded-full tm-bg-teamio-pink tm-px-1.5 tm-py-0.5 tm-text-xs tm-font-semibold tm-leading-tight tm-text-primary-inverted-default"
+    >
       {children}
-    </Tag>
+    </span>
   )
 }
 
@@ -82,7 +82,7 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
                   'tm-font-normal',
                   'tm-leading-tight',
                   'tm-text-primary-default',
-                  onStatClick && 'tm-group-hover:tm-text-action-link-active',
+                  onStatClick && 'group-hover:tm-text-action-link-active',
                 )}
               >
                 {formatCount(count)}
@@ -109,7 +109,7 @@ export function JobPipeline({ candidates, onStatClick, className }: JobPipelineP
                 'tm-text-sm',
                 'tm-font-normal',
                 'tm-text-secondary-default',
-                onStatClick && 'tm-group-hover:tm-text-action-link-active',
+                onStatClick && 'group-hover:tm-text-action-link-active',
               )}
             >
               {label}

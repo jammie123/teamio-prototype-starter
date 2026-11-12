@@ -47,7 +47,14 @@ describe('AdvertisementStats', () => {
     const { rerender } = render(<AdvertisementStats viewCount={2610} onDetail={vi.fn()} />)
     expect(screen.queryByTestId('job-card-disappearance-prolong')).not.toBeInTheDocument()
 
-    rerender(<AdvertisementStats viewCount={2610} onDetail={vi.fn()} showProlong onProlong={onProlong} />)
+    rerender(
+      <AdvertisementStats
+        viewCount={2610}
+        onDetail={vi.fn()}
+        action="prolong"
+        onAction={onProlong}
+      />,
+    )
     const prolong = screen.getByTestId('job-card-disappearance-prolong')
     const detail = screen.getByTestId('job-card-advertisement-detail-action')
 
@@ -64,7 +71,14 @@ describe('AdvertisementStats', () => {
   it('shows a primary Znovuvystavit button on the right for an ended advertisement', async () => {
     const user = userEvent.setup()
     const onRepublish = vi.fn()
-    render(<AdvertisementStats viewCount={2610} onDetail={vi.fn()} showRepublish onRepublish={onRepublish} />)
+    render(
+      <AdvertisementStats
+        viewCount={2610}
+        onDetail={vi.fn()}
+        action="republish"
+        onAction={onRepublish}
+      />,
+    )
 
     const republish = screen.getByTestId('job-card-advertisement-republish')
     expect(republish).toHaveTextContent('Znovuvystavit')

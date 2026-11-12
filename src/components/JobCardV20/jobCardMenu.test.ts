@@ -18,14 +18,13 @@ describe('buildJobCardMenuSections', () => {
     })
 
     expect(sections.map((section) => section.id)).toEqual(['advertisement', 'job'])
-    expect(sections[0].items.map((item) => ({ label: item.label, description: item.description }))).toEqual([
-      { label: 'Editovat inzerát', description: undefined },
-      { label: 'Prodloužit a znovu vystavit', description: undefined },
-      { label: 'Ukončit vystavení', description: undefined },
-      { label: 'Zvýraznit', description: undefined },
-      { label: 'Topovat', description: undefined },
+    expect(sections[0].items.map((item) => item.label)).toEqual([
+      'Editovat inzerát',
+      'Prodloužit a znovu vystavit',
+      'Ukončit vystavení',
+      'Zvýraznit',
+      'Topovat',
     ])
-    expect(sections[0].items.every((item) => item.actions === undefined)).toBe(true)
     expect(sections[1].items.map((item) => item.label)).toEqual([
       'Editovat nábor',
       'Duplikovat',
@@ -58,15 +57,6 @@ describe('buildJobCardMenuSections', () => {
     expect(buildJobCardMenuSections({ onEditJob: vi.fn() })).toEqual([
       { id: 'job', items: [expect.objectContaining({ label: 'Editovat nábor' })] },
     ])
-  })
-
-  it('appends custom actions after the built-in job actions', () => {
-    const sections = buildJobCardMenuSections({
-      onEditJob: vi.fn(),
-      actions: [{ id: 'extra', label: 'Další akce' }],
-    })
-
-    expect(sections[0].items.map((item) => item.label)).toEqual(['Editovat nábor', 'Další akce'])
   })
 
   it('omits advertisement actions for a draft job', () => {

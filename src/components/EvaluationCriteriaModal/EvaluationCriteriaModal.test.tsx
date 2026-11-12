@@ -15,7 +15,9 @@ describe('EvaluationCriteriaModal', () => {
   it('renders title, perex and a criteria table', async () => {
     const dialog = await openModal()
 
-    expect(within(dialog).getByText(/Nastavte, na čem vám u této pozice záleží nejvíc/)).toBeInTheDocument()
+    expect(
+      within(dialog).getByText(/AI vyhodnotí kandidáty podle vašich kritérií a jejich priority/),
+    ).toBeInTheDocument()
     expect(within(dialog).getByRole('columnheader', { name: 'Název kritéria' })).toBeInTheDocument()
     expect(within(dialog).getByRole('columnheader', { name: 'Priorita' })).toBeInTheDocument()
     expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(2)
@@ -183,6 +185,25 @@ describe('EvaluationCriteriaModal', () => {
     await user.click(within(empty).getByRole('button', { name: 'Vygenerovat z pozice' }))
     expect(within(dialog).queryByTestId('evaluation-criteria-empty')).not.toBeInTheDocument()
     expect(within(dialog).getAllByTestId('evaluation-criterion-row').length).toBeGreaterThan(0)
+  })
+
+  it('shows a generating-from-JD state with a loading primary action', async () => {
+    const dialog = await openModal({ defaultCriteria: [], isGenerating: true })
+
+    const generating = within(dialog).getByTestId('evaluation-criteria-generating')
+    expect(within(generating).getByText('Navrhuji kritéria z inzerátu')).toBeInTheDocument()
+    expect(
+      within(generating).getByText(
+        'Navrhujeme kritéria podle inzerátu. Okno můžete zavřít, generování poběží na pozadí. Zabere to jenom chvilku.',
+      ),
+    ).toBeInTheDocument()
+    const loadingButton = within(generating).getByRole('button', { name: 'Generujeme kritéria…' })
+    expect(loadingButton).toBeDisabled()
+    expect(loadingButton).toHaveAttribute('aria-busy', 'true')
+    expect(within(generating).getByTestId('button-spinner')).toBeInTheDocument()
+    expect(within(dialog).queryByTestId('evaluation-criteria-empty')).not.toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Uložit' })).not.toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Zrušit' })).not.toBeInTheDocument()
   })
 
   it('offers generating from the position in the footer once criteria exist', async () => {

@@ -1,6 +1,5 @@
 import type {
   JobAdvertisement,
-  JobCardAction,
   JobCardMenuItem,
   JobCardMenuSection,
   JobStatus,
@@ -36,7 +35,6 @@ export interface JobCardMenuHandlers {
 
 export interface BuildJobCardMenuOptions extends JobCardMenuHandlers {
   advertisements?: JobAdvertisement[]
-  actions?: JobCardAction[]
   status?: JobStatus
 }
 
@@ -114,7 +112,6 @@ function jobItems({
   onInviteColleagues,
   onTransferJob,
   onArchiveJob,
-  actions = [],
 }: BuildJobCardMenuOptions): JobCardMenuItem[] {
   const items: JobCardMenuItem[] = []
 
@@ -154,7 +151,7 @@ function jobItems({
     })
   }
 
-  return [...items, ...actions]
+  return items
 }
 
 /**

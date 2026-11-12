@@ -26,8 +26,6 @@ export function AdvertisementEmptyState({
         'tm-items-center',
         'tm-gap-x-3',
         'tm-gap-y-1',
-        'tm-rounded-xl',
-        'tm-bg-none',
         'md:tm-grid-cols-1',
         'md:tm-items-start',
         'md:tm-gap-4',
@@ -54,11 +52,7 @@ export function AdvertisementEmptyState({
           variant="secondary"
           data-testid="job-card-advertisement-empty-preview"
           className="tm-whitespace-nowrap"
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            onAdvertisementPreviewClick?.()
-          }}
+          onClick={onAdvertisementPreviewClick}
         >
           Zobrazit náhled
         </Button>
@@ -66,11 +60,7 @@ export function AdvertisementEmptyState({
           variant="primary"
           data-testid="job-card-advertisement-empty-publish"
           className="tm-whitespace-nowrap"
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            onCreateAdvertisement?.()
-          }}
+          onClick={onCreateAdvertisement}
         >
           Publikovat
         </Button>

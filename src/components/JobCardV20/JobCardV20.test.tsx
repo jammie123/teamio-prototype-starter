@@ -246,7 +246,6 @@ describe('JobCardV20', () => {
     expect(column.className).not.toContain('tm-w-[300px]')
     expect(column.className).toContain('tm-px-6')
     expect(column.className).not.toContain('tm-w-80')
-    expect(column.className).toContain('tm-bg-none')
     expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(column).toContainElement(advertisement)
     expect(advertisement.className).toContain('tm-w-full')
@@ -412,7 +411,6 @@ describe('JobCardV20', () => {
     const column = screen.getByTestId('job-card-advertisements')
     const empty = within(column).getByTestId('job-card-no-advertisement')
 
-    expect(column.className).toContain('tm-bg-none')
     expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(empty).not.toHaveTextContent('Zatím nevystavený inzerát')
     expect(empty).toHaveTextContent('Zatím neinzerujete')
@@ -437,7 +435,6 @@ describe('JobCardV20', () => {
     })
 
     const column = screen.getByTestId('job-card-advertisements')
-    expect(column.className).toContain('tm-bg-none')
     expect(column.className).not.toContain('tm-bg-emotion-info-background')
     expect(within(column).getByTestId('job-card-no-advertisement')).toHaveTextContent(
       'Zatím neinzerujete',
@@ -445,25 +442,6 @@ describe('JobCardV20', () => {
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'notPublished')
     expect(screen.queryByTestId('job-card-advertisement-stats')).not.toBeInTheDocument()
     expect(screen.queryByText('Přehled')).not.toBeInTheDocument()
-  })
-
-  it('collapses to the first advertisement behind a "show more" link', async () => {
-    const user = userEvent.setup()
-    const onAdditionalAdvertisementsClick = vi.fn()
-    renderJobCard({
-      advertisements: [runningSame, { ...endingSoon, id: 'ad-2' }, { ...runningSame, id: 'ad-3' }],
-      showAdditionalAdvertisementsLink: true,
-      onAdditionalAdvertisementsClick,
-    })
-
-    expect(screen.getAllByTestId('job-card-advertisement')).toHaveLength(1)
-
-    const link = screen.getByTestId('job-card-additional-advertisements')
-    expect(link).toHaveTextContent('Zobrazit další inzeráty (2)')
-    expect(screen.getByTestId('job-card-advertisements')).toContainElement(link)
-
-    await user.click(link)
-    expect(onAdditionalAdvertisementsClick).toHaveBeenCalledOnce()
   })
 
   it('always shows the advertisement heading label', () => {

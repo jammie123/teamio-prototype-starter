@@ -57,7 +57,9 @@ describe('EvaluationCriteriaModalV3', () => {
     expect(within(dialog).queryByRole('button', { name: 'Zavřít dialog' })).not.toBeInTheDocument()
     expect(within(dialog).queryByRole('button', { name: 'Přidat kritérium' })).not.toBeInTheDocument()
     expect(within(dialog).queryByRole('button', { name: 'Vygenerovat z pozice' })).not.toBeInTheDocument()
-    expect(within(dialog).queryByText(/Nastavte, na čem vám/)).not.toBeInTheDocument()
+    expect(
+      within(dialog).queryByText(/AI vyhodnotí kandidáty podle vašich kritérií/),
+    ).not.toBeInTheDocument()
     expect(within(dialog).queryByText(sampleEvaluationCriteria[0].text)).not.toBeInTheDocument()
     expect(editorButtons[0]).toHaveAccessibleName('Uložit')
     expect(editorButtons[1]).toHaveAccessibleName('Zrušit')

@@ -10,6 +10,8 @@ const HIRING_MANAGER_ROLE = 'Hiring manager'
 interface Person {
   name: string
   role: string
+  avatarTestId: string
+  rowTestId: string
 }
 
 export interface JobAssigneeProps extends StyleProps {
@@ -22,8 +24,22 @@ export interface JobAssigneeProps extends StyleProps {
 
 function buildPeople(owner?: string, hiringManagers: string[] = []): Person[] {
   return [
-    ...(owner ? [{ name: owner, role: OWNER_ROLE }] : []),
-    ...hiringManagers.map((name) => ({ name, role: HIRING_MANAGER_ROLE })),
+    ...(owner
+      ? [
+          {
+            name: owner,
+            role: OWNER_ROLE,
+            avatarTestId: 'job-card-owner',
+            rowTestId: 'job-card-people-owner',
+          },
+        ]
+      : []),
+    ...hiringManagers.map((name, index) => ({
+      name,
+      role: HIRING_MANAGER_ROLE,
+      avatarTestId: `job-card-hiring-manager-${index}`,
+      rowTestId: 'job-card-people-hiring-manager',
+    })),
   ]
 }
 
@@ -41,7 +57,9 @@ function PersonAvatar({ name, testId }: { name: string; testId?: string }) {
         'tm-p-0.5',
         'tm-bg-cover-default',
         'tm-font-normal',
-        'border-1 border-solid border-primary-default',
+        'tm-border',
+        'tm-border-solid',
+        'tm-border-primary',
         'tm-leading-none',
         'tm-size-6',
         'tm-text-xs',
@@ -61,7 +79,6 @@ export function JobAssignee({ owner, hiringManagers, onInviteMore, className }: 
     return null
   }
 
-  const managers = people.filter((person) => person.role !== OWNER_ROLE)
   const label = people.map((person) => `${person.name} (${person.role})`).join(', ')
 
   return (
@@ -79,17 +96,13 @@ export function JobAssignee({ owner, hiringManagers, onInviteMore, className }: 
       >
         <span
           className="tm-flex tm-items-center tm-gap-0.5 tm-font-medium"
-          data-testid={managers.length ? 'job-card-hiring-managers' : undefined}
+          data-testid={hiringManagers?.length ? 'job-card-hiring-managers' : undefined}
         >
           {people.map((person) => (
             <PersonAvatar
               key={`${person.role}-${person.name}`}
               name={person.name}
-              testId={
-                person.role === OWNER_ROLE
-                  ? 'job-card-owner'
-                  : `job-card-hiring-manager-${managers.indexOf(person)}`
-              }
+              testId={person.avatarTestId}
             />
           ))}
         </span>
@@ -97,17 +110,13 @@ export function JobAssignee({ owner, hiringManagers, onInviteMore, className }: 
       <DropdownBody
         data-testid="job-card-people-dropdown"
         initialFocus={-1}
-        className="tm-min-w-72"
+        className="tm-min-w-[18rem]"
       >
         <ul className="tm-m-0 tm-flex tm-list-none tm-flex-col tm-gap-2 tm-p-0">
           {people.map((person) => (
             <li
               key={`${person.role}-${person.name}`}
-              data-testid={
-                person.role === OWNER_ROLE
-                  ? 'job-card-people-owner'
-                  : 'job-card-people-hiring-manager'
-              }
+              data-testid={person.rowTestId}
               className="tm-flex tm-items-center tm-gap-2"
             >
               <PersonAvatar name={person.name} />
@@ -127,11 +136,7 @@ export function JobAssignee({ owner, hiringManagers, onInviteMore, className }: 
             data-testid="job-card-people-invite"
             className="tm-mt-3"
             tabIndex={-1}
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              onInviteMore()
-            }}
+            onClick={onInviteMore}
           >
             Upravit zapojení
           </Button>

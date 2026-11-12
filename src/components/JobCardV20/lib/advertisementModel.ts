@@ -47,8 +47,6 @@ export interface AdvertisementModel {
   viewCount?: number
   /** The advertisement is about to disappear, so offer "Prodloužit". */
   canProlong: boolean
-  /** Status dots are only useful once portals differ in status. */
-  showStatusDots: boolean
   /** All portals share the same start and end dates. Otherwise they stack in a column. */
   sharedDates: boolean
 }
@@ -222,7 +220,6 @@ const NOT_PUBLISHED_MODEL: AdvertisementModel = {
   header: { tone: 'neutral', label: NOT_PUBLISHED_LABEL },
   publications: [],
   canProlong: false,
-  showStatusDots: false,
   sharedDates: true,
 }
 
@@ -264,7 +261,6 @@ export function buildAdvertisementModel(
       publications: items,
       viewCount,
       canProlong,
-      showStatusDots: new Set(items.map((item) => item.status)).size > 1,
       sharedDates: shareSameStartDate(publications) && shareSameEndDate(publications),
     }
   }

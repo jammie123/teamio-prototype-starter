@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -93,7 +93,7 @@ function PublicationRow({
           aria-label="Zobrazit inzerát"
           className="tm-shrink-0"
           data-testid={viewTestId}
-          onClick={(event) => handlePublicationActionClick(event, onViewAdvertisement)}
+          onClick={onViewAdvertisement}
         >
           <Icon name="external-link" />
         </Button>
@@ -179,12 +179,6 @@ export function PublicationDetails({
   )
 }
 
-function handlePublicationActionClick(event: MouseEvent<HTMLElement>, onClick?: () => void) {
-  event.preventDefault()
-  event.stopPropagation()
-  onClick?.()
-}
-
 /** Hover-only popover anchored to `trigger`. */
 export function PublicationHoverCard({
   trigger,
@@ -217,7 +211,7 @@ export function PublicationHoverCard({
       autoClose={false}
       placement="bottom-start"
       strategy="fixed"
-      className="tm-group tm-inline-flex"
+      className="tm-inline-flex"
     >
       <DropdownToggle variant="custom" className="tm-rounded-none tm-bg-transparent">
         {trigger}
@@ -226,7 +220,7 @@ export function PublicationHoverCard({
         data-testid={dropdownTestId}
         overflow="visible"
         initialFocus={-1}
-        className="tm-p-4 !tm-w-[300px] !tm-max-w-none !tm-rounded-xl"
+        className="tm-p-4 !tm-w-[300px] !tm-max-w-none !tm-rounded-lg"
       >
         <div className="tm-flex tm-w-full tm-flex-col tm-gap-4">
           {children}
@@ -239,7 +233,7 @@ export function PublicationHoverCard({
                 <Button
                   variant="secondary"
                   data-testid="job-card-publication-prolong"
-                  onClick={(event) => handlePublicationActionClick(event, onProlong)}
+                  onClick={onProlong}
                 >
                   Prodloužit
                 </Button>
@@ -247,8 +241,8 @@ export function PublicationHoverCard({
               {showHighlight ? (
                 <Button
                   variant="secondary"
-                  data-testid="job-card-publication-highlight"
-                  onClick={(event) => handlePublicationActionClick(event, onHighlight)}
+                  data-testid="job-card-publication-highlight-action"
+                  onClick={onHighlight}
                 >
                   Zvýraznit
                 </Button>
@@ -257,7 +251,7 @@ export function PublicationHoverCard({
                 <Button
                   variant="secondary"
                   data-testid="job-card-publication-republish"
-                  onClick={(event) => handlePublicationActionClick(event, onRepublish)}
+                  onClick={onRepublish}
                 >
                   Znovuvystavit inzerát
                 </Button>

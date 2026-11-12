@@ -189,7 +189,6 @@ function CriteriaEditor({
             <Link href={EVALUATION_CRITERIA_HELP_URL} target="_blank">
               {EVALUATION_CRITERIA_COPY.perexHelpLink}
             </Link>
-            .
           </ModalDescription>
         </>
       )}

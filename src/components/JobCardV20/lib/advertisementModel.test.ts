@@ -39,7 +39,6 @@ describe('buildAdvertisementModel', () => {
       dateInfo: '1. 9. – 30. 10. 2026',
     })
     expect(model.publications.every((item) => item.dateLabel === undefined)).toBe(true)
-    expect(model.showStatusDots).toBe(false)
     expect(model.viewCount).toBe(15)
   })
 
@@ -82,7 +81,6 @@ describe('buildAdvertisementModel', () => {
       ['2', 'active', undefined],
       ['1', 'expired', 'ukončeno 15. 8.'],
     ])
-    expect(model.showStatusDots).toBe(true)
   })
 
   it('detects an advertisement that ends within 7 days', () => {

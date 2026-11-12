@@ -16,6 +16,7 @@ import {
 } from '../Modal'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table'
 import { EvaluationCriteriaEmptyState } from './EvaluationCriteriaEmptyState'
+import { EvaluationCriteriaGeneratingState } from './EvaluationCriteriaGeneratingState'
 import { EvaluationCriterionDetailModal } from './EvaluationCriterionDetailModal'
 import { EvaluationCriterionPriorityToggle } from './EvaluationCriterionPriorityToggle'
 import { sampleEvaluationCriteria } from './fixtures'
@@ -25,8 +26,8 @@ import type { EvaluationCriterion } from './types'
 export const EVALUATION_CRITERIA_COPY = {
   title: 'Kritéria hodnocení kandidátů',
   perex:
-    'Nastavte, na čem vám u této pozice záleží nejvíc. Podle priority se kandidáti automaticky řadí a zvýrazňují se ti, kteří nesplňují povinná kritéria.',
-  perexHelpLead: 'Více o této funkci zjistíte v',
+    'AI vyhodnotí kandidáty podle vašich kritérií a jejich priority. Čím vyšší priorita, tím větší vliv na výsledek.',
+  perexHelpLead: 'Více v',
   perexHelpLink: 'nápovědě',
   columnName: 'Název kritéria',
   columnPriority: 'Priorita',
@@ -60,6 +61,8 @@ export interface EvaluationCriteriaModalProps extends StyleProps {
   onSave?: (criteria: EvaluationCriterion[]) => void
   /** Produces criteria for "Vygenerovat z pozice" in the empty state. Defaults to sample data. */
   generateCriteria?: () => EvaluationCriterion[]
+  /** Replaces the empty state with the in-progress generate-from-JD view. */
+  isGenerating?: boolean
 }
 
 function defaultGenerateCriteria(): EvaluationCriterion[] {
@@ -74,6 +77,7 @@ interface CriteriaEditorProps {
   generateCriteria: () => EvaluationCriterion[]
   onSave: (criteria: EvaluationCriterion[]) => void
   onClose: () => void
+  isGenerating: boolean
 }
 
 function CriteriaEditor({
@@ -81,6 +85,7 @@ function CriteriaEditor({
   generateCriteria,
   onSave,
   onClose,
+  isGenerating,
 }: CriteriaEditorProps) {
   // Draft lives only while the dialog is open, so Cancel / Esc discards edits.
   const [draft, setDraft] = useState(initialCriteria)
@@ -151,17 +156,20 @@ function CriteriaEditor({
             <Link href={EVALUATION_CRITERIA_HELP_URL} target="_blank">
               {EVALUATION_CRITERIA_COPY.perexHelpLink}
             </Link>
-            .
           </ModalDescription>
         </>
       )}
       <ModalClose aria-label={EVALUATION_CRITERIA_COPY.close} />
       <ModalBody className="tm-flex tm-min-h-0 tm-max-h-[calc(100vh-14rem)] tm-flex-col tm-items-start tm-gap-2 tm-py-2">
         {isEmpty ? (
-          <EvaluationCriteriaEmptyState
-            onGenerate={handleGenerate}
-            onAddManually={startAdding}
-          />
+          isGenerating ? (
+            <EvaluationCriteriaGeneratingState />
+          ) : (
+            <EvaluationCriteriaEmptyState
+              onGenerate={handleGenerate}
+              onAddManually={startAdding}
+            />
+          )
         ) : (
           <div className="tm-w-full">
             <Table>
@@ -284,6 +292,7 @@ export function EvaluationCriteriaModal({
   defaultCriteria = [],
   onSave,
   generateCriteria = defaultGenerateCriteria,
+  isGenerating = false,
   className,
 }: EvaluationCriteriaModalProps) {
   const [openState, setOpenState] = useState(defaultOpen)
@@ -303,6 +312,7 @@ export function EvaluationCriteriaModal({
         <CriteriaEditor
           initialCriteria={saved}
           generateCriteria={generateCriteria}
+          isGenerating={isGenerating}
           onSave={(next) => {
             setSavedState(next)
             onSave?.(next)

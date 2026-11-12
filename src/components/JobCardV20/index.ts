@@ -3,7 +3,11 @@ export { JobPipeline, type JobPipelineProps } from './JobPipeline'
 export { JobAssignee, type JobAssigneeProps } from './JobAssignee'
 export { JobNote, type JobNoteProps } from './JobNote'
 export { AdvertisementWidget, type AdvertisementWidgetProps } from './AdvertisementWidget'
-export { AdvertisementStats, type AdvertisementStatsProps } from './AdvertisementStats'
+export {
+  AdvertisementStats,
+  type AdvertisementStatsAction,
+  type AdvertisementStatsProps,
+} from './AdvertisementStats'
 export {
   AdvertisementEmptyState,
   type AdvertisementEmptyStateProps,
@@ -18,10 +22,8 @@ export {
 export type {
   JobAdvertisement,
   JobCandidateStat,
-  JobCardAction,
   JobCardCandidates,
   JobCardNote,
-  JobCardSelectableStatus,
   JobPublication,
   JobPublicationHighlight,
   JobPublicationStatus,

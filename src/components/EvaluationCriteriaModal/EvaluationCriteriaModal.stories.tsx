@@ -45,6 +45,15 @@ export const Empty: Story = {
   },
 }
 
+export const GeneratingCriteriaFromJd: Story = {
+  name: 'generating criteria from JD',
+  args: {
+    defaultOpen: true,
+    defaultCriteria: [],
+    isGenerating: true,
+  },
+}
+
 export const DetailOpen: Story = {
   args: {
     defaultOpen: true,

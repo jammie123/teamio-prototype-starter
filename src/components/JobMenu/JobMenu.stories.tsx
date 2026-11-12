@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { JobMenu } from './JobMenu'
-import type { JobAdvertisement } from '../JobCardSynteza/types'
+import type { JobAdvertisement } from '../JobShared/types'
 
 const advertisements: JobAdvertisement[] = [
   { id: 'ad-1', title: 'Hlavní inzerát' },

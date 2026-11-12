@@ -4,7 +4,7 @@ import type { StyleProps } from '../../lib/types'
 import { Alert } from '../Alert'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { formatCount } from '../JobCard/formatCount'
+import { formatCount } from '../JobShared/formatCount'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { Link } from '../Link'
 import {

@@ -1,7 +1,7 @@
 import { useCallback, useId, useMemo, useState, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../lib/cn'
-import { formatCount } from '../JobCard/formatCount'
+import { formatCount } from '../JobShared/formatCount'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { JOB_DETAIL_STATS_COPY } from './jobDetailStatsCopy'
 import { formatJobDetailStatsChartDate, type JobDetailStatsTimeSeriesPoint } from './jobDetailStatsPeriod'

@@ -1,7 +1,7 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { formatCount } from '../JobCardSynteza/formatCount'
+import { formatCount } from '../JobShared/formatCount'
 import { Pill } from '../Pill'
 import {
   CANDIDATE_COPY,

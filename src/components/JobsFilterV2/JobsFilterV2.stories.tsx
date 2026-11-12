@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { expect, fn, within } from 'storybook/test'
 import { JobsFilterV2 } from './JobsFilterV2'
-import type { JobsFilterOption, JobsFilterProps, JobsFilterValue } from '../JobsFilter/types'
+import type { JobsFilterOption, JobsFilterProps, JobsFilterValue } from './types'
 
 const recruiters: JobsFilterOption[] = [
   { value: 'martina', label: 'Martina Nováková' },

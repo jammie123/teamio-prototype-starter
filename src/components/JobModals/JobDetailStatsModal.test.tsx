@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { formatCount } from '../JobCard/formatCount'
+import { formatCount } from '../JobShared/formatCount'
 import { JobDetailStatsModal } from './JobDetailStatsModal'
 import { JOB_DETAIL_STATS_COPY, JOB_DETAIL_STATS_PERIOD_LABELS } from './jobDetailStatsCopy'
 import {

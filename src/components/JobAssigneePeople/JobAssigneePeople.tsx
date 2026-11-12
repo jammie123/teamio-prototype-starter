@@ -2,7 +2,7 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
-import { getInitials } from '../JobCardSynteza/getInitials'
+import { getInitials } from '../JobShared/getInitials'
 
 const OWNER_ROLE = 'Náborář'
 const HIRING_MANAGER_ROLE = 'Hiring manager'

@@ -2,7 +2,7 @@ import {
   formatPublicationRange,
   getRemainingCalendarDays,
   isEndingSoonDays,
-} from '../JobCardSynteza/advertisementSummary'
+} from '../JobShared/advertisementSummary'
 import { JOB_MODAL_COPY } from './jobModalCopy'
 import type { JobModalPublicationPlace } from './types'
 

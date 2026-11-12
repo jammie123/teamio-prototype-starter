@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { formatPublicationRange } from '../JobCardSynteza/advertisementSummary'
+import { formatPublicationRange } from '../JobShared/advertisementSummary'
 import { JobModalActionPlaces } from './JobModalActionPlaces'
 import type { JobModalAdvertisementSection, JobModalPublicationPlace } from './types'
 

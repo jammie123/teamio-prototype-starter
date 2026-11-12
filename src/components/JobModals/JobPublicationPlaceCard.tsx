@@ -3,7 +3,7 @@ import type { StyleProps } from '../../lib/types'
 import { Card } from '../Card'
 import { Checkbox } from '../Checkbox'
 import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
-import { formatPublicationRange } from '../JobCardSynteza/advertisementSummary'
+import { formatPublicationRange } from '../JobShared/advertisementSummary'
 import type { JobModalPublicationPlace } from './types'
 
 export interface JobPublicationPlaceCardProps extends StyleProps {

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobMenu } from './JobMenu'
-import type { JobAdvertisement } from '../JobCardSynteza/types'
+import type { JobAdvertisement } from '../JobShared/types'
 
 const advertisement: JobAdvertisement = { id: 'ad-1', title: 'Hlavní inzerát' }
 

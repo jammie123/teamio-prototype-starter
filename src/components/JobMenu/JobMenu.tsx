@@ -1,10 +1,10 @@
 import type { StyleProps } from '../../lib/types'
-import { JobCardActions } from '../JobCardSynteza/JobCardActions'
+import { JobCardActions } from '../JobShared/JobCardActions'
 import {
   buildJobCardMenuSections,
   type JobCardMenuHandlers,
-} from '../JobCardSynteza/jobCardMenu'
-import type { JobAdvertisement, JobCardAction } from '../JobCardSynteza/types'
+} from '../JobShared/jobCardMenu'
+import type { JobAdvertisement, JobCardAction } from '../JobShared/types'
 
 export const JOB_MENU_LABEL = 'Akce nad náborem a inzerátem'
 

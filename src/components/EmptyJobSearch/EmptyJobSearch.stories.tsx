@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactNode } from 'react'
 import { expect, fn, within } from 'storybook/test'
 import { JobsFilterV2 } from '../JobsFilterV2'
-import type { JobsFilterOption, JobsFilterValue } from '../JobsFilter/types'
+import type { JobsFilterOption, JobsFilterValue } from '../JobsFilterV2/types'
 import { EmptyJobSearch } from './EmptyJobSearch'
 
 const recruiters: JobsFilterOption[] = [

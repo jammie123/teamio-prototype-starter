@@ -13,7 +13,7 @@ import type {
   JobsFilterOption,
   JobsFilterProps,
   JobsFilterValue,
-} from '../JobsFilter/types'
+} from './types'
 
 export type {
   JobsFilterAdvertisementStatus,
@@ -22,7 +22,7 @@ export type {
   JobsFilterProps,
   JobsFilterProps as JobsFilterV2Props,
   JobsFilterValue,
-} from '../JobsFilter/types'
+} from './types'
 
 const EMPTY_JOBS_FILTER: JobsFilterValue = {
   query: '',

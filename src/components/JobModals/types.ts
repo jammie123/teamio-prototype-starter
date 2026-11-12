@@ -1,5 +1,5 @@
 import type { JobPortalLogoType } from '../JobPortalLogo'
-import type { JobPublicationStatus } from '../JobCardSynteza/types'
+import type { JobPublicationStatus } from '../JobShared/types'
 
 export interface JobModalPublicationPlace {
   id: string

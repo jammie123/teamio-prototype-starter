@@ -1,6 +1,6 @@
 import { forwardRef } from 'react'
 import { cn } from '../../lib/cn'
-import { formatCount } from '../JobCardSynteza/formatCount'
+import { formatCount } from '../JobShared/formatCount'
 import { Icon } from '../Icon'
 import { Pill } from '../Pill'
 import { Tabs, TabsList, TabsTrigger } from '../Tabs'

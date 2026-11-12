@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobsFilterV2 } from './JobsFilterV2'
-import type { JobsFilterProps, JobsFilterValue } from '../JobsFilter/types'
+import type { JobsFilterProps, JobsFilterValue } from './types'
 
 const recruiters = [
   { value: 'martina', label: 'Martina Nováková' },

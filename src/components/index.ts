@@ -141,6 +141,18 @@ export {
   type JobCandidateStat as JobCardV20CandidateStat,
   type JobCardNote as JobCardV20Note,
 } from './JobCardV20'
+export {
+  JobCardV18,
+  AdvertisementAction as JobCardV18AdvertisementAction,
+  AdvertisementWidget as JobCardV18AdvertisementWidget,
+  type JobCardV18Props,
+  type AdvertisementActionLayout as JobCardV18AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV18AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV18AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV18Candidates,
+  type JobCandidateStat as JobCardV18CandidateStat,
+  type JobCardNote as JobCardV18Note,
+} from './JobCardV18'
 export { JobAssigneePeople, type JobAssigneePeopleProps } from './JobAssigneePeople/JobAssigneePeople'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
 export {

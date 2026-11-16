@@ -92,6 +92,33 @@ describe('JobMenu', () => {
     expect(onCreateAdvertisement).toHaveBeenCalledTimes(1)
   })
 
+  it('lists Zvýraznit in the advertisement section and fires onHighlightAdvertisement', async () => {
+    const user = userEvent.setup()
+    const onHighlightAdvertisement = vi.fn()
+
+    render(
+      <JobMenu
+        advertisements={[advertisement]}
+        onEndPublication={vi.fn()}
+        onHighlightAdvertisement={onHighlightAdvertisement}
+        onTopAdvertisement={vi.fn()}
+        onEditJob={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByTestId('job-menu-toggle'))
+
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Ukončit vystavení',
+      'Zvýraznit',
+      'Topovat',
+      'Editovat nábor',
+    ])
+
+    await user.click(screen.getByRole('option', { name: 'Zvýraznit' }))
+    expect(onHighlightAdvertisement).toHaveBeenCalledTimes(1)
+  })
+
   it('renders nothing when no handler is passed', () => {
     const { container } = render(<JobMenu advertisements={[advertisement]} />)
     expect(container).toBeEmptyDOMElement()

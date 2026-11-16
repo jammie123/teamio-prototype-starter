@@ -113,6 +113,8 @@ describe('components barrel', () => {
 
   it('exports job components', () => {
     expect(components.JobCardV20).toBeTypeOf('object')
+    expect(components.JobCardV31).toBeTypeOf('object')
+    expect(components.IconButton).toBeTypeOf('object')
     expect(components.JobMenu).toBeTypeOf('function')
     expect(components.JobPageHeader).toBeTypeOf('object')
     expect(components.EmptyJobSearch).toBeTypeOf('function')

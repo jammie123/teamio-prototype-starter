@@ -315,6 +315,9 @@ export default {
             spacing: {
                 'left-menu': '15rem',
                 'left-menu-collapsed': '4.5rem',
+                'pipeline-stat': '9.375rem',
+                'pipeline-total': '7.5rem',
+                popover: '18.75rem',
             },
             minWidth: ({ theme }) => ({
                 ...theme('spacing'),

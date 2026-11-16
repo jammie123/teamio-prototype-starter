@@ -13,6 +13,9 @@ const preview: Preview = {
     a11y: {
       test: 'error',
     },
+    html: {
+      removeEmptyComments: true,
+    },
     options: {
       storySort: {
         order: [

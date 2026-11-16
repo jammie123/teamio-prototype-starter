@@ -332,6 +332,7 @@ function CriteriaEditor({
                               </Button>
                               <div className="tm-ml-auto tm-flex tm-items-center tm-gap-2">
                                 <EvaluationCriterionPriorityToggle
+                                  size="medium"
                                   value={editor.priority}
                                   onChange={(priority) =>
                                     setEditor((current) => (current ? { ...current, priority } : current))
@@ -340,7 +341,7 @@ function CriteriaEditor({
                                 {isNew ? null : (
                                   <Button
                                     variant="tertiary"
-                                    size="small"
+                                    size="medium"
                                     isCircle
                                     aria-label={EVALUATION_CRITERIA_COPY.deleteLabel}
                                     onClick={() => handleDelete(criterion.id)}
@@ -361,6 +362,7 @@ function CriteriaEditor({
                       <TableCell className={`${COLUMN_NAME} ${BODY_Y}`}>{criterion.text}</TableCell>
                       <TableCell className={`${COLUMN_PRIORITY} ${BODY_Y}`}>
                         <EvaluationCriterionPriorityToggle
+                          size="medium"
                           value={criterion.priority}
                           onChange={(priority) =>
                             setDraft((current) =>
@@ -375,7 +377,7 @@ function CriteriaEditor({
                         <div className="tm-flex tm-items-center tm-justify-end tm-gap-2">
                           <Button
                             variant="tertiary"
-                            size="small"
+                            size="medium"
                             isCircle
                             aria-label={EVALUATION_CRITERIA_COPY.editLabel}
                             isDisabled={editor !== null}
@@ -385,7 +387,7 @@ function CriteriaEditor({
                           </Button>
                           <Button
                             variant="tertiary"
-                            size="small"
+                            size="medium"
                             isCircle
                             aria-label={EVALUATION_CRITERIA_COPY.deleteLabel}
                             onClick={() => handleDelete(criterion.id)}

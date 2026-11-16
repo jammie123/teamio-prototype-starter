@@ -57,6 +57,23 @@ export const GeneratingCriteriaFromJd: Story = {
   },
 }
 
+export const GeneratingFailedNoJd: Story = {
+  name: 'generating failed - no JD',
+  args: {
+    defaultOpen: true,
+    defaultCriteria: [],
+    generationError: 'noJobDescription',
+  },
+  play: async () => {
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Kritéria hodnocení kandidátů',
+    })
+    const alert = within(dialog).getByRole('alert')
+    await expect(alert).toHaveTextContent('Zatím nemáme dost informací k vytvoření kritérií')
+    await expect(alert).toHaveTextContent('K nastavení kvalitních kritérií hodnocení')
+  },
+}
+
 export const ReadOnly: Story = {
   args: {
     defaultOpen: true,
@@ -98,6 +115,12 @@ export const InlineEdit: Story = {
     await userEvent.click(within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })[1])
     const textarea = within(dialog).getByRole('textbox', { name: 'Kritérium' })
     await expect(textarea).toHaveValue(sampleEvaluationCriteria[1].text)
+    await expect(within(dialog).getByText('Úprava kritéria')).toBeInTheDocument()
+    await expect(within(dialog).getByRole('button', { name: 'Hotovo' })).toBeInTheDocument()
+    await userEvent.hover(within(dialog).getByTestId('evaluation-save-tooltip-trigger'))
+    await expect(await body.findByRole('tooltip')).toHaveTextContent(
+      'Nejdřív dokončete úpravu kritéria.',
+    )
     await expect(body.queryByRole('dialog', { name: 'Detail kritéria' })).not.toBeInTheDocument()
   },
 }
@@ -114,7 +137,7 @@ export const EeoViolation: Story = {
     await userEvent.clear(textarea)
     await userEvent.type(textarea, 'Hledáme muže do týmu')
     const row = within(dialog).getAllByTestId('evaluation-criterion-row')[1]
-    await userEvent.click(within(row).getByRole('button', { name: 'Uložit' }))
+    await userEvent.click(within(row).getByRole('button', { name: 'Hotovo' }))
     await expect(await within(dialog).findByRole('alert')).toHaveTextContent('nelze uložit')
     await expect(body.queryByRole('dialog', { name: 'Detail kritéria' })).not.toBeInTheDocument()
   },

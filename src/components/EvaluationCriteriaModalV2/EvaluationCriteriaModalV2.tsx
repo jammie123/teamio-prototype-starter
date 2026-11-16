@@ -18,6 +18,7 @@ import {
 } from '../Modal'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table'
 import { TextArea } from '../TextArea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip'
 import { EvaluationCriteriaEmptyState } from '../EvaluationCriteriaModal/EvaluationCriteriaEmptyState'
 import { EvaluationCriteriaGeneratingState } from '../EvaluationCriteriaModal/EvaluationCriteriaGeneratingState'
 import { EvaluationCriteriaReadOnlyView } from '../EvaluationCriteriaModal/EvaluationCriteriaReadOnlyView'
@@ -50,6 +51,11 @@ export interface EvaluationCriteriaModalV2Props extends StyleProps {
   /** Replaces the empty state with the in-progress generate-from-JD view. */
   isGenerating?: boolean
   /**
+   * Generating criteria from the position failed. The empty state shows an error under its
+   * buttons, e.g. `noJobDescription` when the position lacks the information to generate from.
+   */
+  generationError?: EvaluationCriteriaGenerationError
+  /**
    * Opens the modal as a read-only summary: criteria grouped by priority with the actions
    * "Ohodnotit kandidáty" and "Editovat kritéria". The latter switches the modal to the editor.
    * Ignored while there are no criteria (the empty state is shown instead).
@@ -74,9 +80,23 @@ interface CriterionEditor {
   priority: EvaluationCriterionPriority
   isNew: boolean
   hasEeoError: boolean
-  baselineText: string
-  baselinePriority: EvaluationCriterionPriority
 }
+
+const V2_COPY = {
+  done: 'Hotovo',
+  editingLabel: 'Úprava kritéria',
+  finishEditHint: 'Nejdřív dokončete úpravu kritéria.',
+  generationErrors: {
+    noJobDescription: {
+      title: 'Zatím nemáme dost informací k vytvoření kritérií',
+      description:
+        'K nastavení kvalitních kritérií hodnocení potřebujeme víc informací o pozici a náboru. Doplňte je a kritéria vygenerujeme nebo vytvořte kritéria ručně.',
+    },
+  },
+} as const
+
+/** Why generating criteria from the position failed. Shown under the empty-state buttons. */
+export type EvaluationCriteriaGenerationError = keyof typeof V2_COPY.generationErrors
 
 interface CriteriaEditorProps {
   initialCriteria: EvaluationCriterion[]
@@ -85,13 +105,10 @@ interface CriteriaEditorProps {
   onClose: () => void
   onEditingChange: (isEditing: boolean, cancel: () => void) => void
   isGenerating: boolean
+  generationError?: EvaluationCriteriaGenerationError
   readOnly: boolean
   onEvaluate?: () => void
   onEdit?: () => void
-}
-
-function isPristine(editor: CriterionEditor) {
-  return editor.text === editor.baselineText && editor.priority === editor.baselinePriority
 }
 
 function CriteriaEditor({
@@ -101,6 +118,7 @@ function CriteriaEditor({
   onClose,
   onEditingChange,
   isGenerating,
+  generationError,
   readOnly,
   onEvaluate,
   onEdit,
@@ -126,63 +144,47 @@ function CriteriaEditor({
     return `new-criterion-${idSeq.current}`
   }
 
-  const requestEditor = (next: CriterionEditor) => {
-    if (!editor || isPristine(editor)) {
-      setEditor(next)
-      return
-    }
-    const violation = findEeoViolation(editor.text) !== null
-    if (violation || editor.text.trim() === '') {
-      setEditor({ ...editor, hasEeoError: violation })
-    }
-  }
-
+  // Only one row can be edited at a time; the pencil and "Přidat kritérium" are disabled meanwhile.
   const startEditing = (id: string) => {
+    if (editor) return
     const criterion = draft.find((item) => item.id === id)
     if (!criterion) return
-    requestEditor({
+    setEditor({
       id: criterion.id,
       text: criterion.text,
       priority: criterion.priority,
       isNew: false,
       hasEeoError: false,
-      baselineText: criterion.text,
-      baselinePriority: criterion.priority,
     })
   }
 
-  const startAdding = () =>
-    requestEditor({
-      id: nextId(),
-      text: '',
-      priority: 'low',
-      isNew: true,
-      hasEeoError: false,
-      baselineText: '',
-      baselinePriority: 'low',
-    })
+  const startAdding = () => {
+    if (editor) return
+    setEditor({ id: nextId(), text: '', priority: 'low', isNew: true, hasEeoError: false })
+  }
 
+  // The editor is separate from the draft, so cancelling restores the original row.
   const cancelEditor = () => setEditor(null)
 
-  /** Returns the draft after a valid row commit, or null when the open row cannot be saved. */
-  const commitEditor = (): EvaluationCriterion[] | null => {
-    if (!editor) return draft
-    if (editor.text.trim() === '') return null
+  /** "Hotovo": moves the open row into the draft, or keeps it open when it is empty / invalid. */
+  const commitEditor = () => {
+    if (!editor) return
+    if (editor.text.trim() === '') return
     if (findEeoViolation(editor.text) !== null) {
       setEditor({ ...editor, hasEeoError: true })
-      return null
+      return
     }
     const nextCriterion: EvaluationCriterion = {
       id: editor.id,
       text: editor.text,
       priority: editor.priority,
     }
-    const nextDraft = editor.isNew
-      ? [...draft, nextCriterion]
-      : draft.map((item) => (item.id === nextCriterion.id ? nextCriterion : item))
-    setDraft(nextDraft)
+    setDraft((current) =>
+      editor.isNew
+        ? [...current, nextCriterion]
+        : current.map((item) => (item.id === nextCriterion.id ? nextCriterion : item)),
+    )
     setEditor(null)
-    return nextDraft
   }
 
   const handleGenerate = () =>
@@ -198,7 +200,8 @@ function CriteriaEditor({
     setEditor((current) => (current?.id === id ? null : current))
   }
 
-  const showTable = draft.length > 0 || editor !== null
+  const isEditing = editor !== null
+  const showTable = draft.length > 0 || isEditing
   const hideChrome = !showTable && initialCriteria.length === 0
   const rows: EvaluationCriterion[] = editor?.isNew
     ? [...draft, { id: editor.id, text: editor.text, priority: editor.priority }]
@@ -281,9 +284,17 @@ function CriteriaEditor({
                   if (isEditing && editor) {
                     const isNew = editor.isNew
                     return (
-                      <TableRow key={criterion.id} data-testid="evaluation-criterion-row">
+                      <TableRow
+                        key={criterion.id}
+                        data-testid="evaluation-criterion-row"
+                        data-editing="true"
+                        className="tm-bg-cover-light"
+                      >
                         <TableCell colSpan={3} className="!tm-px-4 !tm-py-5">
                           <div className="tm-flex tm-w-full tm-flex-col tm-gap-3">
+                            <span className="tm-text-sm tm-font-medium tm-text-primary-default">
+                              {V2_COPY.editingLabel}
+                            </span>
                             <FormGroup validationState={editor.hasEeoError ? 'error' : 'default'}>
                               <TextArea
                                 aria-label={EVALUATION_CRITERION_DETAIL_COPY.textLabel}
@@ -310,11 +321,11 @@ function CriteriaEditor({
                             ) : null}
                             <div className="tm-flex tm-w-full tm-items-center tm-gap-2">
                               <Button
-                                variant="primary"
+                                variant="secondary"
                                 isDisabled={editor.text.trim() === ''}
                                 onClick={commitEditor}
                               >
-                                {EVALUATION_CRITERIA_COPY.save}
+                                {V2_COPY.done}
                               </Button>
                               <Button variant="tertiary" onClick={cancelEditor}>
                                 {EVALUATION_CRITERIA_COPY.cancel}
@@ -367,6 +378,7 @@ function CriteriaEditor({
                             size="small"
                             isCircle
                             aria-label={EVALUATION_CRITERIA_COPY.editLabel}
+                            isDisabled={editor !== null}
                             onClick={() => startEditing(criterion.id)}
                           >
                             <Icon name="edit" />
@@ -391,10 +403,23 @@ function CriteriaEditor({
         ) : isGenerating ? (
           <EvaluationCriteriaGeneratingState />
         ) : (
-          <EvaluationCriteriaEmptyState onGenerate={handleGenerate} onAddManually={startAdding} />
+          <EvaluationCriteriaEmptyState
+            onGenerate={handleGenerate}
+            onAddManually={startAdding}
+            error={
+              generationError ? (
+                <Alert variant="error">
+                  <div className="tm-font-semibold">
+                    {V2_COPY.generationErrors[generationError].title}
+                  </div>
+                  <div>{V2_COPY.generationErrors[generationError].description}</div>
+                </Alert>
+              ) : null
+            }
+          />
         )}
         {showTable ? (
-          <Button variant="tertiary" onClick={startAdding}>
+          <Button variant="tertiary" isDisabled={editor !== null} onClick={startAdding}>
             <Icon name="plus" />
             {EVALUATION_CRITERIA_COPY.add}
           </Button>
@@ -402,19 +427,39 @@ function CriteriaEditor({
       </ModalBody>
       {hideChrome ? null : (
         <ModalFooter className="tm-shrink-0 tm-bg-basic">
-          <Button
-            onClick={() => {
-              const next = commitEditor()
-              if (!next) return
-              onSave(next)
-              onClose()
-            }}
-          >
-            {EVALUATION_CRITERIA_COPY.save}
-          </Button>
-          <ModalClose asChild aria-label={EVALUATION_CRITERIA_COPY.cancel}>
-            <Button variant="secondary">{EVALUATION_CRITERIA_COPY.cancel}</Button>
-          </ModalClose>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              {/* A disabled button swallows pointer events, so the (focusable) wrapper is the trigger. */}
+              <TooltipTrigger asChild>
+                <span
+                  className="tm-inline-flex"
+                  data-testid="evaluation-save-tooltip-trigger"
+                  tabIndex={isEditing ? 0 : undefined}
+                >
+                  <Button
+                    isDisabled={isEditing}
+                    onClick={() => {
+                      onSave(draft)
+                      onClose()
+                    }}
+                  >
+                    {EVALUATION_CRITERIA_COPY.save}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {isEditing ? (
+                // The modal is z-50; the tooltip must sit above it.
+                <TooltipContent side="top" className="!tm-z-[60]">
+                  {V2_COPY.finishEditHint}
+                </TooltipContent>
+              ) : null}
+            </Tooltip>
+          </TooltipProvider>
+          {isEditing ? null : (
+            <ModalClose asChild aria-label={EVALUATION_CRITERIA_COPY.cancel}>
+              <Button variant="secondary">{EVALUATION_CRITERIA_COPY.cancel}</Button>
+            </ModalClose>
+          )}
           {draft.length === 0 ? null : (
             <Button variant="tertiary" className="sm:tm-ml-auto" onClick={handleGenerate}>
               {EVALUATION_CRITERIA_COPY.generate}
@@ -436,6 +481,7 @@ export function EvaluationCriteriaModalV2({
   onSave,
   generateCriteria = defaultGenerateCriteria,
   isGenerating = false,
+  generationError,
   readOnly = false,
   onEvaluate,
   onEdit,
@@ -480,6 +526,7 @@ export function EvaluationCriteriaModalV2({
           onClose={() => handleOpenChange(false)}
           onEditingChange={handleEditingChange}
           isGenerating={isGenerating}
+          generationError={generationError}
           readOnly={readOnly}
           onEvaluate={onEvaluate}
           onEdit={onEdit}

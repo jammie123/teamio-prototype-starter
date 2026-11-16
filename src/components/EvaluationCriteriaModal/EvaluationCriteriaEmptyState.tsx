@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Button } from '../Button'
 import { Link } from '../Link'
 import { EvaluationCriteriaEmptyIllustration } from './EvaluationCriteriaEmptyIllustration'
@@ -16,11 +17,14 @@ export const EVALUATION_CRITERIA_EMPTY_COPY = {
 export interface EvaluationCriteriaEmptyStateProps {
   onGenerate: () => void
   onAddManually: () => void
+  /** Rendered under the buttons, e.g. an error `Alert` after a failed generation. */
+  error?: ReactNode
 }
 
 export function EvaluationCriteriaEmptyState({
   onGenerate,
   onAddManually,
+  error,
 }: EvaluationCriteriaEmptyStateProps) {
   return (
     <div
@@ -47,6 +51,11 @@ export function EvaluationCriteriaEmptyState({
           {EVALUATION_CRITERIA_EMPTY_COPY.addManually}
         </Button>
       </div>
+      {error ? (
+        <div data-testid="evaluation-criteria-empty-error" className="tm-w-full tm-max-w-[640px] tm-text-left">
+          {error}
+        </div>
+      ) : null}
     </div>
   )
 }

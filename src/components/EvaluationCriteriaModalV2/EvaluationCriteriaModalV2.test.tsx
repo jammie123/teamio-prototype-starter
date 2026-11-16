@@ -55,11 +55,56 @@ describe('EvaluationCriteriaModalV2', () => {
     expect(textarea).toHaveValue(sampleEvaluationCriteria[1].text)
     expect(textarea).toHaveFocus()
     expect(textarea.closest('td')).toHaveAttribute('colspan', '3')
-    expect(rowButtons[0]).toHaveAccessibleName('Uložit')
+    expect(rowButtons[0]).toHaveAccessibleName('Hotovo')
     expect(rowButtons[1]).toHaveAccessibleName('Zrušit')
     expect(rowButtons.at(-1)).toHaveAccessibleName('Smazat kritérium')
+    expect(within(row).queryByRole('button', { name: 'Uložit' })).not.toBeInTheDocument()
+    expect(within(row).getByText('Úprava kritéria')).toBeInTheDocument()
+    expect(row).toHaveClass('tm-bg-cover-light')
     expect(screen.queryByRole('dialog', { name: 'Detail kritéria' })).not.toBeInTheDocument()
     expect(screen.getAllByRole('dialog')).toHaveLength(1)
+  })
+
+  it('disables the footer save with a hint and blocks a second edit while a row is being edited', async () => {
+    const user = userEvent.setup()
+    const dialog = await openModal()
+
+    // No edit: save is active and sits next to cancel.
+    expect(footerButton(dialog, 'Uložit')).toBeEnabled()
+    expect(footerButton(dialog, 'Zrušit')).toBeEnabled()
+    for (const pencil of within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })) {
+      expect(pencil).toBeEnabled()
+    }
+    await user.hover(screen.getByTestId('evaluation-save-tooltip-trigger'))
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+    await user.click(within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })[1])
+
+    expect(footerButton(dialog, 'Uložit')).toBeDisabled()
+    // The hint is a tooltip on the disabled save button, not inline text.
+    expect(within(dialog).queryByText('Nejdřív dokončete úpravu kritéria.')).not.toBeInTheDocument()
+    await user.hover(screen.getByTestId('evaluation-save-tooltip-trigger'))
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Nejdřív dokončete úpravu kritéria.')
+    // The footer "Zrušit" is hidden; the only "Zrušit" left lives inside the editor row.
+    expect(() => footerButton(dialog, 'Zrušit')).toThrow()
+    const otherPencils = within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })
+    expect(otherPencils).toHaveLength(1)
+    expect(otherPencils[0]).toBeDisabled()
+    expect(within(dialog).getByRole('button', { name: 'Přidat kritérium' })).toBeDisabled()
+
+    await user.click(otherPencils[0])
+    expect(within(dialog).getAllByRole('textbox')).toHaveLength(1)
+
+    await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Hotovo' }))
+
+    expect(footerButton(dialog, 'Uložit')).toBeEnabled()
+    expect(footerButton(dialog, 'Zrušit')).toBeEnabled()
+    await user.hover(screen.getByTestId('evaluation-save-tooltip-trigger'))
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: 'Přidat kritérium' })).toBeEnabled()
+    for (const pencil of within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })) {
+      expect(pencil).toBeEnabled()
+    }
   })
 
   it('keeps an empty criterion from being saved', async () => {
@@ -71,7 +116,8 @@ describe('EvaluationCriteriaModalV2', () => {
     const textarea = within(dialog).getByRole('textbox', { name: 'Kritérium' })
     await user.clear(textarea)
 
-    expect(within(editorRow(dialog)).getByRole('button', { name: 'Uložit' })).toBeDisabled()
+    expect(within(editorRow(dialog)).getByRole('button', { name: 'Hotovo' })).toBeDisabled()
+    expect(footerButton(dialog, 'Uložit')).toBeDisabled()
     await user.click(footerButton(dialog, 'Uložit'))
 
     expect(onSave).not.toHaveBeenCalled()
@@ -88,7 +134,7 @@ describe('EvaluationCriteriaModalV2', () => {
     const textarea = within(dialog).getByRole('textbox', { name: 'Kritérium' })
     await user.clear(textarea)
     await user.type(textarea, 'Hledáme muže')
-    await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Uložit' }))
+    await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Hotovo' }))
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1)
     expect(within(dialog).getByRole('alert')).toHaveTextContent('nelze uložit')
@@ -111,7 +157,7 @@ describe('EvaluationCriteriaModalV2', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Přidat kritérium' }))
     expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(3)
     expect(screen.queryByRole('dialog', { name: 'Nové kritérium' })).not.toBeInTheDocument()
-    expect(within(editorRow(dialog)).getByRole('button', { name: 'Uložit' })).toBeDisabled()
+    expect(within(editorRow(dialog)).getByRole('button', { name: 'Hotovo' })).toBeDisabled()
     expect(within(dialog).getAllByRole('button', { name: 'Smazat kritérium' })).toHaveLength(2)
 
     await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Zrušit' }))
@@ -120,14 +166,14 @@ describe('EvaluationCriteriaModalV2', () => {
 
     await user.click(within(dialog).getByRole('button', { name: 'Přidat kritérium' }))
     await user.type(within(dialog).getByRole('textbox', { name: 'Kritérium' }), 'Řidičský průkaz skupiny B')
-    await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Uložit' }))
+    await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Hotovo' }))
 
     expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument()
     expect(within(dialog).getByText('Řidičský průkaz skupiny B')).toBeInTheDocument()
     expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(3)
   })
 
-  it('commits a valid open edit when the list is saved', async () => {
+  it('moves a finished edit into the draft with "Hotovo" and persists it with the footer save', async () => {
     const user = userEvent.setup()
     const onSave = vi.fn()
     const dialog = await openModal({ onSave })
@@ -138,6 +184,7 @@ describe('EvaluationCriteriaModalV2', () => {
     await user.type(textarea, 'Praxe v oboru')
     const priority = within(dialog).getAllByRole('group', { name: 'Priorita' })[1]
     await user.click(within(priority).getByRole('button', { name: 'Vysoká' }))
+    await user.click(within(editorRow(dialog)).getByRole('button', { name: 'Hotovo' }))
     await user.click(footerButton(dialog, 'Uložit'))
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -145,39 +192,6 @@ describe('EvaluationCriteriaModalV2', () => {
       sampleEvaluationCriteria[0],
       { ...sampleEvaluationCriteria[1], text: 'Praxe v oboru', priority: 'high' },
     ])
-  })
-
-  it('does not switch rows while an edit is unsaved, and shows an EEO error when that text is invalid', async () => {
-    const user = userEvent.setup()
-    const dialog = await openModal()
-
-    await user.click(within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })[1])
-    const textarea = within(dialog).getByRole('textbox', { name: 'Kritérium' })
-    await user.type(textarea, ' navíc')
-    await user.click(within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })[0])
-
-    expect(textarea).toHaveValue(`${sampleEvaluationCriteria[1].text} navíc`)
-    expect(within(dialog).getByText(sampleEvaluationCriteria[0].text)).toBeInTheDocument()
-
-    await user.clear(textarea)
-    await user.type(textarea, 'Hledáme muže')
-    await user.click(within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })[0])
-
-    expect(textarea).toHaveValue('Hledáme muže')
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('nelze uložit')
-  })
-
-  it('switches from an untouched editor to another row', async () => {
-    const user = userEvent.setup()
-    const dialog = await openModal()
-
-    await user.click(within(dialog).getByRole('button', { name: 'Přidat kritérium' }))
-    await user.click(within(dialog).getAllByRole('button', { name: 'Upravit kritérium' })[0])
-
-    expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(2)
-    expect(within(dialog).getByRole('textbox', { name: 'Kritérium' })).toHaveValue(
-      sampleEvaluationCriteria[0].text,
-    )
   })
 
   it('restores the original text and priority when the row edit is cancelled', async () => {
@@ -289,6 +303,29 @@ describe('EvaluationCriteriaModalV2', () => {
     expect(within(dialog).queryByTestId('evaluation-criteria-empty')).not.toBeInTheDocument()
     expect(within(dialog).queryByRole('button', { name: 'Uložit' })).not.toBeInTheDocument()
     expect(within(dialog).queryByRole('button', { name: 'Zrušit' })).not.toBeInTheDocument()
+  })
+
+  it('shows the "no JD" generation error under the empty-state buttons', async () => {
+    const dialog = await openModal({ defaultCriteria: [], generationError: 'noJobDescription' })
+
+    const empty = within(dialog).getByTestId('evaluation-criteria-empty')
+    const error = within(empty).getByTestId('evaluation-criteria-empty-error')
+    expect(within(error).getByRole('alert')).toHaveTextContent(
+      'Zatím nemáme dost informací k vytvoření kritérií',
+    )
+    expect(within(error).getByRole('alert')).toHaveTextContent(
+      'K nastavení kvalitních kritérií hodnocení potřebujeme víc informací o pozici a náboru. Doplňte je a kritéria vygenerujeme nebo vytvořte kritéria ručně.',
+    )
+    // Under the buttons, and the buttons stay usable.
+    const addButton = within(empty).getByRole('button', { name: 'Přidat kritérium ručně' })
+    expect(addButton.compareDocumentPosition(error) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(within(empty).getByRole('button', { name: 'Vygenerovat z pozice' })).toBeEnabled()
+  })
+
+  it('shows no generation error by default', async () => {
+    const dialog = await openModal({ defaultCriteria: [] })
+
+    expect(within(dialog).queryByTestId('evaluation-criteria-empty-error')).not.toBeInTheDocument()
   })
 
   describe('readOnly', () => {

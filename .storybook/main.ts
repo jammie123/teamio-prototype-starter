@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import type { StorybookConfig } from '@storybook/react-vite'
 import { allowedFsRoots } from '../src/lib/allowedFsRoots'
 
@@ -7,6 +8,8 @@ const config: StorybookConfig = {
     '@storybook/addon-docs',
     '@storybook/addon-a11y',
     '@whitespace/storybook-addon-html',
+    // Panel "Component tree" – kompozice React komponent aktuální story.
+    resolve(import.meta.dirname, '../src/storybook/component-tree/preset.js'),
   ],
   framework: {
     name: '@storybook/react-vite',

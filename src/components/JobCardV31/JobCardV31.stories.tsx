@@ -47,7 +47,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="tm-max-w-[64rem] tm-bg-cover-light tm-p-6">
+      <div className="tm-bg-cover-light tm-p-6">
         <Story />
       </div>
     ),

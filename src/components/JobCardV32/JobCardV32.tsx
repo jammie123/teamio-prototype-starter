@@ -154,12 +154,9 @@ export const JobCardV32 = forwardRef<HTMLElement, JobCardV32Props>(function JobC
                     onInviteColleagues={onInviteColleagues}
                     onTransferJob={onTransferJob}
                     onArchiveJob={onArchiveJob}
-                    onEditAdvertisement={isDraft ? undefined : onEditAdvertisement}
                     onExtendAndRepublish={isDraft ? undefined : onExtendAndRepublish}
                     onEndPublication={isDraft ? undefined : onEndPublication}
-                    onHighlightAdvertisement={isDraft ? undefined : onHighlightAdvertisement}
                     onTopAdvertisement={isDraft ? undefined : onTopAdvertisement}
-                    onCreateAdvertisement={isDraft ? undefined : onCreateAdvertisement}
                   />
                 </>
               }

@@ -1,22 +1,37 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 import { Button } from '../Button'
+import { Icon } from '../Icon'
+import { Modal, ModalBody, ModalClose, ModalContent } from '../Modal'
+import { Table, TableBody } from '../Table'
+import { EVALUATION_CRITERIA_COPY } from '../EvaluationCriteriaModal/EvaluationCriteriaModal'
 import {
   sampleEvaluationCriteria,
   sampleGroupedEvaluationCriteria,
 } from '../EvaluationCriteriaModal/fixtures'
+import { CriteriaModalFooter } from './CriteriaModalFooter'
+import { CriteriaModalHeader } from './CriteriaModalHeader'
+import { CriteriaTableHead } from './CriteriaTableHead'
+import { CriterionEditorRow } from './CriterionEditorRow'
+import { CriterionRow } from './CriterionRow'
 import { EvaluationCriteriaModalV2 } from './EvaluationCriteriaModalV2'
 
 const meta = {
   id: 'ai-evaluation-evaluationcriteriamodal-v2',
   title: 'AI Evaluation/EvaluationCriteriaModal/V2',
   component: EvaluationCriteriaModalV2,
+  // Docs stránka je v EvaluationCriteriaModalV2.mdx (autodocs by vytvořil duplicitní stránku).
+  tags: ['!autodocs'],
   args: {
     defaultCriteria: sampleEvaluationCriteria,
     onSave: fn(),
   },
   parameters: {
     layout: 'padded',
+    docs: {
+      // Modal se renderuje v portálu přes celou stránku, proto každá ukázka běží v iframe.
+      story: { inline: false, iframeHeight: 640 },
+    },
   },
 } satisfies Meta<typeof EvaluationCriteriaModalV2>
 
@@ -32,6 +47,52 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Kritéria hodnocení' }))
     const dialog = await within(document.body).findByRole('dialog')
     await expect(dialog).toHaveAccessibleName('Kritéria hodnocení kandidátů')
+  },
+}
+
+/**
+ * Jak se modal skládá. Statická ukázka bez stavu - přesně ty bloky, ze kterých
+ * `EvaluationCriteriaModalV2` renderuje editor: hlavička, tabulka (hlavička + řádek ve čtení +
+ * řádek v editaci), tlačítko „Přidat kritérium“ a patička. V záložce Show code je celé JSX.
+ */
+export const Composition: Story = {
+  parameters: {
+    controls: { disable: true },
+    docs: { story: { inline: false, iframeHeight: 720 } },
+  },
+  render: () => (
+    <Modal open>
+      <ModalContent size="wide">
+        <CriteriaModalHeader />
+        <ModalClose aria-label={EVALUATION_CRITERIA_COPY.close} />
+        <ModalBody className="tm-flex tm-flex-col tm-items-start tm-gap-2 tm-py-2">
+          <div className="tm-w-full">
+            <Table>
+              <CriteriaTableHead />
+              <TableBody>
+                <CriterionRow criterion={sampleEvaluationCriteria[0]} isEditDisabled />
+                <CriterionEditorRow
+                  text={sampleEvaluationCriteria[1].text}
+                  priority={sampleEvaluationCriteria[1].priority}
+                />
+              </TableBody>
+            </Table>
+          </div>
+          <Button variant="tertiary" isDisabled>
+            <Icon name="plus" />
+            {EVALUATION_CRITERIA_COPY.add}
+          </Button>
+        </ModalBody>
+        <CriteriaModalFooter isEditing />
+      </ModalContent>
+    </Modal>
+  ),
+  play: async () => {
+    const dialog = await within(document.body).findByRole('dialog', {
+      name: 'Kritéria hodnocení kandidátů',
+    })
+    await expect(within(dialog).getAllByTestId('evaluation-criterion-row')).toHaveLength(2)
+    await expect(within(dialog).getByRole('button', { name: 'Uložit' })).toBeDisabled()
   },
 }
 

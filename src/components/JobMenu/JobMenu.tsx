@@ -1,62 +1,54 @@
 import type { StyleProps } from '../../lib/types'
 import { JobCardActions } from '../JobShared/JobCardActions'
-import {
-  buildJobCardMenuSections,
-  type JobCardMenuHandlers,
-} from '../JobShared/jobCardMenu'
-import type { JobAdvertisement, JobCardAction } from '../JobShared/types'
+import type { JobAdvertisement } from '../JobShared/types'
+import { buildJobMenuItems, type JobMenuHandlers } from './jobMenuItems'
 
 export const JOB_MENU_LABEL = 'Akce nad náborem a inzerátem'
 
-export interface JobMenuProps extends StyleProps, JobCardMenuHandlers {
+export interface JobMenuProps extends StyleProps, JobMenuHandlers {
+  /** Advertisement actions (end, extend, top) are shown only when this is non-empty. */
   advertisements?: JobAdvertisement[]
-  actions?: JobCardAction[]
   label?: string
   testId?: string
 }
 
 export function JobMenu({
   advertisements,
-  actions,
   onEditJob,
   onDuplicateJob,
+  onEndPublication,
+  onExtendAndRepublish,
+  onTopAdvertisement,
   onInviteColleagues,
   onTransferJob,
   onArchiveJob,
-  onEditAdvertisement,
-  onExtendAndRepublish,
-  onEndPublication,
-  onHighlightAdvertisement,
-  onTopAdvertisement,
-  onCreateAdvertisement,
-  onAddNote,
   label = JOB_MENU_LABEL,
   testId = 'job-menu-toggle',
   className,
 }: JobMenuProps) {
-  const sections = buildJobCardMenuSections({
+  const items = buildJobMenuItems({
     advertisements,
-    actions,
     onEditJob,
     onDuplicateJob,
+    onEndPublication,
+    onExtendAndRepublish,
+    onTopAdvertisement,
     onInviteColleagues,
     onTransferJob,
     onArchiveJob,
-    onEditAdvertisement,
-    onExtendAndRepublish,
-    onEndPublication,
-    onHighlightAdvertisement,
-    onTopAdvertisement,
-    onCreateAdvertisement,
-    onAddNote,
   })
 
-  if (!sections.length) {
+  if (!items.length) {
     return null
   }
 
   return (
-    <JobCardActions sections={sections} label={label} testId={testId} className={className} />
+    <JobCardActions
+      sections={[{ id: 'job-menu', items }]}
+      label={label}
+      testId={testId}
+      className={className}
+    />
   )
 }
 

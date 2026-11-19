@@ -14,24 +14,21 @@ const meta = {
   component: JobMenu,
   args: {
     advertisements,
-    onEditAdvertisement: fn(),
-    onExtendAndRepublish: fn(),
-    onEndPublication: fn(),
-    onTopAdvertisement: fn(),
-    onCreateAdvertisement: fn(),
     onEditJob: fn(),
     onDuplicateJob: fn(),
+    onEndPublication: fn(),
+    onExtendAndRepublish: fn(),
+    onTopAdvertisement: fn(),
     onInviteColleagues: fn(),
     onTransferJob: fn(),
     onArchiveJob: fn(),
-    onAddNote: fn(),
   },
   parameters: {
     layout: 'padded',
   },
   decorators: [
     (Story) => (
-      <div className="tm-flex tm-justify-end tm-mb-[280px]">
+      <div className="tm-flex tm-justify-end tm-mb-[320px]">
         <Story />
       </div>
     ),
@@ -45,9 +42,18 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByTestId('job-menu-toggle'))
-    await expect(canvas.getByRole('option', { name: 'Prodloužit a znovu vystavit' })).toBeVisible()
-    await expect(canvas.getByRole('option', { name: 'Ukončit vystavení' })).toBeVisible()
-    await expect(canvas.getByRole('option', { name: 'Topovat' })).toBeVisible()
+    for (const name of [
+      'Editovat nábor',
+      'Duplikovat',
+      'Ukončit vystavování',
+      'Prodloužit a znovuvystavit',
+      'Topovat',
+      'Zapojit kolegu',
+      'Předat nábor',
+      'Archivovat',
+    ]) {
+      await expect(canvas.getByRole('option', { name })).toBeVisible()
+    }
   },
 }
 
@@ -58,7 +64,10 @@ export const NoAdvertisements: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByTestId('job-menu-toggle'))
-    await expect(canvas.getByRole('option', { name: 'Přidat inzerát' })).toBeVisible()
+    await expect(canvas.getByRole('option', { name: 'Editovat nábor' })).toBeVisible()
     await expect(canvas.queryByRole('option', { name: 'Topovat' })).not.toBeInTheDocument()
+    await expect(
+      canvas.queryByRole('option', { name: 'Ukončit vystavování' }),
+    ).not.toBeInTheDocument()
   },
 }

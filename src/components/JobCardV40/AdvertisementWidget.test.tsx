@@ -123,6 +123,8 @@ describe('AdvertisementWidget', () => {
     })
 
     const channels = screen.getByTestId('job-card-advertisement-publications')
+    expect(channels.className).toContain('tm-hidden')
+    expect(channels.className).toContain('md:tm-flex')
     expect(channels.className).toContain('tm-flex-col')
     expect(channels.className).not.toMatch(/(?:^|\s)tm-flex-row(?:\s|$)/)
   })
@@ -143,6 +145,8 @@ describe('AdvertisementWidget', () => {
     expect(heading).toHaveTextContent('1. 1. – 1. 2. 2026')
     expect(within(heading).queryByTestId('job-card-advertisement-heading-label')).not.toBeInTheDocument()
     expect(heading.compareDocumentPosition(channels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(channels.className).toContain('tm-hidden')
+    expect(channels.className).toContain('md:tm-flex')
     expect(channels.className).toContain('tm-flex-row')
     expect(channels.className).not.toContain('md:tm-flex-col')
     expect(channels.className).toContain('tm-gap-1')

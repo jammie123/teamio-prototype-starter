@@ -1,4 +1,6 @@
 import { forwardRef, type ReactNode } from 'react'
+import { cn } from '../../lib/cn'
+import { Button } from '../Button'
 import { Option } from '../OptionList'
 import { PageHeader, type PageHeaderProps } from '../PageHeader'
 import { SplitButton } from '../SplitButton'
@@ -21,11 +23,23 @@ export interface JobPageHeaderProps
   tabs?: ReactNode
   onAddJob?: () => void
   onAddBrigade?: () => void
+  /** When true, the bulk-edit toggle shows as active: Vypnout hromadné úpravy. */
+  bulkActionsActive?: boolean
+  onBulkActionsToggle?: () => void
 }
 
 export const JobPageHeader = forwardRef<HTMLElement, JobPageHeaderProps>(
   function JobPageHeader(
-    { title = 'Nábory', actions, tabs, onAddJob, onAddBrigade, ...rest },
+    {
+      title = 'Nábory',
+      actions,
+      tabs,
+      onAddJob,
+      onAddBrigade,
+      bulkActionsActive = false,
+      onBulkActionsToggle,
+      ...rest
+    },
     ref,
   ) {
     return (
@@ -34,13 +48,27 @@ export const JobPageHeader = forwardRef<HTMLElement, JobPageHeaderProps>(
         title={title}
         actions={
           actions ?? (
-            <SplitButton
-              label="Přidat nábor"
-              onClick={onAddJob}
-              menuLabel="Další možnosti přidání"
-            >
-              <Option onClick={onAddBrigade}>Přidat brigádu</Option>
-            </SplitButton>
+            <>
+              <SplitButton
+                label="Přidat nábor"
+                onClick={onAddJob}
+                menuLabel="Další možnosti přidání"
+              >
+                <Option onClick={onAddBrigade}>Přidat brigádu</Option>
+              </SplitButton>
+              <Button
+                variant="secondary"
+                data-testid="job-page-header-bulk-toggle"
+                aria-pressed={bulkActionsActive}
+                onClick={onBulkActionsToggle}
+                className={cn(
+                  bulkActionsActive &&
+                    '!tm-bg-interactive-active !tm-border-action-secondary-active',
+                )}
+              >
+                {bulkActionsActive ? 'Vypnout hromadné úpravy' : 'Hromadné akce'}
+              </Button>
+            </>
           )
         }
         tabs={tabs ?? defaultNaboryTabs()}

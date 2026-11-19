@@ -79,7 +79,11 @@ export function AdvertisementHeader({
           ) : null}
           <span
             data-testid="job-card-advertisement-heading-label"
-            className={cn(highlighted ? 'tm-text-base' : 'tm-text-sm', LABEL_WEIGHT[tone])}
+            className={cn(
+              highlighted ? 'tm-text-base' : 'tm-text-sm',
+              LABEL_WEIGHT[tone],
+              (tone === 'warning' || tone === 'ended') && 'tm-uppercase',
+            )}
           >
             {label}
           </span>

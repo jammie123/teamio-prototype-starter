@@ -33,6 +33,7 @@ describe('AdvertisementHeader', () => {
     expect(heading.className).toContain('md:tm-items-baseline')
     expect(heading.className).toContain('tm-text-emotion-warning-emphasis')
     expect(label.className).toContain('tm-font-semibold')
+    expect(label.className).toContain('tm-uppercase')
     expect(label.compareDocumentPosition(date) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(date.className).toContain('tm-font-normal')
     expect(date.className).toContain('tm-text-secondary-default')
@@ -89,6 +90,9 @@ describe('AdvertisementHeader', () => {
     expect(within(heading).getByTestId('job-card-advertisement-heading-label')).toHaveTextContent(
       'Expirováno',
     )
+    expect(within(heading).getByTestId('job-card-advertisement-heading-label').className).toContain(
+      'tm-uppercase',
+    )
     expect(heading).toHaveTextContent('Expirováno 1. 8. – 15. 8. 2026')
     expect(heading.className).toContain('tm-text-secondary-default')
   })
@@ -111,5 +115,8 @@ describe('AdvertisementHeader', () => {
     const heading = screen.getByTestId('job-card-advertisement-heading')
     expect(heading).toHaveTextContent('Zatím nevystavený inzerát')
     expect(heading.className).toContain('tm-text-secondary-default')
+    expect(within(heading).getByTestId('job-card-advertisement-heading-label').className).not.toContain(
+      'tm-uppercase',
+    )
   })
 })

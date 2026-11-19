@@ -39,7 +39,7 @@ export function AdvertisementStats({
     <div
       data-testid="job-card-advertisement-stats"
       className={cn(
-        'tm-mt-0 tm-flex tm-w-auto tm-shrink-0 tm-items-center tm-gap-2 tm-self-start tm-pt-0 md:tm-mt-auto md:tm-w-full md:tm-pt-4',
+        'tm-mt-0 tm-flex tm-w-full tm-shrink-0 tm-items-center tm-gap-2 tm-pt-4 md:tm-mt-auto',
         className,
       )}
     >

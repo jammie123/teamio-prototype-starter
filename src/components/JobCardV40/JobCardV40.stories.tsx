@@ -158,7 +158,6 @@ export const Draft: Story = {
     hiringManagers: ['Lukáš Procházka'],
     status: 'draft',
     lastChanged: '22. 8. 2026',
-    onCompleteDraft: fn(),
     candidates: undefined,
     advertisements: [],
     note: undefined,
@@ -187,5 +186,14 @@ export const ManyAssignees: Story = {
   name: 'Více zapojených lidí',
   args: {
     hiringManagers: ['Lukáš Procházka', 'Jana Svobodová', 'Tomáš Král'],
+  },
+}
+
+export const BulkAction: Story = {
+  name: 'Hromadné akce',
+  args: {
+    isBulkAction: true,
+    isSelected: false,
+    onBulkSelectChange: fn(),
   },
 }

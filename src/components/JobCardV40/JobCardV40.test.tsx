@@ -149,6 +149,11 @@ describe('JobCardV40', () => {
     expect(layoutRow).toContainElement(actions)
     expect(layoutRow).toContainElement(main)
     expect(layoutRow).toContainElement(advertisements)
+    expect(actions.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(title.compareDocumentPosition(headerActions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      headerActions.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(layoutRow.className).toContain('tm-flex-col')
     expect(layoutRow.className).toContain('md:tm-flex-row')
     expect(main.className).toContain('tm-gap-4')
@@ -159,12 +164,14 @@ describe('JobCardV40', () => {
     expect(headingRow).toContainElement(people)
     expect(headingRow).toContainElement(preview)
     expect(headingRow).not.toContainElement(pipeline)
-    expect(headingRow.className).toContain('tm-items-start')
-    expect(headingRow.className).not.toContain('tm-flex-col')
-    expect(headerActions.className).toContain('tm-ml-auto')
+    expect(headingRow.className).toContain('tm-flex-col')
+    expect(headingRow.className).toContain('md:tm-flex-row')
+    expect(headingRow.className).toContain('md:tm-items-start')
+    expect(headerActions.className).toContain('md:tm-ml-auto')
     expect(headerActions).toContainElement(people)
     expect(headerActions).toContainElement(preview)
     expect(preview.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(pipeline.className).toContain('tm-w-full')
     expect(pipeline.className).not.toContain('tm-ml-auto')
     expect(title.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(people.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -191,29 +198,28 @@ describe('JobCardV40', () => {
     const headingRow = screen.getByTestId('job-card-title-heading-row')
     const actions = screen.getByTestId('job-card-actions-toggle')
     const people = screen.getByTestId('job-card-people')
+    const toolbar = screen.getByTestId('job-card-toolbar')
     const cluster = main.parentElement
-    const menu = actions.parentElement
+    const menuWrap = toolbar.lastElementChild
 
     expect(headingRow).toContainElement(people)
     expect(headingRow).not.toContainElement(actions)
-    expect(cluster).toContainElement(actions)
+    expect(toolbar).toContainElement(actions)
+    expect(cluster).toContainElement(toolbar)
     expect(cluster).toContainElement(main)
-    expect(cluster?.className).toContain('tm-grid')
-    expect(cluster?.className).toContain('tm-grid-cols-[minmax(0,1fr)_auto]')
+    expect(cluster?.className).toContain('tm-flex-col')
+    expect(cluster?.className).toContain('md:tm-flex-row')
     expect(cluster?.className).toContain('tm-gap-3')
     expect(cluster?.className).toContain('tm-px-6')
     expect(cluster?.className).toContain('md:tm-gap-2')
     expect(cluster?.className).toContain('md:tm-px-4')
-    expect(cluster?.className).toContain('md:tm-flex')
-    expect(main.className).toContain('tm-col-start-1')
-    expect(menu?.className).toContain('tm-col-start-2')
-    expect(menu?.className).toContain('tm-self-start')
-    expect(menu?.className).toContain('tm--top-1')
-    expect(menu?.className).toContain('tm-border-l')
-    expect(menu?.className).toContain('tm-pl-3')
-    expect(menu?.className).toContain('md:tm-border-l-0')
-    expect(menu?.className).toContain('md:tm-pl-0')
-    expect(menu?.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(toolbar.className).toContain('tm-justify-end')
+    expect(toolbar.className).toContain('md:tm-contents')
+    expect(main.className).toContain('tm-w-full')
+    expect(menuWrap?.className).toContain('tm-size-8')
+    expect(menuWrap?.className).toContain('tm-self-start')
+    expect(menuWrap?.className).toContain('md:tm--top-1')
+    expect(toolbar.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('renders the pipeline stats via JobPipeline', () => {
@@ -275,10 +281,9 @@ describe('JobCardV40', () => {
     expect(layoutRow).toContainElement(column)
     expect(main).not.toContainElement(column)
     expect(column.className).toContain('tm-w-full')
-    expect(column.className).toContain('tm-flex-row')
-    expect(column.className).toContain('tm-items-start')
-    expect(column.className).toContain('md:tm-items-stretch')
-    expect(column.className).toContain('md:tm-flex-col')
+    expect(column.className).toContain('tm-flex-col')
+    expect(column.className).toContain('tm-items-stretch')
+    expect(column.className).not.toContain('tm-flex-row')
     expect(column.className).toContain('md:tm-w-[450px]')
     expect(column.className).not.toContain('md:tm-w-[350px]')
     expect(column.className).toContain('tm-border-t')
@@ -297,12 +302,15 @@ describe('JobCardV40', () => {
       '1. 1. – 1. 2. 2026',
     )
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
+    const publications = within(column).getByTestId('job-card-advertisement-publications')
+    expect(publications.className).toContain('tm-hidden')
+    expect(publications.className).toContain('md:tm-flex')
     const stats = within(column).getByTestId('job-card-advertisement-stats')
     expect(advertisement).not.toContainElement(stats)
     expect(stats.className).toContain('tm-mt-0')
-    expect(stats.className).toContain('tm-pt-0')
+    expect(stats.className).toContain('tm-w-full')
+    expect(stats.className).toContain('tm-pt-4')
     expect(stats.className).toContain('md:tm-mt-auto')
-    expect(stats.className).toContain('md:tm-pt-4')
     expect(stats.className).not.toContain('tm-pt-2')
     expect(stats).toHaveTextContent('Přehled')
     expect(
@@ -319,60 +327,44 @@ describe('JobCardV40', () => {
     expect(advertisements[1].className).toContain('tm-border-t')
   })
 
-  it('renders a compact draft row with last change and a primary Dokončit button', async () => {
-    const user = userEvent.setup()
-    const onCompleteDraft = vi.fn()
+  it('renders draft last-change meta under the title without a Dokončit link', () => {
     renderJobCard({
       status: 'draft',
       lastChanged: '22. 8. 2026',
-      onCompleteDraft,
     })
 
     const cluster = screen.getByTestId('job-card-main').parentElement
     const headingRow = screen.getByTestId('job-card-title-heading-row')
+    const title = screen.getByTestId('job-card-title')
     const lastChanged = screen.getByTestId('job-card-last-changed')
-    const complete = screen.getByTestId('job-card-complete-draft')
     const people = screen.getByTestId('job-card-people')
     const meta = screen.getByTestId('job-card-draft-meta')
 
     expect(screen.queryByTestId('job-card-advertisements')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-pipeline')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-complete-draft')).not.toBeInTheDocument()
     expect(cluster?.className).toContain('tm-py-3')
-    expect(cluster?.className).toContain('tm-items-center')
     expect(cluster?.className).not.toContain('tm-py-6')
-    expect(headingRow.className).toContain('tm-items-center')
-    expect(headingRow.className).not.toContain('tm-pr-')
     expect(headingRow).toContainElement(people)
     expect(headingRow).toContainElement(screen.getByTestId('job-card-header-advertisement-preview'))
-    expect(headingRow).not.toContainElement(meta)
+    expect(headingRow).toContainElement(meta)
+    expect(title.compareDocumentPosition(meta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(lastChanged).toHaveTextContent('Poslední změna')
     expect(lastChanged).toHaveTextContent('22. 8. 2026')
     expect(lastChanged).not.toHaveTextContent('Poslední změna:')
-    expect(lastChanged.className).toContain('tm-flex-col')
+    expect(lastChanged.className).toContain('tm-flex-row')
+    expect(lastChanged.className).not.toContain('tm-flex-col')
     expect(lastChanged.className).toContain('tm-text-secondary-default')
-    expect(complete).toHaveTextContent('Dokončit')
-    expect(complete).not.toHaveTextContent('Dokončit nábor')
-    expect(complete).toHaveClass('tm-bg-action-primary-default')
-    expect(meta.className).toContain('tm-w-full')
-    expect(meta.className).toContain('md:tm-w-[450px]')
-    expect(meta.className).toContain('tm-ml-4')
-    expect(meta.className).toContain('tm-justify-between')
-    expect(meta.className).toContain('tm-border-t')
-    expect(meta.className).toContain('md:tm-border-l')
-    expect(meta.className).toContain('md:tm-border-t-0')
-    expect(people.compareDocumentPosition(meta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(lastChanged.compareDocumentPosition(complete) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-
-    await user.click(complete)
-    expect(onCompleteDraft).toHaveBeenCalledOnce()
+    expect(meta.className).not.toContain('md:tm-w-[450px]')
   })
 
-  it('keeps Dokončit on a draft when lastChanged is missing', () => {
+  it('omits draft meta when lastChanged is missing', () => {
     renderJobCard({ status: 'draft' })
 
     expect(screen.queryByTestId('job-card-last-changed')).not.toBeInTheDocument()
-    expect(screen.getByTestId('job-card-complete-draft')).toHaveTextContent('Dokončit')
+    expect(screen.queryByTestId('job-card-draft-meta')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-complete-draft')).not.toBeInTheDocument()
   })
 
   it('offers a primary Znovuvystavit button on an ended advertisement', async () => {
@@ -537,23 +529,20 @@ describe('JobCardV40', () => {
     expect(screen.getByTestId('job-card').className).toContain('!tm-bg-basic/50')
   })
 
-  it('replaces the advertisement column with Náhled for a Hiring Manager', async () => {
-    const user = userEvent.setup()
-    const onAdvertisementPreviewClick = vi.fn()
+  it('hides the advertisement column for a Hiring Manager and keeps preview in the header', () => {
     renderJobCard({
       isHiringManager: true,
       candidates: { toAssess: 4, total: 52 },
-      onAdvertisementPreviewClick,
     })
 
     expect(screen.queryByTestId('job-card-advertisements')).not.toBeInTheDocument()
     expect(screen.queryByTestId('job-card-note')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-hm-preview')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('job-card-advertisement-preview-action')).not.toBeInTheDocument()
+    expect(screen.getByTestId('job-card-header-advertisement-preview')).toBeInTheDocument()
     const stats = within(screen.getByTestId('job-card-pipeline')).getByTestId('job-card-stats')
     expect(within(stats).getByText('K ohodnocení')).toBeInTheDocument()
     expect(within(stats).getByText('Celkem')).toBeInTheDocument()
-
-    await user.click(screen.getByTestId('job-card-advertisement-preview-action'))
-    expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
   })
 
   it('collapses a job with every portal into five portals and "+ 4 dalších" in the 450px column', async () => {
@@ -606,5 +595,55 @@ describe('JobCardV40', () => {
     fireEvent.click(within(actions).getByRole('button', { name: 'Zvýraznit' }))
     expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
     expect(onHighlightAdvertisement).toHaveBeenCalledOnce()
+  })
+
+  it('hides the bulk-select checkbox until isBulkAction is on', () => {
+    renderJobCard()
+
+    expect(screen.queryByTestId('job-card-bulk-select')).not.toBeInTheDocument()
+  })
+
+  it('shows a left checkbox while bulk editing and reports selection changes', async () => {
+    const user = userEvent.setup()
+    const onBulkSelectChange = vi.fn()
+    renderJobCard({ isBulkAction: true, isSelected: false, onBulkSelectChange })
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Vybrat nábor Řidič/ka sk. C ČB PO–PÁ' })
+    const toolbar = screen.getByTestId('job-card-toolbar')
+    const main = screen.getByTestId('job-card-main')
+    const menu = screen.getByTestId('job-card-actions-toggle')
+
+    expect(checkbox).toHaveAttribute('data-testid', 'job-card-bulk-select')
+    expect(checkbox).not.toBeChecked()
+    expect(toolbar).toContainElement(checkbox)
+    expect(toolbar).toContainElement(menu)
+    expect(toolbar.firstElementChild?.className).toContain('tm-mr-auto')
+    expect(toolbar.firstElementChild?.className).toContain('md:tm-mr-0')
+    expect(
+      checkbox.compareDocumentPosition(menu) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      checkbox.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+
+    await user.click(checkbox)
+    expect(onBulkSelectChange).toHaveBeenCalledWith(true)
+  })
+
+  it('checks the bulk-select checkbox when the job is selected', () => {
+    renderJobCard({ isBulkAction: true, isSelected: true })
+
+    expect(screen.getByTestId('job-card-bulk-select')).toBeChecked()
+  })
+
+  it('keeps JobMenu on the toolbar while bulk editing is on', () => {
+    renderJobCard({ isBulkAction: true })
+
+    const toolbar = screen.getByTestId('job-card-toolbar')
+    const checkbox = screen.getByTestId('job-card-bulk-select')
+    const menu = screen.getByTestId('job-card-actions-toggle')
+
+    expect(toolbar).toContainElement(checkbox)
+    expect(toolbar).toContainElement(menu)
   })
 })

@@ -37,6 +37,7 @@ const preview: Preview = {
             'JobModals',
             'JobPageHeader',
             ['V1'],
+            'JobBulkAction',
             'JobsFilter',
             ['V2'],
           ],

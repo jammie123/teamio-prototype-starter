@@ -1,13 +1,11 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
-import { Button } from '../Button'
 import { Card } from '../Card'
-import { Icon } from '../Icon'
+import { Checkbox } from '../Checkbox'
 import { JobMenu } from '../JobMenu'
 import type { JobCardMenuHandlers } from '../JobShared/jobCardMenu'
 import { JobCardAdvertisements } from './JobCardAdvertisements'
-import { JobCardDraftMeta } from './JobCardDraftMeta'
 import { JobCardHeader } from './JobCardHeader'
 import { buildJobCardAdvertisements } from './lib/jobCardAdvertisements'
 import { JobNote } from './JobNote'
@@ -25,7 +23,7 @@ export interface JobCardV40Props
   hiringManagers?: string[]
   /**
    * published = running job, unpublished = ended by the recruiter ("Ukončené vystavování"),
-   * archived = "Archivní" pill with ended advertisements, draft = compact row with Dokončit.
+   * archived = "Archivní" pill with ended advertisements, draft = compact row with last change.
    */
   status?: JobStatus
   candidates?: JobCardCandidates
@@ -42,12 +40,15 @@ export interface JobCardV40Props
   onAdvertisementPreviewClick?: () => void
   /** Pre-formatted Czech date shown on a draft (`3. 11. 2026`). */
   lastChanged?: string
-  onCompleteDraft?: () => void
   /**
-   * Hiring Manager view: pipeline shows K ohodnocení / Celkem and the advertisement column
-   * is replaced by a single Náhled button under the job. The note is not shown.
+   * Hiring Manager view: pipeline shows K ohodnocení / Celkem, the advertisement column
+   * is hidden, and the note is not shown. Preview stays in the header capsule.
    */
   isHiringManager?: boolean
+  /** Shows a leading checkbox so the job can be included in bulk actions. */
+  isBulkAction?: boolean
+  isSelected?: boolean
+  onBulkSelectChange?: (selected: boolean) => void
 }
 
 /**
@@ -85,8 +86,10 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
     onAdvertisementDetailClick,
     onAdvertisementPreviewClick,
     lastChanged,
-    onCompleteDraft,
     isHiringManager = false,
+    isBulkAction = false,
+    isSelected = false,
+    onBulkSelectChange,
     now,
     className,
     ...rest
@@ -97,7 +100,6 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
   const isArchived = status === 'archived'
   const hasAdvertisementStatus = status === 'published' || status === 'unpublished' || isArchived
   const showAdvertisements = hasAdvertisementStatus && !isHiringManager
-  const showHiringManagerPreview = hasAdvertisementStatus && isHiringManager
   const showAdMenuActions = hasAdvertisementStatus && !isArchived && !isDraft
   const advertisementColumn = buildJobCardAdvertisements(
     hasAdvertisementStatus ? status : 'published',
@@ -129,34 +131,55 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
       >
         <div
           className={cn(
-            'tm-grid tm-min-w-0 tm-flex-1 tm-grid-cols-[minmax(0,1fr)_auto] tm-gap-3 tm-px-6 md:tm-flex md:tm-gap-2 md:tm-px-4',
-            isDraft ? 'tm-items-center tm-py-3' : 'tm-py-6',
+            'tm-flex tm-min-w-0 tm-flex-1 tm-flex-col tm-gap-3 tm-px-6 md:tm-flex-row md:tm-gap-2 md:tm-px-4',
+            isDraft ? 'tm-items-stretch tm-py-3 md:tm-items-center' : 'tm-py-6',
           )}
         >
-          <JobMenu
-            advertisements={showAdMenuActions ? advertisements : []}
-            label="Akce nad náborem a inzerátem"
-            testId="job-card-actions-toggle"
+          <div
+            data-testid="job-card-toolbar"
             className={cn(
-              'tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0',
-              isDraft ? 'tm-self-center' : 'tm-self-start tm--top-1',
+              'tm-flex tm-w-full tm-shrink-0 tm-items-center tm-justify-end md:tm-contents',
+              isDraft ? 'md:tm-self-center' : 'md:tm-self-start',
             )}
-            onEditJob={onEditJob}
-            onDuplicateJob={onDuplicateJob}
-            onInviteColleagues={onInviteColleagues}
-            onTransferJob={onTransferJob}
-            onArchiveJob={onArchiveJob}
-            onExtendAndRepublish={showAdMenuActions ? onExtendAndRepublish : undefined}
-            onEndPublication={showAdMenuActions ? onEndPublication : undefined}
-            onTopAdvertisement={showAdMenuActions ? onTopAdvertisement : undefined}
-          />
+          >
+            {isBulkAction ? (
+              <Checkbox
+                data-testid="job-card-bulk-select"
+                aria-label={`Vybrat nábor ${title}`}
+                checked={isSelected}
+                onChange={(event) => onBulkSelectChange?.(event.target.checked)}
+                className={cn(
+                  'tm-mr-auto tm-shrink-0 md:tm-mr-0',
+                  isDraft ? 'tm-self-center' : 'tm-self-start',
+                )}
+              />
+            ) : null}
+            <div
+              className={cn(
+                'tm-flex tm-size-8 tm-shrink-0 tm-items-center tm-justify-center',
+                isDraft ? 'tm-self-center' : 'tm-self-start md:tm--top-1',
+              )}
+            >
+              <JobMenu
+                advertisements={showAdMenuActions ? advertisements : []}
+                label="Akce nad náborem a inzerátem"
+                testId="job-card-actions-toggle"
+                onEditJob={onEditJob}
+                onDuplicateJob={onDuplicateJob}
+                onInviteColleagues={onInviteColleagues}
+                onTransferJob={onTransferJob}
+                onArchiveJob={onArchiveJob}
+                onExtendAndRepublish={showAdMenuActions ? onExtendAndRepublish : undefined}
+                onEndPublication={showAdMenuActions ? onEndPublication : undefined}
+                onTopAdvertisement={showAdMenuActions ? onTopAdvertisement : undefined}
+              />
+            </div>
+          </div>
           <div
             data-testid="job-card-main"
             className={cn(
-              'tm-col-start-1 tm-row-start-1 tm-flex tm-min-w-0 tm-flex-1',
-              isDraft
-                ? 'tm-flex-col tm-items-stretch md:tm-flex-row md:tm-items-center'
-                : 'tm-flex-col tm-gap-4',
+              'tm-flex tm-min-w-0 tm-w-full tm-flex-1',
+              isDraft ? 'tm-flex-col tm-items-stretch' : 'tm-flex-col tm-gap-4',
             )}
           >
             <JobCardHeader
@@ -166,15 +189,14 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
               hiringManagers={hiringManagers}
               onInviteColleagues={onInviteColleagues}
               onAdvertisementPreviewClick={onAdvertisementPreviewClick}
+              lastChanged={lastChanged}
               isDraft={isDraft}
               isArchived={isArchived}
             />
-            {isDraft ? (
-              <JobCardDraftMeta lastChanged={lastChanged} onCompleteDraft={onCompleteDraft} />
-            ) : (
+            {!isDraft ? (
               <>
                 {candidates ? (
-                  <div data-testid="job-card-pipeline" className="tm-shrink-0">
+                  <div data-testid="job-card-pipeline" className="tm-w-full tm-shrink-0">
                     <JobPipeline
                       candidates={candidates}
                       onStatClick={onCandidatesClick}
@@ -185,24 +207,8 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
                 {hasNote && !isHiringManager ? (
                   <JobNote note={note as JobCardNote} onExpand={onExpandNote} className="tm-w-full" />
                 ) : null}
-                {showHiringManagerPreview ? (
-                  <div
-                    data-testid="job-card-hm-preview"
-                    className="tm-flex tm-w-full tm-justify-start"
-                  >
-                    <Button
-                      variant="secondary"
-                      aria-label="Náhled inzerátu"
-                      data-testid="job-card-advertisement-preview-action"
-                      onClick={onAdvertisementPreviewClick}
-                    >
-                      <Icon name="advertisement-preview" size={16} aria-hidden />
-                      Náhled
-                    </Button>
-                  </div>
-                ) : null}
               </>
-            )}
+            ) : null}
           </div>
         </div>
 

@@ -60,20 +60,21 @@ export function JobPreviewPublicationsList({
               'tm-cursor-pointer',
               'tm-items-center',
               'tm-justify-center',
-              'tm-rounded-full',
+              'tm-rounded',
               'tm-border-2',
+              'tm-border-solid',
               'tm-p-0',
               'focus-visible:tm-ring',
               'focus-visible:tm-outline-0',
               isActive
-                ? 'tm-border-active tm-bg-interactive-active'
+                ? 'tm-border-active tm-bg-basic tm-shadow-sm'
                 : 'tm-border-transparent tm-bg-cover-default hover:tm-bg-interactive-hover',
             )}
           >
             <JobPortalLogo
               type={publication.logoType ?? jobPortalLogoTypeFromChannel(publication.name)}
               title=""
-              className="tm-size-8"
+              className={cn('tm-size-8', !isActive && 'tm-opacity-60')}
             />
           </button>
         )

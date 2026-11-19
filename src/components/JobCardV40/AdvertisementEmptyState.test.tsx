@@ -30,25 +30,25 @@ describe('AdvertisementEmptyState', () => {
       'Mrkněte, jak by váš inzerát vypadal. Relevantní kandidáti z našich portálů se pak ozvou rychle.',
     )
     expect(root.className).not.toContain('tm-bg-emotion-info-background')
-    expect(root.className).toContain('tm-grid-cols-[minmax(0,1fr)_auto]')
-    expect(root.className).toContain('md:tm-grid-cols-1')
+    expect(root.className).toContain('tm-flex-col')
+    expect(root.className).not.toContain('tm-grid-cols-[minmax(0,1fr)_auto]')
     expect(within(root).getByTestId('job-card-advertisement-empty-title').className).toContain(
       'tm-text-sm',
     )
     expect(within(root).getByTestId('job-card-advertisement-empty-title').className).not.toContain(
       'tm-text-base',
     )
-    expect(actions.className).toContain('tm-col-start-2')
-    expect(actions.className).not.toContain('tm-col-start-3')
     expect(actions.className).toContain('tm-flex-row')
     expect(actions.className).not.toContain('tm-flex-col')
-    expect(actions.className).toContain('md:tm-w-full')
+    expect(actions.className).toContain('tm-w-full')
     expect(preview).toHaveClass('tm-bg-basic')
     expect(preview).toHaveClass('tm-border-action-secondary-default')
-    expect(preview).toHaveClass('tm-min-h-8')
+    expect(preview).toHaveClass('!tm-min-h-7', '!tm-px-3')
+    expect(preview).not.toHaveClass('tm-min-h-8')
     expect(preview.className).not.toContain('md:tm-w-full')
     expect(publish).toHaveClass('tm-bg-action-primary-default')
-    expect(publish).toHaveClass('tm-min-h-8')
+    expect(publish).toHaveClass('!tm-min-h-7', '!tm-px-3')
+    expect(publish).not.toHaveClass('tm-min-h-8')
     expect(publish).not.toHaveClass('tm-min-h-10')
     expect(publish.className).not.toContain('md:tm-w-full')
     expect(preview.compareDocumentPosition(publish) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()

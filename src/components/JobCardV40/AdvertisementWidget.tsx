@@ -90,7 +90,7 @@ export function AdvertisementWidget({
           <div
             data-testid="job-card-advertisement-publications"
             className={cn(
-              'tm-m-0 tm-flex tm-min-w-0 tm-w-full tm-flex-wrap tm-items-start tm-gap-1 tm-p-0',
+              'tm-m-0 tm-hidden tm-min-w-0 tm-w-full tm-flex-wrap tm-items-start tm-gap-1 tm-p-0 md:tm-flex',
               model.sharedDates ? 'tm-flex-row' : 'tm-flex-col',
             )}
           >

@@ -3,6 +3,7 @@ import type { StyleProps } from '../../lib/types'
 import { Pill } from '../Pill'
 import { JobAdvertisementPreview } from './JobAdvertisementPreview'
 import { JobAssignee } from './JobAssignee'
+import { JobCardDraftMeta } from './JobCardDraftMeta'
 
 export interface JobCardHeaderProps extends StyleProps {
   title: string
@@ -12,6 +13,7 @@ export interface JobCardHeaderProps extends StyleProps {
   hiringManagers?: string[]
   onInviteColleagues?: () => void
   onAdvertisementPreviewClick?: () => void
+  lastChanged?: string
   /** Draft rows are compact: the title is vertically centered with the assignees. */
   isDraft?: boolean
   /** Shows the "Archivní" pill after the title. */
@@ -26,6 +28,7 @@ export function JobCardHeader({
   hiringManagers,
   onInviteColleagues,
   onAdvertisementPreviewClick,
+  lastChanged,
   isDraft = false,
   isArchived = false,
   className,
@@ -34,44 +37,47 @@ export function JobCardHeader({
     <div
       data-testid="job-card-title-heading-row"
       className={cn(
-        'tm-flex tm-min-w-0 tm-w-full tm-gap-3',
-        isDraft ? 'tm-flex-1 tm-items-center' : 'tm-items-start',
+        'tm-flex tm-min-w-0 tm-w-full tm-flex-col tm-gap-3 md:tm-flex-row',
+        isDraft ? 'tm-flex-1 md:tm-items-center' : 'md:tm-items-start',
         className,
       )}
     >
-      <div className="tm-flex tm-min-w-0 tm-flex-1 tm-flex-wrap tm-items-baseline tm-gap-x-2">
-        <h3
-          data-testid="job-card-title"
-          className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-medium tm-leading-tight tm-text-teamio-blue"
-        >
-          {title}
-        </h3>
-        {department ? (
-          <span className="tm-inline-flex tm-items-baseline tm-gap-x-2">
-            <span
-              data-testid="job-card-department-separator"
-              className="tm-text-sm tm-text-secondary-default"
-              aria-hidden
-            >
-              ·
+      <div className="tm-flex tm-min-w-0 tm-w-full tm-flex-col tm-gap-1 md:tm-flex-1">
+        <div className="tm-flex tm-min-w-0 tm-flex-wrap tm-items-baseline tm-gap-x-2">
+          <h3
+            data-testid="job-card-title"
+            className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-medium tm-leading-tight tm-text-teamio-blue"
+          >
+            {title}
+          </h3>
+          {department ? (
+            <span className="tm-inline-flex tm-items-baseline tm-gap-x-2">
+              <span
+                data-testid="job-card-department-separator"
+                className="tm-text-sm tm-text-secondary-default"
+                aria-hidden
+              >
+                ·
+              </span>
+              <span
+                data-testid="job-card-department"
+                className="tm-text-sm tm-text-secondary-default"
+              >
+                {department}
+              </span>
             </span>
-            <span
-              data-testid="job-card-department"
-              className="tm-text-sm tm-text-secondary-default"
-            >
-              {department}
-            </span>
-          </span>
-        ) : null}
-        {isArchived ? (
-          <Pill color="tertiary" data-testid="job-card-archived-pill">
-            Archivní
-          </Pill>
-        ) : null}
+          ) : null}
+          {isArchived ? (
+            <Pill color="tertiary" data-testid="job-card-archived-pill">
+              Archivní
+            </Pill>
+          ) : null}
+        </div>
+        {isDraft && lastChanged ? <JobCardDraftMeta lastChanged={lastChanged} /> : null}
       </div>
       <div
         data-testid="job-card-header-actions"
-        className="tm-ml-auto tm-flex tm-shrink-0 tm-items-center tm-gap-2"
+        className="tm-flex tm-shrink-0 tm-items-center tm-gap-2 md:tm-ml-auto"
       >
         <JobAdvertisementPreview onClick={onAdvertisementPreviewClick} />
         <JobAssignee

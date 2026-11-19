@@ -31,4 +31,36 @@ describe('JobPageHeader', () => {
     await user.click(screen.getByRole('option', { name: 'Přidat brigádu' }))
     expect(onAddBrigade).toHaveBeenCalledTimes(1)
   })
+
+  it('renders a secondary Hromadné akce toggle to the right of Přidat nábor', async () => {
+    const user = userEvent.setup()
+    const onBulkActionsToggle = vi.fn()
+
+    render(
+      <Tabs defaultValue="aktivni">
+        <JobPageHeader onBulkActionsToggle={onBulkActionsToggle} />
+      </Tabs>,
+    )
+
+    const bulkToggle = screen.getByRole('button', { name: 'Hromadné akce' })
+    expect(bulkToggle).toHaveAttribute('aria-pressed', 'false')
+    expect(bulkToggle.className).toContain('tm-bg-basic')
+
+    await user.click(bulkToggle)
+    expect(onBulkActionsToggle).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows Vypnout hromadné úpravy as the active toggle while bulk editing is on', () => {
+    render(
+      <Tabs defaultValue="aktivni">
+        <JobPageHeader bulkActionsActive onBulkActionsToggle={vi.fn()} />
+      </Tabs>,
+    )
+
+    const bulkToggle = screen.getByRole('button', { name: 'Vypnout hromadné úpravy' })
+    expect(screen.queryByRole('button', { name: 'Hromadné akce' })).not.toBeInTheDocument()
+    expect(bulkToggle).toHaveAttribute('aria-pressed', 'true')
+    expect(bulkToggle.className).toContain('tm-bg-interactive-active')
+    expect(bulkToggle.className).toContain('tm-border-action-secondary-active')
+  })
 })

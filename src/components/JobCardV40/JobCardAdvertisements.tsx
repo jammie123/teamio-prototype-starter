@@ -53,7 +53,7 @@ export function JobCardAdvertisements({
     <div
       data-testid="job-card-advertisements"
       className={cn(
-        'tm-flex tm-w-full tm-shrink-0 tm-flex-row tm-items-start tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-px-6 tm-py-6 md:tm-flex-col md:tm-items-stretch md:tm-border-t-0 md:tm-border-l',
+        'tm-flex tm-w-full tm-shrink-0 tm-flex-col tm-items-stretch tm-border-0 tm-border-t tm-border-solid tm-border-secondary tm-px-6 tm-py-6 md:tm-border-t-0 md:tm-border-l',
         JOB_CARD_SIDE_COLUMN_WIDTH,
         className,
       )}

@@ -27,6 +27,7 @@ export { JobModalPublish, type JobModalPublishProps } from './JobModalPublish'
 export { JobModalBoost, type JobModalBoostProps } from './JobModalBoost'
 export { JobModalTop, type JobModalTopProps } from './JobModalTop'
 export { JobPreviewModal, type JobPreviewModalProps } from './JobPreviewModal'
+export { SampleJobPreviewAdvertisement } from './SampleJobPreviewAdvertisement'
 export {
   JobPreviewPublicationsList,
   type JobPreviewPublicationsListProps,

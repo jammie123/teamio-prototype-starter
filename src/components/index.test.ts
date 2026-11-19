@@ -140,6 +140,7 @@ describe('components barrel', () => {
     expect(components.JobModalBoost).toBeTypeOf('function')
     expect(components.JobModalTop).toBeTypeOf('function')
     expect(components.JobPreviewModal).toBeTypeOf('function')
+    expect(components.SampleJobPreviewAdvertisement).toBeTypeOf('function')
     expect(components.EvaluationCriteriaModal).toBeTypeOf('function')
     expect(components.EvaluationCriteriaModalV2).toBeTypeOf('function')
     expect(components.EvaluationCriterionDetailModal).toBeTypeOf('function')

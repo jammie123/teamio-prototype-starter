@@ -271,6 +271,7 @@ export {
   JobModalBoost,
   JobModalTop,
   JobPreviewModal,
+  SampleJobPreviewAdvertisement,
   JobPreviewPublicationsList,
   JobPreviewUrlBar,
   JOB_PREVIEW_COPY,

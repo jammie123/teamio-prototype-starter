@@ -182,3 +182,10 @@ export const PresentationUnit: Story = {
   name: 'Prezentační jednotka',
   args: { department: 'České Budějovice' },
 }
+
+export const ManyAssignees: Story = {
+  name: 'Více zapojených lidí',
+  args: {
+    hiringManagers: ['Lukáš Procházka', 'Jana Svobodová', 'Tomáš Král'],
+  },
+}

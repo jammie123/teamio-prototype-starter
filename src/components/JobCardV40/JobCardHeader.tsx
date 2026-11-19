@@ -1,6 +1,7 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Pill } from '../Pill'
+import { JobAdvertisementPreview } from './JobAdvertisementPreview'
 import { JobAssignee } from './JobAssignee'
 
 export interface JobCardHeaderProps extends StyleProps {
@@ -10,19 +11,21 @@ export interface JobCardHeaderProps extends StyleProps {
   owner?: string
   hiringManagers?: string[]
   onInviteColleagues?: () => void
+  onAdvertisementPreviewClick?: () => void
   /** Draft rows are compact: the title is vertically centered with the assignees. */
   isDraft?: boolean
   /** Shows the "Archivní" pill after the title. */
   isArchived?: boolean
 }
 
-/** Title row of the job card: title, optional department and the assignee avatars. */
+/** Title row of the job card: title, optional department, Náhled icon and assignee pill. */
 export function JobCardHeader({
   title,
   department,
   owner,
   hiringManagers,
   onInviteColleagues,
+  onAdvertisementPreviewClick,
   isDraft = false,
   isArchived = false,
   className,
@@ -66,12 +69,18 @@ export function JobCardHeader({
           </Pill>
         ) : null}
       </div>
-      <JobAssignee
-        owner={owner}
-        hiringManagers={hiringManagers}
-        onInviteMore={onInviteColleagues}
-        className="tm-ml-auto tm-shrink-0"
-      />
+      <div
+        data-testid="job-card-header-actions"
+        className="tm-ml-auto tm-flex tm-shrink-0 tm-items-center tm-gap-2"
+      >
+        <JobAdvertisementPreview onClick={onAdvertisementPreviewClick} />
+        <JobAssignee
+          owner={owner}
+          hiringManagers={hiringManagers}
+          onInviteMore={onInviteColleagues}
+          className="tm-shrink-0"
+        />
+      </div>
     </div>
   )
 }

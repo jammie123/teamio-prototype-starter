@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobCardV40, type JobCardV40Props } from './JobCardV40'
@@ -141,6 +141,8 @@ describe('JobCardV40', () => {
     const actions = screen.getByTestId('job-card-actions-toggle')
     const pipeline = screen.getByTestId('job-card-pipeline')
     const people = screen.getByTestId('job-card-people')
+    const headerActions = screen.getByTestId('job-card-header-actions')
+    const preview = screen.getByTestId('job-card-header-advertisement-preview')
     const title = screen.getByTestId('job-card-title')
     const advertisements = screen.getByTestId('job-card-advertisements')
 
@@ -155,13 +157,31 @@ describe('JobCardV40', () => {
     expect(main).not.toContainElement(advertisements)
     expect(headingRow).toContainElement(title)
     expect(headingRow).toContainElement(people)
+    expect(headingRow).toContainElement(preview)
     expect(headingRow).not.toContainElement(pipeline)
     expect(headingRow.className).toContain('tm-items-start')
     expect(headingRow.className).not.toContain('tm-flex-col')
-    expect(people.parentElement?.className).toContain('tm-ml-auto')
+    expect(headerActions.className).toContain('tm-ml-auto')
+    expect(headerActions).toContainElement(people)
+    expect(headerActions).toContainElement(preview)
+    expect(preview.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(pipeline.className).not.toContain('tm-ml-auto')
     expect(title.compareDocumentPosition(people) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(people.compareDocumentPosition(pipeline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('opens the advertisement preview from the header Náhled capsule', async () => {
+    const user = userEvent.setup()
+    const onAdvertisementPreviewClick = vi.fn()
+    renderJobCard({ onAdvertisementPreviewClick })
+
+    const preview = screen.getByTestId('job-card-header-advertisement-preview')
+    await user.hover(preview)
+    await waitFor(() => {
+      expect(screen.getByRole('tooltip')).toHaveTextContent('Náhled inzerátu')
+    })
+    await user.click(preview)
+    expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
   })
 
   it('places the actions menu to the right of assignees below md and left of the title from md up', () => {
@@ -324,6 +344,7 @@ describe('JobCardV40', () => {
     expect(headingRow.className).toContain('tm-items-center')
     expect(headingRow.className).not.toContain('tm-pr-')
     expect(headingRow).toContainElement(people)
+    expect(headingRow).toContainElement(screen.getByTestId('job-card-header-advertisement-preview'))
     expect(headingRow).not.toContainElement(meta)
     expect(lastChanged).toHaveTextContent('Poslední změna')
     expect(lastChanged).toHaveTextContent('22. 8. 2026')

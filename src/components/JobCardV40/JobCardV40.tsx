@@ -4,12 +4,12 @@ import type { StyleProps } from '../../lib/types'
 import { Button } from '../Button'
 import { Card } from '../Card'
 import { Icon } from '../Icon'
-import { JobCardActions } from './JobCardActions'
+import { JobMenu } from '../JobMenu'
+import type { JobCardMenuHandlers } from '../JobShared/jobCardMenu'
 import { JobCardAdvertisements } from './JobCardAdvertisements'
 import { JobCardDraftMeta } from './JobCardDraftMeta'
 import { JobCardHeader } from './JobCardHeader'
 import { buildJobCardAdvertisements } from './lib/jobCardAdvertisements'
-import { buildJobCardMenuSections, type JobCardMenuHandlers } from './jobCardMenu'
 import { JobNote } from './JobNote'
 import { JobPipeline } from './JobPipeline'
 import type { JobAdvertisement, JobCandidateStat, JobCardCandidates, JobCardNote, JobStatus } from './types'
@@ -98,24 +98,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
   const hasAdvertisementStatus = status === 'published' || status === 'unpublished' || isArchived
   const showAdvertisements = hasAdvertisementStatus && !isHiringManager
   const showHiringManagerPreview = hasAdvertisementStatus && isHiringManager
-  const menuSections = buildJobCardMenuSections({
-    onEditJob,
-    onDuplicateJob,
-    onInviteColleagues,
-    onTransferJob,
-    onArchiveJob,
-    ...(hasAdvertisementStatus && !isArchived
-      ? {
-          advertisements,
-          onEditAdvertisement,
-          onExtendAndRepublish,
-          onEndPublication,
-          onHighlightAdvertisement,
-          onTopAdvertisement,
-          onCreateAdvertisement,
-        }
-      : {}),
-  })
+  const showAdMenuActions = hasAdvertisementStatus && !isArchived && !isDraft
   const advertisementColumn = buildJobCardAdvertisements(
     hasAdvertisementStatus ? status : 'published',
     hasAdvertisementStatus ? advertisements : [],
@@ -150,17 +133,23 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
             isDraft ? 'tm-items-center tm-py-3' : 'tm-py-6',
           )}
         >
-          {menuSections.length ? (
-            <JobCardActions
-              sections={menuSections}
-              label="Akce nad náborem a inzerátem"
-              testId="job-card-actions-toggle"
-              className={cn(
-                'tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0',
-                isDraft ? 'tm-self-center' : 'tm-self-start tm--top-1',
-              )}
-            />
-          ) : null}
+          <JobMenu
+            advertisements={showAdMenuActions ? advertisements : []}
+            label="Akce nad náborem a inzerátem"
+            testId="job-card-actions-toggle"
+            className={cn(
+              'tm-col-start-2 tm-row-start-1 tm-shrink-0 tm-border-0 tm-border-l tm-border-solid tm-border-secondary tm-pl-3 md:tm-border-l-0 md:tm-pl-0',
+              isDraft ? 'tm-self-center' : 'tm-self-start tm--top-1',
+            )}
+            onEditJob={onEditJob}
+            onDuplicateJob={onDuplicateJob}
+            onInviteColleagues={onInviteColleagues}
+            onTransferJob={onTransferJob}
+            onArchiveJob={onArchiveJob}
+            onExtendAndRepublish={showAdMenuActions ? onExtendAndRepublish : undefined}
+            onEndPublication={showAdMenuActions ? onEndPublication : undefined}
+            onTopAdvertisement={showAdMenuActions ? onTopAdvertisement : undefined}
+          />
           <div
             data-testid="job-card-main"
             className={cn(
@@ -176,6 +165,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
               owner={owner}
               hiringManagers={hiringManagers}
               onInviteColleagues={onInviteColleagues}
+              onAdvertisementPreviewClick={onAdvertisementPreviewClick}
               isDraft={isDraft}
               isArchived={isArchived}
             />

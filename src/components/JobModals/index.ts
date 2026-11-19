@@ -2,6 +2,7 @@ export type {
   JobModalAdvertisement,
   JobModalAdvertisementSection,
   JobModalPublicationPlace,
+  JobPreviewPublication,
 } from './types'
 export { JobPublicationPlaceCard, type JobPublicationPlaceCardProps } from './JobPublicationPlaceCard'
 export {
@@ -25,6 +26,13 @@ export { JobModalProlong, type JobModalProlongProps } from './JobModalProlong'
 export { JobModalPublish, type JobModalPublishProps } from './JobModalPublish'
 export { JobModalBoost, type JobModalBoostProps } from './JobModalBoost'
 export { JobModalTop, type JobModalTopProps } from './JobModalTop'
+export { JobPreviewModal, type JobPreviewModalProps } from './JobPreviewModal'
+export {
+  JobPreviewPublicationsList,
+  type JobPreviewPublicationsListProps,
+} from './JobPreviewPublicationsList'
+export { JobPreviewUrlBar, type JobPreviewUrlBarProps } from './JobPreviewUrlBar'
+export { JOB_PREVIEW_COPY } from './jobPreviewCopy'
 export { JobDetailStatsModal, type JobDetailStatsModalProps } from './JobDetailStatsModal'
 export type { JobDetailStatsModalStatus } from './JobDetailStatsModal'
 export {

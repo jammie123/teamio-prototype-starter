@@ -18,6 +18,7 @@ import {
   CircleHelp,
   CirclePlus,
   Columns3,
+  Copy,
   Database,
   Download,
   Ellipsis,
@@ -29,6 +30,7 @@ import {
   Hourglass,
   Home,
   Info,
+  Link2,
   Mail,
   Maximize2,
   Menu,
@@ -37,6 +39,7 @@ import {
   Pencil,
   Phone,
   Plus,
+  Printer,
   RotateCw,
   Search,
   SlidersHorizontal,
@@ -116,6 +119,9 @@ const iconMap = {
   'columns-3': Columns3,
   'grip-vertical': GripVertical,
   hourglass: Hourglass,
+  copy: Copy,
+  link: Link2,
+  print: Printer,
 } as const satisfies Record<string, LucideIcon>
 
 const customIconMap = {

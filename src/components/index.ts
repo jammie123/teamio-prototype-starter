@@ -270,6 +270,10 @@ export {
   JobModalPublish,
   JobModalBoost,
   JobModalTop,
+  JobPreviewModal,
+  JobPreviewPublicationsList,
+  JobPreviewUrlBar,
+  JOB_PREVIEW_COPY,
   JobDetailStatsModal,
   JobDetailStatsChart,
   JOB_DETAIL_STATS_COPY,
@@ -307,6 +311,10 @@ export {
   type JobModalPublishProps,
   type JobModalBoostProps,
   type JobModalTopProps,
+  type JobPreviewPublication,
+  type JobPreviewModalProps,
+  type JobPreviewPublicationsListProps,
+  type JobPreviewUrlBarProps,
   type JobDetailStatsModalProps,
   type JobDetailStatsModalStatus,
   type JobDetailStatsChartProps,
@@ -376,6 +384,10 @@ export {
   JobPageHeader,
   type JobPageHeaderProps,
 } from './JobPageHeader'
+export {
+  JobBulkAction,
+  type JobBulkActionProps,
+} from './JobBulkAction'
 export {
   EmptyJobSearch,
   EMPTY_JOB_SEARCH_COPY,

@@ -9,7 +9,7 @@ import { cn } from '../../lib/cn'
 import type { ChildrenProps, StyleProps } from '../../lib/types'
 import { Icon } from '../Icon'
 
-export type ModalSize = 'default' | 'wide' | 'full'
+export type ModalSize = 'default' | 'wide' | 'full' | 'fullscreen'
 
 export const Modal = DialogPrimitive.Root
 export const ModalTrigger = DialogPrimitive.Trigger
@@ -57,8 +57,8 @@ export const ModalContent = forwardRef<
           'tm-top-1/2',
           'tm-z-50',
           'tm-flex',
-          'tm-max-h-[calc(100vh-2rem)]',
-          'tm-w-[calc(100%_-_1rem)]',
+          size !== 'fullscreen' && 'tm-max-h-[calc(100vh-2rem)]',
+          size !== 'fullscreen' && 'tm-w-[calc(100%_-_1rem)]',
           'tm--translate-x-1/2',
           'tm--translate-y-1/2',
           'tm-flex-col',
@@ -72,6 +72,7 @@ export const ModalContent = forwardRef<
           'focus:tm-outline-0',
           size === 'wide' && 'tm-max-w-[900px]',
           size === 'full' && 'tm-max-w-[1600px] md:tm-w-[90%] lg:tm-w-[80%]',
+          size === 'fullscreen' && 'tm-h-[95vh] tm-w-[95vw]',
           size === 'default' && 'tm-max-w-[600px]',
           className,
         )}

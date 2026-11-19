@@ -80,7 +80,7 @@ describe('JobCardV35', () => {
     const title = screen.getByTestId('job-card-title')
     expect(title.tagName).toBe('H3')
     expect(title).toHaveTextContent('Řidič/ka sk. C ČB PO–PÁ')
-    expect(title.className).toContain('tm-text-lg')
+    expect(title.className).toContain('tm-text-base')
     expect(title.className).toContain('tm-font-normal')
     expect(title.className).not.toContain('tm-font-semibold')
   })
@@ -261,7 +261,7 @@ describe('JobCardV35', () => {
     expect(screen.getByTestId('job-card').className).toContain('tm-pb-0')
     expect(band).toContainElement(screen.getByTestId('job-card-advertisement'))
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      'Běžící 1. 1. – 1. 2. 2026',
+      '1. 1. – 1. 2. 2026',
     )
     expect(screen.getAllByTestId('job-card-publication')).toHaveLength(3)
   })

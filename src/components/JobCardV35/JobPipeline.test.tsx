@@ -31,7 +31,9 @@ describe('JobPipeline', () => {
     const total = screen.getByTestId('job-card-stat-total')
 
     for (const stat of [unassessed, inProgress, opalcovani, total]) {
-      expect(stat.className).toContain('md:tm-w-[126px]')
+      expect(stat.className).toContain('md:tm-w-auto')
+      expect(stat.className).toContain('md:tm-px-4')
+      expect(stat.className).not.toMatch(/md:tm-w-\[/)
       expect(stat.className).not.toContain('md:tm-w-pipeline')
     }
     expect(unassessed.className).toContain('md:tm-items-end')
@@ -39,15 +41,17 @@ describe('JobPipeline', () => {
     expect(total.className).toContain('md:tm-items-end')
     expect(inProgress.className).toContain('md:tm-border-l')
     expect(inProgress.className).toContain('tm-border-t')
-    expect(within(unassessed).getByText('14').className).toContain('tm-text-xl')
+    expect(within(unassessed).getByText('14').className).toContain('tm-text-lg')
     expect(within(unassessed).getByText('14').className).not.toContain('tm-text-2xl')
-    expect(within(inProgress).getByText('6').className).toContain('tm-text-xl')
-    expect(within(opalcovani).getByText('3').className).toContain('tm-text-xl')
+    expect(within(unassessed).getByText('14').className).toContain('tm-font-medium')
+    expect(within(unassessed).getByText('Neposouzený').className).toContain('tm-text-13')
+    expect(within(inProgress).getByText('6').className).toContain('tm-text-lg')
+    expect(within(opalcovani).getByText('3').className).toContain('tm-text-lg')
     expect(within(unassessed).getByText('14').parentElement?.className).toContain(
       'tm-flex-row-reverse',
     )
     expect(within(unassessed).getByText('14').parentElement?.className).toContain('tm-gap-2')
-    expect(within(total).getByText('52').className).toContain('tm-text-xl')
+    expect(within(total).getByText('52').className).toContain('tm-text-lg')
   })
 
   it('shows the new candidates as a pink Pill on Neposouzený only', () => {

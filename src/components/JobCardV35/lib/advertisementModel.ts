@@ -43,7 +43,8 @@ export interface BuildAdvertisementModelOptions {
 
 export interface AdvertisementHeaderModel {
   tone: AdvertisementTone
-  label: string
+  /** Omitted for a running advertisement; the date (or the per portal dates) is enough then. */
+  label?: string
   /** Date range or single date shown under (or next to) the label. */
   dateInfo?: string
 }
@@ -351,11 +352,17 @@ export function buildAdvertisementModel(
       ? richestDateLabel(endDates(remainingDated))
       : undefined
 
+    const remainingStart = shareSameStartDate(remaining) ? remaining[0].startDate : undefined
+    const runningHeader: AdvertisementHeaderModel =
+      remainingEnd && remainingStart
+        ? { tone: 'success', dateInfo: formatCompactDateRange(remainingStart, remainingEnd) }
+        : remainingEnd
+          ? { tone: 'success', label: 'Běžící', dateInfo: stripYear(remainingEnd) }
+          : { tone: 'success' }
+
     return finish(
       'runningMixed',
-      remainingEnd
-        ? { tone: 'success', label: 'Běžící', dateInfo: stripYear(remainingEnd) }
-        : { tone: 'success', label: 'Běží v různých obdobích' },
+      runningHeader,
       'active',
       { showLiveDates: !remainingEnd, showEndedDates: true },
     )
@@ -368,7 +375,7 @@ export function buildAdvertisementModel(
   if (samePeriod && startDate && endDate) {
     return finish(
       'running',
-      { tone: 'success', label: 'Běžící', dateInfo: formatCompactDateRange(startDate, endDate) },
+      { tone: 'success', dateInfo: formatCompactDateRange(startDate, endDate) },
       'active',
       { showLiveDates: false, showEndedDates: false },
     )
@@ -376,7 +383,7 @@ export function buildAdvertisementModel(
 
   return finish(
     'runningDifferent',
-    { tone: 'success', label: 'Běží v různých obdobích' },
+    { tone: 'success' },
     'active',
     { showLiveDates: true, showEndedDates: false },
   )

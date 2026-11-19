@@ -189,7 +189,7 @@ export const JobCardV35 = forwardRef<HTMLElement, JobCardV35Props>(function JobC
               <div className="tm-flex tm-min-w-0 tm-flex-row tm-flex-wrap tm-items-center tm-gap-2">
                 <h3
                   data-testid="job-card-title"
-                  className="tm-mb-0 tm-min-w-0 tm-text-lg tm-font-normal tm-leading-tight tm-text-teamio-blue"
+                  className="tm-mb-0 tm-min-w-0 tm-text-base tm-font-normal tm-leading-tight tm-text-teamio-blue"
                 >
                   {title}
                 </h3>

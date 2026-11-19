@@ -35,7 +35,6 @@ describe('buildAdvertisementModel', () => {
     expect(model.kind).toBe('running')
     expect(model.header).toEqual({
       tone: 'success',
-      label: 'Běžící',
       dateInfo: '1. 9. – 30. 10. 2026',
     })
     expect(model.publications.every((item) => item.dateLabel === undefined)).toBe(true)
@@ -56,7 +55,7 @@ describe('buildAdvertisementModel', () => {
     )
 
     expect(model.kind).toBe('runningDifferent')
-    expect(model.header.label).toBe('Běží v různých obdobích')
+    expect(model.header).toEqual({ tone: 'success' })
     expect(model.publications.map((item) => item.dateLabel)).toEqual(['do 30. 10.', 'do 15. 11.'])
   })
 
@@ -74,12 +73,29 @@ describe('buildAdvertisementModel', () => {
 
     expect(model.kind).toBe('runningMixed')
     expect(model.canProlong).toBe(true)
-    expect(model.header).toEqual({ tone: 'success', label: 'Běžící', dateInfo: '30. 10.' })
+    expect(model.header).toEqual({ tone: 'success', dateInfo: '1. 9. – 30. 10. 2026' })
     expect(model.publications.map((item) => [item.publication.id, item.status, item.dateLabel])).toEqual([
       ['2', 'active', undefined],
       ['1', 'expired', 'ukončeno 15. 8.'],
     ])
     expect(model.showStatusDots).toBe(true)
+  })
+
+  it('keeps a label when running portals share only the end date next to an ended portal', () => {
+    const model = buildAdvertisementModel(
+      {
+        id: 'a',
+        publications: [
+          portal({ id: '1', channel: 'Prace.cz', status: 'expired', endDate: '15. 8. 2026' }),
+          portal({ id: '2', channel: 'Jobs.cz', startDate: '1. 9. 2026', endDate: '30. 10. 2026' }),
+          portal({ id: '3', channel: 'Kariéra', startDate: '5. 9. 2026', endDate: '30. 10. 2026' }),
+        ],
+      },
+      now,
+    )
+
+    expect(model.kind).toBe('runningMixed')
+    expect(model.header).toEqual({ tone: 'success', label: 'Běžící', dateInfo: '30. 10.' })
   })
 
   it('detects an advertisement that ends within 7 days', () => {

@@ -57,7 +57,7 @@ describe('AdvertisementWidget', () => {
     const channels = within(topRow).getByTestId('job-card-advertisement-publications')
     const actions = within(topRow).getByTestId('job-card-advertisement-action')
 
-    expect(heading).toHaveTextContent('Běžící 1. 1. – 1. 2. 2026')
+    expect(heading).toHaveTextContent('1. 1. – 1. 2. 2026')
     expect(topRow.parentElement).toBe(advertisement)
     expect(heading.parentElement?.parentElement).toBe(topRow)
     expect(heading.parentElement?.className).toContain('md:tm-flex-row')
@@ -112,9 +112,8 @@ describe('AdvertisementWidget', () => {
     })
 
     const advertisement = screen.getByTestId('job-card-advertisement')
-    expect(within(advertisement).getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      'Běží v různých obdobích',
-    )
+    expect(within(advertisement).queryByTestId('job-card-advertisement-heading')).not.toBeInTheDocument()
+    expect(within(advertisement).queryByTestId('job-card-advertisement-heading-label')).not.toBeInTheDocument()
     expect(within(advertisement).getByText('do 30. 10.')).toBeInTheDocument()
     expect(within(advertisement).getByText('do 15. 11.')).toBeInTheDocument()
     expect(advertisement).not.toHaveTextContent('1. 9. – 30. 10.')
@@ -143,7 +142,7 @@ describe('AdvertisementWidget', () => {
 
     const advertisement = screen.getByTestId('job-card-advertisement')
     expect(within(advertisement).getByTestId('job-card-advertisement-heading')).toHaveTextContent(
-      'Běžící 30. 10.',
+      '1. 9. – 30. 10. 2026',
     )
     expect(within(advertisement).getByText('ukončeno 15. 8.')).toBeInTheDocument()
     expect(screen.getAllByTestId('job-card-publication-dot')).toHaveLength(3)

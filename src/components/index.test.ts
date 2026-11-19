@@ -118,6 +118,8 @@ describe('components barrel', () => {
     expect(components.JobCardV33).toBeTypeOf('object')
     expect(components.JobCardV34).toBeTypeOf('object')
     expect(components.JobCardV35).toBeTypeOf('object')
+    expect(components.JobCardV36).toBeTypeOf('object')
+    expect(components.JobCardV40).toBeTypeOf('object')
     expect(components.IconButton).toBeTypeOf('object')
     expect(components.JobMenu).toBeTypeOf('function')
     expect(components.JobPageHeader).toBeTypeOf('object')

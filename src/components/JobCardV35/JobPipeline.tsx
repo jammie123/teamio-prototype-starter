@@ -61,7 +61,7 @@ export function JobPipeline({
         const layout = cn(
           'tm-flex',
           'tm-w-full',
-          'md:tm-w-[126px]',
+          'md:tm-w-auto',
           'tm-min-w-0',
           'md:tm-shrink-0',
           // Mobile: one stat per row, label left and count right. Desktop: stacked cell.
@@ -85,8 +85,8 @@ export function JobPipeline({
             <span className="tm-inline-flex tm-flex-row-reverse tm-flex-wrap tm-items-center tm-gap-2">
               <span
                 className={cn(
-                  'tm-text-xl',
-                  'tm-font-normal',
+                  'tm-text-lg',
+                  'tm-font-medium',
                   'tm-leading-tight',
                   'tm-text-primary-default',
                   onStatClick && 'group-hover:tm-text-action-link-active',
@@ -106,7 +106,7 @@ export function JobPipeline({
             </span>
             <span
               className={cn(
-                'tm-text-sm',
+                'tm-text-13',
                 'tm-font-normal',
                 'tm-text-secondary-default',
                 onStatClick && 'group-hover:tm-text-action-link-active',

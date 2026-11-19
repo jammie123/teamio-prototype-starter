@@ -222,6 +222,29 @@ export {
   type JobCandidateStat as JobCardV35CandidateStat,
   type JobCardNote as JobCardV35Note,
 } from './JobCardV35'
+export {
+  JobCardV36,
+  AdvertisementAction as JobCardV36AdvertisementAction,
+  AdvertisementWidget as JobCardV36AdvertisementWidget,
+  type JobCardV36Props,
+  type AdvertisementActionLayout as JobCardV36AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV36AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV36AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV36Candidates,
+  type JobCandidateStat as JobCardV36CandidateStat,
+  type JobCardNote as JobCardV36Note,
+} from './JobCardV36'
+export {
+  JobCardV40,
+  AdvertisementWidget as JobCardV40AdvertisementWidget,
+  AdvertisementStats as JobCardV40AdvertisementStats,
+  type JobCardV40Props,
+  type AdvertisementWidgetProps as JobCardV40AdvertisementWidgetProps,
+  type AdvertisementStatsProps as JobCardV40AdvertisementStatsProps,
+  type JobCardCandidates as JobCardV40Candidates,
+  type JobCandidateStat as JobCardV40CandidateStat,
+  type JobCardNote as JobCardV40Note,
+} from './JobCardV40'
 export { JobAssigneePeople, type JobAssigneePeopleProps } from './JobAssigneePeople/JobAssigneePeople'
 export { IconButton, type IconButtonProps } from './IconButton'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'

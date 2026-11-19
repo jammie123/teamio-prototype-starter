@@ -70,6 +70,24 @@ describe('AdvertisementHeader', () => {
     expect(within(heading).queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('hides the label and shows only the date when no label is given', () => {
+    render(<AdvertisementHeader tone="success" dateInfo="1. 1. – 1. 2. 2026" />)
+
+    const heading = screen.getByTestId('job-card-advertisement-heading')
+    expect(
+      within(heading).queryByTestId('job-card-advertisement-heading-label'),
+    ).not.toBeInTheDocument()
+    expect(within(heading).getByTestId('job-card-advertisement-heading-date')).toHaveTextContent(
+      '1. 1. – 1. 2. 2026',
+    )
+  })
+
+  it('renders nothing without label and date', () => {
+    render(<AdvertisementHeader tone="success" />)
+
+    expect(screen.queryByTestId('job-card-advertisement-heading')).not.toBeInTheDocument()
+  })
+
   it('shows no date element for a not-yet-published advertisement', () => {
     render(<AdvertisementHeader tone="neutral" label="Zatím nevystavený inzerát" />)
 

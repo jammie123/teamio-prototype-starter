@@ -5,7 +5,8 @@ import type { AdvertisementTone } from './lib/advertisementModel'
 export interface AdvertisementHeaderProps extends StyleProps {
   /** success = Běží, warning = Brzy končí / Skončilo před N dny, ended = Skončilo / Ukončené vystavování, neutral = Zatím nevystavený. */
   tone: AdvertisementTone
-  label: string
+  /** Omitted when the date (or nothing at all) is enough, e.g. for a running advertisement. */
+  label?: string
   /** Date range or single date under the label. */
   dateInfo?: string
 }
@@ -26,6 +27,10 @@ const LABEL_WEIGHT: Record<AdvertisementTone, string> = {
 
 /** Status of the advertisement stacked: label in a tone color with the date below in secondary color. */
 export function AdvertisementHeader({ tone, label, dateInfo, className }: AdvertisementHeaderProps) {
+  if (!label && !dateInfo) {
+    return null
+  }
+
   return (
     <div
       data-testid="job-card-advertisement-heading"
@@ -42,18 +47,20 @@ export function AdvertisementHeader({ tone, label, dateInfo, className }: Advert
         className,
       )}
     >
-      <span
-        data-testid="job-card-advertisement-heading-label"
-        className={cn('tm-text-base', LABEL_WEIGHT[tone])}
-      >
-        {label}
-      </span>
+      {label ? (
+        <span
+          data-testid="job-card-advertisement-heading-label"
+          className={cn('tm-text-base', LABEL_WEIGHT[tone])}
+        >
+          {label}
+        </span>
+      ) : null}
       {dateInfo ? (
         <span
           data-testid="job-card-advertisement-heading-date"
           className="tm-text-sm tm-font-normal tm-text-secondary-default"
         >
-          {' '}
+          {label ? ' ' : null}
           {dateInfo}
         </span>
       ) : null}

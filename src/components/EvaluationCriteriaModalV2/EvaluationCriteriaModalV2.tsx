@@ -2,39 +2,33 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { StyleProps } from '../../lib/types'
 import { Alert } from '../Alert'
 import { Button } from '../Button'
-import { FormGroup } from '../FormGroup'
 import { Icon } from '../Icon'
-import { Link } from '../Link'
 import {
   Modal,
   ModalBody,
   ModalClose,
   ModalContent,
-  ModalDescription,
   ModalFooter,
   ModalTitle,
   ModalTrigger,
   type ModalProps,
 } from '../Modal'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table'
-import { TextArea } from '../TextArea'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip'
+import { Table, TableBody } from '../Table'
 import { EvaluationCriteriaEmptyState } from '../EvaluationCriteriaModal/EvaluationCriteriaEmptyState'
 import { EvaluationCriteriaGeneratingState } from '../EvaluationCriteriaModal/EvaluationCriteriaGeneratingState'
 import { EvaluationCriteriaReadOnlyView } from '../EvaluationCriteriaModal/EvaluationCriteriaReadOnlyView'
 import { EVALUATION_CRITERIA_COPY } from '../EvaluationCriteriaModal/EvaluationCriteriaModal'
-import { EVALUATION_CRITERION_DETAIL_COPY } from '../EvaluationCriteriaModal/EvaluationCriterionDetailModal'
-import { EvaluationCriterionPriorityToggle } from '../EvaluationCriteriaModal/EvaluationCriterionPriorityToggle'
 import { sampleEvaluationCriteria } from '../EvaluationCriteriaModal/fixtures'
 import { findEeoViolation } from '../EvaluationCriteriaModal/evaluationCriteriaRules'
-import { EVALUATION_CRITERIA_HELP_URL } from '../EvaluationCriteriaModal/helpUrl'
 import type { EvaluationCriterion, EvaluationCriterionPriority } from '../EvaluationCriteriaModal/types'
+import { CriteriaModalFooter } from './CriteriaModalFooter'
+import { CriteriaModalHeader } from './CriteriaModalHeader'
+import { CriteriaTableHead } from './CriteriaTableHead'
+import { CriterionEditorRow } from './CriterionEditorRow'
+import { CriterionRow } from './CriterionRow'
+import { V2_COPY, type EvaluationCriteriaGenerationError } from './copy'
 
-const COLUMN_NAME = '!tm-pl-4 !tm-pr-6'
-const COLUMN_PRIORITY = '!tm-px-6'
-const COLUMN_ACTIONS = '!tm-pl-6 !tm-pr-4 tm-whitespace-nowrap'
-const HEADER_Y = '!tm-py-3'
-const BODY_Y = '!tm-py-5 tm-align-middle'
+export type { EvaluationCriteriaGenerationError }
 
 export interface EvaluationCriteriaModalV2Props extends StyleProps {
   open?: ModalProps['open']
@@ -81,22 +75,6 @@ interface CriterionEditor {
   isNew: boolean
   hasEeoError: boolean
 }
-
-const V2_COPY = {
-  done: 'Hotovo',
-  editingLabel: 'Úprava kritéria',
-  finishEditHint: 'Nejdřív dokončete úpravu kritéria.',
-  generationErrors: {
-    noJobDescription: {
-      title: 'Zatím nemáme dost informací k vytvoření kritérií',
-      description:
-        'K nastavení kvalitních kritérií hodnocení potřebujeme víc informací o pozici a náboru. Doplňte je a kritéria vygenerujeme nebo vytvořte kritéria ručně.',
-    },
-  },
-} as const
-
-/** Why generating criteria from the position failed. Shown under the empty-state buttons. */
-export type EvaluationCriteriaGenerationError = keyof typeof V2_COPY.generationErrors
 
 interface CriteriaEditorProps {
   initialCriteria: EvaluationCriterion[]
@@ -207,17 +185,7 @@ function CriteriaEditor({
     ? [...draft, { id: editor.id, text: editor.text, priority: editor.priority }]
     : draft
 
-  const header = (
-    <>
-      <ModalTitle>{EVALUATION_CRITERIA_COPY.title}</ModalTitle>
-      <ModalDescription className="tm--mt-3 tm-pb-4">
-        {EVALUATION_CRITERIA_COPY.perex} {EVALUATION_CRITERIA_COPY.perexHelpLead}{' '}
-        <Link href={EVALUATION_CRITERIA_HELP_URL} target="_blank">
-          {EVALUATION_CRITERIA_COPY.perexHelpLink}
-        </Link>
-      </ModalDescription>
-    </>
-  )
+  const header = <CriteriaModalHeader />
 
   // Nothing to summarise for an empty list - fall through to the editor / empty state.
   if (isReadOnly && initialCriteria.length > 0) {
@@ -265,140 +233,45 @@ function CriteriaEditor({
         {showTable ? (
           <div className="tm-w-full">
             <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeader className={`${COLUMN_NAME} ${HEADER_Y}`}>
-                    {EVALUATION_CRITERIA_COPY.columnName}
-                  </TableHeader>
-                  <TableHeader className={`${COLUMN_PRIORITY} ${HEADER_Y}`}>
-                    {EVALUATION_CRITERIA_COPY.columnPriority}
-                  </TableHeader>
-                  <TableHeader className={`${COLUMN_ACTIONS} ${HEADER_Y}`}>
-                    <span className="tm-sr-only">{EVALUATION_CRITERIA_COPY.columnActions}</span>
-                  </TableHeader>
-                </TableRow>
-              </TableHead>
+              <CriteriaTableHead />
               <TableBody>
-                {rows.map((criterion) => {
-                  const isEditing = editor?.id === criterion.id
-                  if (isEditing && editor) {
-                    const isNew = editor.isNew
-                    return (
-                      <TableRow
-                        key={criterion.id}
-                        data-testid="evaluation-criterion-row"
-                        data-editing="true"
-                        className="tm-bg-cover-light"
-                      >
-                        <TableCell colSpan={3} className="!tm-px-4 !tm-py-5">
-                          <div className="tm-flex tm-w-full tm-flex-col tm-gap-3">
-                            <span className="tm-text-sm tm-font-medium tm-text-primary-default">
-                              {V2_COPY.editingLabel}
-                            </span>
-                            <FormGroup validationState={editor.hasEeoError ? 'error' : 'default'}>
-                              <TextArea
-                                aria-label={EVALUATION_CRITERION_DETAIL_COPY.textLabel}
-                                className="tm-w-full"
-                                rows={3}
-                                value={editor.text}
-                                autoFocus
-                                onChange={(event) =>
-                                  setEditor((current) =>
-                                    current
-                                      ? { ...current, text: event.target.value, hasEeoError: false }
-                                      : current,
-                                  )
-                                }
-                              />
-                            </FormGroup>
-                            {editor.hasEeoError ? (
-                              <Alert variant="error">
-                                {EVALUATION_CRITERION_DETAIL_COPY.eeoError}{' '}
-                                <Link href={EVALUATION_CRITERIA_HELP_URL} target="_blank">
-                                  {EVALUATION_CRITERION_DETAIL_COPY.eeoHelp}
-                                </Link>
-                              </Alert>
-                            ) : null}
-                            <div className="tm-flex tm-w-full tm-items-center tm-gap-2">
-                              <Button
-                                variant="secondary"
-                                isDisabled={editor.text.trim() === ''}
-                                onClick={commitEditor}
-                              >
-                                {V2_COPY.done}
-                              </Button>
-                              <Button variant="tertiary" onClick={cancelEditor}>
-                                {EVALUATION_CRITERIA_COPY.cancel}
-                              </Button>
-                              <div className="tm-ml-auto tm-flex tm-items-center tm-gap-2">
-                                <EvaluationCriterionPriorityToggle
-                                  size="medium"
-                                  value={editor.priority}
-                                  onChange={(priority) =>
-                                    setEditor((current) => (current ? { ...current, priority } : current))
-                                  }
-                                />
-                                {isNew ? null : (
-                                  <Button
-                                    variant="tertiary"
-                                    size="medium"
-                                    isCircle
-                                    aria-label={EVALUATION_CRITERIA_COPY.deleteLabel}
-                                    onClick={() => handleDelete(criterion.id)}
-                                  >
-                                    <Icon name="trash" />
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  }
-
-                  return (
-                    <TableRow key={criterion.id} data-testid="evaluation-criterion-row">
-                      <TableCell className={`${COLUMN_NAME} ${BODY_Y}`}>{criterion.text}</TableCell>
-                      <TableCell className={`${COLUMN_PRIORITY} ${BODY_Y}`}>
-                        <EvaluationCriterionPriorityToggle
-                          size="medium"
-                          value={criterion.priority}
-                          onChange={(priority) =>
-                            setDraft((current) =>
-                              current.map((item) =>
-                                item.id === criterion.id ? { ...item, priority } : item,
-                              ),
-                            )
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className={`${COLUMN_ACTIONS} ${BODY_Y}`}>
-                        <div className="tm-flex tm-items-center tm-justify-end tm-gap-2">
-                          <Button
-                            variant="tertiary"
-                            size="medium"
-                            isCircle
-                            aria-label={EVALUATION_CRITERIA_COPY.editLabel}
-                            isDisabled={editor !== null}
-                            onClick={() => startEditing(criterion.id)}
-                          >
-                            <Icon name="edit" />
-                          </Button>
-                          <Button
-                            variant="tertiary"
-                            size="medium"
-                            isCircle
-                            aria-label={EVALUATION_CRITERIA_COPY.deleteLabel}
-                            onClick={() => handleDelete(criterion.id)}
-                          >
-                            <Icon name="trash" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
+                {rows.map((criterion) =>
+                  editor?.id === criterion.id ? (
+                    <CriterionEditorRow
+                      key={criterion.id}
+                      text={editor.text}
+                      priority={editor.priority}
+                      isNew={editor.isNew}
+                      hasEeoError={editor.hasEeoError}
+                      onTextChange={(text) =>
+                        setEditor((current) =>
+                          current ? { ...current, text, hasEeoError: false } : current,
+                        )
+                      }
+                      onPriorityChange={(priority) =>
+                        setEditor((current) => (current ? { ...current, priority } : current))
+                      }
+                      onDone={commitEditor}
+                      onCancel={cancelEditor}
+                      onDelete={() => handleDelete(criterion.id)}
+                    />
+                  ) : (
+                    <CriterionRow
+                      key={criterion.id}
+                      criterion={criterion}
+                      isEditDisabled={editor !== null}
+                      onPriorityChange={(priority) =>
+                        setDraft((current) =>
+                          current.map((item) =>
+                            item.id === criterion.id ? { ...item, priority } : item,
+                          ),
+                        )
+                      }
+                      onEdit={() => startEditing(criterion.id)}
+                      onDelete={() => handleDelete(criterion.id)}
+                    />
+                  ),
+                )}
               </TableBody>
             </Table>
           </div>
@@ -428,46 +301,15 @@ function CriteriaEditor({
         ) : null}
       </ModalBody>
       {hideChrome ? null : (
-        <ModalFooter className="tm-shrink-0 tm-bg-basic">
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              {/* A disabled button swallows pointer events, so the (focusable) wrapper is the trigger. */}
-              <TooltipTrigger asChild>
-                <span
-                  className="tm-inline-flex"
-                  data-testid="evaluation-save-tooltip-trigger"
-                  tabIndex={isEditing ? 0 : undefined}
-                >
-                  <Button
-                    isDisabled={isEditing}
-                    onClick={() => {
-                      onSave(draft)
-                      onClose()
-                    }}
-                  >
-                    {EVALUATION_CRITERIA_COPY.save}
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              {isEditing ? (
-                // The modal is z-50; the tooltip must sit above it.
-                <TooltipContent side="top" className="!tm-z-[60]">
-                  {V2_COPY.finishEditHint}
-                </TooltipContent>
-              ) : null}
-            </Tooltip>
-          </TooltipProvider>
-          {isEditing ? null : (
-            <ModalClose asChild aria-label={EVALUATION_CRITERIA_COPY.cancel}>
-              <Button variant="secondary">{EVALUATION_CRITERIA_COPY.cancel}</Button>
-            </ModalClose>
-          )}
-          {draft.length === 0 ? null : (
-            <Button variant="tertiary" className="sm:tm-ml-auto" onClick={handleGenerate}>
-              {EVALUATION_CRITERIA_COPY.generate}
-            </Button>
-          )}
-        </ModalFooter>
+        <CriteriaModalFooter
+          isEditing={isEditing}
+          showGenerate={draft.length > 0}
+          onSave={() => {
+            onSave(draft)
+            onClose()
+          }}
+          onGenerate={handleGenerate}
+        />
       )}
     </>
   )

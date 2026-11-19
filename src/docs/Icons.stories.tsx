@@ -56,6 +56,7 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   'thumb-down': 'Nevyhovující',
   'stop-reason': 'Nechat na později',
   advertisement: 'Inzerát',
+  'advertisement-doc': 'Dokument inzerátu',
   'advertisement-preview': 'Náhled inzerátu',
   'calendar-clock': 'Kalendář s časem',
   'alert-triangle-outline': 'Varování (obrys)',

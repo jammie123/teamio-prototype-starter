@@ -222,6 +222,39 @@ export const AdvertisementPreviewIcon = forwardRef<SVGSVGElement, LucideProps>(
 
 AdvertisementPreviewIcon.displayName = 'AdvertisementPreviewIcon'
 
+export const AdvertisementDocIcon = forwardRef<SVGSVGElement, LucideProps>(
+  function AdvertisementDocIcon({ color = 'currentColor', size = 24, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...rest}
+      >
+        <path
+          d="M8.00977 6.25C7.59555 6.25 7.25977 6.58579 7.25977 7C7.25977 7.41421 7.59555 7.75 8.00977 7.75H16.0098C16.424 7.75 16.7598 7.41421 16.7598 7C16.7598 6.58579 16.424 6.25 16.0098 6.25H8.00977Z"
+          fill={color}
+        />
+        <path
+          d="M8.00977 9.25C7.59555 9.25 7.25977 9.58579 7.25977 10C7.25977 10.4142 7.59555 10.75 8.00977 10.75H12.0098C12.424 10.75 12.7598 10.4142 12.7598 10C12.7598 9.58579 12.424 9.25 12.0098 9.25H8.00977Z"
+          fill={color}
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M12.1813 22C12.7118 22 13.2205 21.7893 13.5956 21.4142L20.424 14.5858C20.7991 14.2107 21.0098 13.702 21.0098 13.1716V6C21.0098 3.79086 19.2189 2 17.0098 2H7.00977C4.80063 2 3.00977 3.79086 3.00977 6V18C3.00977 20.2091 4.80063 22 7.00977 22H12.1813ZM18.1384 14.75L13.7598 19.1287V18C13.7598 16.2051 15.2148 14.75 17.0098 14.75H18.1384ZM12.2598 18V20.5H7.00977C5.62905 20.5 4.50977 19.3807 4.50977 18V6C4.50977 4.61929 5.62905 3.5 7.00977 3.5H17.0098C18.3905 3.5 19.5098 4.61929 19.5098 6V13.25H17.0098C14.3864 13.25 12.2598 15.3766 12.2598 18Z"
+          fill={color}
+        />
+      </svg>
+    )
+  },
+)
+
+AdvertisementDocIcon.displayName = 'AdvertisementDocIcon'
+
 export const ClockIcon = forwardRef<SVGSVGElement, LucideProps>(function ClockIcon(
   { color = 'currentColor', size = 24, ...rest },
   ref,

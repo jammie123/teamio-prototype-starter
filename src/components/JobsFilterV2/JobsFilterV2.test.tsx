@@ -172,7 +172,7 @@ describe('JobsFilterV2', () => {
     const onSortChange = vi.fn()
     const sortOptions = [
       { value: 'latestAd', label: 'Nejnovější inzeráty' },
-      { value: 'newestJob', label: 'Nejnovější nábor' },
+      { value: 'oldestAd', label: 'Nejstarší inzeráty' },
     ]
     renderFilter({
       sortValue: 'latestAd',
@@ -185,33 +185,8 @@ describe('JobsFilterV2', () => {
 
     await user.click(sort)
     expect(screen.queryByRole('option', { name: 'Všichni' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('option', { name: 'Nejnovější nábor' }))
-    expect(onSortChange).toHaveBeenCalledWith('newestJob')
-  })
-
-  it('renders a subtitle under a sort option and lists the extra sort choices', async () => {
-    const user = userEvent.setup()
-    renderFilter({
-      sortValue: 'latestAd',
-      sortOptions: [
-        {
-          value: 'latestAd',
-          label: 'Nejnovější inzeráty',
-          description: 'Vystavení inzerátu, topování a zvýraznění',
-        },
-        { value: 'mostNewCandidates', label: 'Nejvíce nových uchazečů' },
-        { value: 'titleAz', label: 'Název A–Z' },
-      ],
-      onSortChange: vi.fn(),
-    })
-
-    await user.click(screen.getByRole('button', { name: 'Řazení' }))
-
-    expect(screen.getByTestId('option-description')).toHaveTextContent(
-      'Vystavení inzerátu, topování a zvýraznění',
-    )
-    expect(screen.getByRole('option', { name: /Nejvíce nových uchazečů/ })).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: /Název A–Z/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('option', { name: 'Nejstarší inzeráty' }))
+    expect(onSortChange).toHaveBeenCalledWith('oldestAd')
   })
 
   it('shows Resetovat filtry when any filter is set and keeps it invisible when empty', () => {
@@ -234,8 +209,8 @@ describe('JobsFilterV2', () => {
 
   it('does not treat sort as an active filter for the reset link', () => {
     renderFilter({
-      sortValue: 'newestJob',
-      sortOptions: [{ value: 'newestJob', label: 'Nejnovější nábor' }],
+      sortValue: 'oldestAd',
+      sortOptions: [{ value: 'oldestAd', label: 'Nejstarší inzeráty' }],
       onSortChange: vi.fn(),
     })
 

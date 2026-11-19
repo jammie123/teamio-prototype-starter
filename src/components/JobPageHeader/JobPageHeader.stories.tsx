@@ -29,6 +29,7 @@ const meta = {
   args: {
     onAddJob: fn(),
     onAddBrigade: fn(),
+    onBulkActionsToggle: fn(),
   },
 } satisfies Meta<typeof JobPageHeader>
 
@@ -45,9 +46,20 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('heading', { level: 1, name: 'Nábory' })).toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Hromadné akce' })).toBeInTheDocument()
     await userEvent.click(canvas.getByRole('button', { name: 'Další možnosti přidání' }))
     await expect(canvas.getByRole('option', { name: 'Přidat brigádu' })).toBeInTheDocument()
   },
+}
+
+export const BulkActionsActive: Story = {
+  decorators: [onPageBackground],
+  args: { bulkActionsActive: true },
+  render: (args) => (
+    <Tabs defaultValue="aktivni">
+      <JobPageHeader {...args} />
+    </Tabs>
+  ),
 }
 
 export const InPage: Story = {

@@ -1,0 +1,107 @@
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks'
+import * as EvaluationCriteriaModalV2Stories from './EvaluationCriteriaModalV2.stories'
+
+<Meta of={EvaluationCriteriaModalV2Stories} />
+
+# EvaluationCriteriaModalV2
+
+Modal pro správu kritérií hodnocení kandidátů. Oproti V1 se kritéria upravují **přímo v řádku tabulky**
+(bez samostatného modalu s detailem kritéria).
+
+## Kompozice
+
+`EvaluationCriteriaModalV2` drží jen stav (draft kritérií, otevřený editor řádku) a z hotových bloků
+skládá UI. Bloky jsou samostatné komponenty se vlastními stories
+(**AI Evaluation / EvaluationCriteriaModal / V2 Parts**).
+
+```text
+Modal
+├─ ModalTrigger                      volitelný trigger (prop `trigger`)
+└─ ModalContent size="wide"
+   ├─ CriteriaModalHeader            ModalTitle + ModalDescription s odkazem na nápovědu
+   ├─ ModalClose                     křížek
+   ├─ ModalBody
+   │  ├─ Table
+   │  │  ├─ CriteriaTableHead       název / priorita / (akce)
+   │  │  └─ TableBody
+   │  │     ├─ CriterionRow           čtení: text, PriorityToggle, tužka, koš
+   │  │     └─ CriterionEditorRow     editace: TextArea, Alert (EEO), Hotovo / Zrušit, PriorityToggle
+   │  ├─ Button „Přidat kritérium“
+   │  └─ nebo EmptyState / GeneratingState (když není co zobrazit)
+   └─ CriteriaModalFooter            Uložit (Tooltip při editaci), Zrušit, Vygenerovat z pozice
+```
+
+Read-only režim místo editoru vykreslí `EvaluationCriteriaReadOnlyView` a vlastní patičku
+s akcemi „Ohodnotit kandidáty“ / „Editovat kritéria“.
+
+Story **Composition** níž je tohle skládání zapsané staticky bez stavu – v záložce **Show code**
+je vidět celé JSX s podkomponentami.
+
+<Canvas of={EvaluationCriteriaModalV2Stories.Composition} />
+
+### Bloky samostatně
+
+| Blok | Odpovědnost | Story |
+| --- | --- | --- |
+| `CriteriaModalHeader` | titulek a perex s nápovědou | `CriteriaModalHeader` |
+| `CriteriaTableHead` | záhlaví sloupců | `CriteriaTableHead` |
+| `CriterionRow` | jeden řádek ve čtení | `CriterionRow`, `CriterionRow - editing another row` |
+| `CriterionEditorRow` | jeden řádek v editaci (včetně chyby EEO) | `CriterionEditorRow`, `… new`, `… EEO error` |
+| `CriteriaModalFooter` | uložení, zrušení, generování | `CriteriaModalFooter`, `… editing a row` |
+
+Modal je řízený buď interně (`defaultOpen`, `trigger`), nebo zvenku (`open` + `onOpenChange`).
+Kritéria se předávají přes `criteria` (controlled) nebo `defaultCriteria`, uložení hlásí `onSave`.
+
+## Použití
+
+V záložce **Show code** u každé ukázky je JSX s přesně těmi props, které story používá.
+
+```tsx
+<EvaluationCriteriaModalV2
+  trigger={<Button>Kritéria hodnocení</Button>}
+  defaultCriteria={criteria}
+  onSave={(next) => setCriteria(next)}
+/>
+```
+
+<Canvas of={EvaluationCriteriaModalV2Stories.Default} />
+
+## Stavy
+
+### Editace v řádku
+
+Tužka v řádku otevře inline editor („Úprava kritéria“). Dokud je řádek otevřený, je „Uložit“ neaktivní
+a Esc zruší jen úpravu řádku, ne celý modal.
+
+<Canvas of={EvaluationCriteriaModalV2Stories.InlineEdit} />
+
+### Kontrola EEO
+
+Diskriminační formulace se při „Hotovo“ odmítne a řádek zůstane otevřený s chybou.
+
+<Canvas of={EvaluationCriteriaModalV2Stories.EeoViolation} />
+
+### Prázdný stav
+
+Bez kritérií se místo tabulky zobrazí prázdný stav s „Vygenerovat z pozice“ a „Přidat kritérium ručně“.
+
+<Canvas of={EvaluationCriteriaModalV2Stories.Empty} />
+
+### Generování z pozice
+
+`isGenerating` nahradí prázdný stav průběhem generování. `generationError="noJobDescription"` zobrazí
+chybu pod tlačítky, když pozice nemá dost informací.
+
+<Canvas of={EvaluationCriteriaModalV2Stories.GeneratingCriteriaFromJd} />
+<Canvas of={EvaluationCriteriaModalV2Stories.GeneratingFailedNoJd} />
+
+### Read-only souhrn
+
+S `readOnly` se modal otevře jako souhrn kritérií seskupených podle priority s akcemi
+„Ohodnotit kandidáty“ (`onEvaluate`) a „Editovat kritéria“ (`onEdit`), která přepne do editoru.
+
+<Canvas of={EvaluationCriteriaModalV2Stories.ReadOnly} />
+
+## Props
+
+<Controls of={EvaluationCriteriaModalV2Stories.Default} />

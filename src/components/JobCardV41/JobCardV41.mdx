@@ -1,0 +1,27 @@
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks'
+import * as JobCardV41Stories from './JobCardV41.stories'
+
+<Meta of={JobCardV41Stories} />
+
+# JobCardV41
+
+Karta náboru ve výpisu.
+
+- **Levý sloupec:** název, vlastníci, pipeline kandidátů, volitelná poznámka
+- **Pravý sloupec (450 px od md):** inzerát (období, portály, statistiky, hover karta)
+
+## Stavy inzerce
+
+| Stav | Hlavička | Karta |
+| --- | --- | --- |
+| Běží (jedno období, různá období, část portálů skončila) | jen datum, bez labelu | aktivní |
+| Brzy končí | `Končí za N dní` + datum | aktivní |
+| Expirováno do 30 dní | `Expirováno před N dny` (varování) | aktivní, vysoká priorita |
+| Expirováno více než 30 dní | `Expirováno` (šedá) | ztlumená |
+| Ukončené vystavování (`unpublished`, `archived`) | `Ukončené vystavování` (šedá) | ztlumená |
+
+Menu, pipeline a stavy karty (`archived`, Hiring Manager) vycházejí z JobCardV35.
+
+<Canvas of={JobCardV41Stories.Running} />
+
+<Controls />

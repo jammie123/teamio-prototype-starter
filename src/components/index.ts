@@ -187,6 +187,75 @@ export {
   type JobCandidateStat as JobCardV32CandidateStat,
   type JobCardNote as JobCardV32Note,
 } from './JobCardV32'
+export {
+  JobCardV33,
+  AdvertisementWidget as JobCardV33AdvertisementWidget,
+  AdvertisementStats as JobCardV33AdvertisementStats,
+  type JobCardV33Props,
+  type AdvertisementWidgetProps as JobCardV33AdvertisementWidgetProps,
+  type AdvertisementStatsProps as JobCardV33AdvertisementStatsProps,
+  type JobCardCandidates as JobCardV33Candidates,
+  type JobCandidateStat as JobCardV33CandidateStat,
+  type JobCardNote as JobCardV33Note,
+} from './JobCardV33'
+export {
+  JobCardV34,
+  AdvertisementAction as JobCardV34AdvertisementAction,
+  AdvertisementWidget as JobCardV34AdvertisementWidget,
+  type JobCardV34Props,
+  type AdvertisementActionLayout as JobCardV34AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV34AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV34AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV34Candidates,
+  type JobCandidateStat as JobCardV34CandidateStat,
+  type JobCardNote as JobCardV34Note,
+} from './JobCardV34'
+export {
+  JobCardV35,
+  AdvertisementAction as JobCardV35AdvertisementAction,
+  AdvertisementWidget as JobCardV35AdvertisementWidget,
+  type JobCardV35Props,
+  type AdvertisementActionLayout as JobCardV35AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV35AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV35AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV35Candidates,
+  type JobCandidateStat as JobCardV35CandidateStat,
+  type JobCardNote as JobCardV35Note,
+} from './JobCardV35'
+export {
+  JobCardV36,
+  AdvertisementAction as JobCardV36AdvertisementAction,
+  AdvertisementWidget as JobCardV36AdvertisementWidget,
+  type JobCardV36Props,
+  type AdvertisementActionLayout as JobCardV36AdvertisementActionLayout,
+  type AdvertisementActionProps as JobCardV36AdvertisementActionProps,
+  type AdvertisementWidgetProps as JobCardV36AdvertisementWidgetProps,
+  type JobCardCandidates as JobCardV36Candidates,
+  type JobCandidateStat as JobCardV36CandidateStat,
+  type JobCardNote as JobCardV36Note,
+} from './JobCardV36'
+export {
+  JobCardV40,
+  AdvertisementWidget as JobCardV40AdvertisementWidget,
+  AdvertisementStats as JobCardV40AdvertisementStats,
+  type JobCardV40Props,
+  type AdvertisementWidgetProps as JobCardV40AdvertisementWidgetProps,
+  type AdvertisementStatsProps as JobCardV40AdvertisementStatsProps,
+  type JobCardCandidates as JobCardV40Candidates,
+  type JobCandidateStat as JobCardV40CandidateStat,
+  type JobCardNote as JobCardV40Note,
+} from './JobCardV40'
+export {
+  JobCardV41,
+  AdvertisementWidget as JobCardV41AdvertisementWidget,
+  AdvertisementStats as JobCardV41AdvertisementStats,
+  type JobCardV41Props,
+  type AdvertisementWidgetProps as JobCardV41AdvertisementWidgetProps,
+  type AdvertisementStatsProps as JobCardV41AdvertisementStatsProps,
+  type JobCardCandidates as JobCardV41Candidates,
+  type JobCandidateStat as JobCardV41CandidateStat,
+  type JobCardNote as JobCardV41Note,
+} from './JobCardV41'
 export { JobAssigneePeople, type JobAssigneePeopleProps } from './JobAssigneePeople/JobAssigneePeople'
 export { IconButton, type IconButtonProps } from './IconButton'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'
@@ -201,6 +270,11 @@ export {
   JobModalPublish,
   JobModalBoost,
   JobModalTop,
+  JobPreviewModal,
+  SampleJobPreviewAdvertisement,
+  JobPreviewPublicationsList,
+  JobPreviewUrlBar,
+  JOB_PREVIEW_COPY,
   JobDetailStatsModal,
   JobDetailStatsChart,
   JOB_DETAIL_STATS_COPY,
@@ -238,6 +312,10 @@ export {
   type JobModalPublishProps,
   type JobModalBoostProps,
   type JobModalTopProps,
+  type JobPreviewPublication,
+  type JobPreviewModalProps,
+  type JobPreviewPublicationsListProps,
+  type JobPreviewUrlBarProps,
   type JobDetailStatsModalProps,
   type JobDetailStatsModalStatus,
   type JobDetailStatsChartProps,
@@ -307,6 +385,10 @@ export {
   JobPageHeader,
   type JobPageHeaderProps,
 } from './JobPageHeader'
+export {
+  JobBulkAction,
+  type JobBulkActionProps,
+} from './JobBulkAction'
 export {
   EmptyJobSearch,
   EMPTY_JOB_SEARCH_COPY,

@@ -157,7 +157,7 @@ export function JobsFilterV2({
   }
 
   return (
-    <div className={cn('tm-flex tm-flex-wrap tm-items-center tm-gap-4', className)}>
+    <div className={cn('tm-flex tm-flex-wrap tm-items-center tm-gap-4 tm-border-0 tm-bg-transparent tm-pt-8 tm-pb-0', className)}>
       <div className="tm-relative tm-min-w-[16rem] tm-flex-1">
         <Icon
           name="search"

@@ -44,14 +44,8 @@ const filledValue: JobsFilterValue = {
 }
 
 const sortOptions: JobsFilterOption[] = [
-  {
-    value: 'latestAd',
-    label: 'Nejnovější inzeráty',
-    description: 'Vystavení inzerátu, topování a zvýraznění',
-  },
+  { value: 'latestAd', label: 'Nejnovější inzeráty' },
   { value: 'oldestAd', label: 'Nejstarší inzeráty' },
-  { value: 'newestJob', label: 'Nejnovější nábor' },
-  { value: 'mostNewCandidates', label: 'Nejvíce nových uchazečů' },
   { value: 'titleAz', label: 'Název A–Z' },
 ]
 

@@ -229,3 +229,19 @@ export const withHighlights: JobAdvertisement = {
     }),
   ],
 }
+
+/** Every portal Teamio can publish to, all running in the same period. */
+export const allPortals: JobAdvertisement = {
+  id: 'ad-all-portals',
+  publications: [
+    portal({ id: 'atmoskop', channel: 'Atmoskop.cz', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 210 }),
+    portal({ id: 'export', channel: 'Export pozic', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 120 }),
+    portal({ id: 'intranet', channel: 'Intranet', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 340 }),
+    portal({ id: 'jobote', channel: 'Jobote', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 95 }),
+    portal({ id: 'jobs', channel: 'Jobs.cz', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 1840 }),
+    portal({ id: 'career-section', channel: 'Kariérní sekce', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 260 }),
+    portal({ id: 'career', channel: 'Kariérní stránky', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 410 }),
+    portal({ id: 'prace', channel: 'Prace.cz', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 920 }),
+    portal({ id: 'nearby', channel: 'Práce za rohem', startDate: '1. 9. 2026', endDate: '30. 11. 2026', viewCount: 70 }),
+  ],
+}

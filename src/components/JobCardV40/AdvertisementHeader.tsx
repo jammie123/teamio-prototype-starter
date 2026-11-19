@@ -1,5 +1,6 @@
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
+import { Icon } from '../Icon'
 import type { AdvertisementTone } from './lib/advertisementModel'
 
 export interface AdvertisementHeaderProps extends StyleProps {
@@ -9,6 +10,8 @@ export interface AdvertisementHeaderProps extends StyleProps {
   label?: string
   /** From–to range next to the label (`1. 9. – 30. 9. 2026`). */
   dateInfo?: string
+  /** Tinted warning background with 8px padding, 16px text and a clock icon (ending soon, expired up to 8 days ago). */
+  highlighted?: boolean
 }
 
 const LABEL_CLASS: Record<AdvertisementTone, string> = {
@@ -29,7 +32,13 @@ const LABEL_WEIGHT: Record<AdvertisementTone, string> = {
  * Status of the advertisement: label in a tone color with an optional date beside it.
  * Running advertisements carry no label, so only the date is shown.
  */
-export function AdvertisementHeader({ tone, label, dateInfo, className }: AdvertisementHeaderProps) {
+export function AdvertisementHeader({
+  tone,
+  label,
+  dateInfo,
+  highlighted = false,
+  className,
+}: AdvertisementHeaderProps) {
   if (!label && !dateInfo) {
     return null
   }
@@ -38,6 +47,7 @@ export function AdvertisementHeader({ tone, label, dateInfo, className }: Advert
     <div
       data-testid="job-card-advertisement-heading"
       data-tone={tone}
+      data-highlighted={highlighted ? 'true' : undefined}
       className={cn(
         'tm-flex',
         'tm-w-full',
@@ -49,25 +59,39 @@ export function AdvertisementHeader({ tone, label, dateInfo, className }: Advert
         'tm-gap-8',
         'md:tm-items-baseline',
         'md:tm-gap-0',
+        highlighted && ['tm-rounded', 'tm-p-2', 'tm-bg-emotion-warning-background'],
         label && dateInfo && 'md:tm-justify-between',
         'tm-whitespace-normal',
-        'tm-text-sm',
+        highlighted ? 'tm-text-base' : 'tm-text-sm',
         LABEL_CLASS[tone],
         className,
       )}
     >
       {label ? (
-        <span
-          data-testid="job-card-advertisement-heading-label"
-          className={cn('tm-text-sm', LABEL_WEIGHT[tone])}
-        >
-          {label}
+        <span className="tm-inline-flex tm-items-center tm-gap-1">
+          {highlighted ? (
+            <Icon
+              name="clock"
+              size={16}
+              data-testid="job-card-advertisement-heading-icon"
+              aria-hidden
+            />
+          ) : null}
+          <span
+            data-testid="job-card-advertisement-heading-label"
+            className={cn(highlighted ? 'tm-text-base' : 'tm-text-sm', LABEL_WEIGHT[tone])}
+          >
+            {label}
+          </span>
         </span>
       ) : null}
       {dateInfo ? (
         <span
           data-testid="job-card-advertisement-heading-date"
-          className="tm-text-sm tm-font-normal tm-text-secondary-default"
+          className={cn(
+            highlighted ? 'tm-text-base' : 'tm-text-sm',
+            'tm-font-normal tm-text-secondary-default',
+          )}
         >
           {label ? ' ' : null}
           {dateInfo}

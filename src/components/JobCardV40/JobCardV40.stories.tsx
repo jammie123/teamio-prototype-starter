@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { JobCardV40 } from './JobCardV40'
 import {
+  allPortals,
   endingSoonSame,
   expiredLongAgoSame,
   expiredRecentlySame,
@@ -162,6 +163,11 @@ export const Draft: Story = {
     advertisements: [],
     note: undefined,
   },
+}
+
+export const AllPortals: Story = {
+  name: 'Všechny portály',
+  args: { advertisements: [allPortals] },
 }
 
 export const HiringManager: Story = {

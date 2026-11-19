@@ -115,6 +115,7 @@ describe('buildAdvertisementModel', () => {
       tone: 'warning',
       label: 'Končí za 3 dny',
       dateInfo: '1. 9. – 30. 9. 2026',
+      highlighted: true,
     })
     expect(model.canProlong).toBe(true)
     expect(model.publications.every((item) => item.status === 'endingSoon')).toBe(true)
@@ -218,7 +219,21 @@ describe('buildAdvertisementModel', () => {
       const model = buildAdvertisementModel(ended('19. 9. 2026'), now)
 
       expect(model.kind).toBe('endedRecently')
-      expect(model.header).toMatchObject({ tone: 'warning', label: 'Expirováno před 8 dny' })
+      expect(model.header).toMatchObject({
+        tone: 'warning',
+        label: 'Expirováno před 8 dny',
+        highlighted: true,
+      })
+    })
+
+    it('tints the heading only up to 8 days after expiry', () => {
+      const nineDays = buildAdvertisementModel(ended('18. 9. 2026'), now)
+
+      expect(nineDays.kind).toBe('endedRecently')
+      expect(nineDays.header.tone).toBe('warning')
+      expect(nineDays.header.highlighted).toBeFalsy()
+      expect(buildAdvertisementModel(ended('27. 9. 2026'), now).header.highlighted).toBe(true)
+      expect(buildAdvertisementModel(ended('27. 8. 2026'), now).header.highlighted).toBeFalsy()
     })
 
     it('uses the most recent end date when portals ended on different days', () => {

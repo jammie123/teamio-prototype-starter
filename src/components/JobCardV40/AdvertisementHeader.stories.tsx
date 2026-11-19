@@ -27,11 +27,26 @@ export const Running: Story = {
 
 export const EndingSoon: Story = {
   name: 'Brzy končí',
-  args: { tone: 'warning', label: 'Končí za 3 dny', dateInfo: '1. 9. – 30. 9. 2026' },
+  args: {
+    tone: 'warning',
+    label: 'Končí za 3 dny',
+    dateInfo: '1. 9. – 30. 9. 2026',
+    highlighted: true,
+  },
 }
 
 export const ExpiredRecently: Story = {
-  name: 'Expirováno do 30 dní',
+  name: 'Expirováno do 8 dní (zvýrazněno)',
+  args: {
+    tone: 'warning',
+    label: 'Expirováno před 5 dny',
+    dateInfo: '1. 8. – 15. 8. 2026',
+    highlighted: true,
+  },
+}
+
+export const ExpiredWithin30Days: Story = {
+  name: 'Expirováno před 9–30 dny (bez pozadí)',
   args: { tone: 'warning', label: 'Expirováno před 12 dny', dateInfo: '1. 8. – 15. 8. 2026' },
 }
 
@@ -55,7 +70,18 @@ export const Overview: Story = {
   render: () => (
     <div className="tm-flex tm-flex-col tm-gap-4">
       <AdvertisementHeader tone="success" dateInfo="1. 9. – 30. 9. 2026" />
-      <AdvertisementHeader tone="warning" label="Končí za 3 dny" dateInfo="1. 9. – 30. 9. 2026" />
+      <AdvertisementHeader
+        highlighted
+        tone="warning"
+        label="Končí za 3 dny"
+        dateInfo="1. 9. – 30. 9. 2026"
+      />
+      <AdvertisementHeader
+        highlighted
+        tone="warning"
+        label="Expirováno před 5 dny"
+        dateInfo="1. 8. – 15. 8. 2026"
+      />
       <AdvertisementHeader
         tone="warning"
         label="Expirováno před 12 dny"

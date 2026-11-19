@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { AdvertisementEmptyState } from './AdvertisementEmptyState'
@@ -22,7 +22,11 @@ export interface AdvertisementWidgetProps extends StyleProps {
   onCreateAdvertisement?: () => void
   /** The job was ended manually or archived, so portals are shown as ended regardless of their dates. */
   endedBy?: AdvertisementEndedBy
+  /** Portals shown before the rest collapses into "+ N dalších" (click to expand, "Zobrazit méně" to collapse). */
+  maxVisiblePublications?: number
 }
+
+export const MAX_VISIBLE_PUBLICATIONS = 5
 
 /**
  * Compact advertisement block for the job-card right column:
@@ -38,9 +42,15 @@ export function AdvertisementWidget({
   onHighlightAdvertisement,
   onCreateAdvertisement,
   endedBy,
+  maxVisiblePublications = MAX_VISIBLE_PUBLICATIONS,
   className,
 }: AdvertisementWidgetProps) {
   const model = buildAdvertisementModel(advertisement, now, { endedBy })
+  const [expanded, setExpanded] = useState(false)
+  const collapsible = model.publications.length > maxVisiblePublications
+  const visiblePublications =
+    collapsible && !expanded ? model.publications.slice(0, maxVisiblePublications) : model.publications
+  const hiddenCount = model.publications.length - visiblePublications.length
   const isNotPublished = model.kind === 'notPublished'
 
   return (
@@ -84,7 +94,7 @@ export function AdvertisementWidget({
               model.sharedDates ? 'tm-flex-row' : 'tm-flex-col',
             )}
           >
-            {model.publications.map((item) => (
+            {visiblePublications.map((item) => (
               <Fragment key={item.publication.id}>
                 <PublicationItem
                   publication={item.publication}
@@ -106,6 +116,17 @@ export function AdvertisementWidget({
                 />
               </Fragment>
             ))}
+            {collapsible ? (
+              <button
+                type="button"
+                data-testid="job-card-publications-more"
+                aria-expanded={expanded}
+                onClick={() => setExpanded((value) => !value)}
+                className="tm-cursor-pointer tm-border-0 tm-bg-transparent tm-p-0 tm-text-sm tm-font-normal tm-text-secondary-default hover:tm-text-action-link-hover focus-visible:tm-text-action-link-hover"
+              >
+                {expanded ? 'Zobrazit méně' : `+ ${hiddenCount} dalších`}
+              </button>
+            ) : null}
           </div>
         </>
       )}

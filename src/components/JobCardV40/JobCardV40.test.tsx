@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobCardV40, type JobCardV40Props } from './JobCardV40'
+import { allPortals } from './fixtures'
 import type { JobAdvertisement, JobPublication } from './types'
 
 const now = new Date(2026, 8, 27)
@@ -532,6 +533,19 @@ describe('JobCardV40', () => {
 
     await user.click(screen.getByTestId('job-card-advertisement-preview-action'))
     expect(onAdvertisementPreviewClick).toHaveBeenCalledOnce()
+  })
+
+  it('collapses a job with every portal into five portals and "+ 4 dalších" in the 450px column', async () => {
+    const user = userEvent.setup()
+    renderJobCard({ advertisements: [allPortals] })
+
+    const column = screen.getByTestId('job-card-advertisements')
+    expect(column.className).toContain('md:tm-w-[450px]')
+    expect(within(column).getAllByTestId('job-card-publication')).toHaveLength(5)
+
+    await user.click(within(column).getByTestId('job-card-publications-more'))
+    expect(within(column).getAllByTestId('job-card-publication')).toHaveLength(9)
+    expect(within(column).getByTestId('job-card-publications-more')).toHaveTextContent('Zobrazit méně')
   })
 
   it('renders the avatars of people without a border', () => {

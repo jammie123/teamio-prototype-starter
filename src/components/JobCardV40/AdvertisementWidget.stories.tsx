@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { AdvertisementWidget } from './AdvertisementWidget'
 import {
+  allPortals,
   endedSame,
   endingSoonSame,
   expiredLongAgoSame,
@@ -77,6 +78,11 @@ export const EndedManually: Story = {
 export const NotPublished: Story = {
   name: 'Zatím nevystavený',
   args: { advertisement: notPublished },
+}
+
+export const AllPortals: Story = {
+  name: 'Všechny portály (sbalené po 5)',
+  args: { advertisement: allPortals },
 }
 
 export const WithHighlights: Story = {

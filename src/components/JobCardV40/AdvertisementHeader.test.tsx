@@ -38,6 +38,50 @@ describe('AdvertisementHeader', () => {
     expect(date.className).toContain('tm-text-secondary-default')
   })
 
+  it('adds 8px padding and the warning background to a highlighted heading', () => {
+    render(
+      <AdvertisementHeader
+        highlighted
+        tone="warning"
+        label="Končí za 3 dny"
+        dateInfo="1. 9. – 30. 9. 2026"
+      />,
+    )
+
+    const heading = screen.getByTestId('job-card-advertisement-heading')
+    expect(heading).toHaveAttribute('data-highlighted', 'true')
+    expect(heading.className).toContain('tm-p-2')
+    expect(heading.className).toContain('tm-bg-emotion-warning-background')
+    expect(heading.className).toContain('tm-text-base')
+    expect(within(heading).getByTestId('job-card-advertisement-heading-label').className).toContain(
+      'tm-text-base',
+    )
+    expect(within(heading).getByTestId('job-card-advertisement-heading-date').className).toContain(
+      'tm-text-base',
+    )
+    const icon = within(heading).getByTestId('job-card-advertisement-heading-icon')
+    expect(icon).toHaveAttribute('data-icon-name', 'clock')
+    expect(
+      icon.compareDocumentPosition(
+        within(heading).getByTestId('job-card-advertisement-heading-label'),
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('has no padding or background without the highlight', () => {
+    render(<AdvertisementHeader tone="warning" label="Expirováno před 20 dny" />)
+
+    const heading = screen.getByTestId('job-card-advertisement-heading')
+    expect(heading).not.toHaveAttribute('data-highlighted')
+    expect(heading.className).not.toContain('tm-p-2')
+    expect(heading.className).not.toMatch(/tm-bg-/)
+    expect(heading.className).toContain('tm-text-sm')
+    expect(heading.className).not.toContain('tm-text-base')
+    expect(
+      within(heading).queryByTestId('job-card-advertisement-heading-icon'),
+    ).not.toBeInTheDocument()
+  })
+
   it('shows the label of ended advertisements in the muted tone', () => {
     render(<AdvertisementHeader tone="ended" label="Expirováno" dateInfo="1. 8. – 15. 8. 2026" />)
 

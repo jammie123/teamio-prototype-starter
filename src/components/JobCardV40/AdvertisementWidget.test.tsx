@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { AdvertisementWidget } from './AdvertisementWidget'
+import { allPortals } from './fixtures'
 import type { JobAdvertisement, JobPublication } from './types'
 
 const now = new Date(2026, 8, 27)
@@ -43,6 +44,45 @@ describe('AdvertisementWidget', () => {
     fireEvent.click(within(dropdown).getByTestId('job-card-publication-prolong'))
 
     expect(onExtendAndRepublish).toHaveBeenCalledOnce()
+  })
+
+  it('collapses portals beyond the fifth into "+ N dalších"', () => {
+    renderWidget(allPortals)
+
+    expect(
+      screen.getAllByTestId('job-card-publication-channel').map((channel) => channel.textContent),
+    ).toEqual(['Atmoskop.cz', 'Export pozic', 'Intranet', 'Jobote', 'Jobs.cz'])
+
+    const more = screen.getByTestId('job-card-publications-more')
+    expect(more).toHaveTextContent('+ 4 dalších')
+    expect(more).toHaveAttribute('type', 'button')
+    expect(more).toHaveAttribute('aria-expanded', 'false')
+    expect(more.previousElementSibling).toBe(screen.getAllByTestId('job-card-publication')[4])
+  })
+
+  it('expands with the remaining portals and collapses with "Zobrazit méně"', async () => {
+    const user = userEvent.setup()
+    renderWidget(allPortals)
+
+    await user.click(screen.getByTestId('job-card-publications-more'))
+
+    expect(screen.getAllByTestId('job-card-publication')).toHaveLength(9)
+    expect(screen.getByText('Práce za rohem')).toBeInTheDocument()
+    const toggle = screen.getByTestId('job-card-publications-more')
+    expect(toggle).toHaveTextContent('Zobrazit méně')
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+    await user.click(toggle)
+
+    expect(screen.getAllByTestId('job-card-publication')).toHaveLength(5)
+    expect(screen.getByTestId('job-card-publications-more')).toHaveTextContent('+ 4 dalších')
+  })
+
+  it('shows all portals without a counter when there are at most five', () => {
+    renderWidget({ id: 'five', publications: allPortals.publications!.slice(0, 5) })
+
+    expect(screen.getAllByTestId('job-card-publication')).toHaveLength(5)
+    expect(screen.queryByTestId('job-card-publications-more')).not.toBeInTheDocument()
   })
 
   it('shows only Znovuvystavit inzerát in the hover card of an ended portal', async () => {

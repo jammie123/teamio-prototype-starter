@@ -2,6 +2,12 @@ import type { StyleProps } from '../../lib/types'
 
 export type JobsFilterOption = { value: string; label: string; description?: string }
 
+export const JOBS_FILTER_SORT_OPTIONS: JobsFilterOption[] = [
+  { value: 'latestAd', label: 'Od nejnovějších' },
+  { value: 'oldestAd', label: 'Od nejstarších' },
+  { value: 'titleAz', label: 'Podle názvu inzerátu (A-Z)' },
+]
+
 export type JobsFilterEmploymentType = 'fullTime' | 'partTime'
 export type JobsFilterAdvertisementStatus = 'active' | 'ended'
 

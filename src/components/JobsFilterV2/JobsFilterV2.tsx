@@ -23,6 +23,7 @@ export type {
   JobsFilterProps as JobsFilterV2Props,
   JobsFilterValue,
 } from './types'
+export { JOBS_FILTER_SORT_OPTIONS } from './types'
 
 const EMPTY_JOBS_FILTER: JobsFilterValue = {
   query: '',

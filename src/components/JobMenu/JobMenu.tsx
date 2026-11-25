@@ -6,7 +6,7 @@ import { buildJobMenuItems, type JobMenuHandlers } from './jobMenuItems'
 export const JOB_MENU_LABEL = 'Akce nad náborem a inzerátem'
 
 export interface JobMenuProps extends StyleProps, JobMenuHandlers {
-  /** Advertisement actions (end, extend, top) are shown only when this is non-empty. */
+  /** Advertisement actions (end, extend, highlight, top) are shown only when this is non-empty. */
   advertisements?: JobAdvertisement[]
   label?: string
   testId?: string
@@ -18,6 +18,7 @@ export function JobMenu({
   onDuplicateJob,
   onEndPublication,
   onExtendAndRepublish,
+  onHighlightAdvertisement,
   onTopAdvertisement,
   onInviteColleagues,
   onTransferJob,
@@ -32,6 +33,7 @@ export function JobMenu({
     onDuplicateJob,
     onEndPublication,
     onExtendAndRepublish,
+    onHighlightAdvertisement,
     onTopAdvertisement,
     onInviteColleagues,
     onTransferJob,

@@ -5,6 +5,7 @@ export const JOB_MENU_LABELS = {
   duplicateJob: 'Duplikovat',
   endPublication: 'Ukončit vystavování',
   extendAndRepublish: 'Prodloužit a znovuvystavit',
+  highlightAdvertisement: 'Zvýraznit',
   topAdvertisement: 'Topovat',
   inviteColleagues: 'Zapojit kolegu',
   transferJob: 'Předat nábor',
@@ -16,6 +17,7 @@ export interface JobMenuHandlers {
   onDuplicateJob?: () => void
   onEndPublication?: () => void
   onExtendAndRepublish?: () => void
+  onHighlightAdvertisement?: () => void
   onTopAdvertisement?: () => void
   onInviteColleagues?: () => void
   onTransferJob?: () => void
@@ -28,8 +30,8 @@ export interface BuildJobMenuItemsOptions extends JobMenuHandlers {
 
 /**
  * The menu is a single flat list in a fixed order. Actions without a handler
- * are left out, and the advertisement actions (end, extend, top) only appear
- * when the job has at least one advertisement.
+ * are left out, and the advertisement actions (end, extend, highlight, top)
+ * only appear when the job has at least one advertisement.
  */
 export function buildJobMenuItems({
   advertisements = [],
@@ -37,6 +39,7 @@ export function buildJobMenuItems({
   onDuplicateJob,
   onEndPublication,
   onExtendAndRepublish,
+  onHighlightAdvertisement,
   onTopAdvertisement,
   onInviteColleagues,
   onTransferJob,
@@ -62,6 +65,12 @@ export function buildJobMenuItems({
       id: 'advertisement-extend',
       label: JOB_MENU_LABELS.extendAndRepublish,
       onClick: onExtendAndRepublish,
+      enabled: hasAdvertisement,
+    },
+    {
+      id: 'advertisement-highlight',
+      label: JOB_MENU_LABELS.highlightAdvertisement,
+      onClick: onHighlightAdvertisement,
       enabled: hasAdvertisement,
     },
     {

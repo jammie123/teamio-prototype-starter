@@ -155,6 +155,7 @@ export const JobCardV31 = forwardRef<HTMLElement, JobCardV31Props>(function JobC
                     onArchiveJob={onArchiveJob}
                     onExtendAndRepublish={isDraft ? undefined : onExtendAndRepublish}
                     onEndPublication={isDraft ? undefined : onEndPublication}
+                    onHighlightAdvertisement={isDraft ? undefined : onHighlightAdvertisement}
                     onTopAdvertisement={isDraft ? undefined : onTopAdvertisement}
                   />
                 </>

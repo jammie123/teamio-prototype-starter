@@ -1,7 +1,7 @@
 import type { JobDetailStatsPeriod } from './jobDetailStatsPeriod'
 
 export const JOB_DETAIL_STATS_COPY = {
-  title: 'Detail inzerátu',
+  title: 'Přehled inzerce',
   periodLabel: 'Období',
   changePeriod: 'Změnit',
   empty: 'Pro vybrané období nejsou k dispozici žádná data',

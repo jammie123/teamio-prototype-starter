@@ -11,6 +11,7 @@ const allHandlers = () => ({
   onDuplicateJob: vi.fn(),
   onEndPublication: vi.fn(),
   onExtendAndRepublish: vi.fn(),
+  onHighlightAdvertisement: vi.fn(),
   onTopAdvertisement: vi.fn(),
   onInviteColleagues: vi.fn(),
   onTransferJob: vi.fn(),
@@ -20,7 +21,7 @@ const allHandlers = () => ({
 const optionLabels = () => screen.getAllByRole('option').map((option) => option.textContent)
 
 describe('JobMenu', () => {
-  it('lists all eight actions in a fixed order', async () => {
+  it('lists all nine actions in a fixed order', async () => {
     const user = userEvent.setup()
 
     render(<JobMenu advertisements={[advertisement]} {...allHandlers()} />)
@@ -31,6 +32,7 @@ describe('JobMenu', () => {
       'Duplikovat',
       'Ukončit vystavování',
       'Prodloužit a znovuvystavit',
+      'Zvýraznit',
       'Topovat',
       'Zapojit kolegu',
       'Předat nábor',
@@ -48,6 +50,7 @@ describe('JobMenu', () => {
       ['Duplikovat', handlers.onDuplicateJob],
       ['Ukončit vystavování', handlers.onEndPublication],
       ['Prodloužit a znovuvystavit', handlers.onExtendAndRepublish],
+      ['Zvýraznit', handlers.onHighlightAdvertisement],
       ['Topovat', handlers.onTopAdvertisement],
       ['Zapojit kolegu', handlers.onInviteColleagues],
       ['Předat nábor', handlers.onTransferJob],
@@ -74,10 +77,10 @@ describe('JobMenu', () => {
     )
     await user.click(screen.getByTestId('job-menu-toggle'))
 
-    expect(optionLabels()).toHaveLength(8)
+    expect(optionLabels()).toHaveLength(9)
   })
 
-  it('hides end, extend and top when the job has no advertisement', async () => {
+  it('hides end, extend, highlight and top when the job has no advertisement', async () => {
     const user = userEvent.setup()
 
     render(<JobMenu advertisements={[]} {...allHandlers()} />)

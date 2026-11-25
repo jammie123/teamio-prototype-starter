@@ -50,8 +50,7 @@ export const ScoreSummaryBadge = forwardRef<HTMLSpanElement, ScoreSummaryBadgePr
           className={className}
           {...rest}
         >
-          <Icon name="sparkles" className="tm-text-xs" />
-          <Icon name="circle-help" className="tm-text-sm" />
+          ?
         </CoverLightBadge>
       )
     }

@@ -148,6 +148,7 @@ export const JobCardV41 = forwardRef<HTMLElement, JobCardV41Props>(function JobC
             onArchiveJob={onArchiveJob}
             onExtendAndRepublish={showAdMenuActions ? onExtendAndRepublish : undefined}
             onEndPublication={showAdMenuActions ? onEndPublication : undefined}
+            onHighlightAdvertisement={showAdMenuActions ? onHighlightAdvertisement : undefined}
             onTopAdvertisement={showAdMenuActions ? onTopAdvertisement : undefined}
           />
           <div

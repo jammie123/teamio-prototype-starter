@@ -31,10 +31,12 @@ import {
   Home,
   Info,
   Link2,
+  ListChecks,
   Mail,
   Maximize2,
   Menu,
   MessageSquare,
+  Minus,
   Paperclip,
   Pencil,
   Phone,
@@ -67,6 +69,7 @@ import {
   StopReasonIcon,
   ThumbDownIcon,
   ThumbUpIcon,
+  TranslateIcon,
   ViewOffIcon,
 } from './customIcons'
 
@@ -96,6 +99,8 @@ const iconMap = {
   'more-horizontal': Ellipsis,
   home: Home,
   'file-text': FileText,
+  'list-checks': ListChecks,
+  minus: Minus,
   user: User,
   briefcase: Briefcase,
   database: Database,
@@ -137,6 +142,7 @@ const customIconMap = {
   'thumb-down': ThumbDownIcon,
   'stop-reason': StopReasonIcon,
   'view-off': ViewOffIcon,
+  translate: TranslateIcon,
 } as const satisfies Record<string, LucideIcon>
 
 export type KnownIconName = keyof typeof iconMap | keyof typeof customIconMap

@@ -92,10 +92,8 @@ describe('ScoreSummary', () => {
     expect(badge).toHaveAttribute('data-badge-type', 'insufficientData')
     expect(badge).toHaveClass('tm-bg-cover-light')
     expect(badge).toHaveAccessibleName(SCORE_SUMMARY_COPY.insufficientDataBadge)
-    const icons = within(badge).getAllByTestId('icon')
-    expect(icons).toHaveLength(2)
-    expect(icons[0]).toHaveAttribute('data-icon-name', 'sparkles')
-    expect(icons[1]).toHaveAttribute('data-icon-name', 'circle-help')
+    expect(badge).toHaveTextContent('?')
+    expect(within(badge).queryByTestId('icon')).not.toBeInTheDocument()
   })
 
   it('shows a danger badge when evaluation fails', () => {

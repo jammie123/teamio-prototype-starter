@@ -59,7 +59,7 @@ describe('jobDetailStatsPeriod', () => {
 })
 
 describe('JobDetailStatsModal', () => {
-  it('exposes dialog title Detail inzerátu', async () => {
+  it('exposes dialog title Přehled inzerce', async () => {
     render(
       <JobDetailStatsModal
         jobId="job-1"

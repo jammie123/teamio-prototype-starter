@@ -97,6 +97,9 @@ describe('components barrel', () => {
     expect(components.ScoreSummaryBadge).toBeTypeOf('object')
     expect(components.ScoreSummaryBody).toBeTypeOf('object')
     expect(components.EvaluationItem).toBeTypeOf('object')
+    expect(components.ScoreSummaryV2).toBeTypeOf('object')
+    expect(components.ScoreSummaryV2Dialog).toBeTypeOf('function')
+    expect(components.ScoreSummaryV2MatchCompact).toBeTypeOf('object')
     expect(components.SCORE_SUMMARY_COPY).toBeTypeOf('object')
     expect(components.getScoreBadgeTone).toBeTypeOf('function')
     expect(components.JobsPipeline).toBeTypeOf('object')
@@ -147,5 +150,10 @@ describe('components barrel', () => {
     expect(components.findEeoViolation).toBeTypeOf('function')
     expect(components.JOB_MODAL_COPY).toBeTypeOf('object')
     expect(components.JobsFilterV2).toBeTypeOf('function')
+    expect(components.JOBS_FILTER_SORT_OPTIONS).toEqual([
+      { value: 'latestAd', label: 'Od nejnovějších' },
+      { value: 'oldestAd', label: 'Od nejstarších' },
+      { value: 'titleAz', label: 'Podle názvu inzerátu (A-Z)' },
+    ])
   })
 })

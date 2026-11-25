@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ScoreSummaryBadge } from './ScoreSummaryBadge'
 
 const meta = {
-  title: 'Components/ScoreSummary/Badge',
+  title: 'AI Evaluation/ScoreSummary/Badge',
   component: ScoreSummaryBadge,
   parameters: {
     layout: 'centered',

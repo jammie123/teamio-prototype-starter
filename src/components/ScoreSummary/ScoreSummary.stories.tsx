@@ -18,7 +18,7 @@ const scoredArgs = {
 }
 
 const meta = {
-  title: 'Components/ScoreSummary',
+  title: 'AI Evaluation/ScoreSummary',
   component: ScoreSummary,
   args: scoredArgs,
   parameters: {

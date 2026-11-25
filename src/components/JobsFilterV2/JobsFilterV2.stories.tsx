@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { expect, fn, within } from 'storybook/test'
 import { JobsFilterV2 } from './JobsFilterV2'
-import type { JobsFilterOption, JobsFilterProps, JobsFilterValue } from './types'
+import { JOBS_FILTER_SORT_OPTIONS, type JobsFilterOption, type JobsFilterProps, type JobsFilterValue } from './types'
 
 const recruiters: JobsFilterOption[] = [
   { value: 'martina', label: 'Martina Nováková' },
@@ -43,11 +43,7 @@ const filledValue: JobsFilterValue = {
   advertisementStatus: 'active',
 }
 
-const sortOptions: JobsFilterOption[] = [
-  { value: 'latestAd', label: 'Nejnovější inzeráty' },
-  { value: 'oldestAd', label: 'Nejstarší inzeráty' },
-  { value: 'titleAz', label: 'Název A–Z' },
-]
+const sortOptions = JOBS_FILTER_SORT_OPTIONS
 
 function InteractiveJobsFilterV2({
   value: initialValue,

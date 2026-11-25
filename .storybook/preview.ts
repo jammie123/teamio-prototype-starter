@@ -41,6 +41,27 @@ const preview: Preview = {
             'JobsFilter',
             ['V2'],
           ],
+          'AI Evaluation',
+          [
+            'ScoreSummary',
+            [
+              'V2',
+              [
+                '*',
+                'Dialog',
+                'Parts',
+                [
+                  'Header',
+                  'Hodnocení',
+                  'Shrnutí uchazeče',
+                  'Splňuje kritéria',
+                  'Kritérium',
+                  'Kritérium kompaktní',
+                  'Otázky',
+                ],
+              ],
+            ],
+          ],
           'Page',
           'App',
         ],

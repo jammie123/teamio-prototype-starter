@@ -18,6 +18,7 @@ const meta = {
     onDuplicateJob: fn(),
     onEndPublication: fn(),
     onExtendAndRepublish: fn(),
+    onHighlightAdvertisement: fn(),
     onTopAdvertisement: fn(),
     onInviteColleagues: fn(),
     onTransferJob: fn(),
@@ -47,6 +48,7 @@ export const Default: Story = {
       'Duplikovat',
       'Ukončit vystavování',
       'Prodloužit a znovuvystavit',
+      'Zvýraznit',
       'Topovat',
       'Zapojit kolegu',
       'Předat nábor',
@@ -65,6 +67,7 @@ export const NoAdvertisements: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByTestId('job-menu-toggle'))
     await expect(canvas.getByRole('option', { name: 'Editovat nábor' })).toBeVisible()
+    await expect(canvas.queryByRole('option', { name: 'Zvýraznit' })).not.toBeInTheDocument()
     await expect(canvas.queryByRole('option', { name: 'Topovat' })).not.toBeInTheDocument()
     await expect(
       canvas.queryByRole('option', { name: 'Ukončit vystavování' }),

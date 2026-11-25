@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { JobsFilterV2 } from './JobsFilterV2'
-import type { JobsFilterProps, JobsFilterValue } from './types'
+import { JOBS_FILTER_SORT_OPTIONS, type JobsFilterProps, type JobsFilterValue } from './types'
 
 const recruiters = [
   { value: 'martina', label: 'Martina Nováková' },
@@ -170,22 +170,21 @@ describe('JobsFilterV2', () => {
   it('renders a sort select after the recruiter and calls onSortChange', async () => {
     const user = userEvent.setup()
     const onSortChange = vi.fn()
-    const sortOptions = [
-      { value: 'latestAd', label: 'Nejnovější inzeráty' },
-      { value: 'oldestAd', label: 'Nejstarší inzeráty' },
-    ]
     renderFilter({
       sortValue: 'latestAd',
-      sortOptions,
+      sortOptions: JOBS_FILTER_SORT_OPTIONS,
       onSortChange,
     })
 
     const sort = screen.getByRole('button', { name: 'Řazení' })
-    expect(sort).toHaveTextContent('Nejnovější inzeráty')
+    expect(sort).toHaveTextContent('Od nejnovějších')
 
     await user.click(sort)
     expect(screen.queryByRole('option', { name: 'Všichni' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('option', { name: 'Nejstarší inzeráty' }))
+    expect(screen.getByRole('option', { name: 'Od nejnovějších' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Od nejstarších' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Podle názvu inzerátu (A-Z)' })).toBeInTheDocument()
+    await user.click(screen.getByRole('option', { name: 'Od nejstarších' }))
     expect(onSortChange).toHaveBeenCalledWith('oldestAd')
   })
 
@@ -210,7 +209,7 @@ describe('JobsFilterV2', () => {
   it('does not treat sort as an active filter for the reset link', () => {
     renderFilter({
       sortValue: 'oldestAd',
-      sortOptions: [{ value: 'oldestAd', label: 'Nejstarší inzeráty' }],
+      sortOptions: [{ value: 'oldestAd', label: 'Od nejstarších' }],
       onSortChange: vi.fn(),
     })
 

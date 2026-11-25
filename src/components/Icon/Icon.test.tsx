@@ -61,7 +61,7 @@ describe('Icon', () => {
     expect(screen.getByRole('img', { name: 'Opalcování' })).toBeInTheDocument()
   })
 
-  it.each(['single-man-time', 'candidate-move', 'advertisement', 'advertisement-doc'])(
+  it.each(['single-man-time', 'candidate-move', 'advertisement', 'advertisement-doc', 'translate'])(
     'renders the custom filled %s icon',
     (name) => {
       render(<Icon name={name} title={name} />)
@@ -82,6 +82,8 @@ describe('Icon', () => {
     'more-horizontal',
     'columns-3',
     'grip-vertical',
+    'list-checks',
+    'minus',
   ])(
     'resolves %s as a known lucide icon',
     (name) => {

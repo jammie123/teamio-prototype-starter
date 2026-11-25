@@ -1,4 +1,4 @@
-export { JobsFilterV2 } from './JobsFilterV2'
+export { JobsFilterV2, JOBS_FILTER_SORT_OPTIONS } from './JobsFilterV2'
 export type {
   JobsFilterAdvertisementStatus,
   JobsFilterEmploymentType,

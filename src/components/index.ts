@@ -382,6 +382,21 @@ export {
   type ScoreSummaryType,
 } from './ScoreSummary'
 export {
+  ScoreSummaryV2,
+  ScoreSummaryV2Dialog,
+  ScoreSummaryV2MatchCompact,
+  type ScoreSummaryV2Props,
+  type ScoreSummaryV2DialogProps,
+  type ScoreSummaryV2MatchCompactProps,
+  type ScoreSummaryV2MatchCompactItem,
+  type ScoreSummaryV2Type,
+  type ScoreMatchItem,
+  type ScoreMatchStatus,
+  type ScoreQuestionItem,
+  type ScoreEvaluationLanguage,
+  type ScoreUiLanguage,
+} from './ScoreSummaryV2'
+export {
   JobPageHeader,
   type JobPageHeaderProps,
 } from './JobPageHeader'
@@ -459,6 +474,7 @@ export {
 export { JobResponseRateBadgeV2, type JobResponseRateBadgeV2Props } from './JobResponseRateBadgeV2'
 export {
   JobsFilterV2,
+  JOBS_FILTER_SORT_OPTIONS,
   type JobsFilterAdvertisementStatus,
   type JobsFilterEmploymentType,
   type JobsFilterOption,

@@ -62,6 +62,12 @@ const ICON_LABELS: Record<KnownIconName, string> = {
   'alert-triangle-outline': 'Varování (obrys)',
   clock: 'Čas',
   'view-off': 'Skrýt',
+  translate: 'Přeložit',
+  'list-checks': 'Kritéria',
+  minus: 'Odebrat',
+  copy: 'Kopírovat',
+  link: 'Odkaz',
+  print: 'Tisk',
 }
 
 const KNOWN_ICONS = Object.keys(ICON_LABELS) as KnownIconName[]

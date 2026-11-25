@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactNode } from 'react'
 import { expect, fn, within } from 'storybook/test'
 import { JobsFilterV2 } from '../JobsFilterV2'
-import type { JobsFilterOption, JobsFilterValue } from '../JobsFilterV2/types'
+import { JOBS_FILTER_SORT_OPTIONS, type JobsFilterOption, type JobsFilterValue } from '../JobsFilterV2/types'
 import { EmptyJobSearch } from './EmptyJobSearch'
 
 const recruiters: JobsFilterOption[] = [
@@ -14,9 +14,7 @@ const managers: JobsFilterOption[] = [{ value: 'karel', label: 'Karel Horák' }]
 
 const departments: JobsFilterOption[] = [{ value: 'centrala', label: 'Centrála' }]
 
-const sortOptions: JobsFilterOption[] = [
-  { value: 'latestAd', label: 'Nejnovější inzeráty' },
-]
+const sortOptions = JOBS_FILTER_SORT_OPTIONS
 
 const emptyValue: JobsFilterValue = {
   query: '',

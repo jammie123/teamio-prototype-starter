@@ -1,6 +1,6 @@
 export { JobCardV40, type JobCardV40Props } from './JobCardV40'
 export { JobPipeline, type JobPipelineProps } from './JobPipeline'
-export { JobAssignee, type JobAssigneeProps } from './JobAssignee'
+export { JobAssignee, type JobAssigneePerson, type JobAssigneeProps } from './JobAssignee'
 export { JobNote, type JobNoteProps } from './JobNote'
 export {
   AdvertisementWidget,

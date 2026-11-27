@@ -15,6 +15,7 @@ import { JobCardV40 } from '@teamio/starter/components'
   title="Řidič/ka sk. C ČB PO–PÁ"
   owner="Petra Nováková"
   hiringManagers={['Lukáš Procházka']}
+  colleagues={[{ name: 'Eva Dvořáková', role: 'HR' }]}
   status="published"
   candidates={{ new: 5, unassessed: 14, inProgress: 6, opalcovani: 3, total: 52 }}
   advertisements={[advertisement]}
@@ -28,7 +29,7 @@ import { JobCardV40 } from '@teamio/starter/components'
 
 | Část | Subkomponenta | Poznámka |
 | --- | --- | --- |
-| Job menu | `JobMenu` | Akce nad náborem. Položky bez handleru se nevykreslí, akce inzerátu jen když nábor inzerát má. |
+| Job menu | `JobMenu` | Akce nad náborem. Položky bez handleru se nevykreslí, akce inzerátu se řídí stavem inzerce (viz JobMenu). |
 | Hlavička | `JobCardHeader`, `JobAssignee`, `JobAdvertisementPreview` | Název, prezentační jednotka, pill „Archivní“, ikona Náhled, zapojení lidé. |
 | Pipeline | `JobPipeline` | Varianta Recruiter a varianta Hiring Manager (`isHiringManager`). |
 | Poznámka | `JobNote` | Jen když `note.text` není prázdný. Platí pro všechny stavy kromě Hiring Managera. |
@@ -54,16 +55,15 @@ Stav se počítá v `buildAdvertisementModel` z dat portálů (`now` lze přepsa
 | --- | --- | --- | --- |
 | Běží (jedno období, různá období, část portálů skončila) | jen datum, bez labelu | aktivní | žádná (při ukončeném portálu `Prodloužit`) |
 | Končí brzy (zbývá nejvýše 7 dní) | `Končí za N dní` + datum, zvýrazněno | aktivní | `Prodloužit` |
-| Expirováno do 30 dní | `Expirováno před N dny`, varování; do 8 dní navíc zvýrazněné pozadí | aktivní | `Znovuvystavit` |
-| Expirováno více než 30 dní | `Expirováno` (šedá) | ztlumená | `Znovuvystavit` |
+| Expirováno do 7 dní | `Expirováno před N dny`, varování, zvýrazněné pozadí | aktivní | `Znovuvystavit` |
+| Expirováno více než 7 dní | `Expirováno` (šedá) | ztlumená | `Znovuvystavit` |
 | Ukončené vystavování (`unpublished`, `archived`) | `Ukončené vystavování` (šedá) | ztlumená | `Znovuvystavit` |
 | Bez inzerce | `AdvertisementEmptyState`: „Zatím neinzerujete“ | aktivní | – |
 
-Prahy jsou konstanty v `lib/advertisementModel.ts`: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 30`,
-`HIGHLIGHTED_ENDED_DAYS = 8`.
+Prahy jsou konstanty v `lib/advertisementModel.ts`: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 7`.
 
 > **Rozdíl proti zadání:** zadání mluví o „Expirovaný ≤ 10 dní“ a „> 10 dní“. Implementace dnes používá
-> hranici 30 dní (a 8 dní pro zvýraznění). Dokumentace popisuje chování kódu.
+> hranici 7 dní (po ní je inzerát ztlumený). Dokumentace popisuje chování kódu.
 
 ## Pohledy a režimy
 
@@ -78,7 +78,7 @@ Prahy jsou konstanty v `lib/advertisementModel.ts`: `ENDING_SOON_DAYS = 7`, `REC
 
 | Prop | Kdy se volá |
 | --- | --- |
-| `onEditJob`, `onDuplicateJob`, `onInviteColleagues`, `onTransferJob`, `onArchiveJob` | Položky Job menu. |
+| `onEditJob`, `onDuplicateJob`, `onAddNote`, `onInviteColleagues`, `onTransferJob`, `onArchiveJob` | Položky Job menu. |
 | `onEditAdvertisement`, `onExtendAndRepublish`, `onEndPublication`, `onHighlightAdvertisement`, `onTopAdvertisement` | Menu inzerátu, hover karta portálu, tlačítko ve statistikách. |
 | `onCandidatesClick(stat)` | Klik na položku pipeline (`unassessed`, `toAssess`, `inProgress`, `opalcovani`, `total`). |
 | `onExpandNote` | Klik na poznámku. |

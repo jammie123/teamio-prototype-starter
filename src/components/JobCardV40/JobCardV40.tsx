@@ -6,6 +6,7 @@ import { Checkbox } from '../Checkbox'
 import { JobMenu } from '../JobMenu'
 import type { JobCardMenuHandlers } from '../JobShared/jobCardMenu'
 import { JobCardAdvertisements } from './JobCardAdvertisements'
+import type { JobAssigneePerson } from './JobAssignee'
 import { JobCardHeader } from './JobCardHeader'
 import { buildJobCardAdvertisements } from './lib/jobCardAdvertisements'
 import { JobNote } from './JobNote'
@@ -21,6 +22,8 @@ export interface JobCardV40Props
   department?: string
   owner?: string
   hiringManagers?: string[]
+  /** Other people involved next to the owner and hiring managers (e.g. HR colleagues). */
+  colleagues?: JobAssigneePerson[]
   /**
    * published = running job, unpublished = ended by the recruiter ("Ukončené vystavování"),
    * archived = "Archivní" pill with ended advertisements, draft = compact row with last change.
@@ -55,8 +58,8 @@ export interface JobCardV40Props
  * Listing card for one recruitment (V40): title, assignees, candidate pipeline,
  * optional note, and the advertisement column (portals, dates, stats; 450px from md up).
  *
- * Advertisement states: running (date only), ending soon, expired up to 30 days ago (highlighted),
- * expired more than 30 days ago (muted) and ended by the recruiter ("Ukončené vystavování", muted).
+ * Advertisement states: running (date only), ending soon, expired up to 7 days ago (highlighted),
+ * expired more than 7 days ago (muted) and ended by the recruiter ("Ukončené vystavování", muted).
  */
 export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobCardV40(
   {
@@ -64,6 +67,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
     department,
     owner,
     hiringManagers,
+    colleagues,
     status = 'published',
     candidates,
     onCandidatesClick,
@@ -71,6 +75,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
     showAdvertisementTitle = false,
     note,
     onExpandNote,
+    onAddNote,
     onCreateAdvertisement,
     onEditJob,
     onDuplicateJob,
@@ -161,7 +166,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
               )}
             >
               <JobMenu
-                advertisements={showAdMenuActions ? advertisements : []}
+                advertisements={showAdMenuActions ? advertisementColumn.advertisements : []}
                 label="Akce nad náborem a inzerátem"
                 testId="job-card-actions-toggle"
                 onEditJob={onEditJob}
@@ -169,6 +174,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
                 onInviteColleagues={onInviteColleagues}
                 onTransferJob={onTransferJob}
                 onArchiveJob={onArchiveJob}
+                onAddNote={onAddNote}
                 onExtendAndRepublish={showAdMenuActions ? onExtendAndRepublish : undefined}
                 onEndPublication={showAdMenuActions ? onEndPublication : undefined}
                 onHighlightAdvertisement={showAdMenuActions ? onHighlightAdvertisement : undefined}
@@ -188,6 +194,7 @@ export const JobCardV40 = forwardRef<HTMLElement, JobCardV40Props>(function JobC
               department={department}
               owner={owner}
               hiringManagers={hiringManagers}
+              colleagues={colleagues}
               onInviteColleagues={onInviteColleagues}
               onAdvertisementPreviewClick={onAdvertisementPreviewClick}
               lastChanged={lastChanged}

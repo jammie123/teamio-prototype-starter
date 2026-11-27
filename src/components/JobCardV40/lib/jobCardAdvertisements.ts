@@ -29,7 +29,7 @@ export interface JobCardAdvertisementsModel {
   endedBy?: AdvertisementEndedBy
   /**
    * The card is greyed out: job ended by the recruiter or archived, or advertisement expired more
-   * than 30 days ago. A recently expired advertisement keeps the card active so its highlight stands out.
+   * than 7 days ago. A recently expired advertisement keeps the card active so its highlight stands out.
    */
   isMuted: boolean
 }

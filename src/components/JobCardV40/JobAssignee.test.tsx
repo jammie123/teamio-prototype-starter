@@ -82,6 +82,48 @@ describe('JobAssignee', () => {
     expect(within(dropdown).getByText('Tomáš Král')).toBeInTheDocument()
   })
 
+  it('gives colleagues their own role and defaults to Hiring manager', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    render(
+      <JobAssignee
+        owner="Petra Nováková"
+        colleagues={[
+          { name: 'Eva Dvořáková', role: 'HR' },
+          { name: 'Marek Novotný', role: 'HR' },
+          { name: 'Lukáš Procházka' },
+        ]}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-people')).toHaveAttribute(
+      'aria-label',
+      'Petra Nováková (Náborář), Eva Dvořáková (HR), Marek Novotný (HR), Lukáš Procházka (Hiring manager)',
+    )
+    expect(screen.getByTestId('job-card-hiring-manager-0')).toHaveTextContent('ED')
+
+    await user.hover(screen.getByTestId('job-card-people'))
+    const dropdown = await screen.findByTestId('job-card-people-dropdown')
+
+    expect(within(dropdown).getAllByText('HR')).toHaveLength(2)
+    expect(within(dropdown).getByText('Hiring manager')).toBeInTheDocument()
+    expect(within(dropdown).getAllByTestId('job-card-people-owner')).toHaveLength(1)
+  })
+
+  it('keeps the owner first even when only colleagues are passed after it', () => {
+    render(
+      <JobAssignee
+        owner="Petra Nováková"
+        hiringManagers={['Lukáš Procházka']}
+        colleagues={[{ name: 'Eva Dvořáková', role: 'HR' }]}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-people')).toHaveAttribute(
+      'aria-label',
+      'Petra Nováková (Náborář), Lukáš Procházka (Hiring manager), Eva Dvořáková (HR)',
+    )
+  })
+
   it('renders nothing without people', () => {
     const { container } = render(<JobAssignee />)
 

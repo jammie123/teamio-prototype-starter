@@ -105,6 +105,7 @@ export function AdvertisementWidget({
                   onHighlight={onHighlightAdvertisement}
                   onRepublish={onExtendAndRepublish}
                   highlights={item.highlights}
+                  now={now}
                 />
                 <PublicationHighlights
                   publication={item.publication}
@@ -113,6 +114,8 @@ export function AdvertisementWidget({
                   onProlong={onExtendAndRepublish}
                   onHighlight={onHighlightAdvertisement}
                   onRepublish={onExtendAndRepublish}
+                  status={item.status}
+                  now={now}
                 />
               </Fragment>
             ))}

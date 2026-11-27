@@ -14,6 +14,7 @@ import { JobMenu } from '@teamio/starter/components'
   advertisements={advertisements}
   onEditJob={…}
   onDuplicateJob={…}
+  onAddNote={…}
   onArchiveJob={…}
 />
 ```
@@ -21,38 +22,58 @@ import { JobMenu } from '@teamio/starter/components'
 ## Pravidla
 
 - Položka se zobrazí jen tehdy, když má předaný handler. Žádný handler = položka neexistuje.
-- Akce inzerátu (`Ukončit vystavování`, `Prodloužit a znovuvystavit`, `Zvýraznit`, `Topovat`) se zobrazí jen tehdy,
-  když je `advertisements` neprázdné.
+- Akce inzerátu (`Ukončit vystavování`, `Prodloužit a znovuvystavit`, `Zvýraznit`, `Topovat`) **zohledňují inzerci**:
+  menu čte stav portálů v `advertisements`, ne jen jejich počet.
 - Bez položek komponenta nevykreslí nic (`null`).
+
+### Inzerce v menu
+
+- **Inzerce** = alespoň jeden inzerát, který má aspoň jeden portál (`publications`), ať běží, nebo už skončil.
+  Inzerát bez portálů (zatím nevystavený) se nepočítá.
+- **Běžící inzerce** = alespoň jeden portál, který není `expired` ani `disabled`. Portál bez `status` se bere jako běžící.
+
+| Akce | Kdy se zobrazí |
+| --- | --- |
+| `Ukončit vystavování` | Je nějaká inzerce. Bez inzerce se nezobrazí. |
+| `Prodloužit a znovuvystavit` | Vždy. |
+| `Zvýraznit` | Jen u běžící inzerce. |
+| `Topovat` | Jen u běžící inzerce. |
+
 ## Pořadí položek
 
 | # | Položka | Handler | Podmínka |
 | --- | --- | --- | --- |
 | 1 | Editovat nábor | `onEditJob` | – |
 | 2 | Duplikovat | `onDuplicateJob` | – |
-| 3 | Ukončit vystavování | `onEndPublication` | má inzerát |
-| 4 | Prodloužit a znovuvystavit | `onExtendAndRepublish` | má inzerát |
-| 5 | Zvýraznit | `onHighlightAdvertisement` | má inzerát |
-| 6 | Topovat | `onTopAdvertisement` | má inzerát |
-| 7 | Zapojit kolegu | `onInviteColleagues` | – |
-| 8 | Předat nábor | `onTransferJob` | – |
-| 9 | Archivovat | `onArchiveJob` | – |
+| 3 | Ukončit vystavování | `onEndPublication` | je nějaká inzerce |
+| 4 | Prodloužit a znovuvystavit | `onExtendAndRepublish` | vždy |
+| 5 | Zvýraznit | `onHighlightAdvertisement` | běžící inzerce |
+| 6 | Topovat | `onTopAdvertisement` | běžící inzerce |
+| 7 | Přidat poznámku | `onAddNote` | – |
+| 8 | Zapojit kolegu | `onInviteColleagues` | – |
+| 9 | Předat nábor | `onTransferJob` | – |
+| 10 | Archivovat | `onArchiveJob` | – |
 
-> **Rozdíl proti zadání:** zadání zmiňuje „Přidat poznámku“ v Job menu. V kódu tato položka zatím není
-> (`JobMenuHandlers` ji neobsahuje), poznámku zobrazuje `JobNote`.
+`Přidat poznámku` otevírá aplikace přes `onAddNote`; samotnou poznámku na kartě zobrazuje `JobNote`.
 
 ## Použití v kartě
 
 `JobCardV40` předává akce inzerátu jen u aktivních karet (`published`, `unpublished`), ne u `draft` a `archived`.
+Inzerci pro menu bere tak, jak ji karta zobrazuje: u `unpublished` jsou všechny portály ukončené, takže
+`Zvýraznit` a `Topovat` se nezobrazí.
 Tlačítko má `data-testid="job-card-actions-toggle"` a `aria-label="Akce nad náborem a inzerátem"`.
 
 ## Stavy
 
-### Nábor s inzerátem
+### Běžící inzerce
 
 <Canvas of={JobMenuStories.Default} />
 
-### Nábor bez inzerátu
+### Ukončená inzerce
+
+<Canvas of={JobMenuStories.EndedAdvertising} />
+
+### Bez inzerce
 
 <Canvas of={JobMenuStories.NoAdvertisements} />
 

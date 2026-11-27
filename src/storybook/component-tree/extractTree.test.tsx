@@ -70,4 +70,21 @@ describe('extractTree', () => {
   it('returns an empty tree for an empty container', () => {
     expect(extractTree(document.createElement('div'))).toEqual([])
   })
+
+  it('returns an empty tree for a container whose React root was unmounted', () => {
+    // Storybook přepíná mezi story a docs: root se odmountuje a React nastaví
+    // `__reactContainer$…` na null, klíč ale zůstane na elementu.
+    const { container, unmount } = render(<Branch />)
+    unmount()
+
+    expect(() => extractTree(container)).not.toThrow()
+    expect(extractTree(container)).toEqual([])
+  })
+
+  it('returns an empty tree for a container with a stale null React container key', () => {
+    const container = document.createElement('div')
+    Object.defineProperty(container, '__reactContainer$test', { value: null, configurable: true })
+
+    expect(extractTree(container)).toEqual([])
+  })
 })

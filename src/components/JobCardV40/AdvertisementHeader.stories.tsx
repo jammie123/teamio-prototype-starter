@@ -37,7 +37,7 @@ export const EndingSoon: Story = {
 }
 
 export const ExpiredRecently: Story = {
-  name: 'Expirováno do 8 dní (zvýrazněno)',
+  name: 'Expirováno do 7 dní (zvýrazněno)',
   args: {
     tone: 'warning',
     label: 'Expirováno před 5 dny',
@@ -46,13 +46,8 @@ export const ExpiredRecently: Story = {
   },
 }
 
-export const ExpiredWithin30Days: Story = {
-  name: 'Expirováno před 9–30 dny (bez pozadí)',
-  args: { tone: 'warning', label: 'Expirováno před 12 dny', dateInfo: '1. 8. – 15. 8. 2026' },
-}
-
 export const Expired: Story = {
-  name: 'Expirováno více než 30 dní',
+  name: 'Expirováno více než 7 dní',
   args: { tone: 'ended', label: 'Expirováno', dateInfo: '1. 6. – 15. 6. 2026' },
 }
 
@@ -81,11 +76,6 @@ export const Overview: Story = {
         highlighted
         tone="warning"
         label="Expirováno před 5 dny"
-        dateInfo="1. 8. – 15. 8. 2026"
-      />
-      <AdvertisementHeader
-        tone="warning"
-        label="Expirováno před 12 dny"
         dateInfo="1. 8. – 15. 8. 2026"
       />
       <AdvertisementHeader tone="ended" label="Expirováno" dateInfo="1. 6. – 15. 6. 2026" />

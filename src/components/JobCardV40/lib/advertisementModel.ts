@@ -15,11 +15,8 @@ import {
 
 export const ENDING_SOON_DAYS = 7
 
-/** An advertisement that expired at most this many days ago still counts as "recently expired". */
-export const RECENTLY_ENDED_DAYS = 30
-
-/** An advertisement that expired at most this many days ago gets the highlighted (tinted) heading. */
-export const HIGHLIGHTED_ENDED_DAYS = 8
+/** An advertisement that expired at most this many days ago still counts as "recently expired" (highlighted). */
+export const RECENTLY_ENDED_DAYS = 7
 
 export type AdvertisementTone = 'success' | 'warning' | 'ended' | 'neutral'
 
@@ -29,9 +26,9 @@ export type AdvertisementKind =
   | 'runningDifferent'
   | 'runningMixed'
   | 'endingSoon'
-  /** Expired 0 to 30 days ago ("Expirováno před N dny"); highlighted with the same tone as endingSoon. */
+  /** Expired 0 to 7 days ago ("Expirováno před N dny"); highlighted with the same tone as endingSoon. */
   | 'endedRecently'
-  /** Expired more than 30 days ago ("Expirováno"); muted. */
+  /** Expired more than 7 days ago ("Expirováno"); muted. */
   | 'ended'
   /** Ended by the recruiter ("Ukončené vystavování"). */
   | 'endedManually'
@@ -50,7 +47,7 @@ export interface AdvertisementHeaderModel {
   label?: string
   /** Date range or single date shown under (or next to) the label. */
   dateInfo?: string
-  /** Tinted heading with padding: ending soon, or expired up to 8 days ago. */
+  /** Tinted heading with padding: ending soon, or expired up to 7 days ago. */
   highlighted?: boolean
 }
 
@@ -318,7 +315,7 @@ export function buildAdvertisementModel(
           label:
             daysSinceEnd <= 0 ? 'Expirováno dnes' : `Expirováno ${formatDaysAgoLabel(daysSinceEnd)}`,
           dateInfo,
-          highlighted: daysSinceEnd <= HIGHLIGHTED_ENDED_DAYS,
+          highlighted: true,
         },
         'active',
         dateOptions,

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cn } from '../../lib/cn'
 import { Button } from '../Button'
 import { Dropdown, DropdownBody, DropdownToggle } from '../Dropdown'
 import { Icon } from '../Icon'
@@ -6,7 +7,8 @@ import { JobPortalLogo, jobPortalLogoTypeFromChannel } from '../JobPortalLogo'
 import { Link } from '../Link'
 import { formatConversionRate, formatCount } from './lib/format'
 import { formatPublicationRange } from './lib/dates'
-import type { JobPublication, JobPublicationHighlight } from './types'
+import { getPublicationStatusInfo, type PublicationStatusInfo } from './lib/publicationStatusInfo'
+import type { JobPublication, JobPublicationHighlight, JobPublicationStatus } from './types'
 
 const STATS: { key: 'viewCount' | 'reactionCount'; label: string }[] = [
   { key: 'viewCount', label: 'Zhlédnutí' },
@@ -69,6 +71,7 @@ function PublicationRow({
   periodTestId,
   viewTestId,
   onViewAdvertisement,
+  statusInfo,
 }: {
   channel: string
   startDate: string
@@ -76,6 +79,7 @@ function PublicationRow({
   periodTestId: string
   viewTestId?: string
   onViewAdvertisement?: () => void
+  statusInfo?: PublicationStatusInfo
 }) {
   return (
     <div className="tm-flex tm-min-w-0 tm-items-center tm-gap-3">
@@ -85,6 +89,20 @@ function PublicationRow({
         <div data-testid={periodTestId} className="tm-text-sm tm-tabular-nums tm-text-secondary-default">
           {formatPublicationRange(startDate, endDate)}
         </div>
+        {statusInfo ? (
+          <div
+            data-testid="job-card-publication-status-info"
+            data-tone={statusInfo.tone}
+            className={cn(
+              'tm-text-sm',
+              statusInfo.tone === 'warning'
+                ? 'tm-font-medium tm-text-emotion-warning-emphasis'
+                : 'tm-text-secondary-default',
+            )}
+          >
+            {statusInfo.text}
+          </div>
+        ) : null}
       </div>
       {viewTestId ? (
         <Button
@@ -136,10 +154,16 @@ export function PublicationDetails({
   publication,
   highlights = [],
   onViewAdvertisement,
+  status,
+  now,
 }: {
   publication: JobPublication
   highlights?: JobPublicationHighlight[]
   onViewAdvertisement?: () => void
+  /** Adds the status line for an ending-soon (`Končí za …`) or ended (`Ukončeno …`) portal. */
+  status?: JobPublicationStatus
+  /** Reference date for `Končí za …`; defaults to today. */
+  now?: Date
 }) {
   return (
     <div className="tm-flex tm-min-w-0 tm-flex-col">
@@ -151,6 +175,7 @@ export function PublicationDetails({
           periodTestId="job-card-publication-dropdown-period"
           viewTestId="job-card-publication-view-advertisement"
           onViewAdvertisement={onViewAdvertisement}
+          statusInfo={getPublicationStatusInfo(publication, status, now)}
         />
       </div>
       {highlights.length > 0 ? (

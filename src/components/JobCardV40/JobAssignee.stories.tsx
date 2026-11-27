@@ -37,6 +37,17 @@ export const ManyManagers: Story = {
   args: { hiringManagers: ['Lukáš Procházka', 'Jana Svobodová', 'Tomáš Král'] },
 }
 
+export const HrColleagues: Story = {
+  name: 'Samí HR kolegové',
+  args: {
+    hiringManagers: [],
+    colleagues: [
+      { name: 'Eva Dvořáková', role: 'HR' },
+      { name: 'Marek Novotný', role: 'HR' },
+    ],
+  },
+}
+
 export const WithoutInvite: Story = {
   name: 'Bez tlačítka Upravit zapojení',
   args: { onInviteMore: undefined },

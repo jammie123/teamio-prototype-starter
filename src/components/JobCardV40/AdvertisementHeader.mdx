@@ -23,7 +23,7 @@ import { AdvertisementHeader } from '@teamio/starter/components/JobCardV40'
 | `ended` | Expirováno, Ukončené vystavování | šedá |
 | `neutral` | Zatím nevystavený inzerát | šedá |
 
-`highlighted` přidá tónované pozadí, větší text a ikonu hodin. Používá se u Končí brzy a u expirace do 8 dní.
+`highlighted` přidá tónované pozadí, větší text a ikonu hodin. Používá se u Končí brzy a u expirace do 7 dní.
 `label` bez `dateInfo` i naopak jsou platné kombinace.
 
 ## Texty podle stavu
@@ -32,9 +32,8 @@ import { AdvertisementHeader } from '@teamio/starter/components/JobCardV40'
 | --- | --- | --- |
 | Běží | – | jen `dateInfo` |
 | Končí brzy | `Končí za N dní`, `Končí dnes` | `highlighted` |
-| Expirováno do 8 dní | `Expirováno před N dny`, `Expirováno dnes` | `highlighted` |
-| Expirováno před 9–30 dny | `Expirováno před N dny` | bez pozadí |
-| Expirováno více než 30 dní | `Expirováno` | šedá |
+| Expirováno do 7 dní | `Expirováno před N dny`, `Expirováno dnes` | `highlighted` |
+| Expirováno více než 7 dní | `Expirováno` | šedá |
 | Ukončené vystavování | `Ukončené vystavování` | šedá |
 | Bez inzerce | `Zatím nevystavený inzerát` | neutrální |
 
@@ -48,15 +47,11 @@ import { AdvertisementHeader } from '@teamio/starter/components/JobCardV40'
 
 <Canvas of={AdvertisementHeaderStories.EndingSoon} />
 
-### Expirováno do 8 dní (zvýrazněno)
+### Expirováno do 7 dní (zvýrazněno)
 
 <Canvas of={AdvertisementHeaderStories.ExpiredRecently} />
 
-### Expirováno před 9–30 dny
-
-<Canvas of={AdvertisementHeaderStories.ExpiredWithin30Days} />
-
-### Expirováno více než 30 dní
+### Expirováno více než 7 dní
 
 <Canvas of={AdvertisementHeaderStories.Expired} />
 

@@ -111,7 +111,7 @@ export const endedSame: JobAdvertisement = {
   ],
 }
 
-/** Expired 12 days ago: still "recently expired" (up to 30 days), highlighted. */
+/** Expired 5 days ago: still "recently expired" (up to 7 days), highlighted. */
 export const expiredRecentlySame: JobAdvertisement = {
   id: 'ad-expired-recently',
   publications: [
@@ -119,30 +119,30 @@ export const expiredRecentlySame: JobAdvertisement = {
       id: 'jobs',
       channel: 'Jobs.cz',
       status: 'expired',
-      startDate: daysFromNow(-42),
-      endDate: daysFromNow(-12),
+      startDate: daysFromNow(-35),
+      endDate: daysFromNow(-5),
       viewCount: 1840,
     }),
     portal({
       id: 'prace',
       channel: 'Prace.cz',
       status: 'expired',
-      startDate: daysFromNow(-42),
-      endDate: daysFromNow(-12),
+      startDate: daysFromNow(-35),
+      endDate: daysFromNow(-5),
       viewCount: 920,
     }),
     portal({
       id: 'career',
       channel: 'Kariérní stránky',
       status: 'expired',
-      startDate: daysFromNow(-42),
-      endDate: daysFromNow(-12),
+      startDate: daysFromNow(-35),
+      endDate: daysFromNow(-5),
       viewCount: 410,
     }),
   ],
 }
 
-/** Expired 45 days ago: more than 30 days, muted. */
+/** Expired 45 days ago: more than 7 days, muted. */
 export const expiredLongAgoSame: JobAdvertisement = {
   id: 'ad-expired-long-ago',
   publications: expiredRecentlySame.publications?.map((publication) => ({

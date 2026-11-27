@@ -28,7 +28,8 @@ Položka se nevykreslí, když je v `candidates` její hodnota `undefined`. Kdy�
 
 ## Pravidla
 
-- Růžový badge (`Pill`) s počtem nových kandidátů je jen u **Neposouzený** a jen když `candidates.new > 0`.
+- Růžový badge (`Pill`) s počtem nových kandidátů je u **Neposouzený** (Recruiter) a u **K ohodnocení**
+  (Liniový manažer), vždy jen když `candidates.new > 0`. U ostatních položek badge není.
 - `onStatClick` dostane klíč položky: `unassessed`, `toAssess`, `inProgress`, `opalcovani`, `total`.
   Klíč `new` se nepředává, nový badge není samostatně klikatelný.
 - Čísla se formátují přes `formatCount` (např. tisíce s mezerou).
@@ -55,6 +56,18 @@ Položka se nevykreslí, když je v `candidates` její hodnota `undefined`. Kdy�
 ### Klikací
 
 <Canvas of={JobPipelineStories.Clickable} />
+
+### Liniový manažer
+
+<Canvas of={JobPipelineStories.HiringManager} />
+
+### Liniový manažer – nový badge
+
+<Canvas of={JobPipelineStories.HiringManagerWithNewBadge} />
+
+### Liniový manažer – klikací
+
+<Canvas of={JobPipelineStories.HiringManagerClickable} />
 
 ### Velká čísla
 

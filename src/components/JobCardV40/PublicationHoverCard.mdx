@@ -37,6 +37,20 @@ import { PublicationHoverCard, PublicationDetails } from '@teamio/starter/compon
 > Tlačítko pro otevření inzerátu se v kódu otevírá callbackem `onViewAdvertisement`. Otevření v novém tabu je odpovědnost
 > aplikace, která callback předá.
 
+### Informace o stavu portálu
+
+Pod obdobím se zobrazí řádek se stavem, jen když je předaný `status` do `PublicationDetails`
+(`PublicationItem` ho předává sám):
+
+| Stav portálu | Řádek | Barva |
+| --- | --- | --- |
+| Běží | – (nic se nezobrazí) | – |
+| Končí brzy | `Končí za 3 dny`, `Končí dnes` (bez parsovatelného data `Končí brzy`) | varovná |
+| Ukončený | `Ukončeno 15. 8. 2026` (datum konce portálu) | tlumená |
+
+Selektor `job-card-publication-status-info`, `data-tone` je `warning` nebo `ended`. Počet dní se počítá od `now`
+(výchozí dnes).
+
 ## Kontextová tlačítka
 
 | Stav portálu | Tlačítka | Props |

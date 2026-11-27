@@ -179,7 +179,12 @@ function findRootFiber(container: Element): Fiber | null {
   const containerKey = Object.getOwnPropertyNames(record).find((key) =>
     key.startsWith('__reactContainer$'),
   )
-  if (containerKey) return liveRoot(record[containerKey] as Fiber)
+  if (containerKey) {
+    // Po `root.unmount()` (např. přechod ze story na docs) React hodnotu nastaví na null,
+    // ale klíč na elementu nechá – takový kontejner už žádný strom nemá.
+    const hostRoot = record[containerKey] as Fiber | null | undefined
+    return hostRoot ? liveRoot(hostRoot) : null
+  }
 
   // Záloha: fiber libovolného potomka a vyšplhat nahoru ke kořeni.
   for (const element of container.querySelectorAll('*')) {
@@ -188,7 +193,10 @@ function findRootFiber(container: Element): Fiber | null {
     )
     if (!fiberKey) continue
 
-    let fiber = (element as unknown as AnyRecord)[fiberKey] as Fiber
+    // Odmountované elementy mají fiber vynulovaný.
+    let fiber = (element as unknown as AnyRecord)[fiberKey] as Fiber | null | undefined
+    if (!fiber) continue
+
     while (fiber.return) fiber = fiber.return
     return liveRoot(fiber)
   }

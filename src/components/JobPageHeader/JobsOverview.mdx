@@ -52,17 +52,16 @@ Všechny podčásti jsou v jedné komponentě `JobsFilterV2`, samostatné storie
 
 | Oblast | Hodnoty |
 | --- | --- |
-| Stavy inzerce | Běží, Končí brzy, Expirovaný (do 30 dní), Expirovaný (více než 30 dní), Ukončené vystavování |
+| Stavy inzerce | Běží, Končí brzy, Expirovaný (do 7 dní), Expirovaný (více než 7 dní), Ukončené vystavování |
 | Stav bez inzerce | Kontextové akce (hotový návrh) |
 | Indikátor portálu | Zelená (běží), oranžová (končí brzy), šedá (ukončený) |
 | Layout Publication List | row (stejné období), column (různé období) |
 | Stavy karty | Aktivní (`published`, `unpublished`), draft, archiv |
 
 > Rozdíly mezi zadáním a aktuální implementací jsou vždy uvedeny na stránce konkrétní komponenty
-> (např. hranice „Expirovaný“ je v kódu 30 dní, ne 10; popisek rozbalení portálů je „+ N dalších“).
+> (např. hranice „Expirovaný“ je v kódu 7 dní, ne 10; popisek rozbalení portálů je „+ N dalších“).
 
 ## Co v kódu zatím není
 
 - Samostatné stories pro Search, filtr Recruiter, Sorting a Reset (jsou součástí `JobsFilterV2`).
-- Položka „Přidat poznámku“ v `JobMenu`.
 - Tabová navigace specifická pro výpis (Otevřené, Zveřejněné, …) jako Jobs komponenta: dnes jde o příběh `Components / Tabs`.

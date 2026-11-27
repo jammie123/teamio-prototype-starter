@@ -16,18 +16,33 @@ interface Person {
   role: string
 }
 
+/** A colleague involved in the job next to the owner; the role defaults to Hiring manager. */
+export interface JobAssigneePerson {
+  name: string
+  /** Label in the hover card, e.g. `HR`. Defaults to `Hiring manager`. */
+  role?: string
+}
+
 export interface JobAssigneeProps extends StyleProps {
   /** Náborář – shown first. */
   owner?: string
+  /** Hiring managers (role `Hiring manager`), shown after the owner. */
   hiringManagers?: string[]
+  /** Other people involved, e.g. HR colleagues; shown after the hiring managers. */
+  colleagues?: JobAssigneePerson[]
   /** Adds the "Upravit zapojení" button to the hover card. */
   onInviteMore?: () => void
 }
 
-function buildPeople(owner?: string, hiringManagers: string[] = []): Person[] {
+function buildPeople(
+  owner?: string,
+  hiringManagers: string[] = [],
+  colleagues: JobAssigneePerson[] = [],
+): Person[] {
   return [
     ...(owner ? [{ name: owner, role: OWNER_ROLE }] : []),
     ...hiringManagers.map((name) => ({ name, role: HIRING_MANAGER_ROLE })),
+    ...colleagues.map(({ name, role }) => ({ name, role: role?.trim() || HIRING_MANAGER_ROLE })),
   ]
 }
 
@@ -92,8 +107,14 @@ function OverflowBadge({ count }: { count: number }) {
 }
 
 /** Avatars of the owner and hiring managers; hovering opens the list with roles. */
-export function JobAssignee({ owner, hiringManagers, onInviteMore, className }: JobAssigneeProps) {
-  const people = buildPeople(owner, hiringManagers)
+export function JobAssignee({
+  owner,
+  hiringManagers,
+  colleagues,
+  onInviteMore,
+  className,
+}: JobAssigneeProps) {
+  const people = buildPeople(owner, hiringManagers, colleagues)
 
   if (people.length === 0) {
     return null

@@ -500,21 +500,21 @@ describe('JobCardV40', () => {
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Končí za 3 dny')
   })
 
-  it('keeps the card active and highlighted when the advertisement expired within 30 days', () => {
-    renderJobCard({ advertisements: [expiredAgo(12)] })
+  it('keeps the card active and highlighted when the advertisement expired within 7 days', () => {
+    renderJobCard({ advertisements: [expiredAgo(5)] })
 
     const card = screen.getByTestId('job-card')
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'endedRecently')
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent(
-      'Expirováno před 12 dny',
+      'Expirováno před 5 dny',
     )
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveAttribute('data-tone', 'warning')
     expect(card.className).not.toContain('!tm-bg-basic/50')
     expect(screen.getByTestId('job-card-advertisement-republish')).toBeInTheDocument()
   })
 
-  it('mutes the card when the advertisement expired more than 30 days ago', () => {
-    renderJobCard({ advertisements: [expiredAgo(31)] })
+  it('mutes the card when the advertisement expired more than 7 days ago', () => {
+    renderJobCard({ advertisements: [expiredAgo(8)] })
 
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'ended')
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent('Expirováno')

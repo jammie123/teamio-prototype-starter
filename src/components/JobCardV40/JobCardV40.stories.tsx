@@ -17,6 +17,7 @@ import {
 const menuHandlers = {
   onEditJob: fn(),
   onDuplicateJob: fn(),
+  onAddNote: fn(),
   onInviteColleagues: fn(),
   onTransferJob: fn(),
   onArchiveJob: fn(),
@@ -80,12 +81,12 @@ export const EndingSoon: Story = {
 }
 
 export const ExpiredRecently: Story = {
-  name: '5 · Expirováno nedávno (do 30 dní)',
+  name: '5 · Expirováno nedávno (do 7 dní)',
   args: { advertisements: [expiredRecentlySame] },
 }
 
 export const ExpiredLongAgo: Story = {
-  name: '6 · Expirováno před více než 30 dny',
+  name: '6 · Expirováno před více než 7 dny',
   args: { advertisements: [expiredLongAgoSame] },
 }
 
@@ -114,8 +115,8 @@ export const Overview: Story = {
           ['2 · Běží v různých obdobích', { advertisements: [runningDifferent] }],
           ['3 · Běží, některé portály už skončily', { advertisements: [mixedEndedPortal] }],
           ['4 · Brzy končí', { advertisements: [endingSoonSame] }],
-          ['5 · Expirováno nedávno (do 30 dní)', { advertisements: [expiredRecentlySame] }],
-          ['6 · Expirováno před více než 30 dny', { advertisements: [expiredLongAgoSame] }],
+          ['5 · Expirováno nedávno (do 7 dní)', { advertisements: [expiredRecentlySame] }],
+          ['6 · Expirováno před více než 7 dny', { advertisements: [expiredLongAgoSame] }],
           [
             '7 · Ukončené vystavování (ručně)',
             { status: 'unpublished', advertisements: [runningSame] },

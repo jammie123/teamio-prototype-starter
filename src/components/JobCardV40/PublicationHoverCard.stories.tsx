@@ -92,6 +92,7 @@ export const RunningPortal: Story = {
     await expect(dropdown).toBeVisible()
     await expect(within(dropdown).getByTestId('job-card-publication-stats')).toBeVisible()
     await expect(within(dropdown).queryByTestId('job-card-publication-actions')).toBeNull()
+    await expect(within(dropdown).queryByTestId('job-card-publication-status-info')).toBeNull()
   },
 }
 
@@ -129,7 +130,7 @@ export const RunningPortalWithRunningHighlight: Story = {
   },
 }
 
-/** Ukončený portál – období a statistiky za celou dobu běhu. Karta nabízí Znovuvystavit inzerát. */
+/** Ukončený portál – „Ukončeno k datu“, období a statistiky za celou dobu běhu. Karta nabízí Znovuvystavit inzerát. */
 export const EndedPortal: Story = {
   name: 'Ukončený portál',
   render: () => (
@@ -152,18 +153,22 @@ export const EndedPortal: Story = {
     await expect(within(dropdown).getByTestId('job-card-publication-dropdown-period')).toHaveTextContent(
       '15. 8. 2026',
     )
+    await expect(within(dropdown).getByTestId('job-card-publication-status-info')).toHaveTextContent(
+      'Ukončeno 15. 8. 2026',
+    )
     await expect(within(dropdown).getByRole('button', { name: 'Znovuvystavit inzerát' })).toBeVisible()
   },
 }
 
-/** Blíží se konec inzerce – karta nabízí Prodloužit. */
+/** Blíží se konec inzerce – karta ukazuje „Končí za N dní“ a nabízí Prodloužit. */
 export const EndingSoon: Story = {
   name: 'Blíží se konec inzerce',
   render: () => (
     <PublicationItem
-      publication={jobsCz}
+      publication={{ ...jobsCz, endDate: '30. 9. 2026' }}
       status="endingSoon"
       dateLabel="do 30. 9."
+      now={new Date(2026, 8, 27)}
       showHighlight={false}
       showProlong
       onViewAdvertisement={onViewAdvertisement}
@@ -175,6 +180,9 @@ export const EndingSoon: Story = {
       canvasElement,
       'job-card-publication-channel',
       'job-card-publication-dropdown',
+    )
+    await expect(within(dropdown).getByTestId('job-card-publication-status-info')).toHaveTextContent(
+      'Končí za 3 dny',
     )
     const actions = within(dropdown).getByTestId('job-card-publication-actions')
     await expect(within(actions).getByRole('button', { name: 'Prodloužit' })).toBeVisible()

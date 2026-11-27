@@ -101,10 +101,47 @@ describe('JobPipeline', () => {
       Array.from(stats.children).map((child) => child.getAttribute('data-testid')),
     ).toEqual(['job-card-stat-toAssess', 'job-card-stat-total'])
     expect(within(stats).getByText('K ohodnocení')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /K ohodnocení: 4/ }))
+    expect(onStatClick).toHaveBeenCalledWith('toAssess')
+  })
+
+  it('shows the new candidates as a pink Pill on K ohodnocení for a Hiring Manager', () => {
+    render(<JobPipeline isHiringManager candidates={{ ...candidates, toAssess: 4 }} />)
+
+    const pill = within(screen.getByTestId('job-card-stat-toAssess')).getByTestId(
+      'job-card-new-candidates',
+    )
+    expect(pill).toHaveTextContent(/^5$/)
+    expect(pill.className).toContain('tm-bg-teamio-pink')
+    expect(
+      within(screen.getByTestId('job-card-stat-total')).queryByTestId('job-card-new-candidates'),
+    ).not.toBeInTheDocument()
+    expect(screen.getAllByTestId('job-card-new-candidates')).toHaveLength(1)
+  })
+
+  it('hides the Hiring Manager pill without new candidates', () => {
+    const { rerender } = render(
+      <JobPipeline isHiringManager candidates={{ toAssess: 4, total: 52 }} />,
+    )
     expect(screen.queryByTestId('job-card-new-candidates')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'K ohodnocení: 4' }))
-    expect(onStatClick).toHaveBeenCalledWith('toAssess')
+    rerender(<JobPipeline isHiringManager candidates={{ new: 0, toAssess: 4, total: 52 }} />)
+    expect(screen.queryByTestId('job-card-new-candidates')).not.toBeInTheDocument()
+  })
+
+  it('describes the Hiring Manager pill in the accessible name of the clickable stat', () => {
+    render(
+      <JobPipeline
+        isHiringManager
+        candidates={{ new: 2, toAssess: 4, total: 52 }}
+        onStatClick={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /K ohodnocení: 4/ })).toHaveAccessibleName(
+      'K ohodnocení: 4, Noví kandidáti: 2',
+    )
   })
 
   it('renders nothing without counts', () => {

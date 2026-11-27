@@ -61,6 +61,31 @@ export const Empty: Story = {
   },
 }
 
+export const HiringManager: Story = {
+  name: 'Liniový manažer (K ohodnocení)',
+  args: {
+    isHiringManager: true,
+    candidates: { toAssess: 4, total: 52 },
+  },
+}
+
+export const HiringManagerWithNewBadge: Story = {
+  name: 'Liniový manažer – nový badge (Pill)',
+  args: {
+    isHiringManager: true,
+    candidates: { new: 2, toAssess: 4, total: 52 },
+  },
+}
+
+export const HiringManagerClickable: Story = {
+  name: 'Liniový manažer – klikací',
+  args: {
+    isHiringManager: true,
+    candidates: { new: 2, toAssess: 4, total: 52 },
+    onStatClick: fn(),
+  },
+}
+
 export const Overview: Story = {
   name: 'Přehled stavů',
   render: (args) => (
@@ -71,6 +96,8 @@ export const Overview: Story = {
         candidates={{ new: 5, unassessed: 14, inProgress: 6, opalcovani: 3, total: 52 }}
       />
       <JobPipeline {...args} candidates={{ unassessed: 0, inProgress: 0, opalcovani: 0, total: 0 }} />
+      <JobPipeline {...args} isHiringManager candidates={{ toAssess: 4, total: 52 }} />
+      <JobPipeline {...args} isHiringManager candidates={{ new: 2, toAssess: 4, total: 52 }} />
     </div>
   ),
 }

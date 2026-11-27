@@ -24,6 +24,8 @@ export interface PublicationItemProps extends StyleProps {
   onRepublish?: () => void
   /** Placements shown as rows in the hover card (e.g. Jobstip). */
   highlights?: JobPublicationHighlight[]
+  /** Reference date for `Končí za …` in the hover card; defaults to today. */
+  now?: Date
 }
 
 const DOT_CLASS: Record<JobPublicationStatus, string> = {
@@ -51,6 +53,7 @@ export function PublicationItem({
   onHighlight,
   onRepublish,
   highlights = [],
+  now,
   className,
 }: PublicationItemProps) {
   return (
@@ -101,6 +104,8 @@ export function PublicationItem({
           publication={publication}
           highlights={highlights}
           onViewAdvertisement={onViewAdvertisement}
+          status={status}
+          now={now}
         />
       </PublicationHoverCard>
       {dateLabel ? (
@@ -126,6 +131,9 @@ export interface PublicationHighlightsProps extends StyleProps {
   showHighlight?: boolean
   onHighlight?: () => void
   onRepublish?: () => void
+  /** Status of the portal; adds `Končí za …` / `Ukončeno …` to the hover card. */
+  status?: JobPublicationStatus
+  now?: Date
 }
 
 function PublicationHighlightName({
@@ -138,6 +146,8 @@ function PublicationHighlightName({
   showHighlight = publicationSupportsHighlight(publication),
   onHighlight,
   onRepublish,
+  status,
+  now,
 }: {
   publication: JobPublication
   highlight: JobPublicationHighlight
@@ -148,6 +158,8 @@ function PublicationHighlightName({
   showHighlight?: boolean
   onHighlight?: () => void
   onRepublish?: () => void
+  status?: JobPublicationStatus
+  now?: Date
 }) {
   const isEnded = publication.status === 'expired'
 
@@ -180,6 +192,8 @@ function PublicationHighlightName({
         publication={publication}
         highlights={highlights}
         onViewAdvertisement={onViewAdvertisement}
+        status={status}
+        now={now}
       />
     </PublicationHoverCard>
   )
@@ -195,6 +209,8 @@ export function PublicationHighlights({
   showHighlight = publicationSupportsHighlight(publication),
   onHighlight,
   onRepublish,
+  status,
+  now,
   className,
 }: PublicationHighlightsProps) {
   if (highlights.length === 0) {
@@ -234,6 +250,8 @@ export function PublicationHighlights({
             showHighlight={showHighlight}
             onHighlight={onHighlight}
             onRepublish={onRepublish}
+            status={status}
+            now={now}
           />
         </Fragment>
       ))}

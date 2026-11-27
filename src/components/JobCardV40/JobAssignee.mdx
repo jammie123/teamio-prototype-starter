@@ -13,13 +13,16 @@ import { JobAssignee } from '@teamio/starter/components/JobCardV40'
 <JobAssignee
   owner="Petra Nováková"
   hiringManagers={['Lukáš Procházka']}
+  colleagues={[{ name: 'Eva Dvořáková', role: 'HR' }]}
   onInviteMore={() => …}
 />
 ```
 
 ## Pravidla
 
-- Náborář (`owner`) je vždy první, role `Náborář`. Další osoby mají roli `Hiring manager`.
+- Náborář (`owner`) je vždy první, role `Náborář`.
+- Další osoby nemusí být jen hiring manageři. Pořadí za nimi: `hiringManagers` (role `Hiring manager`), pak `colleagues`
+  (např. HR kolegové) s vlastní rolí: `{ name: 'Eva Dvořáková', role: 'HR' }`. Bez `role` je výchozí `Hiring manager`.
 - Na kapsli jsou vidět iniciály maximálně 2 lidí, zbytek se sbalí do `+N`.
 - Tlačítko „Upravit zapojení“ v hover kartě se zobrazí jen tehdy, když je předán `onInviteMore`.
 
@@ -36,6 +39,10 @@ import { JobAssignee } from '@teamio/starter/components/JobCardV40'
 ### Více hiring managerů (sbalení do +N)
 
 <Canvas of={JobAssigneeStories.ManyManagers} />
+
+### Samí HR kolegové
+
+<Canvas of={JobAssigneeStories.HrColleagues} />
 
 ### Bez tlačítka Upravit zapojení
 

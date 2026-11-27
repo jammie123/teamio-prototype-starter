@@ -14,7 +14,12 @@ function sendTree() {
   if (!root) return
 
   // Kanál ořezává hluboce zanořené objekty (telejson), proto strom posíláme jako JSON string.
-  addons.getChannel().emit(EVENTS.TREE_UPDATE, JSON.stringify(extractTree(root)))
+  // Panel je jen pomůcka – interní struktura Reactu se nesmí promítnout do vykreslení story.
+  try {
+    addons.getChannel().emit(EVENTS.TREE_UPDATE, JSON.stringify(extractTree(root)))
+  } catch (error) {
+    console.warn('[component-tree] Nepodařilo se načíst strom komponent.', error)
+  }
 }
 
 function ComponentTreeReporter({ children }: { children: ReactNode }) {

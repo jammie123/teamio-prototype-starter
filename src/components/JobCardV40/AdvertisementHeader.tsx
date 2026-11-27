@@ -10,7 +10,7 @@ export interface AdvertisementHeaderProps extends StyleProps {
   label?: string
   /** From–to range next to the label (`1. 9. – 30. 9. 2026`). */
   dateInfo?: string
-  /** Tinted warning background with 8px padding, 16px text and a clock icon (ending soon, expired up to 8 days ago). */
+  /** Tinted warning background with 8px padding, 16px text and a clock icon (ending soon, expired up to 7 days ago). */
   highlighted?: boolean
 }
 

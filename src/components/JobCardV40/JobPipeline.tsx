@@ -21,12 +21,17 @@ const STAT_LABELS: Record<JobCandidateStat, string> = {
 
 const STAT_ORDER: JobCandidateStat[] = ['unassessed', 'inProgress', 'opalcovani', 'total']
 const HIRING_MANAGER_STAT_ORDER: JobCandidateStat[] = ['toAssess', 'total']
+/** Stats that carry the pink pill with new candidates: Neposouzený (Recruiter) and K ohodnocení (Hiring Manager). */
+const NEW_BADGE_STATS = new Set<JobCandidateStat>(['unassessed', 'toAssess'])
 
 function highlightCount(value: number | undefined) {
   return typeof value === 'number' && value > 0 ? value : undefined
 }
 
-/** Neposouzený / Ve hře / Opalcovaný / Celkem with an optional pill (count of new candidates) on Neposouzený. */
+/**
+ * Recruiter: Neposouzený / Ve hře / Opalcovaný / Celkem. Hiring Manager: K ohodnocení / Celkem.
+ * The first stat carries an optional pill with the count of new candidates.
+ */
 export function JobPipeline({
   candidates,
   onStatClick,
@@ -57,7 +62,7 @@ export function JobPipeline({
       {items.map((key, index) => {
         const count = candidates[key] as number
         const label = STAT_LABELS[key]
-        const newCount = key === 'unassessed' ? highlightCount(candidates.new) : undefined
+        const newCount = NEW_BADGE_STATS.has(key) ? highlightCount(candidates.new) : undefined
         const layout = cn(
           'tm-flex',
           'tm-w-full',

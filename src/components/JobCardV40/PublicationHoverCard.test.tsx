@@ -33,6 +33,58 @@ describe('PublicationDetails', () => {
   })
 })
 
+describe('PublicationDetails status info', () => {
+  const now = new Date(2026, 8, 27)
+
+  it('says how soon an ending portal finishes', () => {
+    render(
+      <PublicationDetails
+        publication={{ ...publication, endDate: '30. 9. 2026' }}
+        status="endingSoon"
+        now={now}
+      />,
+    )
+
+    const info = screen.getByTestId('job-card-publication-status-info')
+    expect(info).toHaveTextContent('Končí za 3 dny')
+    expect(info).toHaveAttribute('data-tone', 'warning')
+  })
+
+  it('says "Končí dnes" when the portal ends today', () => {
+    render(
+      <PublicationDetails
+        publication={{ ...publication, endDate: '27. 9. 2026' }}
+        status="endingSoon"
+        now={now}
+      />,
+    )
+
+    expect(screen.getByTestId('job-card-publication-status-info')).toHaveTextContent('Končí dnes')
+  })
+
+  it('shows the end date of an ended portal', () => {
+    render(
+      <PublicationDetails
+        publication={{ ...publication, endDate: '15. 8. 2026' }}
+        status="expired"
+        now={now}
+      />,
+    )
+
+    const info = screen.getByTestId('job-card-publication-status-info')
+    expect(info).toHaveTextContent('Ukončeno 15. 8. 2026')
+    expect(info).toHaveAttribute('data-tone', 'ended')
+  })
+
+  it('shows nothing for a running portal or without a status', () => {
+    const { rerender } = render(<PublicationDetails publication={publication} status="active" />)
+    expect(screen.queryByTestId('job-card-publication-status-info')).not.toBeInTheDocument()
+
+    rerender(<PublicationDetails publication={publication} />)
+    expect(screen.queryByTestId('job-card-publication-status-info')).not.toBeInTheDocument()
+  })
+})
+
 describe('PublicationDetails with highlights', () => {
   it('lists Jobstip and Topováno as compact name/date rows without repeating the portal logo', () => {
     render(

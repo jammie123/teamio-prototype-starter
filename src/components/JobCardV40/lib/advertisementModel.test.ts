@@ -199,41 +199,20 @@ describe('buildAdvertisementModel', () => {
       ['26. 9. 2026', 'Expirováno před 1 dnem'],
       ['24. 9. 2026', 'Expirováno před 3 dny'],
       ['20. 9. 2026', 'Expirováno před 7 dny'],
-      ['28. 8. 2026', 'Expirováno před 30 dny'],
     ])('highlights an advertisement that expired on %s as recently expired', (endDate, label) => {
       const model = buildAdvertisementModel(ended(endDate), now)
 
       expect(model.kind).toBe('endedRecently')
-      expect(model.header).toMatchObject({ tone: 'warning', label })
+      expect(model.header).toMatchObject({ tone: 'warning', label, highlighted: true })
       expect(model.canProlong).toBe(true)
     })
 
-    it('treats an advertisement that expired 31 days ago as an old expired one', () => {
-      const model = buildAdvertisementModel(ended('27. 8. 2026'), now)
+    it('treats an advertisement that expired 8 days ago as an old expired one', () => {
+      const model = buildAdvertisementModel(ended('19. 9. 2026'), now)
 
       expect(model.kind).toBe('ended')
       expect(model.header).toMatchObject({ tone: 'ended', label: 'Expirováno' })
-    })
-
-    it('keeps highlighting an advertisement that expired 8 days ago', () => {
-      const model = buildAdvertisementModel(ended('19. 9. 2026'), now)
-
-      expect(model.kind).toBe('endedRecently')
-      expect(model.header).toMatchObject({
-        tone: 'warning',
-        label: 'Expirováno před 8 dny',
-        highlighted: true,
-      })
-    })
-
-    it('tints the heading only up to 8 days after expiry', () => {
-      const nineDays = buildAdvertisementModel(ended('18. 9. 2026'), now)
-
-      expect(nineDays.kind).toBe('endedRecently')
-      expect(nineDays.header.tone).toBe('warning')
-      expect(nineDays.header.highlighted).toBeFalsy()
-      expect(buildAdvertisementModel(ended('27. 9. 2026'), now).header.highlighted).toBe(true)
-      expect(buildAdvertisementModel(ended('27. 8. 2026'), now).header.highlighted).toBeFalsy()
+      expect(model.header.highlighted).toBeFalsy()
     })
 
     it('uses the most recent end date when portals ended on different days', () => {

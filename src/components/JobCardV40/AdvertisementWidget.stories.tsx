@@ -57,12 +57,12 @@ export const EndingSoon: Story = {
 }
 
 export const ExpiredRecently: Story = {
-  name: 'Expirováno do 30 dní',
+  name: 'Expirováno do 7 dní',
   args: { advertisement: expiredRecentlySame },
 }
 
 export const ExpiredLongAgo: Story = {
-  name: 'Expirováno více než 30 dní',
+  name: 'Expirováno více než 7 dní',
   args: { advertisement: expiredLongAgoSame },
 }
 

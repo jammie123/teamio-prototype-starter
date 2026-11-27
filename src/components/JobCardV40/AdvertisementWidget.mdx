@@ -38,11 +38,11 @@ import { AdvertisementWidget } from '@teamio/starter/components'
 | `runningDifferent` | Běží, každý portál jinak |
 | `runningMixed` | Běží, část portálů už skončila |
 | `endingSoon` | Končí brzy (do 7 dní) |
-| `endedRecently` | Expirováno před 0–30 dny |
-| `ended` | Expirováno před více než 30 dny |
+| `endedRecently` | Expirováno před 0–7 dny |
+| `ended` | Expirováno před více než 7 dny |
 | `endedManually` | Ukončené vystavování (`endedBy` = `manual` nebo `archived`) |
 
-Prahy: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 30`, `HIGHLIGHTED_ENDED_DAYS = 8` v `lib/advertisementModel.ts`.
+Prahy: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 7` v `lib/advertisementModel.ts`.
 
 ## Důležité props
 
@@ -53,7 +53,6 @@ Prahy: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 30`, `HIGHLIGHTED_ENDED_DA
 | `now` | Referenční datum pro „Končí brzy“ a „Expirováno“ (výchozí dnes; pro stories a testy). |
 | `showTitle` | Název inzerátu nad stavem (u více inzerátů). |
 | `maxVisiblePublications` | Počet portálů před sbalením (výchozí `MAX_VISIBLE_PUBLICATIONS = 5`). |
-| `hideTopBorder` | Skryje horní linku (výchozí `true`; karta ji zapíná až od druhého inzerátu). |
 
 Na mobilu (pod `md`) se výpis portálů skrývá; zůstane stav a datum.
 
@@ -79,11 +78,11 @@ Na mobilu (pod `md`) se výpis portálů skrývá; zůstane stav a datum.
 
 <Canvas of={AdvertisementWidgetStories.EndingSoon} />
 
-### Expirováno do 30 dní
+### Expirováno do 7 dní
 
 <Canvas of={AdvertisementWidgetStories.ExpiredRecently} />
 
-### Expirováno více než 30 dní
+### Expirováno více než 7 dní
 
 <Canvas of={AdvertisementWidgetStories.ExpiredLongAgo} />
 

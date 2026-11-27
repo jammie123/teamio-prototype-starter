@@ -2,7 +2,7 @@ import { cn } from '../../lib/cn'
 import type { StyleProps } from '../../lib/types'
 import { Pill } from '../Pill'
 import { JobAdvertisementPreview } from './JobAdvertisementPreview'
-import { JobAssignee } from './JobAssignee'
+import { JobAssignee, type JobAssigneePerson } from './JobAssignee'
 import { JobCardDraftMeta } from './JobCardDraftMeta'
 
 export interface JobCardHeaderProps extends StyleProps {
@@ -11,6 +11,7 @@ export interface JobCardHeaderProps extends StyleProps {
   department?: string
   owner?: string
   hiringManagers?: string[]
+  colleagues?: JobAssigneePerson[]
   onInviteColleagues?: () => void
   onAdvertisementPreviewClick?: () => void
   lastChanged?: string
@@ -26,6 +27,7 @@ export function JobCardHeader({
   department,
   owner,
   hiringManagers,
+  colleagues,
   onInviteColleagues,
   onAdvertisementPreviewClick,
   lastChanged,
@@ -83,6 +85,7 @@ export function JobCardHeader({
         <JobAssignee
           owner={owner}
           hiringManagers={hiringManagers}
+          colleagues={colleagues}
           onInviteMore={onInviteColleagues}
           className="tm-shrink-0"
         />

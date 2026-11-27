@@ -344,17 +344,17 @@ describe('AdvertisementWidget', () => {
     )
   })
 
-  it('highlights an advertisement that expired within 30 days', () => {
+  it('highlights an advertisement that expired within 7 days', () => {
     renderWidget({
       id: 'ad-recent',
       publications: [
-        portal({ id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '1. 8. 2026', endDate: '15. 9. 2026' }),
+        portal({ id: 'jobs', channel: 'Jobs.cz', status: 'expired', startDate: '1. 8. 2026', endDate: '22. 9. 2026' }),
       ],
     })
 
     expect(screen.getByTestId('job-card-advertisement')).toHaveAttribute('data-kind', 'endedRecently')
     expect(screen.getByTestId('job-card-advertisement-heading-label')).toHaveTextContent(
-      'Expirováno před 12 dny',
+      'Expirováno před 5 dny',
     )
     expect(screen.getByTestId('job-card-advertisement-heading')).toHaveAttribute('data-tone', 'warning')
   })

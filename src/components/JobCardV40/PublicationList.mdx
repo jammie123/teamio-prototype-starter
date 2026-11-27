@@ -1,0 +1,77 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as PublicationListStories from './PublicationList.stories'
+
+<Meta of={PublicationListStories} />
+
+# PublicationList
+
+Výpis portálů inzerátu. Není to samostatná komponenta: je součástí `AdvertisementWidget` (kontejner
+`job-card-advertisement-publications`) a skládá se z `PublicationItem` a `PublicationHighlights`.
+Tyto stories ukazují jeho chování.
+
+## Layout
+
+| Podmínka | Layout | Zobrazení |
+| --- | --- | --- |
+| Všechny portály mají stejné datum začátku i konce | **row** (`data-kind="running"` apod.) | Portály vedle sebe, bez dat u portálů; období je v hlavičce. |
+| Portály mají různá období | **column** | Portály pod sebou, každý s datem `do D. M.`. |
+
+Určuje to `AdvertisementModel.sharedDates`. Pod `md` je výpis skrytý.
+
+## Řazení
+
+Běžící portály první, mezi nimi ten, který končí dřív, první. Ukončené portály na konec.
+
+## Limit a rozbalení
+
+- Zobrazí se nejvýše `maxVisiblePublications` portálů (výchozí 5, konstanta `MAX_VISIBLE_PUBLICATIONS`).
+- Nad limit se zobrazí odkaz `+ N dalších`. Po kliknutí se výpis rozbalí a odkaz se změní na `Zobrazit méně`.
+- Odkaz má `data-testid="job-card-publications-more"` a `aria-expanded`.
+- Přesně 5 portálů se nesbaluje.
+
+> **Rozdíl proti zadání:** zadání popisuje popisek „Zobrazit [count] další / méně“. Implementace dnes používá
+> `+ N dalších` / `Zobrazit méně`.
+
+## Stavy indikátoru a zvýraznění
+
+Indikátor stavu (kolečko) u portálu: zelená = běží, oranžová = končí brzy, šedá = ukončený. Kolečka se zobrazují jen
+tehdy, když se portály ve stavu liší. Zvýraznění (Jobstip, Topováno) se zobrazí jako `+ Jobstip, Topováno` za portálem,
+viz `PublicationItem`.
+
+## Stavy
+
+### Layout row
+
+<Canvas of={PublicationListStories.LayoutRow} />
+
+### Layout column
+
+<Canvas of={PublicationListStories.LayoutColumn} />
+
+### Ukončený portál na konci
+
+<Canvas of={PublicationListStories.WithEndedPortal} />
+
+### Přesně 5 portálů
+
+<Canvas of={PublicationListStories.ExactlyFivePortals} />
+
+### Více než 5, row, sbaleno
+
+<Canvas of={PublicationListStories.CollapsedRow} />
+
+### Více než 5, column, sbaleno
+
+<Canvas of={PublicationListStories.CollapsedColumn} />
+
+### Rozbaleno
+
+<Canvas of={PublicationListStories.Expanded} />
+
+### Vlastní limit
+
+<Canvas of={PublicationListStories.CustomLimit} />
+
+## Props (AdvertisementWidget)
+
+<ArgTypes of={PublicationListStories} />

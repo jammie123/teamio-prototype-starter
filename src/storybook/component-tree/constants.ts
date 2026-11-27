@@ -11,7 +11,7 @@ export const EVENTS = {
 export interface TreeNode {
   /** Název komponenty (displayName / name). */
   name: string
-  /** Zkrácená cesta ke zdrojáku (např. `components/JobCardV20/JobCardHeader.tsx`), pokud ji jde zjistit. */
+  /** Zkrácená cesta ke zdrojáku (např. `components/JobCardV40/JobCardHeader.tsx`), pokud ji jde zjistit. */
   file?: string
   /** `true` = komponenta z tohoto repa, `false` = knihovna (Radix, Lucide, Storybook...). */
   project: boolean

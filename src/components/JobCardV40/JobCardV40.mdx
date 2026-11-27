@@ -1,27 +1,136 @@
-import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks'
+import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks'
 import * as JobCardV40Stories from './JobCardV40.stories'
 
 <Meta of={JobCardV40Stories} />
 
-# JobCardV40
+# Job Card
 
-Karta náboru ve výpisu.
+Karta jednoho náboru ve výpisu (`JobCardV40`). Jde o jedinou aktuální variantu karty; subkomponenty
+jsou dokumentované v sekci **Subkomponenty** pod touto stránkou.
 
-- **Levý sloupec:** název, vlastníci, pipeline kandidátů, volitelná poznámka
-- **Pravý sloupec (450 px od md):** inzerát (období, portály, statistiky, hover karta)
+```tsx
+import { JobCardV40 } from '@teamio/starter/components'
+
+<JobCardV40
+  title="Řidič/ka sk. C ČB PO–PÁ"
+  owner="Petra Nováková"
+  hiringManagers={['Lukáš Procházka']}
+  status="published"
+  candidates={{ new: 5, unassessed: 14, inProgress: 6, opalcovani: 3, total: 52 }}
+  advertisements={[advertisement]}
+  note={{ author: 'Petra Nováková', text: '…', addedAt: '12. 9. 2026' }}
+  onEditJob={…}
+  onCandidatesClick={(stat) => …}
+/>
+```
+
+## Složení karty
+
+| Část | Subkomponenta | Poznámka |
+| --- | --- | --- |
+| Job menu | `JobMenu` | Akce nad náborem. Položky bez handleru se nevykreslí, akce inzerátu jen když nábor inzerát má. |
+| Hlavička | `JobCardHeader`, `JobAssignee`, `JobAdvertisementPreview` | Název, prezentační jednotka, pill „Archivní“, ikona Náhled, zapojení lidé. |
+| Pipeline | `JobPipeline` | Varianta Recruiter a varianta Hiring Manager (`isHiringManager`). |
+| Poznámka | `JobNote` | Jen když `note.text` není prázdný. Platí pro všechny stavy kromě Hiring Managera. |
+| Advertise sekce | `AdvertisementWidget` → `AdvertisementHeader`, `PublicationItem`, `PublicationHoverCard`; `AdvertisementStats`; `AdvertisementEmptyState` | Pravý sloupec, 450 px od breakpointu `md`. |
+
+Layout: levý sloupec (název, vlastníci, pipeline, poznámka) a pravý sloupec s inzerátem. Pod `md` se
+sloupce skládají pod sebe a menu přeskočí nahoru.
+
+## Stavy karty (`status`)
+
+| `status` | Vzhled |
+| --- | --- |
+| `published` | Aktivní nábor s inzercí (výchozí). |
+| `unpublished` | Inzerce ukončena ručně: „Ukončené vystavování“, ztlumená karta. |
+| `archived` | Pill „Archivní“, inzerce ukončená, bez akcí inzerátu v menu, bez tlačítka pro nový inzerát. |
+| `draft` | Kompaktní řádek: název, datum „Poslední změna“, bez pipeline, poznámky a inzerce. |
 
 ## Stavy inzerce
 
-| Stav | Hlavička | Karta |
-| --- | --- | --- |
-| Běží (jedno období, různá období, část portálů skončila) | jen datum, bez labelu | aktivní |
-| Brzy končí | `Končí za N dní` + datum | aktivní |
-| Expirováno do 30 dní | `Expirováno před N dny` (varování) | aktivní, vysoká priorita |
-| Expirováno více než 30 dní | `Expirováno` (šedá) | ztlumená |
-| Ukončené vystavování (`unpublished`, `archived`) | `Ukončené vystavování` (šedá) | ztlumená |
+Stav se počítá v `buildAdvertisementModel` z dat portálů (`now` lze přepsat pro testy a stories).
 
-Menu, pipeline a stavy karty (`archived`, Hiring Manager) vycházejí z JobCardV35.
+| Stav | Hlavička inzerce | Karta | Akce ve statistikách |
+| --- | --- | --- | --- |
+| Běží (jedno období, různá období, část portálů skončila) | jen datum, bez labelu | aktivní | žádná (při ukončeném portálu `Prodloužit`) |
+| Končí brzy (zbývá nejvýše 7 dní) | `Končí za N dní` + datum, zvýrazněno | aktivní | `Prodloužit` |
+| Expirováno do 30 dní | `Expirováno před N dny`, varování; do 8 dní navíc zvýrazněné pozadí | aktivní | `Znovuvystavit` |
+| Expirováno více než 30 dní | `Expirováno` (šedá) | ztlumená | `Znovuvystavit` |
+| Ukončené vystavování (`unpublished`, `archived`) | `Ukončené vystavování` (šedá) | ztlumená | `Znovuvystavit` |
+| Bez inzerce | `AdvertisementEmptyState`: „Zatím neinzerujete“ | aktivní | – |
+
+Prahy jsou konstanty v `lib/advertisementModel.ts`: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 30`,
+`HIGHLIGHTED_ENDED_DAYS = 8`.
+
+> **Rozdíl proti zadání:** zadání mluví o „Expirovaný ≤ 10 dní“ a „> 10 dní“. Implementace dnes používá
+> hranici 30 dní (a 8 dní pro zvýraznění). Dokumentace popisuje chování kódu.
+
+## Pohledy a režimy
+
+- **Hiring Manager** (`isHiringManager`): pipeline `K ohodnocení` / `Celkem`, bez pravého sloupce inzerce
+  a bez poznámky.
+- **Hromadné akce** (`isBulkAction`, `isSelected`, `onBulkSelectChange`): vlevo se zobrazí checkbox.
+  Jen JobCardV40.
+- **Prezentační jednotka** (`department`): zobrazí se za názvem po tečce.
+- **Název inzerátu** (`showAdvertisementTitle`): nad stavem inzerce, když je více inzerátů.
+
+## Callbacky
+
+| Prop | Kdy se volá |
+| --- | --- |
+| `onEditJob`, `onDuplicateJob`, `onInviteColleagues`, `onTransferJob`, `onArchiveJob` | Položky Job menu. |
+| `onEditAdvertisement`, `onExtendAndRepublish`, `onEndPublication`, `onHighlightAdvertisement`, `onTopAdvertisement` | Menu inzerátu, hover karta portálu, tlačítko ve statistikách. |
+| `onCandidatesClick(stat)` | Klik na položku pipeline (`unassessed`, `toAssess`, `inProgress`, `opalcovani`, `total`). |
+| `onExpandNote` | Klik na poznámku. |
+| `onViewStatisticsClick`, `onAdvertisementDetailClick` | Počet zhlédnutí a „Přehled“ ve statistikách. |
+| `onAdvertisementPreviewClick` | Ikona Náhled, odkaz na inzerát v hover kartě, „Zobrazit náhled“ v prázdném stavu. |
+| `onCreateAdvertisement` | „Publikovat“ v prázdném stavu. |
+
+## Testovací selektory
+
+`job-card`, `job-card-title`, `job-card-pipeline`, `job-card-advertisements`, `job-card-actions-toggle`,
+`job-card-bulk-select`, `job-card-archived-pill`. Atribut `data-variant="v40"` označuje variantu.
+
+## Stavy
 
 <Canvas of={JobCardV40Stories.Running} />
 
 <Controls />
+
+### Přehled všech stavů inzerce
+
+<Canvas of={JobCardV40Stories.Overview} />
+
+### Další stavy karty
+
+Archivní karta:
+
+<Canvas of={JobCardV40Stories.Archived} />
+
+Rozpracovaný nábor:
+
+<Canvas of={JobCardV40Stories.Draft} />
+
+Hiring Manager:
+
+<Canvas of={JobCardV40Stories.HiringManager} />
+
+Hromadné akce:
+
+<Canvas of={JobCardV40Stories.BulkAction} />
+
+Nábor bez inzerátu:
+
+<Canvas of={JobCardV40Stories.NoAdvertisement} />
+
+Bez poznámky:
+
+<Canvas of={JobCardV40Stories.WithoutNote} />
+
+Prezentační jednotka:
+
+<Canvas of={JobCardV40Stories.PresentationUnit} />
+
+## Props
+
+<ArgTypes of={JobCardV40Stories} />

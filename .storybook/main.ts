@@ -1,11 +1,22 @@
 import { resolve } from 'node:path'
 import type { StorybookConfig } from '@storybook/react-vite'
+import remarkGfm from 'remark-gfm'
 import { allowedFsRoots } from '../src/lib/allowedFsRoots'
 
 const config: StorybookConfig = {
-  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  // JobCardV41 zůstává v kódu, ale ve Storybooku dokumentujeme jen JobCardV40.
+  stories: [
+    '../src/*.mdx',
+    '../src/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/**/!(JobCardV41)/*.mdx',
+    '../src/**/!(JobCardV41)/*.stories.@(js|jsx|mjs|ts|tsx)',
+  ],
   addons: [
-    '@storybook/addon-docs',
+    {
+      name: '@storybook/addon-docs',
+      // remark-gfm: tabulky v MDX (bez něj se vykreslí jako holý text s |).
+      options: { mdxPluginOptions: { mdxCompileOptions: { remarkPlugins: [remarkGfm] } } },
+    },
     '@storybook/addon-a11y',
     '@whitespace/storybook-addon-html',
     // Panel "Component tree" – kompozice React komponent aktuální story.

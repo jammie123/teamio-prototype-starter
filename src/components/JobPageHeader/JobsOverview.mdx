@@ -1,0 +1,68 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Jobs/Přehled výpisu náborů" />
+
+# Přehled výpisu náborů
+
+Soupis komponent a částí stránky „Výpis náborů“ a odkazy na jejich dokumentaci ve Storybooku.
+
+## Úroveň stránky
+
+| Komponenta | Účel | Dokumentace |
+| --- | --- | --- |
+| Tabová navigace | Taby Otevřené, Zveřejněné, Nezveřejněné, Rozpracované, Archivní. Countery se přepočítávají po filtraci, pamatuje poslední tab. Staví na existující komponentě `Tabs`. | [Components / Tabs, příběh „WithCounts“](?path=/story/components-tabs--with-counts) |
+| JobPageHeader | Nadpis stránky + akční tlačítka nad výpisem. | [Jobs / JobPageHeader / V1](?path=/docs/jobs-jobpageheader-v1--docs) |
+| Filtrace + sorting | Prioritní filtry viditelné, ostatní v dialogu. Obsahuje search, filtr Recruiter, sorting a reset. | [Jobs / JobsFilter / V2](?path=/docs/jobs-jobsfilter-v2--docs) |
+| Výpis JobCard | Seznam karet náborů, včetně Empty page. | [Jobs / Job Card](?path=/docs/jobs-job-card--docs) |
+
+## Filtrace + sorting (podčásti)
+
+Všechny podčásti jsou v jedné komponentě `JobsFilterV2`, samostatné stories nemají.
+
+- Search (real-time, název inzerátu)
+- Filtr Recruiter (pamatuje poslední nastavení)
+- Prioritní filtry (vždy vidět)
+- Dialog s dalšími filtry (na vyžádání; příběh „MoreFiltersOpen“)
+- Sorting (od nejnovějších, od nejstarších, dle názvu A–Z)
+- Reset filtrace (viditelný, když je něco vyplněno; příběh „Filled“)
+- Empty page (nic nenalezeno): [Jobs / EmptyJobSearch](?path=/docs/jobs-emptyjobsearch--docs)
+
+## JobCard
+
+| Část | Obsah | Dokumentace |
+| --- | --- | --- |
+| Job menu | Akce nad náborem | [JobMenu](?path=/docs/jobs-job-card-subkomponenty-jobmenu--docs) |
+| Pipeline | Varianta Recruiter (s „Opalcovaný“) a varianta Liniák | [JobPipeline](?path=/docs/jobs-job-card-subkomponenty-jobpipeline--docs) |
+| Poznámka | Jen když nábor má poznámku, platí pro všechny stavy | [JobNote](?path=/docs/jobs-job-card-subkomponenty-jobnote--docs) |
+| Advertise sekce | Největší část karty | [AdvertisementWidget](?path=/docs/jobs-job-card-subkomponenty-advertisementwidget--docs) |
+
+### Advertise sekce
+
+| Komponenta | Účel | Dokumentace |
+| --- | --- | --- |
+| Advertise Header | Datum od–do, prioritní upoutávka | [AdvertisementHeader](?path=/docs/jobs-job-card-subkomponenty-advertisementheader--docs) |
+| Publication List | Výpis portálů, layout row/column, řazení, limit 5 | [PublicationList](?path=/docs/jobs-job-card-subkomponenty-publicationlist--docs) |
+| Publication Item | Jeden portál: indikátor stavu, název, datum, zvýraznění | [PublicationItem](?path=/docs/jobs-job-card-subkomponenty-publicationitem--docs) |
+| AdvertiseStats | Statistiky inzerce + odkaz na přehled | [AdvertisementStats](?path=/docs/jobs-job-card-subkomponenty-advertisementstats--docs) |
+| AdvertiseAction | Kontextové tlačítko podle stavu (Prodloužit, Znovuvystavit) | součást [AdvertisementStats](?path=/docs/jobs-job-card-subkomponenty-advertisementstats--docs) |
+| PublicationHoverDialog | Detail portálu po najetí myší | [PublicationHoverCard](?path=/docs/jobs-job-card-subkomponenty-publicationhovercard--docs) |
+| Stav bez inzerce | Hotový návrh, akce Zobrazit náhled a Publikovat | [AdvertisementEmptyState](?path=/docs/jobs-job-card-subkomponenty-advertisementemptystate--docs) |
+
+## Stavy a varianty (průřezově)
+
+| Oblast | Hodnoty |
+| --- | --- |
+| Stavy inzerce | Běží, Končí brzy, Expirovaný (do 30 dní), Expirovaný (více než 30 dní), Ukončené vystavování |
+| Stav bez inzerce | Kontextové akce (hotový návrh) |
+| Indikátor portálu | Zelená (běží), oranžová (končí brzy), šedá (ukončený) |
+| Layout Publication List | row (stejné období), column (různé období) |
+| Stavy karty | Aktivní (`published`, `unpublished`), draft, archiv |
+
+> Rozdíly mezi zadáním a aktuální implementací jsou vždy uvedeny na stránce konkrétní komponenty
+> (např. hranice „Expirovaný“ je v kódu 30 dní, ne 10; popisek rozbalení portálů je „+ N dalších“).
+
+## Co v kódu zatím není
+
+- Samostatné stories pro Search, filtr Recruiter, Sorting a Reset (jsou součástí `JobsFilterV2`).
+- Položka „Přidat poznámku“ v `JobMenu`.
+- Tabová navigace specifická pro výpis (Otevřené, Zveřejněné, …) jako Jobs komponenta: dnes jde o příběh `Components / Tabs`.

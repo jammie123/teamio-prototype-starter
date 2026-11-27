@@ -1,0 +1,74 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as PublicationHoverCardStories from './PublicationHoverCard.stories'
+
+<Meta of={PublicationHoverCardStories} />
+
+# PublicationHoverCard (PublicationHoverDialog)
+
+Popover portálu, který se otevře po najetí myší na název portálu nebo zvýraznění. Obalem je `Dropdown`
+(`openOnHover`, zpoždění 150 ms, umístění `bottom-start`). Obsah vyplňuje `PublicationDetails`.
+
+```tsx
+import { PublicationHoverCard, PublicationDetails } from '@teamio/starter/components/JobCardV40/PublicationHoverCard'
+
+<PublicationHoverCard
+  trigger={<span>Jobs.cz</span>}
+  dropdownTestId="job-card-publication-dropdown"
+  showProlong
+  showHighlight
+  onProlong={…}
+  onHighlight={…}
+>
+  <PublicationDetails publication={publication} highlights={highlights} onViewAdvertisement={…} />
+</PublicationHoverCard>
+```
+
+## Obsah
+
+| Část | Popis | Selektor |
+| --- | --- | --- |
+| Logo a název portálu | `JobPortalLogo` + název | – |
+| Datum od–do | `formatPublicationRange` | `job-card-publication-dropdown-period` |
+| Odkaz na inzerát | kruhové tlačítko `tertiary` (ikona `external-link`, `aria-label="Zobrazit inzerát"`), volá `onViewAdvertisement` | `job-card-publication-view-advertisement` |
+| Zvýraznění | Řádek na každé zvýraznění (název růžově, období vpravo) | `job-card-publication-highlight-row` |
+| Statistiky | Zhlédnutí, Reakce, Míra reakce (reakce / zhlédnutí v %); chybějící hodnota = `–` | `job-card-publication-stats` |
+| Akční tlačítka | Podle stavu, viz níže | `job-card-publication-actions` |
+
+> Tlačítko pro otevření inzerátu se v kódu otevírá callbackem `onViewAdvertisement`. Otevření v novém tabu je odpovědnost
+> aplikace, která callback předá.
+
+## Kontextová tlačítka
+
+| Stav portálu | Tlačítka | Props |
+| --- | --- | --- |
+| Běží | Zvýraznit (jen Jobs.cz, Prace.cz, Atmoskop) | `showHighlight`, `onHighlight` |
+| Končí brzy | Prodloužit, Zvýraznit | `showProlong`, `onProlong` |
+| Ukončený | Znovuvystavit inzerát | `showRepublish`, `onRepublish` |
+
+Řádek akcí se nevykreslí, když není zapnuté žádné tlačítko.
+
+## Stavy
+
+### Běžící portál
+
+<Canvas of={PublicationHoverCardStories.RunningPortal} />
+
+### Běžící portál s běžícím zvýrazněním
+
+<Canvas of={PublicationHoverCardStories.RunningPortalWithRunningHighlight} />
+
+### Běžící portál se zvýrazněním (tlačítko)
+
+<Canvas of={PublicationHoverCardStories.RunningPortalWithHighlightButton} />
+
+### Blíží se konec inzerce
+
+<Canvas of={PublicationHoverCardStories.EndingSoon} />
+
+### Ukončený portál
+
+<Canvas of={PublicationHoverCardStories.EndedPortal} />
+
+## Props
+
+<ArgTypes of={PublicationHoverCardStories} />

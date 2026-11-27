@@ -3,8 +3,9 @@ import { fn } from 'storybook/test'
 import { AdvertisementStats } from './AdvertisementStats'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/AdvertisementStats',
+  title: 'Jobs/Job Card/Subkomponenty/AdvertisementStats',
   component: AdvertisementStats,
+  tags: ['!autodocs'],
   args: {
     viewCount: 2610,
     onStatistics: fn(),

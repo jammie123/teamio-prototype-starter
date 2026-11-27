@@ -1,0 +1,80 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as PublicationItemStories from './PublicationItem.stories'
+
+<Meta of={PublicationItemStories} />
+
+# PublicationItem
+
+Jeden portál ve výpisu: indikátor stavu (kolečko), název portálu s tečkovaným podtržením a volitelné datum.
+Po najetí na název se otevře `PublicationHoverCard`. Zvýraznění portálu (Jobstip, Topováno) vykresluje
+`PublicationHighlights` hned za položkou.
+
+```tsx
+import { PublicationItem, PublicationHighlights } from '@teamio/starter/components/JobCardV40'
+
+<PublicationItem
+  publication={publication}
+  status="endingSoon"
+  dateLabel="do 30. 9."
+  onViewAdvertisement={…}
+  onProlong={…}
+  onHighlight={…}
+  onRepublish={…}
+  highlights={publication.highlights}
+/>
+```
+
+## Stav portálu (`status`)
+
+| `status` | Kolečko | Název | Hover karta nabízí |
+| --- | --- | --- | --- |
+| `active` | zelené | tučně | Zvýraznit (jen Jobs.cz, Prace.cz, Atmoskop) |
+| `endingSoon` | oranžové | tučně | Prodloužit, Zvýraznit |
+| `expired` | šedé | běžně, šedě | Znovuvystavit inzerát |
+
+Kolečko se dá skrýt přes `showStatusDot={false}`. `AdvertisementWidget` ho zapíná jen tehdy, když se portály liší stavem.
+
+## Datum (`dateLabel`)
+
+Předpřipravený popisek: `do 30. 9.` pro běžící, `ukončeno 15. 8.` pro ukončené. Zobrazuje se, když portály nesdílejí datum
+konce (layout column). Sestavuje ho `buildAdvertisementModel`, komponenta jen vypisuje.
+
+## Zvýraznění (Jobstip, Supermax, Topování)
+
+`PublicationHighlights` vykreslí `+ Jobstip, Topováno` růžově za portálem. Každý název má vlastní hover kartu, ve které jsou
+řádky zvýraznění s obdobím. Do `highlights` se nedostanou zvýraznění se stavem `expired`.
+
+## Selektory
+
+`job-card-publication` (`data-status`), `job-card-publication-dot`, `job-card-publication-channel`,
+`job-card-publication-dates`, `job-card-publication-highlight`, `job-card-publication-highlight-name`.
+
+## Stavy
+
+### Běží
+
+<Canvas of={PublicationItemStories.Running} />
+
+### Běží s datem „do“
+
+<Canvas of={PublicationItemStories.RunningWithDate} />
+
+### Končí brzy
+
+<Canvas of={PublicationItemStories.EndingSoon} />
+
+### Ukončený
+
+<Canvas of={PublicationItemStories.Ended} />
+
+### Bez tečky stavu
+
+<Canvas of={PublicationItemStories.WithoutDot} />
+
+### Přehled stavů a zvýraznění
+
+<Canvas of={PublicationItemStories.Overview} />
+
+## Props
+
+<ArgTypes of={PublicationItemStories} />

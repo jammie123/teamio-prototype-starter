@@ -28,7 +28,7 @@ const menuHandlers = {
 }
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40',
+  title: 'Jobs/Job Card',
   component: JobCardV40,
   tags: ['!autodocs'],
   args: {

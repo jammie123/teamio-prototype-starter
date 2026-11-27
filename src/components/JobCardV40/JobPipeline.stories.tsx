@@ -3,8 +3,9 @@ import { fn } from 'storybook/test'
 import { JobPipeline } from './JobPipeline'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/JobPipeline',
+  title: 'Jobs/Job Card/Subkomponenty/JobPipeline',
   component: JobPipeline,
+  tags: ['!autodocs'],
   args: {
     candidates: { unassessed: 14, inProgress: 6, opalcovani: 3, total: 52 },
   },

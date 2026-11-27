@@ -9,9 +9,9 @@ const advertisements: JobAdvertisement[] = [
 ]
 
 const meta = {
-  id: 'jobs-jobmenu',
-  title: 'Jobs/JobMenu',
+  title: 'Jobs/Job Card/Subkomponenty/JobMenu',
   component: JobMenu,
+  tags: ['!autodocs'],
   args: {
     advertisements,
     onEditJob: fn(),

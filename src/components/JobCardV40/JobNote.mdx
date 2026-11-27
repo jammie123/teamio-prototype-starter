@@ -1,0 +1,51 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as JobNoteStories from './JobNote.stories'
+
+<Meta of={JobNoteStories} />
+
+# JobNote
+
+Poznámka k náboru pod pipeline v levém sloupci karty: ikona, jednořádkový text a „iniciály · datum“.
+
+```tsx
+import { JobNote } from '@teamio/starter/components/JobCardV40'
+
+<JobNote
+  note={{ author: 'Petra Nováková', text: 'Čekáme na schválení rozpočtu', addedAt: '12. 9. 2026' }}
+  onExpand={() => openNote()}
+/>
+```
+
+## Pravidla
+
+- Zobrazuje se jen tehdy, když nábor má poznámku. Prázdný text (po `trim`) = komponenta nevykreslí nic.
+- Platí pro všechny stavy karty, kromě pohledu Hiring Managera (karta poznámku skryje).
+- Text je na jednom řádku a zkracuje se výpustkou.
+- `note.showDate = false` skryje datum, iniciály zůstanou. Iniciály se skládají z `author`.
+- S `onExpand` je celá poznámka tlačítko (např. pro otevření celé poznámky); bez něj je statická.
+
+## Selektor
+
+`note-text`
+
+## Stavy
+
+### Poznámka
+
+<Canvas of={JobNoteStories.Default} />
+
+### Klikací
+
+<Canvas of={JobNoteStories.Clickable} />
+
+### Bez data
+
+<Canvas of={JobNoteStories.WithoutDate} />
+
+### Dlouhý text
+
+<Canvas of={JobNoteStories.LongText} />
+
+## Props
+
+<ArgTypes of={JobNoteStories} />

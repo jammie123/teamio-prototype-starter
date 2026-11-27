@@ -15,8 +15,9 @@ import {
 } from './fixtures'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/AdvertisementWidget',
+  title: 'Jobs/Job Card/Subkomponenty/AdvertisementWidget',
   component: AdvertisementWidget,
+  tags: ['!autodocs'],
   args: {
     advertisement: runningSame,
     onExtendAndRepublish: fn(),

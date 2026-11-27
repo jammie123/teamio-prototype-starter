@@ -3,8 +3,9 @@ import { fn } from 'storybook/test'
 import { JobAssignee } from './JobAssignee'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/JobAssignee',
+  title: 'Jobs/Job Card/Subkomponenty/JobAssignee',
   component: JobAssignee,
+  tags: ['!autodocs'],
   args: {
     owner: 'Petra Nováková',
     hiringManagers: ['Lukáš Procházka'],

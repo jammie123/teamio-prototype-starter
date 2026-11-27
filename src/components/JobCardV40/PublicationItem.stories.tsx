@@ -13,8 +13,9 @@ const jobsCz: JobPublication = {
 }
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/PublicationItem',
+  title: 'Jobs/Job Card/Subkomponenty/PublicationItem',
   component: PublicationItem,
+  tags: ['!autodocs'],
   args: {
     publication: jobsCz,
     status: 'active',

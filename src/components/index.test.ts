@@ -115,13 +115,6 @@ describe('components barrel', () => {
   })
 
   it('exports job components', () => {
-    expect(components.JobCardV20).toBeTypeOf('object')
-    expect(components.JobCardV31).toBeTypeOf('object')
-    expect(components.JobCardV32).toBeTypeOf('object')
-    expect(components.JobCardV33).toBeTypeOf('object')
-    expect(components.JobCardV34).toBeTypeOf('object')
-    expect(components.JobCardV35).toBeTypeOf('object')
-    expect(components.JobCardV36).toBeTypeOf('object')
     expect(components.JobCardV40).toBeTypeOf('object')
     expect(components.JobCardV41).toBeTypeOf('object')
     expect(components.IconButton).toBeTypeOf('object')

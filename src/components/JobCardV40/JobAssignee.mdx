@@ -1,0 +1,46 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as JobAssigneeStories from './JobAssignee.stories'
+
+<Meta of={JobAssigneeStories} />
+
+# JobAssignee
+
+Kapsle s iniciály lidí zapojených do náboru v hlavičce karty. Po najetí se otevře hover karta se jmény a rolemi.
+
+```tsx
+import { JobAssignee } from '@teamio/starter/components/JobCardV40'
+
+<JobAssignee
+  owner="Petra Nováková"
+  hiringManagers={['Lukáš Procházka']}
+  onInviteMore={() => …}
+/>
+```
+
+## Pravidla
+
+- Náborář (`owner`) je vždy první, role `Náborář`. Další osoby mají roli `Hiring manager`.
+- Na kapsli jsou vidět iniciály maximálně 2 lidí, zbytek se sbalí do `+N`.
+- Tlačítko „Upravit zapojení“ v hover kartě se zobrazí jen tehdy, když je předán `onInviteMore`.
+
+## Stavy
+
+### Náborář a hiring manager
+
+<Canvas of={JobAssigneeStories.OwnerAndManager} />
+
+### Jen náborář
+
+<Canvas of={JobAssigneeStories.OnlyOwner} />
+
+### Více hiring managerů (sbalení do +N)
+
+<Canvas of={JobAssigneeStories.ManyManagers} />
+
+### Bez tlačítka Upravit zapojení
+
+<Canvas of={JobAssigneeStories.WithoutInvite} />
+
+## Props
+
+<ArgTypes of={JobAssigneeStories} />

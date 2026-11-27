@@ -3,8 +3,9 @@ import { fn } from 'storybook/test'
 import { JobNote } from './JobNote'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/JobNote',
+  title: 'Jobs/Job Card/Subkomponenty/JobNote',
   component: JobNote,
+  tags: ['!autodocs'],
   args: {
     note: {
       author: 'Petra Nováková',

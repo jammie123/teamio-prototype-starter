@@ -1,0 +1,40 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as AdvertisementEmptyStateStories from './AdvertisementEmptyState.stories'
+
+<Meta of={AdvertisementEmptyStateStories} />
+
+# AdvertisementEmptyState
+
+Pravý sloupec karty pro nábor, který ještě nemá vystavený inzerát („hotový návrh“): nadpis, krátký popis a dvě akce.
+Zobrazí se místo hlavičky a výpisu portálů; `AdvertisementStats` se u tohoto stavu nevykresluje.
+
+```tsx
+import { AdvertisementEmptyState } from '@teamio/starter/components/JobCardV40'
+
+<AdvertisementEmptyState
+  onAdvertisementPreviewClick={() => openPreview()}
+  onCreateAdvertisement={() => openPublishDialog()}
+/>
+```
+
+## Obsah
+
+| Prvek | Text | Handler | Selektor |
+| --- | --- | --- | --- |
+| Nadpis | Zatím neinzerujete | – | `job-card-advertisement-empty-title` |
+| Popis | Zkontrolujte náhled a publikujte. Kandidáti se ozvou rychle. | – | `job-card-advertisement-empty-body` |
+| Sekundární tlačítko | Zobrazit náhled | `onAdvertisementPreviewClick` | `job-card-advertisement-empty-preview` |
+| Primární tlačítko | Publikovat | `onCreateAdvertisement` | `job-card-advertisement-empty-publish` |
+
+## Kdy se zobrazí
+
+- `advertisements` karty je prázdné, nebo inzerát nemá žádné portály (`kind = notPublished`).
+- U archivních karet se `onCreateAdvertisement` nepředává, tlačítko tedy nic nespustí.
+
+## Stav
+
+<Canvas of={AdvertisementEmptyStateStories.Default} />
+
+## Props
+
+<ArgTypes of={AdvertisementEmptyStateStories} />

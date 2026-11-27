@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AdvertisementHeader } from './AdvertisementHeader'
 
 const meta = {
-  title: 'Jobs/Job Cards Variant/JobCardV40/AdvertisementHeader',
+  title: 'Jobs/Job Card/Subkomponenty/AdvertisementHeader',
   component: AdvertisementHeader,
+  tags: ['!autodocs'],
   args: {
     tone: 'success',
     label: undefined,

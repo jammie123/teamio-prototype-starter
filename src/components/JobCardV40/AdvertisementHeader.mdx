@@ -1,0 +1,77 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as AdvertisementHeaderStories from './AdvertisementHeader.stories'
+
+<Meta of={AdvertisementHeaderStories} />
+
+# AdvertisementHeader
+
+Hlavička inzerce: datum od–do a prioritní upoutávka (Končí brzy, Expirováno). Vykresluje ji `AdvertisementWidget`,
+hodnoty (`tone`, `label`, `dateInfo`, `highlighted`) počítá `buildAdvertisementModel`.
+
+```tsx
+import { AdvertisementHeader } from '@teamio/starter/components/JobCardV40'
+
+<AdvertisementHeader tone="warning" label="Končí za 3 dny" dateInfo="1. 9. – 30. 9. 2026" highlighted />
+```
+
+## Tóny
+
+| `tone` | Použití | Barva labelu |
+| --- | --- | --- |
+| `success` | Běží (label se nezobrazuje, jen datum) | zelená |
+| `warning` | Končí brzy, Expirováno před N dny | oranžová, tučné |
+| `ended` | Expirováno, Ukončené vystavování | šedá |
+| `neutral` | Zatím nevystavený inzerát | šedá |
+
+`highlighted` přidá tónované pozadí, větší text a ikonu hodin. Používá se u Končí brzy a u expirace do 8 dní.
+`label` bez `dateInfo` i naopak jsou platné kombinace.
+
+## Texty podle stavu
+
+| Stav | `label` | Pozn. |
+| --- | --- | --- |
+| Běží | – | jen `dateInfo` |
+| Končí brzy | `Končí za N dní`, `Končí dnes` | `highlighted` |
+| Expirováno do 8 dní | `Expirováno před N dny`, `Expirováno dnes` | `highlighted` |
+| Expirováno před 9–30 dny | `Expirováno před N dny` | bez pozadí |
+| Expirováno více než 30 dní | `Expirováno` | šedá |
+| Ukončené vystavování | `Ukončené vystavování` | šedá |
+| Bez inzerce | `Zatím nevystavený inzerát` | neutrální |
+
+## Stavy
+
+### Běží
+
+<Canvas of={AdvertisementHeaderStories.Running} />
+
+### Brzy končí
+
+<Canvas of={AdvertisementHeaderStories.EndingSoon} />
+
+### Expirováno do 8 dní (zvýrazněno)
+
+<Canvas of={AdvertisementHeaderStories.ExpiredRecently} />
+
+### Expirováno před 9–30 dny
+
+<Canvas of={AdvertisementHeaderStories.ExpiredWithin30Days} />
+
+### Expirováno více než 30 dní
+
+<Canvas of={AdvertisementHeaderStories.Expired} />
+
+### Ukončené vystavování
+
+<Canvas of={AdvertisementHeaderStories.EndedManually} />
+
+### Zatím nevystavený inzerát
+
+<Canvas of={AdvertisementHeaderStories.NotPublished} />
+
+### Přehled
+
+<Canvas of={AdvertisementHeaderStories.Overview} />
+
+## Props
+
+<ArgTypes of={AdvertisementHeaderStories} />

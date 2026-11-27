@@ -1,0 +1,116 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as AdvertisementWidgetStories from './AdvertisementWidget.stories'
+
+<Meta of={AdvertisementWidgetStories} />
+
+# AdvertisementWidget (Advertise sekce)
+
+Největší část karty: pravý sloupec s inzercí jednoho inzerátu. Skládá se z `AdvertisementHeader`
+(stav a datum), výpisu portálů (`PublicationItem`, dokumentováno jako **PublicationList**) a – mimo widget,
+v `JobCardAdvertisements` – z `AdvertisementStats`.
+
+```tsx
+import { AdvertisementWidget } from '@teamio/starter/components'
+
+<AdvertisementWidget
+  advertisement={{ id: 'ad-1', publications: [...] }}
+  endedBy={undefined}
+  onExtendAndRepublish={…}
+  onAdvertisementPreviewClick={…}
+  onHighlightAdvertisement={…}
+  onCreateAdvertisement={…}
+/>
+```
+
+## Co widget dělá
+
+1. Z dat portálů spočítá model (`buildAdvertisementModel`): druh stavu, hlavičku, popisky dat portálů, součet zhlédnutí.
+2. Bez portálů vykreslí `AdvertisementEmptyState` („Zatím neinzerujete“).
+3. Jinak vykreslí `AdvertisementHeader` a seznam portálů.
+4. Portály jsou řazené: běžící nejdřív (nejdřív končící první), ukončené na konec.
+
+## Druhy stavu (`data-kind`)
+
+| `data-kind` | Význam |
+| --- | --- |
+| `notPublished` | Zatím nevystavený inzerát |
+| `running` | Běží, všechny portály ve stejném období |
+| `runningDifferent` | Běží, každý portál jinak |
+| `runningMixed` | Běží, část portálů už skončila |
+| `endingSoon` | Končí brzy (do 7 dní) |
+| `endedRecently` | Expirováno před 0–30 dny |
+| `ended` | Expirováno před více než 30 dny |
+| `endedManually` | Ukončené vystavování (`endedBy` = `manual` nebo `archived`) |
+
+Prahy: `ENDING_SOON_DAYS = 7`, `RECENTLY_ENDED_DAYS = 30`, `HIGHLIGHTED_ENDED_DAYS = 8` v `lib/advertisementModel.ts`.
+
+## Důležité props
+
+| Prop | Účel |
+| --- | --- |
+| `advertisement` | Data inzerátu (`publications` s pre-formátovanými daty `D. M.` nebo `D. M. YYYY`). |
+| `endedBy` | Karta byla ukončena ručně nebo archivována: všechny portály se berou jako ukončené bez ohledu na data. |
+| `now` | Referenční datum pro „Končí brzy“ a „Expirováno“ (výchozí dnes; pro stories a testy). |
+| `showTitle` | Název inzerátu nad stavem (u více inzerátů). |
+| `maxVisiblePublications` | Počet portálů před sbalením (výchozí `MAX_VISIBLE_PUBLICATIONS = 5`). |
+| `hideTopBorder` | Skryje horní linku (výchozí `true`; karta ji zapíná až od druhého inzerátu). |
+
+Na mobilu (pod `md`) se výpis portálů skrývá; zůstane stav a datum.
+
+## Selektory
+
+`job-card-advertisement`, `job-card-advertisement-title`, `job-card-advertisement-publications`, `job-card-publications-more`.
+
+## Stavy
+
+### Běží, jedno období
+
+<Canvas of={AdvertisementWidgetStories.Running} />
+
+### Běží, každý portál jinak
+
+<Canvas of={AdvertisementWidgetStories.RunningDifferentPeriods} />
+
+### Běží, některé portály už skončily
+
+<Canvas of={AdvertisementWidgetStories.RunningWithEndedPortal} />
+
+### Brzy končí
+
+<Canvas of={AdvertisementWidgetStories.EndingSoon} />
+
+### Expirováno do 30 dní
+
+<Canvas of={AdvertisementWidgetStories.ExpiredRecently} />
+
+### Expirováno více než 30 dní
+
+<Canvas of={AdvertisementWidgetStories.ExpiredLongAgo} />
+
+### Ukončené vystavování
+
+<Canvas of={AdvertisementWidgetStories.EndedManually} />
+
+### Zatím nevystavený
+
+<Canvas of={AdvertisementWidgetStories.NotPublished} />
+
+### Všechny portály (sbalené po 5)
+
+<Canvas of={AdvertisementWidgetStories.AllPortals} />
+
+### Jobstip a Topováno
+
+<Canvas of={AdvertisementWidgetStories.WithHighlights} />
+
+### S názvem inzerátu
+
+<Canvas of={AdvertisementWidgetStories.WithTitle} />
+
+### Přehled stavů
+
+<Canvas of={AdvertisementWidgetStories.Overview} />
+
+## Props
+
+<ArgTypes of={AdvertisementWidgetStories} />

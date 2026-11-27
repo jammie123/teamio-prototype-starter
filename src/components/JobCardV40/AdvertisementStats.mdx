@@ -1,0 +1,56 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as AdvertisementStatsStories from './AdvertisementStats.stories'
+
+<Meta of={AdvertisementStatsStories} />
+
+# AdvertisementStats (včetně AdvertiseAction)
+
+Patička inzerce na dně pravého sloupce: souhrnná zhlédnutí, odkaz „Přehled“ a kontextové tlačítko podle stavu inzerce.
+
+```tsx
+import { AdvertisementStats } from '@teamio/starter/components'
+
+<AdvertisementStats
+  viewCount={3170}
+  action="prolong"
+  onAction={…}
+  onStatistics={…}
+  onDetail={…}
+/>
+```
+
+## Kontextové tlačítko (`action`)
+
+Primární tlačítko vpravo, malé. Bez `action` se nevykreslí.
+
+| `action` | Popisek | Kdy ho `JobCardAdvertisements` předá | Selektor |
+| --- | --- | --- | --- |
+| `prolong` | Prodloužit | Inzerát končí brzy, nebo aspoň jeden portál už skončil | `job-card-disappearance-prolong` |
+| `republish` | Znovuvystavit | Inzerce skončila (expirováno, ukončené vystavování) | `job-card-advertisement-republish` |
+| – | – | Běžící inzerát bez ukončeného portálu | – |
+
+Obě akce volají `onAction` (v kartě `onExtendAndRepublish`).
+
+## Ostatní prvky
+
+- **Zhlédnutí** (oko + číslo) se zobrazí, když je `viewCount` předán. Klik volá `onStatistics`. Za číslem je svislý oddělovač.
+- **Přehled** (šipka) volá `onDetail`; je zobrazen vždy.
+- Footer se nevykresluje pro `notPublished` (to řeší karta).
+
+## Selektory
+
+`job-card-advertisement-stats`, `job-card-advertisement-aggregate-views`, `job-card-advertisement-detail-action`.
+
+## Stavy
+
+### Zhlédnutí a Přehled
+
+<Canvas of={AdvertisementStatsStories.WithViews} />
+
+### Jen Přehled
+
+<Canvas of={AdvertisementStatsStories.WithoutViews} />
+
+## Props
+
+<ArgTypes of={AdvertisementStatsStories} />

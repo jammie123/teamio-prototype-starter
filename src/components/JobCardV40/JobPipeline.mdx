@@ -1,0 +1,73 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as JobPipelineStories from './JobPipeline.stories'
+
+<Meta of={JobPipelineStories} />
+
+# JobPipeline
+
+Pipeline kandidátů v levém sloupci karty. Každá položka je číslo + popisek; při předaném `onStatClick`
+je položka tlačítko (proklik do seznamu reakcí s filtrem).
+
+```tsx
+import { JobPipeline } from '@teamio/starter/components/JobCardV40'
+
+<JobPipeline
+  candidates={{ new: 5, unassessed: 14, inProgress: 6, opalcovani: 3, total: 52 }}
+  onStatClick={(stat) => navigateToResponses(stat)}
+/>
+```
+
+## Varianty
+
+| Varianta | Prop | Položky (v tomto pořadí) |
+| --- | --- | --- |
+| Recruiter | výchozí | Neposouzený, Ve hře, Opalcovaný, Celkem |
+| Liniový manažer (Hiring Manager) | `isHiringManager` | K ohodnocení, Celkem |
+
+Položka se nevykreslí, když je v `candidates` její hodnota `undefined`. Když nezbyde žádná, komponenta vrací `null`.
+
+## Pravidla
+
+- Růžový badge (`Pill`) s počtem nových kandidátů je jen u **Neposouzený** a jen když `candidates.new > 0`.
+- `onStatClick` dostane klíč položky: `unassessed`, `toAssess`, `inProgress`, `opalcovani`, `total`.
+  Klíč `new` se nepředává, nový badge není samostatně klikatelný.
+- Čísla se formátují přes `formatCount` (např. tisíce s mezerou).
+- Na mobilu je každá položka jeden řádek (popisek vlevo, číslo vpravo), od `md` jsou položky v řadě s dělicí čárou.
+
+## Selektory
+
+`job-card-stats` (kontejner), `job-card-stat-<klíč>` (např. `job-card-stat-opalcovani`), `job-card-new-candidates` (badge).
+
+## Stavy
+
+### Počty
+
+<Canvas of={JobPipelineStories.Default} />
+
+### Nový badge
+
+<Canvas of={JobPipelineStories.WithNewBadges} />
+
+### Jen nový kandidát
+
+<Canvas of={JobPipelineStories.OnlyNewCandidates} />
+
+### Klikací
+
+<Canvas of={JobPipelineStories.Clickable} />
+
+### Velká čísla
+
+<Canvas of={JobPipelineStories.LargeNumbers} />
+
+### Nuly
+
+<Canvas of={JobPipelineStories.Empty} />
+
+### Přehled
+
+<Canvas of={JobPipelineStories.Overview} />
+
+## Props
+
+<ArgTypes of={JobPipelineStories} />

@@ -1,0 +1,61 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as JobMenuStories from './JobMenu.stories'
+
+<Meta of={JobMenuStories} />
+
+# JobMenu
+
+Menu akcí nad náborem v pravém horním rohu karty (`Job Card`). Jde o jeden plochý seznam v pevném pořadí.
+
+```tsx
+import { JobMenu } from '@teamio/starter/components'
+
+<JobMenu
+  advertisements={advertisements}
+  onEditJob={…}
+  onDuplicateJob={…}
+  onArchiveJob={…}
+/>
+```
+
+## Pravidla
+
+- Položka se zobrazí jen tehdy, když má předaný handler. Žádný handler = položka neexistuje.
+- Akce inzerátu (`Ukončit vystavování`, `Prodloužit a znovuvystavit`, `Zvýraznit`, `Topovat`) se zobrazí jen tehdy,
+  když je `advertisements` neprázdné.
+- Bez položek komponenta nevykreslí nic (`null`).
+## Pořadí položek
+
+| # | Položka | Handler | Podmínka |
+| --- | --- | --- | --- |
+| 1 | Editovat nábor | `onEditJob` | – |
+| 2 | Duplikovat | `onDuplicateJob` | – |
+| 3 | Ukončit vystavování | `onEndPublication` | má inzerát |
+| 4 | Prodloužit a znovuvystavit | `onExtendAndRepublish` | má inzerát |
+| 5 | Zvýraznit | `onHighlightAdvertisement` | má inzerát |
+| 6 | Topovat | `onTopAdvertisement` | má inzerát |
+| 7 | Zapojit kolegu | `onInviteColleagues` | – |
+| 8 | Předat nábor | `onTransferJob` | – |
+| 9 | Archivovat | `onArchiveJob` | – |
+
+> **Rozdíl proti zadání:** zadání zmiňuje „Přidat poznámku“ v Job menu. V kódu tato položka zatím není
+> (`JobMenuHandlers` ji neobsahuje), poznámku zobrazuje `JobNote`.
+
+## Použití v kartě
+
+`JobCardV40` předává akce inzerátu jen u aktivních karet (`published`, `unpublished`), ne u `draft` a `archived`.
+Tlačítko má `data-testid="job-card-actions-toggle"` a `aria-label="Akce nad náborem a inzerátem"`.
+
+## Stavy
+
+### Nábor s inzerátem
+
+<Canvas of={JobMenuStories.Default} />
+
+### Nábor bez inzerátu
+
+<Canvas of={JobMenuStories.NoAdvertisements} />
+
+## Props
+
+<ArgTypes of={JobMenuStories} />

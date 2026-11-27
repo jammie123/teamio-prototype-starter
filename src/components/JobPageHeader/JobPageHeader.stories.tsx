@@ -16,6 +16,14 @@ const leftMenuItems: LeftMenuItemData[] = [
   { id: 'uchazeci', label: 'Uchazeči', icon: 'user', href: '#uchazeci' },
 ]
 
+const sampleCounts = {
+  open: 12,
+  published: 8,
+  unpublished: 3,
+  draft: 2,
+  archived: 5,
+}
+
 // The header is a white surface, so stories sit on the page background to show its elevation.
 const onPageBackground: Decorator = (Story) => (
   <div className="tm-mb-[180px] tm-bg-cover-light tm-p-6">
@@ -39,32 +47,50 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   decorators: [onPageBackground],
   render: (args) => (
-    <Tabs defaultValue="aktivni">
+    <Tabs defaultValue="open">
       <JobPageHeader {...args} />
     </Tabs>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('heading', { level: 1, name: 'Nábory' })).toBeInTheDocument()
+    await expect(canvas.getByRole('tab', { name: 'Otevřený' })).toBeInTheDocument()
     await expect(canvas.getByRole('button', { name: 'Hromadné akce' })).toBeInTheDocument()
     await userEvent.click(canvas.getByRole('button', { name: 'Další možnosti přidání' }))
     await expect(canvas.getByRole('option', { name: 'Přidat brigádu' })).toBeInTheDocument()
   },
 }
 
+export const WithCounts: Story = {
+  decorators: [onPageBackground],
+  args: {
+    jobCount: 30,
+    tabCounts: sampleCounts,
+  },
+  render: (args) => (
+    <Tabs defaultValue="open">
+      <JobPageHeader {...args} />
+    </Tabs>
+  ),
+}
+
 export const BulkActionsActive: Story = {
   decorators: [onPageBackground],
   args: { bulkActionsActive: true },
   render: (args) => (
-    <Tabs defaultValue="aktivni">
+    <Tabs defaultValue="open">
       <JobPageHeader {...args} />
     </Tabs>
   ),
 }
 
 export const InPage: Story = {
+  args: {
+    jobCount: 30,
+    tabCounts: sampleCounts,
+  },
   render: (args) => (
-    <Tabs defaultValue="aktivni" className="tm-contents">
+    <Tabs defaultValue="open" className="tm-contents">
       <PageTemplate
         leftMenu={{
           items: leftMenuItems,
@@ -78,9 +104,11 @@ export const InPage: Story = {
         }}
         pageHeader={<JobPageHeader {...args} />}
       >
-        <TabsContent value="aktivni">Otevřené pozice.</TabsContent>
-        <TabsContent value="archiv">Uzavřené pozice.</TabsContent>
-        <TabsContent value="navrhy">Návrhy k publikaci.</TabsContent>
+        <TabsContent value="open">Otevřené pozice.</TabsContent>
+        <TabsContent value="published">Zveřejněné pozice.</TabsContent>
+        <TabsContent value="unpublished">Nezveřejněné pozice.</TabsContent>
+        <TabsContent value="draft">Rozpracované pozice.</TabsContent>
+        <TabsContent value="archived">Archivní pozice.</TabsContent>
       </PageTemplate>
     </Tabs>
   ),

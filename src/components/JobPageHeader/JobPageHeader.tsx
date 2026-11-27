@@ -6,12 +6,63 @@ import { PageHeader, type PageHeaderProps } from '../PageHeader'
 import { SplitButton } from '../SplitButton'
 import { TabsList, TabsTrigger } from '../Tabs'
 
-function defaultNaboryTabs() {
+export type JobPageHeaderTab =
+  | 'open'
+  | 'published'
+  | 'unpublished'
+  | 'draft'
+  | 'archived'
+
+export const JOB_PAGE_HEADER_TABS: ReadonlyArray<{
+  value: JobPageHeaderTab
+  label: string
+  info?: string
+}> = [
+  {
+    value: 'open',
+    label: 'Otevřený',
+    info: 'Otevřený nábor, který má alespoň jeden inzerát',
+  },
+  {
+    value: 'published',
+    label: 'Zveřejněný',
+    info: 'Otevřený nábor, na kterém běží vystavená inzerce',
+  },
+  {
+    value: 'unpublished',
+    label: 'Nezveřejněný',
+    info: 'Otevřený nábor s ukončenou nebo vypršelou inzercí',
+  },
+  { value: 'draft', label: 'Rozpracovaný' },
+  { value: 'archived', label: 'Archivní' },
+]
+
+function defaultTitle(jobCount?: number): ReactNode {
+  if (typeof jobCount !== 'number') {
+    return 'Nábory'
+  }
+
+  return (
+    <>
+      Nábory{' '}
+      <span className="tm-font-normal tm-text-secondary-default">({jobCount})</span>
+    </>
+  )
+}
+
+function defaultNaboryTabs(tabCounts?: Partial<Record<JobPageHeaderTab, number>>) {
   return (
     <TabsList aria-label="Filtry náborů">
-      <TabsTrigger value="aktivni">Aktivní</TabsTrigger>
-      <TabsTrigger value="archiv">Archiv</TabsTrigger>
-      <TabsTrigger value="navrhy">Návrhy</TabsTrigger>
+      {JOB_PAGE_HEADER_TABS.map((item) => (
+        <TabsTrigger
+          key={item.value}
+          value={item.value}
+          count={tabCounts?.[item.value]}
+          info={item.info}
+        >
+          {item.label}
+        </TabsTrigger>
+      ))}
     </TabsList>
   )
 }
@@ -19,6 +70,10 @@ function defaultNaboryTabs() {
 export interface JobPageHeaderProps
   extends Omit<PageHeaderProps, 'title' | 'actions' | 'tabs'> {
   title?: ReactNode
+  /** When set and title is defaulted, renders: Nábory (N) with muted count. */
+  jobCount?: number
+  /** Counts for default tab triggers; ignored when `tabs` is provided. */
+  tabCounts?: Partial<Record<JobPageHeaderTab, number>>
   actions?: ReactNode
   tabs?: ReactNode
   onAddJob?: () => void
@@ -31,21 +86,29 @@ export interface JobPageHeaderProps
 export const JobPageHeader = forwardRef<HTMLElement, JobPageHeaderProps>(
   function JobPageHeader(
     {
-      title = 'Nábory',
+      title,
+      jobCount,
+      tabCounts,
       actions,
       tabs,
       onAddJob,
       onAddBrigade,
       bulkActionsActive = false,
       onBulkActionsToggle,
+      'aria-label': ariaLabel,
       ...rest
     },
     ref,
   ) {
+    const resolvedTitle = title ?? defaultTitle(jobCount)
+    const resolvedAriaLabel =
+      ariaLabel ?? (typeof jobCount === 'number' && title === undefined ? 'Nábory' : undefined)
+
     return (
       <PageHeader
         ref={ref}
-        title={title}
+        title={resolvedTitle}
+        aria-label={resolvedAriaLabel}
         actions={
           actions ?? (
             <>
@@ -71,7 +134,7 @@ export const JobPageHeader = forwardRef<HTMLElement, JobPageHeaderProps>(
             </>
           )
         }
-        tabs={tabs ?? defaultNaboryTabs()}
+        tabs={tabs ?? defaultNaboryTabs(tabCounts)}
         {...rest}
       />
     )

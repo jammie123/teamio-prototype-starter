@@ -141,17 +141,6 @@ export {
   type JobCandidateStat as JobCardV40CandidateStat,
   type JobCardNote as JobCardV40Note,
 } from './JobCardV40'
-export {
-  JobCardV41,
-  AdvertisementWidget as JobCardV41AdvertisementWidget,
-  AdvertisementStats as JobCardV41AdvertisementStats,
-  type JobCardV41Props,
-  type AdvertisementWidgetProps as JobCardV41AdvertisementWidgetProps,
-  type AdvertisementStatsProps as JobCardV41AdvertisementStatsProps,
-  type JobCardCandidates as JobCardV41Candidates,
-  type JobCandidateStat as JobCardV41CandidateStat,
-  type JobCardNote as JobCardV41Note,
-} from './JobCardV41'
 export { JobAssigneePeople, type JobAssigneePeopleProps } from './JobAssigneePeople/JobAssigneePeople'
 export { IconButton, type IconButtonProps } from './IconButton'
 export { JobMenu, JOB_MENU_LABEL, type JobMenuProps } from './JobMenu'

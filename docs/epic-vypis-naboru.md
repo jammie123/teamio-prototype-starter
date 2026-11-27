@@ -292,7 +292,6 @@ EPIC Výpis náborů
 
 - Samostatné Stories pro Search / Recruiter / Sorting / Reset (jsou součástí `JobsFilterV2`).
 - Dedikovaná Jobs tab komponenta (dnes `Components / Tabs`).
-- `JobCardV41` jako náhrada V40 (V40 je aktuální varianta katalogu).
 
 ## Reference
 

@@ -4,12 +4,11 @@ import remarkGfm from 'remark-gfm'
 import { allowedFsRoots } from '../src/lib/allowedFsRoots'
 
 const config: StorybookConfig = {
-  // JobCardV41 zůstává v kódu, ale ve Storybooku dokumentujeme jen JobCardV40.
   stories: [
     '../src/*.mdx',
     '../src/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../src/**/!(JobCardV41)/*.mdx',
-    '../src/**/!(JobCardV41)/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/**/*.mdx',
+    '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [
     {
